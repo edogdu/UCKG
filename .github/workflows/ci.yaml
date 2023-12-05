@@ -18,11 +18,11 @@ jobs:
         run: |
           docker build -t uckg-image:123 .
           docker save -o docker-image.tar uckg-image:123
-        # Archive the Docker image as an artifact
-        if [[ -f "docker-image.tar" ]]; then
-          mv docker-image.tar $GITHUB_WORKSPACE/docker-image.tar
-        fi
-        echo "::set-output name=image_path::$GITHUB_WORKSPACE/docker-image.tar"
+          # Archive the Docker image as an artifact
+          if [[ -f "docker-image.tar" ]]; then
+            mv docker-image.tar $GITHUB_WORKSPACE/docker-image.tar
+          fi
+          echo "::set-output name=image_path::$GITHUB_WORKSPACE/docker-image.tar"
 
       - name: Upload Docker Image Artifact
         uses: actions/upload-artifact@v2
