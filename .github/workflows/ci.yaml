@@ -15,6 +15,7 @@ jobs:
           ls -a
 
       - name: Build docker image
+        id: build-docker-image
         run: |
           docker build -t uckg-image:123 .
           docker save -o docker-image.tar uckg-image:123
@@ -28,5 +29,5 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: docker-image
-          path: ${{ steps.build.outputs.image_path }}
+          path: ${{ steps.build-docker-image.outputs.image_path }}
   
