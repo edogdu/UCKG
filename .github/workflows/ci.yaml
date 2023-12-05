@@ -15,7 +15,6 @@ jobs:
           ls -a
 
       - name: Build docker image
-         - name: Build Docker image
         run: |
           docker build -t uckg-image:123 .
           docker save -o docker-image.tar uckg-image:123
