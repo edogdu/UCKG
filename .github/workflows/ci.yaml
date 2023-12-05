@@ -5,7 +5,7 @@ on: workflow_dispatch
 jobs:
   run-ci-workflow:
     name: Run CI Workflow
-
+    runs-on: ubuntu-latest
     steps:
       - name: Check out the repo
         uses: actions/checkout@v4
