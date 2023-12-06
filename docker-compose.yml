@@ -1,0 +1,29 @@
+version: '3'
+services:
+  neo4j:
+    image: neo4j:4.4.0
+    # healthcheck:
+    #   test: ["CMD", "nc", "-z", "localhost", "7687"]
+    #   interval: 10s
+    #   timeout: 5s
+    #   retries: 5
+    environment:
+      NEO4J_AUTH: neo4j/abcd90909090
+      NEO4JLABS_PLUGINS: '["apoc", "n10s"]' # Include n10s (Neosemantics) plugin
+      NEO4J_ACCEPT_LICENSE_AGREEMENT: 'yes' # Required if using Enterprise version
+    ports:
+      - "7474:7474"
+      - "7687:7687"
+    volumes:
+      - $PWD/plugins:/plugins # Mount the plugins directory
+      # - $PWD/neo4j/data:/data # Persist data (optional)
+      # - $PWD/neo4j/logs:/logs # Logs (optional)
+      # - $PWD/neo4j/import:/var/lib/neo4j/import # Import directory (optional)
+      # - $PWD/neo4j/conf:/var/lib/neo4j/conf # Configuration (optional)
+
+  uckg-scripts:
+    build: .
+    environment:
+      NEO4J_URI: bolt://neo4j:abcd90909090@neo4j:7687
+    depends_on:
+      - neo4j
