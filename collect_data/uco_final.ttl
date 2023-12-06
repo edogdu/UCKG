@@ -4,10 +4,6 @@
 @prefix uco: <http://purl.org/cyber/uco#> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
-<http://anonymous> a owl:Ontology .
-
-<http://inferrences> a owl:Ontology .
-
 uco:VULN-CVE-1999-1000 a uco:ucoVulnerability ;
     uco:hasCVE_ID uco:CVE-1999-1000 ;
     uco:ucoLastModifiedDate "2022-08-17T08:18:41"^^xsd:dateTime ;
