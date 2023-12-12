@@ -18,38 +18,61 @@
 # How to read the CVEs from a json file and itterate
 uco:ClassAMap a rr:TriplesMap;
   rml:logicalSource [
-    rml:source "cve/cves.json";
+    rml:source "./rml_mapper/cve/cves.json";
     rml:referenceFormulation ql:JSONPath;
-    rml:iterator "$.cves[*]"
+    rml:iterator "cves[*]"
   ];
 
 #Vulnerability Class mapping
 rr:subjectMap [
-  rr:template "http://purl.org/cyber/uco#VULN-{cveMetadata.cveId}";
+  rr:template "http://purl.org/cyber/uco#VULN-{cve.id}";
   rr:class uco:ucoVulnerability
 ].
 
 #CVE Class mapping
 uco:ClassBMap a rr:TriplesMap;
   rml:logicalSource [
-    rml:source "cve/cves.json";
+    rml:source "./rml_mapper/cve/cves.json";
     rml:referenceFormulation ql:JSONPath;
-    rml:iterator "$.cves[*]"
+    rml:iterator "cves[*]"
   ];
 rr:subjectMap [
-  rr:template "http://purl.org/cyber/uco#{cveMetadata.cveId}";
+  rr:template "http://purl.org/cyber/uco#{cve.id}";
   rr:class uco:ucoCVE
+].
+
+#CWE Weakness Class mapping
+uco:ClassCMap a rr:TriplesMap;
+  rml:logicalSource [
+    rml:source "./rml_mapper/cve/cves.json";
+    rml:referenceFormulation ql:JSONPath;
+    rml:iterator "$.cves[*].cve.cwes[*].cwe"
+  ];
+rr:subjectMap [
+  rr:template "http://purl.org/cyber/uco#ExploitTarget-{id}";
+  rr:class uco:ucoExploitTarget
 ].
 
 # Vulnerability hasCVE_ID predicate
 # This is alos how you join two classes
 uco:ClassAMap rr:predicateObjectMap [
-    rr:predicate uco:hasCVE_ID;  # The predicate linking ClassA to ClassB
+    rr:predicate uco:ucohasVulnerability;  # The predicate linking ClassA to ClassB
     rr:objectMap [
         rr:parentTriplesMap uco:ClassBMap;  # Referencing the ClassB map
         rr:joinCondition [
-          rr:child "cveMetadata.cveId";
-          rr:parent "cveMetadata.cveId"
+          rr:child "cve.id";
+          rr:parent "cve.id"
+        ]
+    ]
+].
+
+uco:ClassCMap rr:predicateObjectMap [
+    rr:predicate uco:ucohasVulnerability;  # The predicate linking ClassA to ClassB
+    rr:objectMap [
+        rr:parentTriplesMap uco:ClassAMap;  # Referencing the ClassB map
+        rr:joinCondition [
+          rr:child "cve.id";
+          rr:parent "id"
         ]
     ]
 ].
@@ -59,7 +82,7 @@ uco:ClassAMap rr:predicateObjectMap [
 uco:ClassAMap rr:predicateObjectMap [
         rr:predicate uco:ucoPublishedDate;  # Your DatatypeProperty for dateTime
         rr:objectMap [
-            rml:reference "cveMetadata.datePublished";  # Field in your data source
+            rml:reference "cve.published";  # Field in your data source
             rr:datatype xsd:dateTime  # Specifying that the datatype is dateTime
         ]
 ].
@@ -68,7 +91,7 @@ uco:ClassAMap rr:predicateObjectMap [
 uco:ClassAMap rr:predicateObjectMap [
         rr:predicate uco:ucoLastModifiedDate;  # Your DatatypeProperty for dateTime
         rr:objectMap [
-            rml:reference "cveMetadata.dateUpdated";  # Field in your data source
+            rml:reference "cve.lastModified";  # Field in your data source
             rr:datatype xsd:dateTime  # Specifying that the datatype is dateTime
         ]
 ].
@@ -77,7 +100,7 @@ uco:ClassAMap rr:predicateObjectMap [
 uco:ClassAMap rr:predicateObjectMap [
         rr:predicate uco:ucosummary;  # Your DatatypeProperty for dateTime
         rr:objectMap [
-            rml:reference "containers.cna.descriptions[*].value";  # Field in your data source
+            rml:reference "cve.descriptions[*].value";  # Field in your data source
             rr:datatype xsd:string  # Specifying that the datatype is dateTime
         ]
 ].

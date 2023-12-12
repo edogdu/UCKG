@@ -1,4 +1,7 @@
 version: '3'
+volumes:
+  my_volume:
+    driver: local
 services:
   neo4j:
     image: neo4j:4.4.0
@@ -9,21 +12,27 @@ services:
     #   retries: 5
     environment:
       NEO4J_AUTH: neo4j/abcd90909090
+      NEO4J_apoc_trigger_enabled: "true"
       NEO4JLABS_PLUGINS: '["apoc", "n10s"]' # Include n10s (Neosemantics) plugin
       NEO4J_ACCEPT_LICENSE_AGREEMENT: 'yes' # Required if using Enterprise version
+      NEO4J_dbms_security_procedures_unrestricted: "apoc.*"
+      NEO4J_apoc_initializers_neo4jConf: "true"
+      NEO4J_apoc_import_file_enabled: "true"
+      NEO4J_apoc_initializer_cypher: "CALL apoc.cypher.runFiles(['file:///init.cypher', 'file:///constraint.cypher'])"
     ports:
       - "7474:7474"
       - "7687:7687"
     volumes:
-      - $PWD/plugins:/plugins # Mount the plugins directory
-      # - $PWD/neo4j/data:/data # Persist data (optional)
-      # - $PWD/neo4j/logs:/logs # Logs (optional)
-      # - $PWD/neo4j/import:/var/lib/neo4j/import # Import directory (optional)
-      # - $PWD/neo4j/conf:/var/lib/neo4j/conf # Configuration (optional)
+      - $PWD/plugins:/neo4j/plugins # Mount the plugins directory
+      - my_volume:/vol/data # Persist data 
+      - $PWD/neo4j/import:/var/lib/neo4j/import # Import directory 
 
   uckg-scripts:
     build: .
     environment:
       NEO4J_URI: bolt://neo4j:abcd90909090@neo4j:7687
+      VOL_PATH: /vol/data
+    volumes:
+      - my_volume:/vol/data # Persist data 
     depends_on:
       - neo4j
