@@ -1,0 +1,9 @@
+FROM ubuntu:latest
+# Install cron
+RUN apt-get update && apt-get install -y cron \
+    python3.11
+RUN export PATH=$PATH:/usr/bin/python3.11
+COPY hello_world.py /hello_world.py
+COPY update.cron /opt
+RUN crontab /opt/update.cron
+CMD ["cron", "-f"]
