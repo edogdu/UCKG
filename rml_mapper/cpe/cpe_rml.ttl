@@ -1,0 +1,15 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix uco: <http://purl.org/uco/ns#> .
+@prefix ex: <http://example.org/ontology#> .
+
+# Define the subclass relationship
+ex:DummyEntity rdf:type rdfs:Class ;
+               rdfs:subClassOf uco:UCOThing .
+
+# Define some properties and instances related to DummyEntity
+ex:dummyProperty rdf:type rdf:Property ;
+                  rdfs:domain ex:DummyEntity ;
+                  rdfs:range xsd:string .
+
+ex:instance1 rdf:type ex:DummyEntity ;
+             ex:dummyProperty "Value1" .

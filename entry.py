@@ -36,6 +36,17 @@ elif cve_data_status == 0:
     logger.info("The CVE initialization has not finished yet, continuing now...\n")
     collect.cve_init()
 
+cpe_data_status = collect.check_cpe_status()
+
+if (cpe_data_status == 3):
+    logger.info("The CPE database does not yet exist")
+    collect.cpe_init()
+elif (cpe_data_status == 1):
+    logger.info("The CPE table exists and is up to date")
+elif cpe_data_status == 0:
+    logger.info("The CPE initialization has not finished yet, continuing now...\n")
+    collect.cpe_init()
+
 logger.info("###############################################")
 logger.info("All Data Sources Have Been Initialized!")
 logger.info("###############################################")
