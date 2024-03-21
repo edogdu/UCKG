@@ -36,6 +36,15 @@ elif cve_data_status == 0:
     logger.info("The CVE initialization has not finished yet, continuing now...\n")
     collect.cve_init()
 
+d3fend_data_status = collect.check_d3fend_status()
+
+if d3fend_data_status == 3:
+    logger.info("The D3FEND database has not been created yet, starting initialization now...\n")
+    collect.d3fend_init()
+elif d3fend_data_status == 0:
+    logger.info("The D3FEND initialization has not finished yet, continuing now...\n")
+    collect.d3fend_init()
+
 logger.info("###############################################")
 logger.info("All Data Sources Have Been Initialized!")
 logger.info("###############################################")

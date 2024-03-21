@@ -7,6 +7,7 @@ import datetime
 import sqlite3
 import logging
 import subprocess
+import hashlib
 import xml.etree.ElementTree as ET
 
 # Configure the logging module
@@ -326,6 +327,110 @@ def get_cwe_id_list():
     # logger.info(f"Database initialization finished: {init_finished}\n")
 
 
+########################################################################################################################
+########################################################################################################################
+########################################################################################################################
+
+
+def download_d3fend_json_file():
+    url = "https://d3fend.mitre.org/api/ontology/inference/d3fend-full-mappings.json"
+
+    # Send a GET request to fetch the JSON file
+    response = requests.get(url)
+
+    # Check if the request was successful
+    if response.status_code == 200:
+        # Save the JSON file in the specified directory
+        folder_path = "../rml_mapper/d3fend"  # Path to the directory one level up and down to /rml_mapper/d3fend
+        os.makedirs(folder_path, exist_ok=True)  # Ensure the directory exists, or create it if it doesn't
+
+        # Extract the filename from the URL
+        filename = os.path.join(folder_path, "tmp_d3fend.json")
+
+        # Save the JSON file
+        with open(filename, "wb") as f:
+            f.write(response.content)
+
+        logger.info("############################")
+        logger.info(f"File '{filename}' downloaded and saved successfully.")
+        logger.info("############################\n")
+    else:
+        logger.info("Failed to download the D3FEND JSON file.")
+        print("Failed to download the JSON file.")
+
+
+def calculate_file_hash(file_path):
+    """Calculate the SHA-256 hash of a file."""
+    sha256_hash = hashlib.sha256()
+    with open(file_path, "rb") as f:
+        while chunk := f.read(4096):
+            sha256_hash.update(chunk)
+    return sha256_hash.hexdigest()
+
+
+def handle_d3fend_file():
+    folder_path = "../rml_mapper/d3fend/"  # Path to the folder containing the files
+    tmp_file_name = "tmp_d3fend.json"  # Name of the temporary file
+
+    """Handle the d3fend.json file based on its existence and content."""
+    # Define the final file name
+    final_file_name = "d3fend.json"
+
+    # Define the full paths
+    tmp_file_path = os.path.join(folder_path, tmp_file_name)
+    final_file_path = os.path.join(folder_path, final_file_name)
+
+    # Check if d3fend.json already exists
+    if os.path.exists(final_file_path):
+        # Calculate hashes of both files
+        tmp_file_hash = calculate_file_hash(tmp_file_path)
+        final_file_hash = calculate_file_hash(final_file_path)
+
+        # Compare hashes
+        if tmp_file_hash == final_file_hash:
+            # Hashes are the same, delete tmp file
+            os.remove(tmp_file_path)
+            print("The new file is identical to the existing file. Deleted tmp_d3fend.json.")
+        else:
+            # Hashes are different, replace existing file
+            os.remove(final_file_path)
+            os.rename(tmp_file_path, final_file_path)
+            print("The new file is different from the existing file. Replaced d3fend.json.")
+    else:
+        # Rename tmp file to final file
+        os.rename(tmp_file_path, final_file_path)
+        print("Renamed tmp_d3fend.json to d3fend.json.")
+
+
+def check_d3fend_status():
+    # Get the directory of the currently executing script
+    current_directory = os.path.dirname(os.path.abspath(__file__))
+
+    # Define the relative path to the d3fend.json file
+    d3fend_file_path = os.path.join(current_directory, '../rml_mapper/d3fend/d3fend.json')
+
+    # Check if d3fend.json file exists
+    if os.path.exists(d3fend_file_path):
+        return 0  # File exists, return 0
+    else:
+        return 3  # File doesn't exist, return 3
+
+
+def d3fend_init():
+
+    # Download latest D3FEND json from mitre.
+    download_d3fend_json_file()
+
+    # Compare d3fend files to see if there is an update
+    handle_d3fend_file()
+
+
+########################################################################################################################
+########################################################################################################################
+########################################################################################################################
+
+
+
 def call_ontology_updater():
     successfully_updated_ontology = ontology_updater.update_ontology()
     if successfully_updated_ontology:
@@ -342,6 +447,8 @@ def call_mapper_update(datasource):
         mapping_file = "./rml_mapper/cve/cve_rml.ttl"
     elif datasource == "cwe":
         mapping_file = "./rml_mapper/cwe/cwe_rml.ttl"
+    elif datasource == "d3fend":
+        mapping_file = "./rml_mapper/d3fend/d3fend_rml.ttl"
     else:
         logger.info("Not a valid rml source...")
         return False
