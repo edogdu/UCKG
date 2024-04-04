@@ -1,3 +1,22 @@
+# File: neo4j.py
+# Purpose: A Python script for parsing a Turtle (TTL) file using RDFLib,
+# generating Cypher queries for Neo4j graph database based on the parsed RDF
+# triples, and executing these queries to populate the graph database.
+#
+# Functions:
+#     parse_ttl(file_path): Parses the TTL file using RDFLib and returns the RDF
+#                           graph.
+#     sanitize_label(label): Sanitizes the given label by replacing invalid
+#                            characters with underscores.
+#     generate_cypher_queries(graph): Generates Cypher queries based on the RDF
+#                                     triples extracted from the parsed RDF
+#                                     graph.
+#     __main__: Executes the main logic of the script, including parsing the TTL
+#               file, generating Cypher queries, and executing them in the Neo4j
+#               graph database.
+#
+# Last Updated (by):
+
 from rdflib import Graph
 from neo4j import GraphDatabase
 import re
@@ -32,10 +51,10 @@ def generate_cypher_queries(graph):
 
 if __name__ == "__main__":
     ttl_file_path = "C:/Users/newmo/Downloads/d3fend.ttl"
-    
+
     # Step 1: Parse TTL file
     rdf_graph = parse_ttl(ttl_file_path)
-    
+
 
     # Step 2-5: Generate Cypher queries
     cypher_queries = generate_cypher_queries(rdf_graph)

@@ -1,3 +1,18 @@
+# File: ontology_updater.py
+# Purpose: A Python script for updating an ontology by converting it to OWL XML
+# format, adding instances, performing reasoning, and saving the updated
+# ontology and instances in Turtle format.
+#
+# Functions:
+#   update_ontology(): Performs the ontology update process by converting
+#                      ontology to OWL XML format, adding instances, reasoning,
+#                      and saving the updated ontology and instances in Turtle
+#                      format, also handles exceptions and deletion of temporary
+#                      files.
+#
+# Last Updated (by): 
+
+
 from owlready2 import *
 from rdflib import *
 import os

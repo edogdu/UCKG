@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="http://lnkd.tech/editor#BuiltinGlobalGraphs">
+    <option name="disabled">
+      <set>
+        <option value="DC_AM" />
+        <option value="DC_E" />
+        <option value="DC_T" />
+        <option value="DC_TYPE" />
+        <option value="FOAF" />
+        <option value="FOAF_ORG" />
+        <option value="ML_XS" />
+        <option value="OWL2" />
+        <option value="RDF" />
+        <option value="RDFS" />
+        <option value="SHACL" />
+        <option value="SHACL_SHACL" />
+        <option value="SKOS" />
+        <option value="SKOS_ORG" />
+        <option value="SPIN_MODELING" />
+        <option value="SPIN_MODELING_ORG" />
+        <option value="SPIN_SPARQL" />
+        <option value="SPIN_SPARQL_ORG" />
+        <option value="SPIN_STD" />
+        <option value="SPIN_STD_ORG" />
+        <option value="VANN" />
+        <option value="VOAF" />
+        <option value="schemaorg_all_http" />
+        <option value="schemaorg_all_https" />
+      </set>
+    </option>
+  </component>
+</project>

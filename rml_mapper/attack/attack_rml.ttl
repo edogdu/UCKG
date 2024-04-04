@@ -1,0 +1,79 @@
+@prefix rml: <http://semweb.mmlab.be/ns/rml#> .
+@prefix rr: <http://www.w3.org/ns/r2rml#> .
+@prefix ql: <http://semweb.mmlab.be/ns/ql#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix schema: <http://schema.org/> .
+@prefix dbo: <http://dbpedia.org/ontology/> .
+@prefix d3f: <http://d3fend.mitre.org/ontologies/d3fend.owl#> .
+@prefix attck: <https://attack.mitre.org/> .
+@base <http://purl.org/cyber/uco#> .
+
+# Logical Source Definition
+[] a rr:TriplesMap;
+  rml:logicalSource [
+    rml:source "./rml_mapper/att&ck/att&ck_data.json";
+    rml:referenceFormulation ql:JSONPath;
+    rml:iterator "results.bindings[*]"
+  ].
+
+# Class Mapping
+[] rr:subjectMap [
+  rr:template "http://purl.org/cyber/uco#VULN-{off_tech_label}";
+  rr:class uco:ucoVulnerability
+].
+
+[] rr:subjectMap [
+  rr:template "http://purl.org/cyber/uco#CWE-{def_tech_label}";
+  rr:class uco:ucoCWE
+].
+
+[] rr:subjectMap [
+  rr:template "http://purl.org/cyber/uco#ExploitTarget-{off_tech_label}";
+  rr:class uco:ucoExploitTarget
+].
+
+# Predicate-Object Mappings
+[] rr:predicateObjectMap [
+  rr:predicate uco:ucohasVulnerability;
+  rr:objectMap [
+    rr:parentTriplesMap [
+      rr:template "http://purl.org/cyber/uco#CWE-{def_tech_label}";
+      rr:class uco:ucoCWE;
+      rr:joinCondition [
+        rr:child "off_tech_label";
+        rr:parent "def_tech_label"
+      ]
+    ]
+  ]
+].
+
+[] rr:predicateObjectMap [
+  rr:predicate uco:ucohasVulnerability;
+  rr:objectMap [
+    rr:parentTriplesMap [
+      rr:template "http://purl.org/cyber/uco#ExploitTarget-{off_tech_label}";
+      rr:class uco:ucoExploitTarget;
+      rr:joinCondition [
+        rr:child "off_tech_label";
+        rr:parent "def_tech_label"
+      ]
+    ]
+  ]
+].
+
+# Datatype Properties
+[] rr:predicateObjectMap [
+  rr:predicate uco:def_tech_label;
+  rr:objectMap [
+    rml:reference "def_tech_label";
+    rr:datatype xsd:string
+  ]
+].
+
+[] rr:predicateObjectMap [
+  rr:predicate uco:off_tech_label;
+  rr:objectMap [
+    rml:reference "off_tech_label";
+    rr:datatype xsd:string
+  ]
+].

@@ -1,3 +1,28 @@
+# File: collect.py
+# Purpose: This Python script parses an XML file, extracts specific elements
+# based on predefined paths, formats the extracted elements into a JSON object,
+# and writes the JSON object to a file.
+#
+# Functions:
+#     extract_specific_elements(xml_file, target_path): Parses the XML file and
+#                                                       extracts specific
+#                                                       elements based on the
+#                                                       provided target path.
+#                                                       Returns a list of
+#                                                       extracted elements.
+#
+# Variables:
+# xml_file: Path to the XML file to be parsed.
+# target_path: Dictionary containing XPath expressions for the target elements.
+#
+# Main Logic:
+#   Defines the path to the XML file and the target elements.
+#   Calls the extract_specific_elements function to extract specific elements from the XML file.
+#   Formats the extracted elements into a JSON object containing CWE IDs.
+#   Writes the JSON object to a file named "cwes.json" in the specified directory.
+#
+# Last Updated (by):
+
 import xml.etree.ElementTree as ET
 import json
 

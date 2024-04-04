@@ -5,105 +5,69 @@
 @prefix : <http://example.org/rules/> .
 @prefix schema: <http://schema.org/> .
 @prefix dbo: <http://dbpedia.org/ontology/> .
-@prefix cve: <http://purl.org/cyber/cve#> .
-@prefix owl: <http://www.w3.org/2002/07/owl#> .
-@prefix stx: <http://purl.org/cyber/stx#> .
+@prefix d3f: <http://d3fend.mitre.org/ontologies/d3fend.owl#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
 @prefix uco: <http://purl.org/cyber/uco#> .
-@prefix xml: <http://www.w3.org/XML/1998/namespace> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
-@prefix capec: <http://purl.org/cyber/capec#> .
 @base <http://purl.org/cyber/uco#> .
 
-# How to read the CVEs from a json file and itterate
-uco:ClassAMap a rr:TriplesMap;
+# Logical Source Definition
+[] a rr:TriplesMap;
   rml:logicalSource [
-    rml:source "./rml_mapper/cve/cves.json";
+    rml:source "./rml_mapper/d3fend/d3fend_data.json";
     rml:referenceFormulation ql:JSONPath;
-    rml:iterator "cves[*]"
+    rml:iterator "d3fend[*]"
   ];
+  rr:subjectMap [
+    rr:template "http://purl.org/cyber/uco#VULN-{d3f.id}";
+    rr:class uco:ucoVulnerability
+  ].
 
-#Vulnerability Class mapping
-rr:subjectMap [
-  rr:template "http://purl.org/cyber/uco#VULN-{cve.id}";
-  rr:class uco:ucoVulnerability
-].
+[] a rr:TriplesMap;
+  rr:subjectMap [
+    rr:template "http://purl.org/cyber/uco#{d3f.id}";
+    rr:class uco:ucoCWE
+  ].
 
-#CVE Class mapping
-uco:ClassBMap a rr:TriplesMap;
-  rml:logicalSource [
-    rml:source "./rml_mapper/cve/cves.json";
-    rml:referenceFormulation ql:JSONPath;
-    rml:iterator "cves[*]"
-  ];
-rr:subjectMap [
-  rr:template "http://purl.org/cyber/uco#{cve.id}";
-  rr:class uco:ucoCVE
-].
+[] a rr:TriplesMap;
+  rr:subjectMap [
+    rr:template "http://purl.org/cyber/uco#ExploitTarget-{weakness-of}";
+    rr:class uco:ucoExploitTarget
+  ].
 
-#CWE Weakness Class mapping
-uco:ClassCMap a rr:TriplesMap;
-  rml:logicalSource [
-    rml:source "./rml_mapper/cve/cves.json";
-    rml:referenceFormulation ql:JSONPath;
-    rml:iterator "$.cves[*].cve.cwes[*].cwe"
-  ];
-rr:subjectMap [
-  rr:template "http://purl.org/cyber/uco#ExploitTarget-{id}";
-  rr:class uco:ucoExploitTarget
-].
-
-# Vulnerability hasCVE_ID predicate
-# This is alos how you join two classes
-uco:ClassAMap rr:predicateObjectMap [
-    rr:predicate uco:ucohasVulnerability;  # The predicate linking ClassA to ClassB
-    rr:objectMap [
-        rr:parentTriplesMap uco:ClassBMap;  # Referencing the ClassB map
-        rr:joinCondition [
-          rr:child "cve.id";
-          rr:parent "cve.id"
-        ]
+[] rr:predicateObjectMap [
+  rr:predicate uco:ucohasVulnerability;
+  rr:objectMap [
+    rr:parentTriplesMap [
+      rr:template "http://purl.org/cyber/uco#VULN-{d3f.id}";
+      rr:class uco:ucoVulnerability
+    ];
+    rr:joinCondition [
+      rr:child "d3f.id";
+      rr:parent "d3f.id"
     ]
+  ]
 ].
 
-uco:ClassCMap rr:predicateObjectMap [
-    rr:predicate uco:ucohasVulnerability;  # The predicate linking ClassA to ClassB
-    rr:objectMap [
-        rr:parentTriplesMap uco:ClassAMap;  # Referencing the ClassB map
-        rr:joinCondition [
-          rr:child "cve.id";
-          rr:parent "id"
-        ]
+[] rr:predicateObjectMap [
+  rr:predicate uco:ucohasVulnerability;
+  rr:objectMap [
+    rr:parentTriplesMap [
+      rr:template "http://purl.org/cyber/uco#ExploitTarget-{weakness-of}";
+      rr:class uco:ucoExploitTarget
+    ];
+    rr:joinCondition [
+      rr:child "weakness-of";
+      rr:parent "d3f.cwe-id"
     ]
+  ]
 ].
 
-
-#Vulnerability ucoPublishedDate predicate
-uco:ClassAMap rr:predicateObjectMap [
-        rr:predicate uco:ucoPublishedDate;  # Your DatatypeProperty for dateTime
-        rr:objectMap [
-            rml:reference "cve.published";  # Field in your data source
-            rr:datatype xsd:dateTime  # Specifying that the datatype is dateTime
-        ]
+[] rr:predicateObjectMap [
+  rr:predicate uco:ucoPublishedDate;
+  rr:objectMap [
+    rml:reference "d3f.published";
+    rr:datatype xsd:dateTime
+  ]
 ].
-
-#Vulnerability ucoLastModifiedDate predicate
-uco:ClassAMap rr:predicateObjectMap [
-        rr:predicate uco:ucoLastModifiedDate;  # Your DatatypeProperty for dateTime
-        rr:objectMap [
-            rml:reference "cve.lastModified";  # Field in your data source
-            rr:datatype xsd:dateTime  # Specifying that the datatype is dateTime
-        ]
-].
-
-#Vulnerability ucosummary predicate
-uco:ClassAMap rr:predicateObjectMap [
-        rr:predicate uco:ucosummary;  # Your DatatypeProperty for dateTime
-        rr:objectMap [
-            rml:reference "cve.descriptions[*].value";  # Field in your data source
-            rr:datatype xsd:string  # Specifying that the datatype is dateTime
-        ]
-].
-
-
-

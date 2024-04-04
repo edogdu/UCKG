@@ -54,7 +54,7 @@ rr:subjectMap [
 ].
 
 # Vulnerability hasCVE_ID predicate
-# This is alos how you join two classes
+# This is also how you join two classes
 uco:ClassAMap rr:predicateObjectMap [
     rr:predicate uco:ucohasVulnerability;  # The predicate linking ClassA to ClassB
     rr:objectMap [

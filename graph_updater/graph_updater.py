@@ -1,3 +1,26 @@
+# File: graph_updater.py
+# Purpose: A Python script for loading a Turtle (TTL) file into a Neo4j graph
+# database.
+#
+# Functions:
+#     load_ttl_file(driver, file_path): Loads a TTL file into Neo4j using a
+#                                       specified driver and file path.
+#     _load_ttl(tx, file_path): Internal function to execute the Cypher query
+#                               for loading the TTL file in a Neo4j transaction.
+#     create_constraint_if_not_exists(driver): Creates a unique constraint on
+#                                              the 'uri' property of the
+#                                              'Resource' label in the Neo4j
+#                                              graph database if it doesn't
+#                                              already exist.
+#     is_graph_ready(): Checks if the Neo4j graph database is ready by
+#                       attempting to create a session and execute a query,
+#                       with retry logic and a timeout of 60 seconds.
+#     update_graph(): Updates the Neo4j graph database by loading the TTL file,
+#                     ensuring the RDF constraint, and closing the database
+#                     connection.
+#
+# Last Updated (by):
+
 import os
 import time
 from neo4j import GraphDatabase
@@ -39,7 +62,7 @@ def create_constraint_if_not_exists(driver):
             print("Constraint created.")
 
 def is_graph_ready():
-    uri = "bolt://neo4j:7687" 
+    uri = "bolt://neo4j:7687"
     username = "neo4j"
     password = "abcd90909090"
     start_time = time.time()
@@ -69,7 +92,7 @@ def update_graph():
     root_folder = os.environ['ROOT_FOLDER']
     vol_path = os.environ['VOL_PATH']
 
-    uri = "bolt://neo4j:7687" 
+    uri = "bolt://neo4j:7687"
     username = "neo4j"
     password = "abcd90909090"
 
