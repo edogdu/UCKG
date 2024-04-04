@@ -36,9 +36,9 @@ services:
       - my_volume:/vol/data # Persist data 
     depends_on:
       - neo4j
-  cron:
-    build:
-      context: .
-      dockerfile: Dockerfile-cron
-    volumes:
-      - my_volume:/vol/data
+        #cron:
+        #build:
+        #context: .
+        #dockerfile: Dockerfile-cron
+        #volumes:
+        #- my_volume:/vol/data

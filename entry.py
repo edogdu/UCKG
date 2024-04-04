@@ -2,9 +2,8 @@ import sys
 import os
 import logging
 import time
-sys.path.append("./collect_data") 
-from collect_data import collect
-
+sys.path.append("./data_collection")
+from data_collection import collect
 uco_abs_path = os.environ['UCO_ONTO_PATH']
 root_folder_abs_path = os.environ['ROOT_FOLDER']
 

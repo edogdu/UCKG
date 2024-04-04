@@ -20,7 +20,7 @@ RUN pip install rdflib
 COPY . /app
 
 # Set permissions for the JAR and data directory
-RUN chmod 755 /app/rml_mapper/mapper.jar
+RUN chmod 755 /app/mapping/mapper.jar
 
 # Set environment variables
 ENV UCO_ONTO_PATH=/app/uco2.ttl
