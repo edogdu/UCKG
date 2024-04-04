@@ -7,6 +7,7 @@
 @prefix d3f: <http://d3fend.mitre.org/ontologies/d3fend.owl#> .
 @prefix attck: <https://attack.mitre.org/> .
 @base <http://purl.org/cyber/uco#> .
+@prefix uco: <http://purl.org/cyber/uco#> .
 
 # Logical Source Definition
 [] a rr:TriplesMap;
@@ -17,19 +18,25 @@
   ].
 
 # Class Mapping
-[] rr:subjectMap [
-  rr:template "http://purl.org/cyber/uco#VULN-{off_tech_label}";
-  rr:class uco:ucoVulnerability
+[
+  rr:subjectMap [
+    rr:template "http://purl.org/cyber/uco#VULN-{off_tech_label}";
+    rr:class uco:ucoVulnerability
+  ]
 ].
 
-[] rr:subjectMap [
-  rr:template "http://purl.org/cyber/uco#CWE-{def_tech_label}";
-  rr:class uco:ucoCWE
+[
+  rr:subjectMap [
+    rr:template "http://purl.org/cyber/uco#CWE-{def_tech_label}";
+    rr:class uco:ucoCWE
+  ]
 ].
 
-[] rr:subjectMap [
-  rr:template "http://purl.org/cyber/uco#ExploitTarget-{off_tech_label}";
-  rr:class uco:ucoExploitTarget
+[
+  rr:subjectMap [
+    rr:template "http://purl.org/cyber/uco#ExploitTarget-{off_tech_label}";
+    rr:class uco:ucoExploitTarget
+  ]
 ].
 
 # Predicate-Object Mappings
