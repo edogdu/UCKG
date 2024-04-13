@@ -10,74 +10,71 @@
 #     initialization routines accordingly.
 #
 # Last Updated (by):
-
-import sys
 import os
-import logging
 import time
+from collect_data.attack_collect import attack_init
+from collect_data.capec_collect import capec_init
+from collect_data.cve_collect import cve_init
+from collect_data.d3fend_collect import d3fend_init
+from collect_data.cwe_collect import cwe_init
+from config import LOGGER, root_file_path, ontology_file_path
+from utilities import check_status
 
+uco_abs_path = os.environ[ontology_file_path]
+root_folder_abs_path = os.environ[root_file_path]
 
-sys.path.append("./collect_data")
-from collect_data import collect
-
-uco_abs_path = os.environ['UCO_ONTO_PATH']
-root_folder_abs_path = os.environ['ROOT_FOLDER']
-
-# Configure the logging module
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-
-# Create a logger
-logger = logging.getLogger('entry_logger')
 
 # Waiting for neo4j to startup
-logger.info("Waiting 2 minutes for neo4j to startup...")
+LOGGER.info("Waiting 2 minutes for neo4j to startup...")
 time.sleep(120)
 
-
-# cwe_data_status = collect.check_cwe_status()
-# if cwe_data_status == 3:
-#     logger.info("The CWE database has not been created yet, starting initialization now...\n")
-#     collect.cwe_init()
-# elif cwe_data_status == 0:
-#     logger.info("The CWE initialization has not finished yet, continuing now...\n")
-#     collect.cwe_init()
-
-cve_data_status = collect.check_cve_status()
+cve_data_status = check_status("cve")
 
 if cve_data_status == 3:
-    logger.info("The CVE database has not been created yet, starting initialization now...\n")
-    collect.cve_init()
+    LOGGER.info("The CVE database has not been created yet, starting initialization now...\n")
+    cve_init()
 elif cve_data_status == 0:
-    logger.info("The CVE initialization has not finished yet, continuing now...\n")
-    collect.cve_init()
+    LOGGER.info("The CVE initialization has not finished yet, continuing now...\n")
+    cve_init()
 
-d3fend_data_status = collect.check_d3fend_status()
+d3fend_data_status = check_status("d3fend")
 
 if d3fend_data_status == 3:
-    logger.info("The D3FEND database has not been created yet, starting initialization now...\n")
-    collect.d3fend_init()
+    LOGGER.info("The D3FEND database has not been created yet, starting initialization now...\n")
+    d3fend_init()
 elif d3fend_data_status == 0:
-    logger.info("The D3FEND initialization has not finished yet, continuing now...\n")
-    collect.d3fend_init()
+    LOGGER.info("The D3FEND initialization has not finished yet, continuing now...\n")
+    d3fend_init()
 
-attack_data_status = collect.check_attack_status()
+attack_data_status = check_status("attack")
 
 if attack_data_status == 3:
-    logger.info("The ATT&CK database has not been created yet, starting initialization now...\n")
-    collect.attack_init()
-elif d3fend_data_status == 0:
-    logger.info("The ATT&CK initialization has not finished yet, continuing now...\n")
-    collect.attack_init()
+    LOGGER.info("The ATT&CK database has not been created yet, starting initialization now...\n")
+    attack_init()
+elif attack_data_status == 0:
+    LOGGER.info("The ATT&CK initialization has not finished yet, continuing now...\n")
+    attack_init()
 
-logger.info("###############################################")
-logger.info("All Data Sources Have Been Initialized!")
-logger.info("###############################################")
+capec_data_status = check_status("capec")
 
-# cve_data_status = collect.check_cwe_status()
+if capec_data_status == 3:
+    LOGGER.info("The CAPEC database has not been created yet, starting initialization now...\n")
+    capec_init()
+elif attack_data_status == 0:
+    LOGGER.info("The CAPEC initialization has not finished yet, continuing now...\n")
+    capec_init()
+
+# cve_data_status = collect.check_status("cwe")
 
 # if cve_data_status == 3:
-#     logger.info("The CWE database has not been created yet, starting initilization now...\n")
-#     collect.cwe_init()
+#     LOGGER.info("The CWE database has not been created yet, starting initialization now...\n")
+#     cwe_init()
 # elif cve_data_status == 0:
-#     logger.info("The CWE initialization has not finished yet, continuining now...\n")
-#     collect.cwe_init()
+#     LOGGER.info("The CWE initialization has not finished yet, continuing now...\n")
+#     cwe_init()
+
+LOGGER.info("###############################################")
+LOGGER.info("All Data Sources Have Been Initialized!")
+LOGGER.info("###############################################")
+
+
