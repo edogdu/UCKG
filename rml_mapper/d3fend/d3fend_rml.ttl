@@ -1,73 +1,50 @@
+@prefix attack: <http://purl.org/cyber/attack#> .
+@prefix d3fend: <http://purl.org/cyber/d3fend#> .
+@prefix uco: <http://purl.org/cyber/uco#> .
 @prefix rml: <http://semweb.mmlab.be/ns/rml#> .
 @prefix rr: <http://www.w3.org/ns/r2rml#> .
 @prefix ql: <http://semweb.mmlab.be/ns/ql#> .
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
-@prefix : <http://example.org/rules/> .
-@prefix schema: <http://schema.org/> .
-@prefix dbo: <http://dbpedia.org/ontology/> .
-@prefix d3f: <http://d3fend.mitre.org/ontologies/d3fend.owl#> .
-@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
-@prefix uco: <http://purl.org/cyber/uco#> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 @base <http://purl.org/cyber/uco#> .
 
-# Logical Source Definition
-[] a rr:TriplesMap;
+# How to read D3FEND data from JSON and iterate
+uco:ClassEMap a rr:TriplesMap;
   rml:logicalSource [
-    rml:source "./rml_mapper/d3fend/d3fend_data.json";
+    rml:source "/vol/data/d3fend.json";  # Adjusted logical source for D3FEND data
     rml:referenceFormulation ql:JSONPath;
-    rml:iterator "d3fend[*]"
-  ];
-  rr:subjectMap [
-    rr:template "http://purl.org/cyber/uco#VULN-{d3f.id}";
-    rr:class uco:ucoVulnerability
+    rml:iterator "$.@graph[*]"
   ].
 
-[] a rr:TriplesMap;
-  rr:subjectMap [
-    rr:template "http://purl.org/cyber/uco#{d3f.id}";
-    rr:class uco:ucoCWE
-  ].
+# Subject mapping for D3FEND data
+uco:ClassEMap rr:subjectMap [
+  rr:template "http://purl.org/cyber/d3fend#Technique-{@id}";
+  rr:class d3fend:Technique
+].
 
-[] a rr:TriplesMap;
-  rr:subjectMap [
-    rr:template "http://purl.org/cyber/uco#ExploitTarget-{weakness-of}";
-    rr:class uco:ucoExploitTarget
-  ].
-
-[] rr:predicateObjectMap [
-  rr:predicate uco:ucohasVulnerability;
+# Mapping d3fend:off_tech_id to attack:id
+uco:ClassEMap rr:predicateObjectMap [
+  rr:predicate attack:id;
   rr:objectMap [
-    rr:parentTriplesMap [
-      rr:template "http://purl.org/cyber/uco#VULN-{d3f.id}";
-      rr:class uco:ucoVulnerability
-    ];
+    rr:parentTriplesMap uco:ClassDMap;  # Referencing the ATT&CK map
     rr:joinCondition [
-      rr:child "d3f.id";
-      rr:parent "d3f.id"
+      rr:child "off_tech_id";  # Using the off_tech_id from the D3FEND data
+      rr:parent "@id"  # Mapping to the id in the ATT&CK map
     ]
   ]
 ].
 
-[] rr:predicateObjectMap [
-  rr:predicate uco:ucohasVulnerability;
-  rr:objectMap [
-    rr:parentTriplesMap [
-      rr:template "http://purl.org/cyber/uco#ExploitTarget-{weakness-of}";
-      rr:class uco:ucoExploitTarget
-    ];
-    rr:joinCondition [
-      rr:child "weakness-of";
-      rr:parent "d3f.cwe-id"
-    ]
-  ]
-].
+# Class D mapping for ATT&CK data
+uco:ClassDMap a rr:TriplesMap;
+  rml:logicalSource [
+    rml:source "/vol/data/attack.json";  # Adjusted logical source for ATT&CK data
+    rml:referenceFormulation ql:JSONPath;
+    rml:iterator "$.@graph[*]"
+  ].
 
-[] rr:predicateObjectMap [
-  rr:predicate uco:ucoPublishedDate;
-  rr:objectMap [
-    rml:reference "d3f.published";
-    rr:datatype xsd:dateTime
-  ]
+# Subject mapping for ATT&CK JSON data
+uco:ClassDMap rr:subjectMap [
+  rr:template "http://purl.org/cyber/attack#Technique-{@id}";
+  rr:class attack:Technique
 ].

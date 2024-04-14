@@ -16,7 +16,7 @@ from collect_data.attack_collect import attack_init
 from collect_data.capec_collect import capec_init
 from collect_data.cve_collect import cve_init
 from collect_data.d3fend_collect import d3fend_init
-from config import LOGGER, root_file_path, ontology_file_path
+from config import LOGGER
 from utilities import check_status
 from collect_data.cwe_collect import cwe_init
 

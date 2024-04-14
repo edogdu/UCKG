@@ -26,7 +26,6 @@
 import xml.etree.ElementTree as ET
 import json
 from config import LOGGER
-
 import requests
 
 
@@ -126,4 +125,107 @@ def parse_attack_file(file_path):
     except Exception as e:
         # Handle any API request errors
         LOGGER.info(f"Error parsing D3FEND file: {e}")
+        return None
+
+
+import xml.etree.ElementTree as ET
+
+
+def parse_capec_file(file_path):
+    try:
+        # Parse XML file
+        tree = ET.parse(file_path)
+        root = tree.getroot()
+
+        # Define namespaces
+        namespaces = {
+            'xmlns': 'http://capec.mitre.org/capec-3',
+            'xhtml': 'http://www.w3.org/1999/xhtml',
+        }
+
+        # Initialize list to store parsed data
+        parsed_data = []
+
+        # Extract attack patterns
+        attack_patterns = root.findall('.//xmlns:Attack_Pattern', namespaces)
+        for attack_pattern in attack_patterns:
+            attack = {}
+            attack['ID'] = attack_pattern.get('ID')
+            attack['Name'] = attack_pattern.get('Name')
+            attack['Abstraction'] = attack_pattern.get('Abstraction')
+            attack['Status'] = attack_pattern.get('Status')
+
+            # Description
+            description = attack_pattern.find('.//xmlns:Description', namespaces)
+            attack['Description'] = description.text if description is not None else ''
+
+            # Likelihood of Attack
+            likelihood = attack_pattern.find('.//xmlns:Likelihood_Of_Attack', namespaces)
+            attack['Likelihood_Of_Attack'] = likelihood.text if likelihood is not None else ''
+
+            # Typical Severity
+            severity = attack_pattern.find('.//xmlns:Typical_Severity', namespaces)
+            attack['Typical_Severity'] = severity.text if severity is not None else ''
+
+            # Related Attack Patterns
+            related_patterns = attack_pattern.findall('.//xmlns:Related_Attack_Patterns/xmlns:Related_Attack_Pattern',
+                                                      namespaces)
+            attack['Related_Attack_Patterns'] = [related_pattern.get('CAPEC_ID') for related_pattern in
+                                                 related_patterns]
+
+            # Execution Flow
+            execution_flow = attack_pattern.findall('.//xmlns:Execution_Flow/xmlns:Attack_Step', namespaces)
+            attack['Execution_Flow'] = [{'Step': step.findtext('xmlns:Step', namespaces),
+                                         'Phase': step.findtext('xmlns:Phase', namespaces),
+                                         'Description': step.findtext('xmlns:Description', namespaces),
+                                         'Techniques': [technique.text for technique in
+                                                        step.findall('xmlns:Technique', namespaces)]}
+                                        for step in execution_flow]
+
+            # Prerequisites
+            prerequisites = attack_pattern.findall('.//xmlns:Prerequisites/xmlns:Prerequisite', namespaces)
+            attack['Prerequisites'] = [prerequisite.text for prerequisite in prerequisites]
+
+            # Skills Required
+            skills_required = attack_pattern.findall('.//xmlns:Skills_Required/xmlns:Skill', namespaces)
+            attack['Skills_Required'] = [{'Level': skill.get('Level'), 'Description': skill.text} for skill in
+                                         skills_required]
+
+            # Resources Required
+            resources_required = attack_pattern.findall('.//xmlns:Resources_Required/xmlns:Resource', namespaces)
+            attack['Resources_Required'] = [resource.text for resource in resources_required]
+
+            # Consequences
+            consequences = attack_pattern.findall('.//xmlns:Consequences/xmlns:Consequence', namespaces)
+            attack['Consequences'] = [{'Scope': consequence.findtext('xmlns:Scope', namespaces),
+                                       'Impact': consequence.findtext('xmlns:Impact', namespaces)}
+                                      for consequence in consequences]
+
+            # Mitigations
+            mitigations = attack_pattern.findall('.//xmlns:Mitigations/xmlns:Mitigation', namespaces)
+            attack['Mitigations'] = [mitigation.text for mitigation in mitigations]
+
+            # Example Instances
+            example_instances = attack_pattern.findall('.//xmlns:Example_Instances/xmlns:Example', namespaces)
+            attack['Example_Instances'] = [example.text for example in example_instances]
+
+            # Related Weaknesses
+            related_weaknesses = attack_pattern.findall('.//xmlns:Related_Weaknesses/xmlns:Related_Weakness',
+                                                        namespaces)
+            attack['Related_Weaknesses'] = ["CWE-" + weakness.get('CWE_ID') for weakness in related_weaknesses]
+
+            # Taxonomy Mappings
+            taxonomy_mappings = attack_pattern.findall('.//xmlns:Taxonomy_Mappings/xmlns:Taxonomy_Mapping', namespaces)
+            attack['Taxonomy_Mappings'] = []
+            for mapping in taxonomy_mappings:
+                entry_ids = mapping.findall('xmlns:Entry_ID', namespaces)
+                attack['Taxonomy_Mappings'].extend([entry_id.text for entry_id in entry_ids])
+
+            # Append parsed attack pattern to list
+            parsed_data.append(attack)
+
+        return parsed_data
+
+    except ET.ParseError as e:
+        print(f"Error parsing XML: {e}")
         return None

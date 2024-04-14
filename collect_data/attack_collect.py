@@ -53,7 +53,7 @@ def download_attack_json_file():
 
         LOGGER.info("Beginning JSON data parse for attack")
         attack_json_data = parse_attack_file(final_filename)
-        attack_parsed_filename = os.path.join(os.environ[vol_file_path], "attack.json")
+        attack_parsed_filename = os.path.join(os.environ['VOL_PATH'], "attack.json")
         LOGGER.info(f"Beginning JSON data parse save {attack_parsed_filename}")
         write_file(attack_parsed_filename, attack_json_data)
         LOGGER.info(f"{attack_parsed_filename} saved successfully")

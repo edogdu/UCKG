@@ -15,7 +15,7 @@
 @prefix capec: <http://purl.org/cyber/capec#> .
 @base <http://purl.org/cyber/uco#> .
 
-# How to read the CWEs from a json file and itterate
+# How to read the CWEs from a json file and iterate
 uco:ClassAMap a rr:TriplesMap;
   rml:logicalSource [
     rml:source "./rml_mapper/cwe/cwes.json";

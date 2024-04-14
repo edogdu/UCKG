@@ -1,72 +1,82 @@
 import os
+import zipfile
 import requests
 from config import LOGGER
-from parse import parse_d3fend_file
+from bs4 import BeautifulSoup
+from parse import parse_capec_file
 from utilities import check_status, write_file, calculate_file_hash, call_mapper_update, call_ontology_updater
 
 
+def download_capec_xml_file():
+    # Define the URL of the page containing the table
+    url = "https://capec.mitre.org/data/downloads.html"
 
-def download_capec_json_file():
-    pass
-    # LOGGER.info("############################")
-    # LOGGER.info("Beginning CAPEC Data Download")
-    # LOGGER.info("############################\n")
-    #
-    # url = 'https://d3fend.mitre.org/api/dao/artifacts.json'
-    #
-    # # Send a GET request to fetch the JSON file
-    # response = requests.get(url)
-    # json_data = response.json()
-    #
-    # # Set the filename
-    # final_filename = os.path.join(os.environ['VOL_PATH'], "d3fend.json")
-    #
-    # # Check if the request was successful
-    # if response.status_code == 200:
-    #     if check_status("d3fend") == 0:
-    #         LOGGER.info("d3fend.json exists...")
-    #         filename = os.path.join(os.environ['VOL_PATH'], "tmp_d3fend.json")
-    #         LOGGER.info("Writing tmp_d3fend.json")
-    #         write_file(filename, json_data)
-    #
-    #         # Calculate the hashes for tmp and final.
-    #         tmp_file_hash = calculate_file_hash(filename)
-    #         final_file_hash = calculate_file_hash(final_filename)
-    #
-    #         # Compare hashes
-    #         if tmp_file_hash == final_file_hash:
-    #             # Hashes are the same, delete tmp file
-    #             os.remove(filename)
-    #             LOGGER.info("The new file is identical to the existing file. Deleted tmp_d3fend.json.")
-    #         else:
-    #             # Hashes are different, replace existing file
-    #             os.remove(final_filename)
-    #             os.rename(filename, "d3fend.json")
-    #             LOGGER.info("The new file is different from the existing file. Replaced d3fend.json with tmp_d3fend.json.")
-    #     else:
-    #         LOGGER.info("d3fend.json DOES NOT exist...")
-    #         filename = os.path.join(os.environ['VOL_PATH'], "d3fend.json")
-    #         LOGGER.info("Writing d3fend.json")
-    #         write_file(filename, json_data)
-    #
-    #     LOGGER.info(f"File '{filename}' downloaded and saved successfully.")
-    #     LOGGER.info("############################\n")
-    # else:
-    #     LOGGER.info("Failed to download the D3FEND JSON file.")
-    #
-    # LOGGER.info("Beginning JSON data parse for d3fend")
-    # d3fend_json_data = parse_d3fend_file(final_filename)
-    # d3fend_parsed_filename = os.path.join(os.environ['ROOT_FOLDER'], "rml_mapper/d3fend/d3fend.json")
-    # LOGGER.info(f"Beginning JSON data parse save {d3fend_parsed_filename}")
-    # write_file(d3fend_parsed_filename, d3fend_json_data)
-    # LOGGER.info(f"{d3fend_parsed_filename} saved successfully")
+    # Send a GET request to the URL
+    response = requests.get(url)
+
+    # Check if the request was successful
+    if response.status_code == 200:
+        # Parse the HTML content of the page
+        soup = BeautifulSoup(response.content, 'html.parser')
+
+        # Find all rows within the table
+        rows = soup.find_all('tr')
+
+        # Iterate through each row
+        for row in rows:
+            # Find the first cell (td) within the row
+            first_cell = row.find('td', {'class': 'FirstCell'})
+
+            # Check if the first cell contains the text "ATT&CK Related Patterns"
+            if first_cell and "ATT&CK Related Patterns" in first_cell.text:
+                # Find the link for the XML.zip file within this row
+                link = row.find('a', text='XML.zip')
+
+                # Check if the link is found
+                if link:
+                    # Get the URL of the XML.zip file
+                    xml_zip_url = link['href']
+
+                    # Extract the filename from the URL
+                    filename = "capec.xml"
+
+                    try:
+                        # Download the ZIP file to the current directory
+                        with open(filename, 'wb') as f:
+                            f.write(requests.get("https://capec.mitre.org" + xml_zip_url).content)
+                        print(f"File '{filename}' downloaded successfully.")
+
+                        # Extract the contents of the ZIP file
+                        with zipfile.ZipFile(filename, 'r') as zip_ref:
+                            # Extract only the XML file
+                            xml_filename = [f for f in zip_ref.namelist() if f.endswith('.xml')][0]
+                            zip_ref.extract(xml_filename)
+                            print(f"XML file '{xml_filename}' extracted successfully.")
+
+                        # Remove the ZIP file after extraction
+                        os.remove(filename)
+                        print(f"ZIP file '{filename}' removed.")
+
+                        break  # Exit the loop after processing the first match
+                    except Exception as e:
+                        print(f"Failed to process ZIP file '{filename}': {e}")
+
+        else:
+            print("Row containing 'ATT&CK Related Patterns' not found")
+    else:
+        print(f"Failed to access URL: {url}")
 
 
 def capec_init():
-    pass
-    # # Download latest capec data.
-    # download_capec_json_file()
-    #
-    # successfully_mapped = call_mapper_update("capec")
-    # if successfully_mapped:
-    #     call_ontology_updater()
+    LOGGER.info("############################")
+    LOGGER.info("Beginning CAPEC Data Download")
+    LOGGER.info("############################\n")
+    download_capec_xml_file()
+
+    LOGGER.info("CAPEC Data Download Complete")
+    LOGGER.info("Beginning CAPEC Parse")
+
+
+    #successfully_mapped = call_mapper_update("capec")
+    #if successfully_mapped:
+    #    call_ontology_updater()

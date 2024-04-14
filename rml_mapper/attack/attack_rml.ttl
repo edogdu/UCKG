@@ -1,86 +1,89 @@
+@prefix attack: <http://purl.org/cyber/attack#> .
+@prefix capec: <http://purl.org/cyber/capec#> .
+@prefix d3fend: <http://purl.org/cyber/d3fend#> .
+@prefix uco: <http://purl.org/cyber/uco#> .
 @prefix rml: <http://semweb.mmlab.be/ns/rml#> .
 @prefix rr: <http://www.w3.org/ns/r2rml#> .
 @prefix ql: <http://semweb.mmlab.be/ns/ql#> .
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
-@prefix schema: <http://schema.org/> .
-@prefix dbo: <http://dbpedia.org/ontology/> .
-@prefix d3f: <http://d3fend.mitre.org/ontologies/d3fend.owl#> .
-@prefix attck: <https://attack.mitre.org/> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 @base <http://purl.org/cyber/uco#> .
-@prefix uco: <http://purl.org/cyber/uco#> .
 
-# Logical Source Definition
-[] a rr:TriplesMap;
+# How to read ATT&CK data from JSON and iterate
+uco:ClassDMap a rr:TriplesMap;
   rml:logicalSource [
-    rml:source "./rml_mapper/att&ck/att&ck_data.json";
+    rml:source "/vol/data/attack.json";
     rml:referenceFormulation ql:JSONPath;
-    rml:iterator "results.bindings[*]"
+    rml:iterator "$.@graph[*]"
   ].
 
-# Class Mapping
-[
-  rr:subjectMap [
-    rr:template "http://purl.org/cyber/uco#VULN-{off_tech_label}";
-    rr:class uco:ucoVulnerability
-  ]
+# Subject mapping for ATT&CK JSON data
+uco:ClassDMap rr:subjectMap [
+  rr:template "{@id}";
+  rr:class uco:attackEntry
 ].
 
-[
-  rr:subjectMap [
-    rr:template "http://purl.org/cyber/uco#CWE-{def_tech_label}";
-    rr:class uco:ucoCWE
-  ]
-].
-
-[
-  rr:subjectMap [
-    rr:template "http://purl.org/cyber/uco#ExploitTarget-{off_tech_label}";
-    rr:class uco:ucoExploitTarget
-  ]
-].
-
-# Predicate-Object Mappings
-[] rr:predicateObjectMap [
-  rr:predicate uco:ucohasVulnerability;
+# Mapping id to capec:Related_Weaknesses
+uco:ClassDMap rr:predicateObjectMap [
+  rr:predicate capec:Related_Weaknesses;
   rr:objectMap [
-    rr:parentTriplesMap [
-      rr:template "http://purl.org/cyber/uco#CWE-{def_tech_label}";
-      rr:class uco:ucoCWE;
-      rr:joinCondition [
-        rr:child "off_tech_label";
-        rr:parent "def_tech_label"
-      ]
+    rr:parentTriplesMap uco:ClassAMap;  # Referencing the CAPEC map
+    rr:joinCondition [
+      rr:child "@id";  # Using the id from the ATT&CK data
+      rr:parent "capec:Related_Weakness/capec:ID"  # Mapping to the ID in the CAPEC map
     ]
   ]
 ].
 
-[] rr:predicateObjectMap [
-  rr:predicate uco:ucohasVulnerability;
+# Class A mapping for CAPEC data
+uco:ClassAMap a rr:TriplesMap;
+  rml:logicalSource [
+    rml:source "/vol/data/capec.json";
+    rml:referenceFormulation ql:XPath;
+    rml:iterator "/capec:CAPEC/capec:Attack_Patterns/capec:Attack_Pattern"
+  ].
+
+# Subject mapping for CAPEC data
+uco:ClassAMap rr:subjectMap [
+  rr:template "http://purl.org/cyber/capec#Attack-{capec:ID}";
+  rr:class capec:Attack_Pattern
+].
+
+# Mapping capec:Related_Weaknesses to id
+uco:ClassAMap rr:predicateObjectMap [
+  rr:predicate attack:id;
   rr:objectMap [
-    rr:parentTriplesMap [
-      rr:template "http://purl.org/cyber/uco#ExploitTarget-{off_tech_label}";
-      rr:class uco:ucoExploitTarget;
-      rr:joinCondition [
-        rr:child "off_tech_label";
-        rr:parent "def_tech_label"
-      ]
+    rr:parentTriplesMap uco:ClassDMap;  # Referencing the ATT&CK map
+    rr:joinCondition [
+      rr:child "capec:Related_Weakness/capec:ID";  # Using the ID from the CAPEC data
+      rr:parent "@id"  # Mapping to the id in the ATT&CK map
     ]
   ]
 ].
 
-# Datatype Properties
-[] rr:predicateObjectMap [
-  rr:predicate uco:def_tech_label;
+# Mapping id to d3fend:off_tech_id
+uco:ClassDMap rr:predicateObjectMap [
+  rr:predicate d3fend:off_tech_id;
   rr:objectMap [
-    rml:reference "def_tech_label";
-    rr:datatype xsd:string
+    rr:parentTriplesMap uco:ClassEMap;  # Referencing the D3FEND map
+    rr:joinCondition [
+      rr:child "@id";  # Using the id from the ATT&CK data
+      rr:parent "d3fend:off_tech_id"  # Mapping to the off_tech_id in the D3FEND map
+    ]
   ]
 ].
 
-[] rr:predicateObjectMap [
-  rr:predicate uco:off_tech_label;
-  rr:objectMap [
-    rml:reference "off_tech_label";
-    rr:datatype xsd:string
-  ]
+# Class E mapping for D3FEND data
+uco:ClassEMap a rr:TriplesMap;
+  rml:logicalSource [
+    rml:source "/vol/data/d3fend.json";
+    rml:referenceFormulation ql:XPath;
+    rml:iterator "/d3fend:D3FEND/d3fend:Techniques/d3fend:Technique"
+  ].
+
+# Subject mapping for D3FEND data
+uco:ClassEMap rr:subjectMap [
+  rr:template "http://purl.org/cyber/d3fend#Technique-{d3fend:Technique_ID}";
+  rr:class d3fend:Technique
 ].

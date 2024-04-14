@@ -1,6 +1,6 @@
 import os
 import requests
-from config import LOGGER, vol_file_path
+from config import LOGGER
 from parse import parse_d3fend_file
 from utilities import check_status, write_file, calculate_file_hash, call_mapper_update, call_ontology_updater
 
@@ -16,13 +16,13 @@ def download_d3fend_json_file():
         json_data = response.json()
 
         # Set the filename
-        final_filename = os.path.join(os.environ[vol_file_path], "d3fend.json")
+        final_filename = os.path.join(os.environ['VOL_PATH'], "d3fend.json")
 
         # Check if the request was successful
         if response.status_code == 200:
             if check_status("d3fend") == 0:
                 LOGGER.info("d3fend.json exists...")
-                filename = os.path.join(os.environ[vol_file_path], "tmp_d3fend.json")
+                filename = os.path.join(os.environ['VOL_PATH'], "tmp_d3fend.json")
                 LOGGER.info("Writing tmp_d3fend.json")
                 write_file(filename, json_data)
 
@@ -38,12 +38,12 @@ def download_d3fend_json_file():
                 else:
                     # Hashes are different, replace existing file
                     os.remove(final_filename)
-                    os.rename(filename, "d3fend.json")
+                    os.rename(filename, "/vol/data/d3fend.json")
                     LOGGER.info("The new file is different from the existing file. Replaced d3fend.json with "
                                 "tmp_d3fend.json.")
             else:
                 LOGGER.info("d3fend.json DOES NOT exist...")
-                filename = os.path.join(os.environ[vol_file_path], "d3fend.json")
+                filename = os.path.join(os.environ['VOL_PATH'], "d3fend.json")
                 LOGGER.info("Writing d3fend.json")
                 write_file(filename, json_data)
 
@@ -53,7 +53,7 @@ def download_d3fend_json_file():
 
         LOGGER.info("Beginning JSON data parse for d3fend")
         d3fend_json_data = parse_d3fend_file(final_filename)
-        d3fend_parsed_filename = os.path.join(os.environ[vol_file_path], "d3fend.json")
+        d3fend_parsed_filename = os.path.join(os.environ['VOL_PATH'], "d3fend.json")
         LOGGER.info(f"Beginning JSON data parse save {d3fend_parsed_filename}")
         write_file(d3fend_parsed_filename, d3fend_json_data)
         LOGGER.info(f"{d3fend_parsed_filename} saved successfully")
