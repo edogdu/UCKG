@@ -18,11 +18,11 @@
 
 <#ATTACKMap> a rr:TriplesMap;
              rml:logicalSource [
-                   rml:source "./data/att&ck/att&ck.json";
+                   rml:source "./data/attack/attack.json";
                    rml:referenceFormulation ql:JSONPath;
                    rml:iterator "$[*]"
                ];
              rr:subjectMap [
                    rr:template "http://example.com/uco-extended#{d3f:attack-id}";
-                   rr:class ucoex:ucoATT%26CK
+                   rr:class ucoex:ucoMITREATTACK
    ].
