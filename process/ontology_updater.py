@@ -5,7 +5,7 @@ import sys
 import logging
 
 # # Configure the logging module
-logging.basicConfig(level=logging.INFO , format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+logging.basicConfig(level=logging.DEBUG , format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 
 # # Create a logger
 logger = logging.getLogger('ontology_updater_logger')

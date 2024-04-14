@@ -24,15 +24,15 @@
                 rml:iterator "$[*]"
             ];
           rr:predicateObjectMap [
-                rr:predicate ucoex:ucohasATT%26CK;
+                rr:predicate ucoex:ucohasMITREATTACK;
                 rr:objectMap [
-                                 rr:template "http://purl.org/cyber/uco#{off_tech_id}";
-                                 rr:class ucoex:ucoATT%26CK
+                                 rr:template "http://example.com/uco-extended#{off_tech_id}";
+                                 rr:class ucoex:ucoMITREATTACK
                              ]
             ];
           rr:subjectMap [
                 rr:template "http://example.com/uco-extended#{@id}";
-                rr:class ucoex:D3FEND
+                rr:class ucoex:ucoMITRED3FEND
             ].
 <#ATTACKMap> a rr:TriplesMap;
              rml:logicalSource [
@@ -42,5 +42,5 @@
                ];
              rr:subjectMap [
                    rr:template "http://example.com/uco-extended#{off_tech_id}";
-                   rr:class ucoex:ucoATT%26CK
+                   rr:class ucoex:ucoMITREATTACK
    ].
