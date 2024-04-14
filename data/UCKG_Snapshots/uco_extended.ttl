@@ -15,3 +15,16 @@
 ucoex:ucohasCPE rdf:type owl:ObjectProperty ;
                                      rdfs:domain uco:ucoCVE;
                                      rdfs:range ucoex:ucoCPE .
+
+
+ucoex:ucoD3FEND rdf:type owl:Class ;
+             rdfs:subClassOf uco:ucoUCOThing .
+
+ucoex:ucoATT%26CK rdf:type owl:Class ;
+                rdfs:subClassOf uco:ucoUCOThing .
+
+
+ucoex:ucohasATT%26CK rdf:type owl:ObjectProperty ;
+                rdfs:domain ucoex:ucoD3FEND;
+                rdfs:range ucoex:ucoATT%26CK .
+
