@@ -2,9 +2,7 @@ import os
 import sys
 import logging
 import subprocess
-from process import cve_collection as cve
-from process import cwe_collection as cwe
-from process import cpe_collection as cpe
+from data_collection import cve_collection as cve
 
 # Configure the logging module
 logging.basicConfig(level=logging.INFO, 
@@ -48,7 +46,7 @@ def call_mapper_update(datasource):
     # Construct the command
     command = ["java", "-jar", jar_path, "-m", mapping_file, "-s", "turtle"]
 
-    with open(output_file, "w") as file:
+    with open(output_file, "w+") as file:
         # Run the command and redirect stdout to the file
         try:
             process = subprocess.Popen(command, stdout=file, stderr=subprocess.PIPE)

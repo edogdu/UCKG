@@ -97,4 +97,10 @@ def update_graph():
     # Load the TTL file
     load_ttl_file(driver, ttl_file_path)
 
+    # Remove uco_with_instances.ttl
+    os.remove(ttl_file_path)
+    logger.info(">>>>>>>>>>>>> removed uco_with_instances.ttl")
+
+
+
     driver.close()

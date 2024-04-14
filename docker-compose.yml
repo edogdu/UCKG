@@ -18,6 +18,7 @@ services:
       NEO4J_dbms_security_procedures_unrestricted: "apoc.*"
       NEO4J_apoc_initializers_neo4jConf: "true"
       NEO4J_apoc_import_file_enabled: "true"
+      NEO4J_apoc_initializer_cypher: "CALL apoc.cypher.runFiles(['file:///init.cypher'])"
     ports:
       - "7474:7474"
       - "7687:7687"

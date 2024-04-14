@@ -24,6 +24,7 @@ RUN chmod 755 /app/mapping/mapper.jar
 
 # Set environment variables
 ENV UCO_ONTO_PATH=/app/data/UCKG_Snapshots/uco2.ttl
+ENV UCO_ONTO_EXTEND_PATH=/app/data/UCKG_Snapshots/uco_extended.ttl
 ENV ROOT_FOLDER=/app
 
 # Set the Python script as the entry point

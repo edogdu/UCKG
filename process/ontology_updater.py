@@ -15,9 +15,13 @@ def update_ontology():
         # Get the current working directory
         g = Graph()
         uco_ontology = os.environ['UCO_ONTO_PATH']
+        uco_extended_ontology = os.environ['UCO_ONTO_EXTEND_PATH']
         root_folder = os.environ['ROOT_FOLDER']
         vol_path = os.environ['VOL_PATH']
+        # Adding the base ontology
         g.parse(uco_ontology, format="turtle")
+        # Extending the ontology
+        g.parse(uco_extended_ontology)
         write_path = os.path.join(vol_path, "uco.owl")
         g.serialize(write_path, format="xml")
         logger.info("\nCreated file uco.owl\n")

@@ -1,0 +1,17 @@
+@prefix ucoex: <http://example.com/uco-extended#> .
+@prefix uco: <http://purl.org/cyber/uco#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@base <http://example.com/uco-extended> .
+
+<http://example.com/uco-extended> rdf:type owl:Ontology ;
+                                owl:imports <http://purl.org/cyber/uco> .
+
+ ucoex:ucoCPE rdf:type owl:Class ;
+       rdfs:subClassOf uco:ucoUCOThing .
+
+
+ucoex:ucohasCPE rdf:type owl:ObjectProperty ;
+                                     rdfs:domain uco:ucoCVE;
+                                     rdfs:range ucoex:ucoCPE .

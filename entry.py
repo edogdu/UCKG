@@ -3,11 +3,9 @@ import os
 import logging
 import time
 
-from process import shared_functions as sf
-from process import cwe_collection as cwe
-from process import cve_collection as cve
-from process import cpe_collection as cpe
-sys.path.append("./process") 
+sys.path.append("./data_collection")
+from data_collection import cpe_collection as cpe, cve_collection as cve, cwe_collection as cwe
+
 
 uco_abs_path = os.environ['UCO_ONTO_PATH']
 root_folder_abs_path = os.environ['ROOT_FOLDER']
@@ -41,16 +39,16 @@ elif cve_data_status == 0:
     logger.info("The CVE initialization has not finished yet, continuing now...\n")
     cve.cve_init()
 
-cpe_data_status = cpe.check_cpe_status()
-
-if (cpe_data_status == 3):
-    logger.info("The CPE database does not yet exist")
-    cpe.cpe_init()
-elif (cpe_data_status == 1):
-    logger.info("The CPE table exists and is up to date")
-elif cpe_data_status == 0:
-    logger.info("The CPE initialization has not finished yet, continuing now...\n")
-    cpe.cpe_init()
+# cpe_data_status = cpe.check_cpe_status()
+#
+# if (cpe_data_status == 3):
+#     logger.info("The CPE database does not yet exist")
+#     cpe.cpe_init()
+# elif (cpe_data_status == 1):
+#     logger.info("The CPE table exists and is up to date")
+# elif cpe_data_status == 0:
+#     logger.info("The CPE initialization has not finished yet, continuing now...\n")
+#     cpe.cpe_init()
 
 logger.info("###############################################")
 logger.info("All Data Sources Have Been Initialized!")
