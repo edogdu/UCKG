@@ -28,3 +28,15 @@ ucoex:ucohasMITREATTACK rdf:type owl:ObjectProperty ;
                 rdfs:domain ucoex:ucoMITRED3FEND;
                 rdfs:range ucoex:ucoMITREATTACK .
 
+ucoex:ucoCAPEC rdf:type owl:Class ;
+                     rdfs:subClassOf uco:ucoUCOThing .
+
+ucoex:ucohasRelatedWeakness rdf:type owl:ObjectProperty ;
+                        rdfs:domain ucoex:ucoCAPEC;
+                        rdfs:range uco:ucoCWE.
+
+ucoex:ucohasTaxonomyMapping rdf:type owl:ObjectProperty ;
+                            rdfs:domain ucoex:ucoCAPEC;
+                            rdfs:range ucoex:ucoMITREATTACK .
+
+

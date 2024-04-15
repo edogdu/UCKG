@@ -5,7 +5,7 @@ import time
 from process import shared_functions as sf
 
 sys.path.append("./data_collection")
-from data_collection import cpe_collection as cpe, cve_collection as cve, cwe_collection as cwe, d3fend_collection as d3fend, attack_collection as attack
+from data_collection import cpe_collection as cpe, cve_collection as cve, cwe_collection as cwe, d3fend_collection as d3fend, attack_collection as attack, capec_collection as capec
 
 
 uco_abs_path = os.environ['UCO_ONTO_PATH']
@@ -58,15 +58,15 @@ if attack_data_status == 3:
 elif attack_data_status == 0:
     logger.info("The ATT&CK initialization has not finished yet, continuing now...\n")
     attack.attack_init()
-#
-# capec_data_status = sf.check_status("capec")
-#
-# if capec_data_status == 3:
-#     LOGGER.info("The CAPEC database has not been created yet, starting initialization now...\n")
-#     capec_init()
-# elif attack_data_status == 0:
-#     LOGGER.info("The CAPEC initialization has not finished yet, continuing now...\n")
-#     capec_init()
+
+capec_data_status = sf.check_status("capec")
+
+if capec_data_status == 3:
+    logger.info("The CAPEC database has not been created yet, starting initialization now...\n")
+    capec.capec_init()
+elif capec_data_status == 0:
+    logger.info("The CAPEC initialization has not finished yet, continuing now...\n")
+    capec.capec_init()
 
 # cpe_data_status = cpe.check_cpe_status()
 #

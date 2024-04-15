@@ -76,6 +76,8 @@ def call_mapper_update(datasource):
         mapping_file = "./mapping/d3fend/d3fend_rml.ttl"
     elif datasource == "attack":
         mapping_file = "./mapping/attack/attack_rml.ttl"
+    elif datasource == "capec":
+        mapping_file = "./mapping/capec/capec_rml.ttl"
     else:
         logger.info("Not a valid rml source...")
         return False

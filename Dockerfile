@@ -15,6 +15,8 @@ RUN pip install requests
 RUN pip install neo4j
 RUN pip install owlready2
 RUN pip install rdflib
+RUN pip install beautifulsoup4 html5lib
+
 
 # Copy your Python script and any other necessary files
 COPY . /app
