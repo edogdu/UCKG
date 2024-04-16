@@ -4,7 +4,7 @@ import logging
 from neo4j import GraphDatabase
 
 # Configure the logging module
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s (%(filename)s:%(lineno)d, %(funcName)s)')
 
 # Create a logger
 logger = logging.getLogger('graph_updater_logger')

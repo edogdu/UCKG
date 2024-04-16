@@ -77,7 +77,7 @@ def download_capec_xml_file():
     # Call the parse function and pass the XML content
     capec_json_content = parse_capec_file(xml_filename)
     # Also write capec to data/capec folder
-    sf.write_file("./data/attack/capec.json", capec_json_content)
+    sf.write_file("./data/capec/capec.json", capec_json_content)
     if sf.check_status("capec") == 0:
         filename = os.path.join(os.environ['VOL_PATH'], "tmp_capec.json")
         final_filename = os.path.join(os.environ['VOL_PATH'], "capec.json")

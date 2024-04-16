@@ -10,7 +10,7 @@ from process import shared_functions as sf
 
 # Configure the logging module
 logging.basicConfig(level=logging.INFO, 
-                    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+                    format='%(asctime)s - %(levelname)s - %(message)s (%(filename)s:%(lineno)d, %(funcName)s)')
 
 # Create a logger
 logger = logging.getLogger('collect_logger')
@@ -128,7 +128,7 @@ def cve_init():
         cves = {"cves": []}
         cwe_id_list = get_cwe_id_list()
         # logger.info(cwe_id_list)
-        while (response.status_code == 200 or response.status_code == 403 or response.status_code == 503) and init_finished == False and start_index < 104000:
+        while (response.status_code == 200 or response.status_code == 403 or response.status_code == 503) and init_finished == False:
             early_exit = False
             if response.status_code == 403 or response.status_code == 503:
                 for i in range(4):
@@ -165,7 +165,7 @@ def cve_init():
                         for desc in weakness['description']:
                             weakness_value = desc['value'].strip()
                             if weakness_value in cwe_id_list:
-                                logger.info(f"Found CWE match for CVE: {cve['cve']['id']} - hasCWE -> {str(desc['value'])}")
+                                # logger.info(f"Found CWE match for CVE: {cve['cve']['id']} - hasCWE -> {str(desc['value'])}")
                                 cwes.append({"cwe": {"id": desc['value'], "cve_id": cve['cve']['id']}})
                     for product in cve['cve']['configurations']:
                         # Access the dictionary within the list
@@ -174,7 +174,7 @@ def cve_init():
                         # A lot of key-values where values are lists...
                         cpeMetaInfo = cpeMeta['cpeMatch'][0]
                         if (cpeMetaInfo['criteria']):
-                            logger.info(f"Found CPE match for CVE: {cve['cve']['id']} - hasCPE -> {cpeMetaInfo['criteria']}")
+                            # logger.info(f"Found CPE match for CVE: {cve['cve']['id']} - hasCPE -> {cpeMetaInfo['criteria']}")
                             cpes.append({"cpe": {"cpeName": cpeMetaInfo['criteria'], "cve_id": cve['cve']['id']}})
 
                 except Exception:

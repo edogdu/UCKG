@@ -41,6 +41,8 @@ def update_ontology():
         # Switch back to owlready2 so I can use the sync_reasoner
         onto_final = get_ontology(write_path).load()
         sync_reasoner()
+        # with onto_final:
+            # sync_reasoner()
 
         # Finally switch back to rdflib so I can the ontology and instances as turtle format
         graph_3 = onto_final.world.as_rdflib_graph()

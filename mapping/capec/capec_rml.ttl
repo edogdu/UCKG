@@ -39,7 +39,7 @@
                                   ];
              rr:subjectMap [
                    rr:template "http://example.com/uco-extended#CAPEC-{ID}";
-                   rr:class ucoex:ucoMITRED3FEND
+                   rr:class ucoex:ucoCAPEC
                ].
 <#ATTACKMap> a rr:TriplesMap;
              rml:logicalSource [

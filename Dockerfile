@@ -6,7 +6,8 @@ WORKDIR /app
 
 # Install any Python dependencies you need
 RUN apt-get update && apt-get install -y python3.11 \
-    openjdk-17-jdk
+    openjdk-17-jdk \
+    sqlite3
 # Install Vim
 RUN export PATH=$PATH:/usr/bin/python3.11
 # Install curl (and vim if you need it)

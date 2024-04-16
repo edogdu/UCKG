@@ -1,5 +1,7 @@
 version: '3'
 volumes:
+  neo4j_vol:
+    driver: local
   my_volume:
     driver: local
 services:
@@ -24,7 +26,8 @@ services:
       - "7687:7687"
     volumes:
       - $PWD/plugins:/neo4j/plugins # Mount the plugins directory
-      - my_volume:/vol/data # Persist data 
+      - my_volume:/vol/data # Persist data
+      - neo4j_vol:/data
       - $PWD/neo4j/import:/var/lib/neo4j/import # Import directory 
 
   uckg-scripts:
