@@ -24,6 +24,7 @@ time.sleep(120)
 
 
 cwe_data_status = cwe.check_cwe_status()
+
 if cwe_data_status == 3:
     logger.info("The CWE database has not been created yet, starting initialization now...\n")
     cwe.cwe_init()

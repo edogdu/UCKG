@@ -128,9 +128,6 @@ def parse_attack_file(file_path):
         return None
 
 
-import xml.etree.ElementTree as ET
-
-
 def parse_capec_file(file_path):
     try:
         # Parse XML file

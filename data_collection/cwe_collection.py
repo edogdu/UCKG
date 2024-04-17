@@ -2,7 +2,13 @@ import os
 import json
 import logging
 import xml.etree.ElementTree as ET
-from process import shared_functions as sf 
+
+from config import LOGGER
+from process import shared_functions as sf
+import requests
+import zipfile
+from bs4 import BeautifulSoup
+from urllib.parse import urljoin
 
 # Configure the logging module
 logging.basicConfig(level=logging.INFO, 
@@ -11,18 +17,84 @@ logging.basicConfig(level=logging.INFO,
 # Create a logger
 logger = logging.getLogger('collect_logger')
 
-#Getting environment variables
+# Getting environment variables
 uco_ontology = os.environ['UCO_ONTO_PATH']
 root_folder = os.environ['ROOT_FOLDER']
 vol_path = os.environ['VOL_PATH']
 
-def check_cwe_status():
-    # Need to add the meta-data
-    return 3
+
+def download_xml_zip():
+    url = "https://cwe.mitre.org/data/downloads.html"
+    save_path = os.path.join(vol_path, "CWE_Comprehensive_View_XML.zip")
+    filename = os.path.join(vol_path, "tmp_cwe_dict.xml")
+    final_filename = os.path.join(vol_path, "cwe_dict.xml")
+
+    try:
+        response = requests.get(url)
+        response.raise_for_status()  # Raise an exception for HTTP errors
+        if response.status_code == 200:
+            soup = BeautifulSoup(response.content, 'html.parser')
+            # Find the table row containing "CWE Comprehensive View"
+            rows = soup.find_all('tr')
+            for row in rows:
+                if "CWE Comprehensive View" in row.text:
+                    # Find the link to the XML.zip file
+                    xml_zip_link = row.find('a', string='XML.zip')['href']
+                    xml_zip_url = urljoin(url, xml_zip_link)
+                    # Download the XML.zip file
+                    response_xml = requests.get(xml_zip_url)
+                    if response_xml.status_code == 200:
+                        # Write the downloaded ZIP file
+                        with open(save_path, 'wb') as file:
+                            file.write(response_xml.content)
+                        LOGGER.info("XML.zip downloaded successfully.")
+                        # Extract XML file from the ZIP archive
+                        with zipfile.ZipFile(save_path, 'r') as zip_ref:
+                            # Extract all contents to the current directory
+                            zip_ref.extractall()
+                        # Rename the XML file to cwe_dict.xml
+                        extracted_files = os.listdir()
+                        for file in extracted_files:
+                            if file.endswith('.xml'):
+                                os.rename(file, 'tmp_cwe_dict.xml')
+                                LOGGER.info("cwe_dict.xml extracted and saved successfully.")
+                                os.remove(save_path)
+                                LOGGER.info("XML.zip deleted successfully.")
+                                if sf.check_status("cwe") == 0:
+                                    LOGGER.info("cwe_dict.xml exists...")
+                                    tmp_file_hash = sf.calculate_file_hash(filename)
+                                    final_file_hash = sf.calculate_file_hash(final_filename)
+                                    if tmp_file_hash == final_file_hash:
+                                        os.remove(filename)
+                                        LOGGER.info("The new file is identical to the existing file. "
+                                                    "Deleted tmp_cwe_dict.xml")
+                                    else:
+                                        os.remove(final_filename)
+                                        os.rename(filename, "/vol/data/cwe_dict.xml")
+                                        LOGGER.info(
+                                            "The new file is different from the existing file. Replaced cwe_dict.xml "
+                                            "with tmp_cwe_dict.xml.")
+                                else:
+                                    LOGGER.info("cwe_dict.xml DOES NOT exist...")
+                                    LOGGER.info("Writing cwe_dict.xml")
+                                    os.rename(filename, "/vol/data/cwe_dict.xml")
+                                break
+                    else:
+                        LOGGER.info(f"Failed to download XML.zip from {xml_zip_url}. Status code:",
+                                    response_xml.status_code)
+            print("CWE Comprehensive View not found in the provided URL.")
+        else:
+            print(f"Failed to fetch {url}. Status code:", response.status_code)
+    except Exception as e:
+        print(f"An error occurred: {str(e)}")
+
 
 def cwe_init():
+    # Download xml_zip(), extract, and compare if it is an update or not.
+    download_xml_zip()
+
     # Parse the XML file
-    xml_file_path = './data/cwe/cwe_dict.xml'
+    xml_file_path = os.path.join(vol_path, "cwe_dict.xml")
 
     # Define the path to the target elements
     target_path = {
