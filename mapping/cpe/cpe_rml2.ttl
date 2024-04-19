@@ -12,12 +12,13 @@
 @prefix xml: <http://www.w3.org/XML/1998/namespace> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix ucoex: <http://example.com/ucoex#> .
 @prefix capec: <http://purl.org/cyber/capec#> .
 @base <http://purl.org/cyber/uco#> .
 
 
 # Platform Class mapping
-uco:CPEMap a rr:TriplesMap;
+<#CPEMap> a rr:TriplesMap;
   rml:logicalSource [
     rml:source "./mapping/cve/cves.json";
     rml:referenceFormulation ql:JSONPath;
@@ -25,12 +26,11 @@ uco:CPEMap a rr:TriplesMap;
 ];
 
 rr:subjectMap [
-  rr:template "http://purl.org/cyber/uco#{criteria}";
-  rr:class uco:ucoCPE
+  rr:template "http://example.com/ucoex#{criteria}";
+  rr:class <http://example.com/ucoexCPE>
 ].
 
-# CPE Class mapping
-uco:PlatformMap a rr:TriplesMap;
+<#CVEMap> a rr:TriplesMap;
   rml:logicalSource [
     rml:source "./mapping/cve/cves.json";
     rml:referenceFormulation ql:JSONPath;
@@ -38,15 +38,15 @@ uco:PlatformMap a rr:TriplesMap;
 ];
 rr:subjectMap [
   rr:template "http://purl.org/cyber/uco#{cve.id}";
-  rr:class uco:ucoCVE
+  rr:class <http://purl.org/cyber/ucoCVE>
 ].
 
 # Platform has CVE_ID predicate
 # This is also how you join two classes
-uco:CPEMap rr:predicateObjectMap [
-    rr:predicate uco:ucohasPlatform;  # The predicate linking CPEMap to PlatformMap
+<#CPEMap> rr:predicateObjectMap [
+    rr:predicate <http://example.com/ucoexhasCPE>;  # The predicate linking CPEMap to PlatformMap
     rr:objectMap [
-        rr:parentTriplesMap uco:PlatformMap;  # Referencing the PlatformMap
+        rr:parentTriplesMap <#CVEMap>;  # Referencing the PlatformMap
         rr:joinCondition [
           rr:child "cve.id";
           rr:parent "cve.id"

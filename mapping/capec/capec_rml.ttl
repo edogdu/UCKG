@@ -13,7 +13,7 @@
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix capec: <http://purl.org/cyber/capec#> .
-@prefix ucoex: <http://example.com/uco-extended#> .
+@prefix ucoex: <http://example.com/ucoex#> .
 @base <http://purl.org/cyber/uco#> .
 
 #CVE Class mapping
@@ -24,22 +24,22 @@
                    rml:iterator "$[*]"
                ];
              rr:predicateObjectMap [
-                   rr:predicate ucoex:ucohasRelatedWeakness;
+                   rr:predicate <http://example.com/ucoexhasRelatedWeakness>;
                    rr:objectMap [
                                     rr:template "http://purl.org/cyber/uco#{.Related_Weaknesses[*]}";
-                                    rr:class uco:ucoCWE
+                                    rr:class <http://purl.org/cyber/ucoCWE>
                                 ]
                ];
             rr:predicateObjectMap [
-                                      rr:predicate ucoex:ucohasTaxonomyMapping ;
+                                      rr:predicate <http://example.com/ucoexhasTaxonomyMapping> ;
                                       rr:objectMap [
-                                                       rr:template "http://example.com/uco-extended#{.Taxonomy_Mappings[*]}";
-                                                       rr:class ucoex:ucoMITREATTACK
+                                                       rr:template "http://example.com/ucoex#{.Taxonomy_Mappings[*]}";
+                                                       rr:class <http://example.com/ucoexMITREATTACK>
                                                    ]
                                   ];
              rr:subjectMap [
-                   rr:template "http://example.com/uco-extended#CAPEC-{ID}";
-                   rr:class ucoex:ucoCAPEC
+                   rr:template "http://example.com/ucoex#CAPEC-{ID}";
+                   rr:class <http://example.com/ucoexCAPEC>
                ].
 <#ATTACKMap> a rr:TriplesMap;
              rml:logicalSource [
@@ -48,8 +48,8 @@
                    rml:iterator "$[*]"
                ];
              rr:subjectMap [
-                   rr:template "http://example.com/uco-extended#{.Taxonomy_Mappings[*]}";
-                   rr:class ucoex:ucoMITREATTACK
+                   rr:template "http://example.com/ucoex#{.Taxonomy_Mappings[*]}";
+                   rr:class <http://example.com/ucoexMITREATTACK>
                ].
 
 <#CWEMap> a rr:TriplesMap;
@@ -60,5 +60,5 @@
                ];
              rr:subjectMap [
                    rr:template "http://purl.org/cyber/uco#{.Related_Weaknesses[*]}";
-                   rr:class uco:ucoCWE
+                   rr:class <http://purl.org/cyber/ucoCWE>
                ].

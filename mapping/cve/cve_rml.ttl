@@ -13,7 +13,7 @@
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix capec: <http://purl.org/cyber/capec#> .
-@prefix ucoex: <http://example.com/uco-extended#> .
+@prefix ucoex: <http://example.com/ucoex#> .
 @base <http://purl.org/cyber/uco#> .
 
 # How to read the CVEs from a json file and iterate
@@ -27,19 +27,19 @@
 #Vulnerability Class mapping
 rr:subjectMap [
   rr:template "http://purl.org/cyber/uco#VULN-{cve.id}";
-  rr:class uco:ucoVulnerability
+  rr:class <http://purl.org/cyber/ucoVulnerability>
 ];
 #Vulnerability ucoPublishedDate predicate
  rr:predicateObjectMap [
-        rr:predicate uco:ucoPublishedDate;  # Your DatatypeProperty for dateTime
+        rr:predicate <http://purl.org/cyber/ucopublishedDateTime>;
         rr:objectMap [
-            rml:reference "cve.published";  # Field in your data source
-            rr:datatype xsd:dateTime  # Specifying that the datatype is dateTime
+            rml:reference "cve.published";  
+            rr:datatype xsd:dateTime  
 ]
 ];
 #Vulnerability ucoLastModifiedDate predicate
  rr:predicateObjectMap [
-   rr:predicate uco:ucoLastModifiedDate;  # Your DatatypeProperty for dateTime
+   rr:predicate <http://purl.org/cyber/ucolastModifiedDateTime>;  # Your DatatypeProperty for dateTime
    rr:objectMap [
                     rml:reference "cve.lastModified";  # Field in your data source
                     rr:datatype xsd:dateTime  # Specifying that the datatype is dateTime
@@ -48,17 +48,17 @@ rr:subjectMap [
 
 #Vulnerability ucosummary predicate
 rr:predicateObjectMap [
-   rr:predicate uco:ucosummary;  # Your DatatypeProperty for dateTime
+   rr:predicate <http://purl.org/cyber/ucosummary>;  # Your DatatypeProperty for dateTime
    rr:objectMap [
                     rml:reference "cve.descriptions[*].value";  # Field in your data source
                     rr:datatype xsd:string  # Specifying that the datatype is dateTime
                 ]
 ];
 rr:predicateObjectMap [
-   rr:predicate uco:ucohasCVE_ID;
+   rr:predicate <http://purl.org/cyber/ucohasCVE_ID>;
    rr:objectMap [
         rr:template "http://purl.org/cyber/uco#{cve.id}";
-        rr:class uco:ucoCVE
+        rr:class <http://purl.org/cyber/ucoCVE>
     ]
    ].
 
@@ -70,15 +70,15 @@ rr:predicateObjectMap [
     rml:iterator "$.cves[*]"
   ];
 rr:predicateObjectMap [
-        rr:predicate ucoex:hasCPE;
+        rr:predicate <http://example.com/ucoexhasCPE>;
         rr:objectMap [
-             rr:template "http://example.com/uco-extended#{.cpes[*].cpe.cpeName}";
-             rr:class ucoex:ucoCPE
+             rr:template "http://example.com/ucoex#{.cpes[*].cpe.cpeName}";
+             rr:class <http://example.com/ucoexCPE>
            ]
 ];
 rr:subjectMap [
   rr:template "http://purl.org/cyber/uco#{cve.id}";
-  rr:class uco:ucoCVE
+  rr:class <http://purl.org/cyber/ucoCVE>
 ].
 
 <#CPEMap> a rr:TriplesMap;
@@ -88,8 +88,8 @@ rr:subjectMap [
         rml:iterator "$.cves[*].cpes[*]"
     ];
     rr:subjectMap [
-        rr:template "http://example.com/uco-extended#{cpe.cpeName}";
-        rr:class ucoex:ucoCPE
+        rr:template "http://example.com/ucoex#{cpe.cpeName}";
+        rr:class <http://example.com/ucoexCPE>
     ].
 
 
@@ -102,20 +102,20 @@ rr:subjectMap [
     ];
     rr:subjectMap [
         rr:template "http://purl.org/cyber/uco#ExploitTarget-{id}";
-        rr:class uco:ucoExploitTarget
+        rr:class <http://purl.org/cyber/ucoExploitTarget>
     ];
     rr:predicateObjectMap [
-      rr:predicate uco:ucohasVulnerability;
+      rr:predicate <http://purl.org/cyber/ucohasVulnerability>;
       rr:objectMap [
                        rr:template "http://purl.org/cyber/uco#VULN-{cve_id}";
-                       rr:class uco:ucoVulnerability
+                       rr:class <http://purl.org/cyber/ucoVulnerability>
                    ]
   ];
     rr:predicateObjectMap [
-        rr:predicate uco:ucohasWeakness;
+        rr:predicate <http://purl.org/cyber/ucohasWeakness>;
         rr:objectMap [
             rr:template "http://purl.org/cyber/uco#{id}";
-            rr:class uco:ucoCWE
+            rr:class <http://purl.org/cyber/ucoCWE>
         ]
     ].
 
@@ -128,7 +128,7 @@ rr:subjectMap [
   ];
   rr:subjectMap [
     rr:template "http://purl.org/cyber/uco#{id}";
-    rr:class uco:ucoCWE  # This ensures every CWE ID is declared as an instance of uco:ucoCWE
+    rr:class <http://purl.org/cyber/ucoCWE>  # This ensures every CWE ID is declared as an instance of uco:ucoCWE
 ].
 
 <#CPETypeMap> a rr:TriplesMap;
@@ -138,6 +138,6 @@ rr:subjectMap [
        rml:iterator "$.cves[*].cve.cpes[*].cpe"
    ];
  rr:subjectMap [
-       rr:template "http://example.com/uco-extended#{cpeName}";
-       rr:class ucoex:ucoCPE
+       rr:template "http://example.com/ucoex#{cpeName}";
+       rr:class <http://example.com/ucoexCPE>
    ].

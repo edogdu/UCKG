@@ -13,7 +13,7 @@
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix capec: <http://purl.org/cyber/capec#> .
-@prefix ucoex: <http://example.com/uco-extended#> .
+@prefix ucoex: <http://example.com/ucoex#> .
 @base <http://purl.org/cyber/uco#> .
 
 <#ATTACKMap> a rr:TriplesMap;
@@ -23,6 +23,6 @@
                    rml:iterator "$[*]"
                ];
              rr:subjectMap [
-                   rr:template "http://example.com/uco-extended#{d3f:attack-id}";
-                   rr:class ucoex:ucoMITREATTACK
+                   rr:template "http://example.com/ucoex#{d3f:attack-id}";
+                   rr:class <http://example.com/ucoexMITREATTACK>
    ].

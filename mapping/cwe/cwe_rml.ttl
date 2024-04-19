@@ -26,7 +26,7 @@ uco:ClassAMap a rr:TriplesMap;
 #Vulnerability Class mapping
 rr:subjectMap [
   rr:template "http://purl.org/cyber/uco#ExploitTarget-{cwe.id_value}";
-  rr:class uco:ucoExploitTarget
+  rr:class <http://purl.org/cyber/ucoExploitTarget>
 ].
 
 #CVE Class mapping
@@ -39,13 +39,13 @@ uco:ClassBMap a rr:TriplesMap;
 
 rr:subjectMap [
   rr:template "http://purl.org/cyber/uco#{cwe.id_value}";
-  rr:class uco:ucoCWE
+  rr:class <http://purl.org/cyber/ucoCWE>
 ].
 
 # Vulnerability ucohasWeakness predicate
 # This is how you join two classes
 uco:ClassAMap rr:predicateObjectMap [
-    rr:predicate uco:ucohasWeakness;  # The predicate linking ClassA to ClassB
+    rr:predicate <http://purl.org/cyber/ucohasWeakness>;  # The predicate linking ClassA to ClassB
     rr:objectMap [
         rr:parentTriplesMap uco:ClassBMap;  # Referencing the ClassB map
         rr:joinCondition [
@@ -57,7 +57,7 @@ uco:ClassAMap rr:predicateObjectMap [
 
 #Vulnerability ucoPublishedDate predicate
 uco:ClassBMap rr:predicateObjectMap [
-        rr:predicate uco:ucodescription;  # Your DatatypeProperty for dateTime
+        rr:predicate <http://purl.org/cyber/ucodescription>;  # Your DatatypeProperty for dateTime
         rr:objectMap [
             rml:reference "cwe.description";  # Field in your data source
             rr:datatype xsd:string
@@ -66,7 +66,7 @@ uco:ClassBMap rr:predicateObjectMap [
 
 #Vulnerability ucoPublishedDate predicate
 uco:ClassBMap rr:predicateObjectMap [
-        rr:predicate uco:ucocweID;  # Your DatatypeProperty for dateTime
+        rr:predicate <http://purl.org/cyber/ucocweID>;  # Your DatatypeProperty for dateTime
         rr:objectMap [
             rml:reference "cwe.id_value";  # Field in your data source
             rr:datatype xsd:string
@@ -75,7 +75,7 @@ uco:ClassBMap rr:predicateObjectMap [
 
 #Vulnerability ucoPublishedDate predicate
 uco:ClassBMap rr:predicateObjectMap [
-        rr:predicate uco:ucocommonConsequences;  # Your DatatypeProperty for dateTime
+        rr:predicate <http://purl.org/cyber/ucocommonConsequences>;  # Your DatatypeProperty for dateTime
         rr:objectMap [
             rml:reference "cwe.common_consequences";  # Field in your data source
             rr:datatype xsd:string
@@ -84,7 +84,7 @@ uco:ClassBMap rr:predicateObjectMap [
 
 #Vulnerability ucoPublishedDate predicate
 uco:ClassBMap rr:predicateObjectMap [
-        rr:predicate uco:ucotimeOfIntroduction;  # Your DatatypeProperty for dateTime
+        rr:predicate <http://purl.org/cyber/ucotimeOfIntroduction>;  # Your DatatypeProperty for dateTime
         rr:objectMap [
             rml:reference "cwe.time_of_introduction";  # Field in your data source
             rr:datatype xsd:date
@@ -93,7 +93,7 @@ uco:ClassBMap rr:predicateObjectMap [
 
 #Vulnerability ucoPublishedDate predicate
 uco:ClassBMap rr:predicateObjectMap [
-        rr:predicate uco:ucocweSummary;  # Your DatatypeProperty for dateTime
+        rr:predicate <http://purl.org/cyber/ucocweSummary>;  # Your DatatypeProperty for dateTime
         rr:objectMap [
             rml:reference "cwe.summary";  # Field in your data source
             rr:datatype xsd:string
@@ -102,7 +102,7 @@ uco:ClassBMap rr:predicateObjectMap [
 
 #Vulnerability ucoPublishedDate predicate
 uco:ClassBMap rr:predicateObjectMap [
-        rr:predicate uco:ucocweExtendedSummary;  # Your DatatypeProperty for dateTime
+        rr:predicate <http://purl.org/cyber/ucocweExtendedSummary>;  # Your DatatypeProperty for dateTime
         rr:objectMap [
             rml:reference "cwe.extended_summary";  # Field in your data source
             rr:datatype xsd:string
@@ -111,7 +111,7 @@ uco:ClassBMap rr:predicateObjectMap [
 
 #Vulnerability ucoPublishedDate predicate
 uco:ClassBMap rr:predicateObjectMap [
-        rr:predicate uco:ucocweName;  # Your DatatypeProperty for dateTime
+        rr:predicate <http://purl.org/cyber/ucocweName>;  # Your DatatypeProperty for dateTime
         rr:objectMap [
             rml:reference "cwe.name";  # Field in your data source
             rr:datatype xsd:string

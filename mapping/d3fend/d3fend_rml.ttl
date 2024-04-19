@@ -13,7 +13,7 @@
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix capec: <http://purl.org/cyber/capec#> .
-@prefix ucoex: <http://example.com/uco-extended#> .
+@prefix ucoex: <http://example.com/ucoex#> .
 @base <http://purl.org/cyber/uco#> .
 
 #CVE Class mapping
@@ -24,15 +24,15 @@
                 rml:iterator "$[*]"
             ];
           rr:predicateObjectMap [
-                rr:predicate ucoex:ucohasMITREATTACK;
+                rr:predicate <http://example.com/ucoexhasMITREATTACK>;
                 rr:objectMap [
-                                 rr:template "http://example.com/uco-extended#{off_tech_id}";
-                                 rr:class ucoex:ucoMITREATTACK
+                                 rr:template "http://example.com/ucoex#{off_tech_id}";
+                                 rr:class <http://example.com/ucoexMITREATTACK>
                              ]
             ];
           rr:subjectMap [
-                rr:template "http://example.com/uco-extended#{@id}";
-                rr:class ucoex:ucoMITRED3FEND
+                rr:template "http://example.com/ucoex#{@id}";
+                rr:class <http://example.com/ucoexMITRED3FEND>
             ].
 <#ATTACKMap> a rr:TriplesMap;
              rml:logicalSource [
@@ -41,6 +41,6 @@
                    rml:iterator "$[*]"
                ];
              rr:subjectMap [
-                   rr:template "http://example.com/uco-extended#{off_tech_id}";
-                   rr:class ucoex:ucoMITREATTACK
+                   rr:template "http://example.com/ucoex#{off_tech_id}";
+                   rr:class <http://example.com/ucoexMITREATTACK>
    ].
