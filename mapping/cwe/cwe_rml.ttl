@@ -1,0 +1,119 @@
+@prefix rml: <http://semweb.mmlab.be/ns/rml#> .
+@prefix rr: <http://www.w3.org/ns/r2rml#> .
+@prefix ql: <http://semweb.mmlab.be/ns/ql#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix : <http://example.org/rules/> .
+@prefix schema: <http://schema.org/> .
+@prefix dbo: <http://dbpedia.org/ontology/> .
+@prefix cve: <http://purl.org/cyber/cve#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix stx: <http://purl.org/cyber/stx#> .
+@prefix uco: <http://purl.org/cyber/uco#> .
+@prefix xml: <http://www.w3.org/XML/1998/namespace> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix capec: <http://purl.org/cyber/capec#> .
+@base <http://purl.org/cyber/uco#> .
+
+# How to read the CWEs from a json file and itterate
+uco:ClassAMap a rr:TriplesMap;
+  rml:logicalSource [
+    rml:source "./data/cwe/cwes.json";
+    rml:referenceFormulation ql:JSONPath;
+    rml:iterator "cwes[*]"
+  ];
+
+#Vulnerability Class mapping
+rr:subjectMap [
+  rr:template "http://purl.org/cyber/uco#ExploitTarget-{cwe.id_value}";
+  rr:class <http://purl.org/cyber/ucoExploitTarget>
+].
+
+#CVE Class mapping
+uco:ClassBMap a rr:TriplesMap;
+  rml:logicalSource [
+    rml:source "./data/cwe/cwes.json";
+    rml:referenceFormulation ql:JSONPath;
+    rml:iterator "cwes[*]"
+  ];
+
+rr:subjectMap [
+  rr:template "http://purl.org/cyber/uco#{cwe.id_value}";
+  rr:class <http://purl.org/cyber/ucoCWE>
+].
+
+# Vulnerability ucohasWeakness predicate
+# This is how you join two classes
+uco:ClassAMap rr:predicateObjectMap [
+    rr:predicate <http://purl.org/cyber/ucohasWeakness>;  # The predicate linking ClassA to ClassB
+    rr:objectMap [
+        rr:parentTriplesMap uco:ClassBMap;  # Referencing the ClassB map
+        rr:joinCondition [
+          rr:child "cwe.id_value";
+          rr:parent "cwe.id_value"
+        ]
+    ]
+].
+
+#Vulnerability ucoPublishedDate predicate
+uco:ClassBMap rr:predicateObjectMap [
+        rr:predicate <http://purl.org/cyber/ucodescription>;  # Your DatatypeProperty for dateTime
+        rr:objectMap [
+            rml:reference "cwe.description";  # Field in your data source
+            rr:datatype xsd:string
+        ]
+].
+
+#Vulnerability ucoPublishedDate predicate
+uco:ClassBMap rr:predicateObjectMap [
+        rr:predicate <http://purl.org/cyber/ucocweID>;  # Your DatatypeProperty for dateTime
+        rr:objectMap [
+            rml:reference "cwe.id_value";  # Field in your data source
+            rr:datatype xsd:string
+        ]
+].
+
+#Vulnerability ucoPublishedDate predicate
+uco:ClassBMap rr:predicateObjectMap [
+        rr:predicate <http://purl.org/cyber/ucocommonConsequences>;  # Your DatatypeProperty for dateTime
+        rr:objectMap [
+            rml:reference "cwe.common_consequences";  # Field in your data source
+            rr:datatype xsd:string
+        ]
+].
+
+#Vulnerability ucoPublishedDate predicate
+uco:ClassBMap rr:predicateObjectMap [
+        rr:predicate <http://purl.org/cyber/ucotimeOfIntroduction>;  # Your DatatypeProperty for dateTime
+        rr:objectMap [
+            rml:reference "cwe.time_of_introduction";  # Field in your data source
+            rr:datatype xsd:date
+        ]
+].
+
+#Vulnerability ucoPublishedDate predicate
+uco:ClassBMap rr:predicateObjectMap [
+        rr:predicate <http://purl.org/cyber/ucocweSummary>;  # Your DatatypeProperty for dateTime
+        rr:objectMap [
+            rml:reference "cwe.summary";  # Field in your data source
+            rr:datatype xsd:string
+        ]
+].
+
+#Vulnerability ucoPublishedDate predicate
+uco:ClassBMap rr:predicateObjectMap [
+        rr:predicate <http://purl.org/cyber/ucocweExtendedSummary>;  # Your DatatypeProperty for dateTime
+        rr:objectMap [
+            rml:reference "cwe.extended_summary";  # Field in your data source
+            rr:datatype xsd:string
+        ]
+].
+
+#Vulnerability ucoPublishedDate predicate
+uco:ClassBMap rr:predicateObjectMap [
+        rr:predicate <http://purl.org/cyber/ucocweName>;  # Your DatatypeProperty for dateTime
+        rr:objectMap [
+            rml:reference "cwe.name";  # Field in your data source
+            rr:datatype xsd:string
+        ]
+].

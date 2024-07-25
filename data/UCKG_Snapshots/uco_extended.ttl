@@ -1,0 +1,40 @@
+@prefix ucoex: <http://example.com/ucoex#> .
+@prefix uco: <http://purl.org/cyber/uco#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@base <http://example.com/ucoex#> .
+
+<http://example.com/ucoex> rdf:type owl:Ontology ;
+                                owl:imports <http://purl.org/cyber/uco> .
+
+ <http://example.com/ucoexCPE> rdf:type owl:Class ;
+       rdfs:subClassOf  <http://purl.org/cyber/ucoUCOThing>.
+
+
+<http://example.com/ucoexhasCPE> rdf:type owl:ObjectProperty ;
+                                     rdfs:domain <http://purl.org/cyber/ucoCVE>;
+                                     rdfs:range <http://example.com/ucoexCPE> .
+
+
+<http://example.com/ucoexMITRED3FEND> rdf:type owl:Class ;
+                rdfs:subClassOf <http://purl.org/cyber/ucoUCOThing>.
+
+<http://example.com/ucoexMITREATTACK> rdf:type owl:Class ;
+                rdfs:subClassOf <http://purl.org/cyber/ucoUCOThing>.
+
+
+<http://example.com/ucoexhasMITREATTACK> rdf:type owl:ObjectProperty ;
+                rdfs:domain <http://example.com/ucoexMITRED3FEND>;
+                rdfs:range <http://example.com/ucoexMITREATTACK> .
+
+<http://example.com/ucoexCAPEC> rdf:type owl:Class ;
+                     rdfs:subClassOf <http://purl.org/cyber/ucoUCOThing> .
+
+<http://example.com/ucoexhasRelatedWeakness> rdf:type owl:ObjectProperty ;
+                        rdfs:domain <http://example.com/ucoexCAPEC>;
+                        rdfs:range <http://purl.org/cyber/ucoCWE> .
+
+<http://example.com/ucoexhasTaxonomyMapping> rdf:type owl:ObjectProperty ;
+                            rdfs:domain <http://example.com/ucoexCAPEC>;
+                            rdfs:range <http://example.com/ucoexMITREATTACK> .

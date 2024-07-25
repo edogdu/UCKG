@@ -1,2 +1,0 @@
-* * * * * python3.11 /app/hello_world.py >> /out.txt
-* * * * * (sleep 30; python3.11 /app/hello_world.py >> /out.txt)

@@ -1,0 +1,28 @@
+@prefix rml: <http://semweb.mmlab.be/ns/rml#> .
+@prefix rr: <http://www.w3.org/ns/r2rml#> .
+@prefix ql: <http://semweb.mmlab.be/ns/ql#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix : <http://example.org/rules/> .
+@prefix schema: <http://schema.org/> .
+@prefix dbo: <http://dbpedia.org/ontology/> .
+@prefix cve: <http://purl.org/cyber/cve#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix stx: <http://purl.org/cyber/stx#> .
+@prefix uco: <http://purl.org/cyber/uco#> .
+@prefix xml: <http://www.w3.org/XML/1998/namespace> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix capec: <http://purl.org/cyber/capec#> .
+@prefix ucoex: <http://example.com/ucoex#> .
+@base <http://purl.org/cyber/uco#> .
+
+<#ATTACKMap> a rr:TriplesMap;
+             rml:logicalSource [
+                   rml:source "./data/attack/attack.json";
+                   rml:referenceFormulation ql:JSONPath;
+                   rml:iterator "$[*]"
+               ];
+             rr:subjectMap [
+                   rr:template "http://example.com/ucoex#{d3f:attack-id}";
+                   rr:class <http://example.com/ucoexMITREATTACK>
+   ].

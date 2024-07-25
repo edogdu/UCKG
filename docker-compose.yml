@@ -1,5 +1,7 @@
 version: '3'
 volumes:
+  neo4j_vol:
+    driver: local
   my_volume:
     driver: local
 services:
@@ -18,13 +20,14 @@ services:
       NEO4J_dbms_security_procedures_unrestricted: "apoc.*"
       NEO4J_apoc_initializers_neo4jConf: "true"
       NEO4J_apoc_import_file_enabled: "true"
-      NEO4J_apoc_initializer_cypher: "CALL apoc.cypher.runFiles(['file:///init.cypher', 'file:///constraint.cypher'])"
+      NEO4J_apoc_initializer_cypher: "CALL apoc.cypher.runFiles(['file:///init.cypher'])"
     ports:
       - "7474:7474"
       - "7687:7687"
     volumes:
       - $PWD/plugins:/neo4j/plugins # Mount the plugins directory
-      - my_volume:/vol/data # Persist data 
+      - my_volume:/vol/data # Persist data
+      - neo4j_vol:/data
       - $PWD/neo4j/import:/var/lib/neo4j/import # Import directory 
 
   uckg-scripts:
@@ -36,9 +39,9 @@ services:
       - my_volume:/vol/data # Persist data 
     depends_on:
       - neo4j
-  cron:
-    build:
-      context: .
-      dockerfile: Dockerfile-cron
-    volumes:
-      - my_volume:/vol/data
+        #cron:
+        #build:
+        #context: .
+        #dockerfile: Dockerfile-cron
+        #volumes:
+        #- my_volume:/vol/data

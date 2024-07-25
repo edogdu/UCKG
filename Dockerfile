@@ -6,24 +6,28 @@ WORKDIR /app
 
 # Install any Python dependencies you need
 RUN apt-get update && apt-get install -y python3.11 \
-    openjdk-17-jdk
+    openjdk-17-jdk \
+    sqlite3
 # Install Vim
 RUN export PATH=$PATH:/usr/bin/python3.11
 # Install curl (and vim if you need it)
 # RUN apt-get update && apt-get install -y curl vim
 RUN pip install requests
-RUN pip install neo4j 
+RUN pip install neo4j
 RUN pip install owlready2
 RUN pip install rdflib
+RUN pip install beautifulsoup4 html5lib
+
 
 # Copy your Python script and any other necessary files
 COPY . /app
 
 # Set permissions for the JAR and data directory
-RUN chmod 755 /app/rml_mapper/mapper.jar
+RUN chmod 755 /app/mapping/mapper.jar
 
 # Set environment variables
-ENV UCO_ONTO_PATH=/app/uco2.ttl
+ENV UCO_ONTO_PATH=/app/data/UCKG_Snapshots/uco2.ttl
+ENV UCO_ONTO_EXTEND_PATH=/app/data/UCKG_Snapshots/uco_extended.ttl
 ENV ROOT_FOLDER=/app
 
 # Set the Python script as the entry point
