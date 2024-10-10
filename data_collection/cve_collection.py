@@ -201,7 +201,7 @@ def cve_init():
             #successfully_mapped2 = sf.call_mapper_update("cpe")
             successfully_mapped2 = True
             if successfully_mapped and successfully_mapped2:
-                if start_index % 10000 == 0 or start_index == 0 or vul_count < 2000:
+                if vul_count < 2000:
                     sf.call_ontology_updater(reason = True)
                 else:
                     sf.call_ontology_updater()

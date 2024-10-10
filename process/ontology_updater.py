@@ -58,15 +58,16 @@ def update_ontology(run_reasoner=False):
         with onto:
             graph_2.parse(os.path.join(vol_path, "out.ttl"))
             write_path = os.path.join(vol_path, "uco_with_instances.owl")
+            validate_and_fix_datetime_literals(graph_2)
             graph_2.serialize(write_path, format="xml")
             logger.info(f"Created file uco_with_instances.owl")
 
         # Switch back to owlready2 so I can use the sync_reasoner
         onto_final = get_ontology(write_path).load()
-        validate_and_fix_datetime_literals(onto_final.world.as_rdflib_graph())
         if run_reasoner:
             logger.info(f"Running the reasoner")
             with onto_final:
+                validate_and_fix_datetime_literals(onto_final.world.as_rdflib_graph())
                 sync_reasoner()
 
         # Finally switch back to rdflib so I can the ontology and instances as turtle format

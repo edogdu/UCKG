@@ -79,7 +79,7 @@ def attack_init():
     if successfully_mapped:
         LOGGER.info("ATT&CK Data Successfully Mapped")
         LOGGER.info("Beginning ATT&CK Ontology Updater")
-        sf.call_ontology_updater()
+        sf.call_ontology_updater(reason=True)
         LOGGER.info("ATT&CK Ontology Updater Complete")
         LOGGER.info("############################\n")
     else:

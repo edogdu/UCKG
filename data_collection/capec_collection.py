@@ -123,7 +123,7 @@ def capec_init():
     if successfully_mapped:
         LOGGER.info("CAPEC Data Successfully Mapped")
         LOGGER.info("Beginning CAPEC Ontology Updater")
-        sf.call_ontology_updater()
+        sf.call_ontology_updater(reason=True)
         LOGGER.info("CAPEC Ontology Updater Complete")
         LOGGER.info("############################\n")
     else:
