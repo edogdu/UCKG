@@ -92,8 +92,6 @@ def cve_init():
         logger.info("############################################################################\n")
         start_index = 0
 
-        cursor.execute(f"DROP TABLE IF EXISTS cve_meta")
-
         # Check if the meta table exists
         cursor.execute(f"SELECT name FROM sqlite_master WHERE type='table' AND name='cve_meta'")
         table_exists = cursor.fetchone()
