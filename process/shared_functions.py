@@ -26,8 +26,11 @@ from process import ontology_updater
 sys.path.append(os.path.join(root_folder, "/process")) 
 from process import graph_updater
 
-def call_ontology_updater():
-    successfully_updated_ontology = ontology_updater.update_ontology()
+def call_ontology_updater(reason=False):
+    if reason:
+        successfully_updated_ontology = ontology_updater.update_ontology(run_reasoner = reason)
+    else:
+        successfully_updated_ontology = ontology_updater.update_ontology()
     if successfully_updated_ontology:
         logger.info("successfully updated the ontology now going to try to insert into the db")
         graph_updater.update_graph()

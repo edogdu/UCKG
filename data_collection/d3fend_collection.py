@@ -79,7 +79,7 @@ def d3fend_init():
     if successfully_mapped:
         LOGGER.info("D3FEND Data Successfully Mapped")
         LOGGER.info("Beginning D3FEND Ontology Updater")
-        sf.call_ontology_updater()
+        sf.call_ontology_updater(reason=True)
         LOGGER.info("############################\n")
         LOGGER.info("D3FEND Ontology Updater Complete")
         LOGGER.info("############################\n")

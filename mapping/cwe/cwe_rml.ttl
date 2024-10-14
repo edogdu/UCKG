@@ -87,7 +87,7 @@ uco:ClassBMap rr:predicateObjectMap [
         rr:predicate <http://purl.org/cyber/ucotimeOfIntroduction>;  # Your DatatypeProperty for dateTime
         rr:objectMap [
             rml:reference "cwe.time_of_introduction";  # Field in your data source
-            rr:datatype xsd:date
+            rr:datatype xsd:dateTime
         ]
 ].
 
