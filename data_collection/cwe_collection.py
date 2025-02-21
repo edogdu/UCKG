@@ -87,7 +87,7 @@ def cwe_init():
                         "id_value": id_value,
                         "description": description,
                         "common_consequences": common_consequences,
-                        "time_of_introduction": time_of_introduction,
+                        "time_of_introduction": time_of_introduction + "T00:00:00",
                         "summary": summary,
                         "name": name,
                         "extended_summary": extended_summary
@@ -103,7 +103,7 @@ def cwe_init():
     successfully_mapped = sf.call_mapper_update("cwe")
     if successfully_mapped:
         logger.info("Successfully mapped CWEs to RML mapper")
-        sf.call_ontology_updater()
+        sf.call_ontology_updater(reason=True)
 
     logger.info("############################")
     logger.info("CWE Data extraction completed")

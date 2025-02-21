@@ -7,6 +7,7 @@ import sqlite3
 import logging
 import xml.etree.ElementTree as ET
 from process import shared_functions as sf
+from time import sleep
 
 # Configure the logging module
 logging.basicConfig(level=logging.INFO, 
@@ -198,7 +199,10 @@ def cve_init():
             #successfully_mapped2 = sf.call_mapper_update("cpe")
             successfully_mapped2 = True
             if successfully_mapped and successfully_mapped2:
-                sf.call_ontology_updater()
+                if vul_count < 2000:
+                    sf.call_ontology_updater(reason = True)
+                else:
+                    sf.call_ontology_updater()
 
 
 
