@@ -4,45 +4,92 @@ volumes:
     driver: local
   my_volume:
     driver: local
+networks:
+  monitoring:
+    driver: bridge
 services:
   neo4j:
-    image: neo4j:4.4.0
-    # healthcheck:
-    #   test: ["CMD", "nc", "-z", "localhost", "7687"]
-    #   interval: 10s
-    #   timeout: 5s
-    #   retries: 5
+    image: neo4j:4.4.0-enterprise
     environment:
       NEO4J_AUTH: neo4j/abcd90909090
       NEO4J_apoc_trigger_enabled: "true"
       NEO4JLABS_PLUGINS: '["apoc", "n10s"]' # Include n10s (Neosemantics) plugin
       NEO4J_ACCEPT_LICENSE_AGREEMENT: 'yes' # Required if using Enterprise version
       NEO4J_dbms_security_procedures_unrestricted: "apoc.*"
-      NEO4J_apoc_initializers_neo4jConf: "true"
       NEO4J_apoc_import_file_enabled: "true"
       NEO4J_apoc_initializer_cypher: "CALL apoc.cypher.runFiles(['file:///init.cypher'])"
       NEO4J_dbms_jvm_additional: "-XX:-UseContainerSupport"
     ports:
       - "7474:7474"
       - "7687:7687"
+      - "2004:2004"  # Expose Neo4j metrics endpoint
+    entrypoint: ["/bin/sh", "-c"]
+    command: 
+      - echo "metrics.prometheus.enabled=true" >> /var/lib/neo4j/conf/neo4j.conf &&
+        echo "metrics.prometheus.endpoint=0.0.0.0:2004" >> /var/lib/neo4j/conf/neo4j.conf &&
+        exec /docker-entrypoint.sh neo4j
     volumes:
       - $PWD/plugins:/neo4j/plugins # Mount the plugins directory
       - my_volume:/vol/data # Persist data
       - neo4j_vol:/data
-      - $PWD/neo4j/import:/var/lib/neo4j/import # Import directory 
-
+      - $PWD/neo4j/import:/var/lib/neo4j/import # Import directory
+    networks:
+      - monitoring
+  prometheus:
+    image: prom/prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    networks:
+      - monitoring
+  grafana:
+    image: grafana/grafana
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_LOG_LEVEL=warn # reduces output of grafana logs
+    volumes:
+      - ./datasource.yml:/etc/grafana/provisioning/datasources/datasource.yml
+    depends_on:
+      - prometheus
+    networks:
+      - monitoring
   uckg-scripts:
     build: .
     environment:
       NEO4J_URI: bolt://neo4j:abcd90909090@neo4j:7687
       VOL_PATH: /vol/data
     volumes:
-      - my_volume:/vol/data # Persist data 
+      - my_volume:/vol/data # Persist data
+    networks:
+      - monitoring
+    ports:
+      - "8000:8000"
     depends_on:
       - neo4j
-        #cron:
-        #build:
-        #context: .
-        #dockerfile: Dockerfile-cron
-        #volumes:
-        #- my_volume:/vol/data
+  statsd: # This service is required if we want to scrape metrics from Airflow and disaply them in Prometheus
+    image: prom/statsd-exporter
+    ports:
+      - "9102:9102"
+    networks:
+      - monitoring
+  airflow:
+    image: apache/airflow:latest
+    ports:
+      - "8081:8080"
+    environment:
+      - LOAD_EX=n
+      - AIRFLOW__METRICS__STATSD_ON=True
+      - AIRFLOW__METRICS__STATSD_HOST=statsd
+      - AIRFLOW__METRICS__STATSD_PORT=9125
+    volumes:
+      - ./airflow/dags:/opt/airflow/dags
+    command: standalone
+    networks:
+      - monitoring
+    depends_on:
+      - uckg-scripts
+      - statsd
