@@ -18,47 +18,84 @@
 
 #CVE Class mapping
 <#CAPECMap> a rr:TriplesMap;
-             rml:logicalSource [
-                   rml:source "./data/capec/capec.json";
-                   rml:referenceFormulation ql:JSONPath;
-                   rml:iterator "$[*]"
-               ];
-             rr:predicateObjectMap [
-                   rr:predicate <http://example.com/ucoexhasRelatedWeakness>;
-                   rr:objectMap [
-                                    rr:template "http://purl.org/cyber/uco#{.Related_Weaknesses[*]}";
-                                    rr:class <http://purl.org/cyber/ucoCWE>
-                                ]
-               ];
-            rr:predicateObjectMap [
-                                      rr:predicate <http://example.com/ucoexhasTaxonomyMapping> ;
-                                      rr:objectMap [
-                                                       rr:template "http://example.com/ucoex#{.Taxonomy_Mappings[*]}";
-                                                       rr:class <http://example.com/ucoexMITREATTACK>
-                                                   ]
-                                  ];
-             rr:subjectMap [
-                   rr:template "http://example.com/ucoex#CAPEC-{ID}";
-                   rr:class <http://example.com/ucoexCAPEC>
-               ].
+    rml:logicalSource [
+        rml:source "./data/capec/capec.json";
+        rml:referenceFormulation ql:JSONPath;
+        rml:iterator "$[*]"
+    ];
+    rr:predicateObjectMap [
+        rr:predicate <http://example.com/ucoexhasRelatedWeakness>;
+        rr:objectMap [
+            rr:template "http://purl.org/cyber/uco#{.Related_Weaknesses[*]}";
+            rr:class <http://purl.org/cyber/ucoCWE>
+        ]
+    ];
+    # ################   Addding part to test out the adding detial of node in CAPEC
+    rr:predicateObjectMap [
+        rr:predicate <http://example.com/ucoCAPEC_name>;  # Your DatatypeProperty
+        rr:objectMap [
+                    rml:reference "Name";  # Field in your data source
+                    rr:datatype xsd:string  # Specifying that the datatype
+        ]
+    ];
+    rr:predicateObjectMap [
+        rr:predicate <http://example.com/ucodesciption>;  # Your DatatypeProperty
+        rr:objectMap [
+                    rml:reference "Description";  # Field in your data source
+                    rr:datatype xsd:string  # Specifying that the datatype
+        ]
+    ];
+    rr:predicateObjectMap [
+        rr:predicate <http://example.com/ucoRelatedAttPattern>;  # Your DatatypeProperty
+        rr:objectMap [
+                    rml:reference "Related_Attack_Patterns[*]";  # Field in your data source
+                    rr:datatype xsd:string  # Specifying that the datatype
+        ]
+    ];
+    rr:predicateObjectMap [
+        rr:predicate <http://example.com/ucoCAPEC_id>;  # Your DatatypeProperty
+        rr:objectMap [
+                    rml:reference "ID";  # Field in your data source
+                    rr:datatype xsd:string  # Specifying that the datatype
+        ]
+    ];
+        rr:predicateObjectMap [
+        rr:predicate <http://example.com/ucoRelatedWeaknesses>;  # Your DatatypeProperty
+        rr:objectMap [
+                    rml:reference "Related_Weaknesses[*]";  # Field in your data source
+                    rr:datatype xsd:string  # Specifying that the datatype
+        ]
+    ];
+    # #############################################################
+    rr:predicateObjectMap [
+        rr:predicate <http://example.com/ucoexhasTaxonomyMapping> ;
+        rr:objectMap [
+            rr:template "http://example.com/ucoex#{.Taxonomy_Mappings[*]}";
+            rr:class <http://example.com/ucoexMITREATTACK>
+        ]
+    ];
+    rr:subjectMap [
+        rr:template "http://example.com/ucoex#CAPEC-{ID}";
+        rr:class <http://example.com/ucoexCAPEC>
+    ].
 <#ATTACKMap> a rr:TriplesMap;
-             rml:logicalSource [
-                   rml:source "./data/capec/capec.json";
-                   rml:referenceFormulation ql:JSONPath;
-                   rml:iterator "$[*]"
-               ];
-             rr:subjectMap [
-                   rr:template "http://example.com/ucoex#{.Taxonomy_Mappings[*]}";
-                   rr:class <http://example.com/ucoexMITREATTACK>
-               ].
+    rml:logicalSource [
+        rml:source "./data/capec/capec.json";
+        rml:referenceFormulation ql:JSONPath;
+        rml:iterator "$[*]"
+    ];
+    rr:subjectMap [
+        rr:template "http://example.com/ucoex#{.Taxonomy_Mappings[*]}";
+        rr:class <http://example.com/ucoexMITREATTACK>
+    ].
 
 <#CWEMap> a rr:TriplesMap;
-             rml:logicalSource [
-                   rml:source "./data/capec/capec.json";
-                   rml:referenceFormulation ql:JSONPath;
-                   rml:iterator "$[*]"
-               ];
-             rr:subjectMap [
-                   rr:template "http://purl.org/cyber/uco#{.Related_Weaknesses[*]}";
-                   rr:class <http://purl.org/cyber/ucoCWE>
-               ].
+    rml:logicalSource [
+        rml:source "./data/capec/capec.json";
+        rml:referenceFormulation ql:JSONPath;
+        rml:iterator "$[*]"
+    ];
+    rr:subjectMap [
+        rr:template "http://purl.org/cyber/uco#{.Related_Weaknesses[*]}";
+        rr:class <http://purl.org/cyber/ucoCWE>
+    ].
