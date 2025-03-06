@@ -29,9 +29,11 @@ def download_capec_xml_file():
         for row in rows:
             # Find the first cell (td) within the row
             first_cell = row.find('td', {'class': 'FirstCell'})
-
+            
+            ############## This should be where I swtich the dataset from CPAEC-ATT&CK Related Patterns --> CAPEC Mechanism of Attack ############
             # Check if the first cell contains the text "ATT&CK Related Patterns"
-            if first_cell and "ATT&CK Related Patterns" in first_cell.text:
+            #if first_cell and "ATT&CK Related Patterns" in first_cell.text: #########################################3
+            if first_cell and "Mechanisms of Attack" in first_cell.text:
                 # Find the link for the XML.zip file within this row
                 link = row.find('a', text='XML.zip')
 
@@ -66,7 +68,8 @@ def download_capec_xml_file():
                         LOGGER.info(f"Failed to process ZIP file '{filename}': {e}")
 
         else:
-            LOGGER.info("Row containing 'ATT&CK Related Patterns' not found")
+            #LOGGER.info("Row containing 'ATT&CK Related Patterns' not found") ########################
+            LOGGER.info("Row contaninig 'Mechanisms of Attact' not found")
     else:
         LOGGER.info(f"Failed to access URL: {url}")
 
