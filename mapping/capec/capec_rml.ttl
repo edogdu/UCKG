@@ -32,6 +32,13 @@
     ];
     # ################   Addding part to test out the adding detial of node in CAPEC
     rr:predicateObjectMap [
+        rr:predicate <http://example.com/ucoCAPEC_id>;  # Your DatatypeProperty
+        rr:objectMap [
+                    rml:reference "ID";  # Field in your data source
+                    rr:datatype xsd:string  # Specifying that the datatype
+        ]
+    ];
+    rr:predicateObjectMap [
         rr:predicate <http://example.com/ucoCAPEC_name>;  # Your DatatypeProperty
         rr:objectMap [
                     rml:reference "Name";  # Field in your data source
@@ -46,6 +53,13 @@
         ]
     ];
     rr:predicateObjectMap [
+        rr:predicate <http://example.com/ucoPrerequisites>;  # Your DatatypeProperty
+        rr:objectMap [
+                    rml:reference "Prerequisites";  # Field in your data source
+                    rr:datatype xsd:string  # Specifying that the datatype
+        ]
+    ];
+    rr:predicateObjectMap [
         rr:predicate <http://example.com/ucoRelatedAttPattern>;  # Your DatatypeProperty
         rr:objectMap [
                     rml:reference "Related_Attack_Patterns[*]";  # Field in your data source
@@ -53,16 +67,23 @@
         ]
     ];
     rr:predicateObjectMap [
-        rr:predicate <http://example.com/ucoCAPEC_id>;  # Your DatatypeProperty
-        rr:objectMap [
-                    rml:reference "ID";  # Field in your data source
-                    rr:datatype xsd:string  # Specifying that the datatype
-        ]
-    ];
-        rr:predicateObjectMap [
         rr:predicate <http://example.com/ucoRelatedWeaknesses>;  # Your DatatypeProperty
         rr:objectMap [
                     rml:reference "Related_Weaknesses[*]";  # Field in your data source
+                    rr:datatype xsd:string  # Specifying that the datatype
+        ]
+    ];
+    rr:predicateObjectMap [
+        rr:predicate <http://example.com/ucoSkills_Required>;  # Your DatatypeProperty
+        rr:objectMap [
+                    rml:reference "Skills_Required[*]";  # Field in your data source
+                    rr:datatype xsd:string  # Specifying that the datatype
+        ]
+    ];
+    rr:predicateObjectMap [
+        rr:predicate <http://example.com/ucoMitigations>;  # Your DatatypeProperty
+        rr:objectMap [
+                    rml:reference "Mitigations";  # Field in your data source
                     rr:datatype xsd:string  # Specifying that the datatype
         ]
     ];
