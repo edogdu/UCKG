@@ -76,20 +76,50 @@ services:
       - "9102:9102"
     networks:
       - monitoring
-  airflow:
-    image: apache/airflow:latest
-    ports:
-      - "8081:8080"
+  # Required for airflow webserver to work.
+  postgres:
+    image: postgres:13
     environment:
-      - LOAD_EX=n
-      - AIRFLOW__METRICS__STATSD_ON=True
-      - AIRFLOW__METRICS__STATSD_HOST=statsd
-      - AIRFLOW__METRICS__STATSD_PORT=9125
-    volumes:
-      - ./airflow/dags:/opt/airflow/dags
-    command: standalone
+      POSTGRES_USER: airflow
+      POSTGRES_PASSWORD: airflow
+      POSTGRES_DB: airflow
+    ports:
+      - "5432:5432"
     networks:
       - monitoring
+  airflow-webserver:
+    image: apache/airflow:latest
+    restart: always
     depends_on:
-      - uckg-scripts
-      - statsd
+      - postgres
+      - airflow-scheduler
+    environment:
+      - PYTHONWARNINGS=ignore::SyntaxWarning # Reduces verbosity of logs for third-party packages we cannot modify.
+      - AIRFLOW__LOGGING__LOGGING_LEVEL=WARNING # Reduces verbosity of logs for Airflow - INFO and DEBUG logs are not shown.
+      - AIRFLOW__CORE__EXECUTOR=LocalExecutor
+      - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql+psycopg2://airflow:airflow@postgres/airflow
+      - LOAD_EX=n
+    ports:
+      - "8081:8080"
+    command: bash -c "airflow db upgrade && airflow users create \
+      --username admin \
+      --password admin \
+      --firstname Admin --lastname User --role Admin --email admin@example.com && \
+      airflow webserver"
+    volumes:
+      - ./airflow/dags:/opt/airflow/dags
+    networks:
+      - monitoring
+  airflow-scheduler:
+    image: apache/airflow:latest
+    restart: always
+    depends_on:
+      - postgres
+    environment:
+      - AIRFLOW__CORE__EXECUTOR=LocalExecutor
+      - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql+psycopg2://airflow:airflow@postgres/airflow
+    command: airflow scheduler
+    volumes:
+      - ./airflow/dags:/opt/airflow/dags
+    networks:
+      - monitoring
