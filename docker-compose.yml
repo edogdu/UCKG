@@ -4,6 +4,8 @@ volumes:
     driver: local
   my_volume:
     driver: local
+  airflow_logs:
+    driver: local
 networks:
   monitoring:
     driver: bridge
@@ -108,6 +110,7 @@ services:
       airflow webserver"
     volumes:
       - ./airflow/dags:/opt/airflow/dags
+      - airflow_logs:/opt/airflow/logs
     networks:
       - monitoring
   airflow-scheduler:
@@ -121,5 +124,6 @@ services:
     command: airflow scheduler
     volumes:
       - ./airflow/dags:/opt/airflow/dags
+      - airflow_logs:/opt/airflow/logs
     networks:
       - monitoring
