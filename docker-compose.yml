@@ -90,6 +90,9 @@ services:
     networks:
       - monitoring
   airflow-webserver:
+    build:
+      context: .
+      dockerfile: Dockerfile.airflow
     image: apache/airflow:latest
     restart: always
     depends_on:
