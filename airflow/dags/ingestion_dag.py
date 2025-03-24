@@ -72,7 +72,7 @@ def compare_counts_and_run():
             conn.commit()
             logger.info("Database connection established and init_finished set to 0.")
             logger.info("Running cve_init() to resume CVE ingestion...")
-            cve_init(DEBUG=False)
+            cve_init()
     else:
         logging.info("No need to run CVE collection. CVEs are up-to-date.")
 
