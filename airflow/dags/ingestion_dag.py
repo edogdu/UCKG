@@ -1,9 +1,16 @@
+import sys
+# Ensure the path to the repo is included for module imports
+sys.path.append('/opt/airflow/repo/data_collection')
+from cve_collection import cve_init
+
+import logging
+import requests
+import sqlite3
+import os
 from airflow import DAG
 from airflow.operators.python import PythonOperator
 from airflow.utils.dates import days_ago
 from datetime import timedelta
-import logging
-import requests
 from neo4j import GraphDatabase
 
 # Configure logging
@@ -26,7 +33,7 @@ def count_cves_in_neo4j():
         count = result.single()["total_cves"]
         logging.info(f"Total CVEs in Neo4j: {count}")
         return count
-'''
+
 # Task 2: Get total CVEs from NVD API
 def count_cves_in_nvd():
     response = requests.get(NVD_API_CVE_COUNT_URL)
@@ -40,6 +47,9 @@ def count_cves_in_nvd():
     return nvd_total
 
 # Task 3: Decide whether to run collection based on counts
+# Working method: Access the database, set the init_finished int to 0 and call
+# cve_init() to resume the ingestion process from the last recorded startIndex
+# in the database.
 def compare_counts_and_run():
     neo4j_count = count_cves_in_neo4j()
     nvd_count = count_cves_in_nvd()
@@ -50,11 +60,22 @@ def compare_counts_and_run():
 
     if nvd_count > neo4j_count:
         logging.info("Running CVE collection - NVD has more CVEs.")
-        # This assumes you have a command in your container:
-        os.system("python /app/cve_collection.py")  # Replace with correct call
+        # Gather the environment variables needed for the database connection
+        # Define the relative path to the data file
+        logger.info("Setting up database connection...")
+        vol_path = os.environ['VOL_PATH']
+        cve_db_file = os.path.join(vol_path, 'cve_database.db')
+        with sqlite3.connect(cve_db_file) as conn:
+            # Create database cursor
+            cursor = conn.cursor()
+            cursor.execute("UPDATE cve_meta SET init_finished=0 WHERE id=12345")
+            conn.commit()
+            logger.info("Database connection established and init_finished set to 0.")
+            logger.info("Running cve_init() to resume CVE ingestion...")
+            cve_init(DEBUG=False)
     else:
         logging.info("No need to run CVE collection. CVEs are up-to-date.")
-'''
+
 # Airflow DAG definition
 default_args = {
     'owner': 'uckg_user',
@@ -74,8 +95,18 @@ with DAG(
     tags=['uckg', 'daily'],
 ) as dag:
 
-    sync_cves_task = PythonOperator(
+    check_and_sync_cves = PythonOperator(
         task_id='check_and_sync_cves',
+        python_callable= compare_counts_and_run,
+        retries=1,
+    )
+    nvd_cve_count = PythonOperator(
+        task_id='retrieve_nvd_cve_count',
+        python_callable= count_cves_in_nvd,
+        retries=1,
+    )
+    sync_cves_task = PythonOperator(
+        task_id='count_neo4j_cve_total',
         python_callable=count_cves_in_neo4j,
         retries=1,
     )

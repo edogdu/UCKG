@@ -78,6 +78,12 @@ services:
       - "9102:9102"
     networks:
       - monitoring
+  init-airflow-vol:
+    image: busybox
+    command: ["sh", "-c", "chown -R 50000:0 /vol/data && chmod -R 777 /vol/data"]
+    volumes:
+      - my_volume:/vol/data
+    user: root
   # Required for airflow webserver to work.
   postgres:
     image: postgres:13
@@ -94,15 +100,19 @@ services:
       context: .
       dockerfile: Dockerfile.airflow
     image: apache/airflow:latest
+    working_dir: /opt/airflow/repo
     restart: always
     depends_on:
       - postgres
       - airflow-scheduler
+      - init-airflow-vol
     environment:
+      - VOL_PATH=/vol/data
       - PYTHONWARNINGS=ignore::SyntaxWarning # Reduces verbosity of logs for third-party packages we cannot modify.
       - AIRFLOW__LOGGING__LOGGING_LEVEL=WARNING # Reduces verbosity of logs for Airflow - INFO and DEBUG logs are not shown.
       - AIRFLOW__CORE__EXECUTOR=LocalExecutor
       - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql+psycopg2://airflow:airflow@postgres/airflow
+      - PYTHONPATH=/opt/airflow/data_collection
       - LOAD_EX=n
     ports:
       - "8081:8080"
@@ -114,19 +124,27 @@ services:
     volumes:
       - ./airflow/dags:/opt/airflow/dags
       - airflow_logs:/opt/airflow/logs
+      - ./:/opt/airflow/repo
+      - my_volume:/vol/data
     networks:
       - monitoring
   airflow-scheduler:
     image: apache/airflow:latest
+    working_dir: /opt/airflow/repo
     restart: always
     depends_on:
       - postgres
+      - init-airflow-vol
     environment:
+      - VOL_PATH=/vol/data
+      - PYTHONPATH=/opt/airflow/repo
       - AIRFLOW__CORE__EXECUTOR=LocalExecutor
       - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql+psycopg2://airflow:airflow@postgres/airflow
-    command: airflow scheduler
+    command: bash -c "airflow scheduler"
     volumes:
       - ./airflow/dags:/opt/airflow/dags
       - airflow_logs:/opt/airflow/logs
+      - ./:/opt/airflow/repo
+      - my_volume:/vol/data
     networks:
       - monitoring

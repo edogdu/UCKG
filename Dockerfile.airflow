@@ -1,7 +1,27 @@
 FROM apache/airflow:2.8.0
 
+# Set the user as airflow rather than root (image requirement) 
+# at the beginning, install dependencies and change permissions
+# to allow wrtie access to the cve_database.db sqlite3 file
+USER root
+WORKDIR /opt/airflow/repo
+COPY /data /app/data
+COPY /mapping /app/mapping
+
+# Ensure airflow owns everything in /vol/data during image build time
+RUN mkdir -p /vol/data && \
+    chown -R 50000:0 /vol/data && \
+    chmod -R 777 /vol/data
+
+RUN chmod 755 /app/mapping/mapper.jar
+RUN apt-get update && apt-get install -y openjdk-17-jdk
+
 USER airflow
 
 RUN pip install neo4j prometheus_client
+RUN pip install owlready2
+RUN pip install rdflib
 
-USER airflow
+ENV UCO_ONTO_PATH=/app/data/UCKG_Snapshots/uco2.ttl
+ENV UCO_ONTO_EXTEND_PATH=/app/data/UCKG_Snapshots/uco_extended.ttl
+ENV ROOT_FOLDER=/app
