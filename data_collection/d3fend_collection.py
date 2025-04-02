@@ -8,7 +8,7 @@ from process import shared_functions as sf
 
 def download_d3fend_json_file():
 
-    url = 'https://d3fend.mitre.org/api/technique/all.json'
+    url = 'https://d3fend.mitre.org/ontologies/d3fend.json'
 
     try:
         # Make API call to retrieve JSON data
