@@ -52,17 +52,35 @@ if torch.cuda.is_available():
     logger.info(f"Current CUDA device: {torch.cuda.current_device()}")
     logger.info(f"CUDA device name: {torch.cuda.get_device_name()}")
 
-model = AutoModelForCausalLM.from_pretrained(
-    model_name,
-    torch_dtype=torch.float16,
-    device_map="auto",
-    trust_remote_code=True
-)
+# Load model with more robust device handling
+try:
+    model = AutoModelForCausalLM.from_pretrained(
+        model_name,
+        torch_dtype=torch.float16,
+        device_map="auto",
+        trust_remote_code=True
+    )
+except Exception as e:
+    logger.warning(f"Failed to load model with device_map='auto': {str(e)}")
+    logger.info("Attempting to load model without device mapping...")
+    model = AutoModelForCausalLM.from_pretrained(
+        model_name,
+        torch_dtype=torch.float16,
+        trust_remote_code=True
+    )
 
 # Log model device and dtype after loading
 logger.info(f"Model device after loading: {model.device}")
 logger.info(f"Model dtype: {model.dtype}")
-logger.info(f"Model config device_map: {model.config.device_map}")
+
+# Try to get device map info safely
+try:
+    if hasattr(model.config, 'device_map'):
+        logger.info(f"Model config device_map: {model.config.device_map}")
+    else:
+        logger.info("Model config does not have device_map attribute")
+except Exception as e:
+    logger.warning(f"Could not access device_map from config: {str(e)}")
 
 # Set padding token if not set
 if tokenizer.pad_token is None:
@@ -162,7 +180,7 @@ async def process_query(request: QueryRequest):
         
         return {
             "response": response,
-            "source_node": context[0]['id'] if context else None,
+            "source_node": {"uri": context[0]['id']} if context else None,
             "context": context,
             "embedding_progress": progress,
             "graph_expansion": get_graph_context(context[0]['id']) if context and request.graph_context else None
