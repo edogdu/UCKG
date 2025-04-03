@@ -13,6 +13,14 @@ from pydantic import BaseModel
 import uvicorn
 from transformers import AutoModelForCausalLM, AutoTokenizer
 import torch
+from prompts import (
+    get_initial_prompt,
+    get_technical_analysis_prompt,
+    get_direct_node_query,
+    get_graph_context_query,
+    get_neo4j_context_query,
+    format_context
+)
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -147,18 +155,8 @@ async def process_query(request: QueryRequest):
         # If no context found, try to get graph context directly
         if not context and request.graph_context:
             logger.info("No semantic context found, trying graph context")
-            # Try to find the node directly in Neo4j
-            query = """
-            MATCH (n)
-            WHERE n.ucodescription CONTAINS $query
-               OR n.ucosummary CONTAINS $query
-               OR n.ucocweSummary CONTAINS $query
-            RETURN n.uri AS uri,
-                   coalesce(n.ucosummary, n.ucocweSummary, n.ucodescription) AS text
-            LIMIT 1
-            """
             with driver.session() as session:
-                result = session.run(query, query=request.query)
+                result = session.run(get_direct_node_query(), query=request.query)
                 record = result.single()
                 if record:
                     context = [{
@@ -183,7 +181,7 @@ async def process_query(request: QueryRequest):
             "source_node": {"uri": context[0]['id']} if context else None,
             "context": context,
             "embedding_progress": progress,
-            "graph_expansion": get_graph_context(context[0]['id']) if context and request.graph_context else None
+            "graph_expansion": await get_graph_context(context[0]['id']) if context and request.graph_context else None
         }
     except Exception as e:
         logger.error(f"Error processing query: {str(e)}")
@@ -202,42 +200,8 @@ def get_embedding_progress():
 async def get_graph_context(uri: str) -> Optional[str]:
     """Get graph context from Neo4j for a given URI."""
     try:
-        # First, get the source node using the uri index
-        query = """
-        MATCH (v)
-        WHERE v.uri = $uri
-        CALL {
-            WITH v
-            // Use full-text indexes for better performance
-            CALL db.index.fulltext.queryNodes("summary_ft_index", v.ucodescription) YIELD node, score
-            WHERE score > 0.5
-            RETURN node.uri AS uri, 
-                   labels(node)[0] AS label, 
-                   coalesce(node.ucosummary, node.ucocweSummary, node.ucodescription) AS summary,
-                   score AS relevance
-            UNION
-            // Also get directly connected nodes
-            MATCH (v)-[rel:*1..3]-(n)
-            WHERE n.ucosummary IS NOT NULL 
-               OR n.ucocweSummary IS NOT NULL 
-               OR n.ucodescription IS NOT NULL
-            RETURN DISTINCT n.uri AS uri, 
-                   labels(n)[0] AS label, 
-                   coalesce(n.ucosummary, n.ucocweSummary, n.ucodescription) AS summary,
-                   1.0 AS relevance
-        }
-        WITH uri, label, summary, relevance
-        ORDER BY relevance DESC
-        LIMIT 5
-        RETURN collect({
-            uri: uri,
-            label: label,
-            summary: summary
-        }) AS context
-        """
-        
         with driver.session() as session:
-            result = session.run(query, uri=uri)
+            result = session.run(get_graph_context_query(), uri=uri)
             record = result.single()
             if record and record["context"]:
                 return format_context(record["context"])
@@ -301,27 +265,8 @@ def create_enriched_document(base_document: str, neo4j_context: Dict) -> str:
 
 def get_neo4j_context(uri: str) -> Dict:
     """Get additional context from Neo4j"""
-    query = """
-    MATCH (n {uri: $uri})
-    WITH n
-    OPTIONAL MATCH (n)-[r]-(related)
-    WHERE related.ucosummary IS NOT NULL 
-       OR related.ucocweSummary IS NOT NULL 
-       OR related.ucodescription IS NOT NULL
-    WITH n, collect({
-        uri: related.uri,
-        summary: coalesce(related.ucosummary, related.ucocweSummary, related.ucodescription),
-        type: labels(related)[0]
-    }) as related_nodes
-    RETURN {
-        uri: n.uri,
-        summary: coalesce(n.ucosummary, n.ucocweSummary, n.ucodescription),
-        type: labels(n)[0],
-        related_nodes: related_nodes
-    } as node
-    """
     with driver.session() as session:
-        result = session.run(query, uri=uri)
+        result = session.run(get_neo4j_context_query(), uri=uri)
         record = result.single()
         return record["node"] if record else None
 
@@ -335,20 +280,8 @@ def generate_response(query: str, context: List[Dict], graph_context: bool = Fal
             for idx, doc in enumerate(context, 1):
                 context_text += f"{idx}. {doc['document']}\n"
         
-        # Create a more focused prompt
-        prompt = f"""You are a cybersecurity expert. Based on the following information, provide a clear and concise answer to the query.
-
-Query: {query}
-
-{context_text}
-
-Instructions:
-1. Focus on technical details and security implications
-2. If the information is incomplete, acknowledge the limitations
-3. Use clear, professional language
-4. If no relevant information is found, state that clearly
-
-Answer:"""
+        # Create initial prompt
+        prompt = get_initial_prompt(query, context_text)
         
         logger.info(f"Input prompt length: {len(prompt)}")
         
@@ -417,19 +350,7 @@ Answer:"""
                 for doc in context:
                     context_text += f"- {doc['document']}\n"
                 
-                prompt = f"""You are a cybersecurity expert. Provide a detailed technical analysis of the following vulnerability or weakness.
-
-Query: {query}
-
-{context_text}
-
-Instructions:
-1. Provide specific technical details about the vulnerability
-2. Explain the security impact
-3. Include any relevant code or system components
-4. If information is limited, explain what is known and what is uncertain
-
-Technical Analysis:"""
+                prompt = get_technical_analysis_prompt(query, context_text)
                 
                 inputs = tokenizer(
                     prompt,
@@ -444,18 +365,18 @@ Technical Analysis:"""
                 outputs = model.generate(
                     input_ids=inputs['input_ids'],
                     attention_mask=inputs['attention_mask'],
-                    max_new_tokens=256,  # Reduced from 512
-                    temperature=0.5,  # Reduced from 0.7
-                    top_p=0.85,  # Reduced from 0.95
+                    max_new_tokens=256,
+                    temperature=0.5,
+                    top_p=0.85,
                     do_sample=True,
                     num_beams=1,
                     pad_token_id=tokenizer.pad_token_id,
                     eos_token_id=tokenizer.eos_token_id,
-                    repetition_penalty=1.0,  # Removed repetition penalty
-                    no_repeat_ngram_size=0,  # Removed n-gram penalty
+                    repetition_penalty=1.0,
+                    no_repeat_ngram_size=0,
                     use_cache=True,
-                    output_scores=True,  # Enable score output for debugging
-                    return_dict_in_generate=True  # Get more detailed output
+                    output_scores=True,
+                    return_dict_in_generate=True
                 )
                 
                 generated_ids = outputs.sequences[0]
