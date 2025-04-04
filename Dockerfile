@@ -32,12 +32,12 @@ ENV ROOT_FOLDER=/app
 
 # PROD
 # Set the Python script as the entry point
-CMD ["python", "entry.py"]
+# CMD ["python", "entry.py"]
 
 # DEV
 # Set the Python script as the entry point
-# RUN pip install debugpy
-# CMD ["python", "-Xfrozen_modules=off", "-m", "debugpy", "--listen", "0.0.0.0:5678", "--wait-for-client", "entry.py"] 
+RUN pip install debugpy
+CMD ["python", "-Xfrozen_modules=off", "-m", "debugpy", "--listen", "0.0.0.0:5678", "--wait-for-client", "entry.py"] 
 
 # Stage 1: Build the custom Neo4j image
 # FROM neo4j:4.4 AS neo4j-builder
