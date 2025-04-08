@@ -4,45 +4,147 @@ volumes:
     driver: local
   my_volume:
     driver: local
+  airflow_logs:
+    driver: local
+networks:
+  monitoring:
+    driver: bridge
 services:
   neo4j:
-    image: neo4j:4.4.0
-    # healthcheck:
-    #   test: ["CMD", "nc", "-z", "localhost", "7687"]
-    #   interval: 10s
-    #   timeout: 5s
-    #   retries: 5
+    image: neo4j:4.4.0-enterprise
     environment:
       NEO4J_AUTH: neo4j/abcd90909090
       NEO4J_apoc_trigger_enabled: "true"
       NEO4JLABS_PLUGINS: '["apoc", "n10s"]' # Include n10s (Neosemantics) plugin
       NEO4J_ACCEPT_LICENSE_AGREEMENT: 'yes' # Required if using Enterprise version
       NEO4J_dbms_security_procedures_unrestricted: "apoc.*"
-      NEO4J_apoc_initializers_neo4jConf: "true"
       NEO4J_apoc_import_file_enabled: "true"
       NEO4J_apoc_initializer_cypher: "CALL apoc.cypher.runFiles(['file:///init.cypher'])"
       NEO4J_dbms_jvm_additional: "-XX:-UseContainerSupport"
     ports:
       - "7474:7474"
       - "7687:7687"
+      - "2004:2004"  # Expose Neo4j metrics endpoint
+    entrypoint: ["/bin/sh", "-c"]
+    command: 
+      - echo "metrics.prometheus.enabled=true" >> /var/lib/neo4j/conf/neo4j.conf &&
+        echo "metrics.prometheus.endpoint=0.0.0.0:2004" >> /var/lib/neo4j/conf/neo4j.conf &&
+        exec /docker-entrypoint.sh neo4j
     volumes:
       - $PWD/plugins:/neo4j/plugins # Mount the plugins directory
       - my_volume:/vol/data # Persist data
       - neo4j_vol:/data
-      - $PWD/neo4j/import:/var/lib/neo4j/import # Import directory 
-
+      - $PWD/neo4j/import:/var/lib/neo4j/import # Import directory
+    networks:
+      - monitoring
+  prometheus:
+    image: prom/prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    networks:
+      - monitoring
+  grafana:
+    image: grafana/grafana
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_LOG_LEVEL=warn # reduces output of grafana logs
+    volumes:
+      - ./datasource.yml:/etc/grafana/provisioning/datasources/datasource.yml
+    depends_on:
+      - prometheus
+    networks:
+      - monitoring
   uckg-scripts:
     build: .
     environment:
       NEO4J_URI: bolt://neo4j:abcd90909090@neo4j:7687
       VOL_PATH: /vol/data
     volumes:
-      - my_volume:/vol/data # Persist data 
+      - my_volume:/vol/data # Persist data
+    networks:
+      - monitoring
+    ports:
+      - "8000:8000"
     depends_on:
       - neo4j
-        #cron:
-        #build:
-        #context: .
-        #dockerfile: Dockerfile-cron
-        #volumes:
-        #- my_volume:/vol/data
+  statsd: # This service is required if we want to scrape metrics from Airflow and disaply them in Prometheus
+    image: prom/statsd-exporter
+    ports:
+      - "9102:9102"
+    networks:
+      - monitoring
+  init-airflow-vol:
+    image: busybox
+    command: ["sh", "-c", "chown -R 50000:0 /vol/data && chmod -R 777 /vol/data"]
+    volumes:
+      - my_volume:/vol/data
+    user: root
+  # Required for airflow webserver to work.
+  postgres:
+    image: postgres:13
+    environment:
+      POSTGRES_USER: airflow
+      POSTGRES_PASSWORD: airflow
+      POSTGRES_DB: airflow
+    ports:
+      - "5432:5432"
+    networks:
+      - monitoring
+  airflow-webserver:
+    build:
+      context: .
+      dockerfile: Dockerfile.airflow
+    image: apache/airflow:latest
+    working_dir: /opt/airflow/repo
+    restart: always
+    depends_on:
+      - postgres
+      - airflow-scheduler
+      - init-airflow-vol
+    environment:
+      - VOL_PATH=/vol/data
+      - PYTHONWARNINGS=ignore::SyntaxWarning # Reduces verbosity of logs for third-party packages we cannot modify.
+      - AIRFLOW__LOGGING__LOGGING_LEVEL=WARNING # Reduces verbosity of logs for Airflow - INFO and DEBUG logs are not shown.
+      - AIRFLOW__CORE__EXECUTOR=LocalExecutor
+      - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql+psycopg2://airflow:airflow@postgres/airflow
+      - PYTHONPATH=/opt/airflow/data_collection
+      - LOAD_EX=n
+    ports:
+      - "8081:8080"
+    command: bash -c "airflow db upgrade && airflow users create \
+      --username admin \
+      --password admin \
+      --firstname Admin --lastname User --role Admin --email admin@example.com && \
+      airflow webserver"
+    volumes:
+      - ./airflow/dags:/opt/airflow/dags
+      - airflow_logs:/opt/airflow/logs
+      - ./:/opt/airflow/repo
+      - my_volume:/vol/data
+    networks:
+      - monitoring
+  airflow-scheduler:
+    image: apache/airflow:latest
+    working_dir: /opt/airflow/repo
+    restart: always
+    depends_on:
+      - postgres
+      - init-airflow-vol
+    environment:
+      - VOL_PATH=/vol/data
+      - PYTHONPATH=/opt/airflow/repo
+      - AIRFLOW__CORE__EXECUTOR=LocalExecutor
+      - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql+psycopg2://airflow:airflow@postgres/airflow
+    command: bash -c "airflow scheduler"
+    volumes:
+      - ./airflow/dags:/opt/airflow/dags
+      - airflow_logs:/opt/airflow/logs
+      - ./:/opt/airflow/repo
+      - my_volume:/vol/data
+    networks:
+      - monitoring
