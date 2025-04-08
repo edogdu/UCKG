@@ -278,6 +278,22 @@ uco:ClassBMap rr:predicateObjectMap [
 ].
 
 uco:ClassBMap rr:predicateObjectMap [
+    rr:predicate <http://purl.org/cyber/ucoobserved_example>;
+    uco:relationshipPropertyMap [
+        uco:propertyName "observed_example_description";
+        rr:template "{.observed_examples.observed_example[*].Description}"
+    ]    
+].
+
+uco:ClassBMap rr:predicateObjectMap [
+    rr:predicate <http://purl.org/cyber/ucoobserved_example>;
+    uco:relationshipPropertyMap [
+        uco:propertyName "observed_example_link";
+        rr:template "{.observed_examples.observed_example[*].Link}"
+    ]    
+].
+
+uco:ClassBMap rr:predicateObjectMap [
         rr:predicate <http://purl.org/cyber/ucoalternative_terms>;  
         rr:objectMap [
             rml:reference "cwe.alternative_terms";  

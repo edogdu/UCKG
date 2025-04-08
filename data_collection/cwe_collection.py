@@ -393,7 +393,8 @@ def cwe_init():
             cwes['cwes'].append({"cwe": cwe_dict})
 
     # Debug print
-    print(json.dumps(cwes, indent=4, ensure_ascii=False))
+    # print(json.dumps(cwes, indent=4, ensure_ascii=False))
+    json.dumps(cwes, indent=4, ensure_ascii=False)
     with open("./data/cwe/cwes.json", "w+", encoding="utf-8") as json_file:
         json.dump(cwes, json_file, indent=4, ensure_ascii=False)
         logger.info(">>>>>>>>>>>>>>>>>>>>created cwes.json")
