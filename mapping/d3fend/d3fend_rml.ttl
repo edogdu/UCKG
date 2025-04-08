@@ -16,31 +16,41 @@
 @prefix ucoex: <http://example.com/ucoex#> .
 @base <http://purl.org/cyber/uco#> .
 
-#CVE Class mapping
-<#D3FENDMap> a rr:TriplesMap;
-          rml:logicalSource [
-                rml:source "./data/d3fend/d3fend.json";
-                rml:referenceFormulation ql:JSONPath;
-                rml:iterator "$[*]"
-            ];
-          rr:predicateObjectMap [
+<#DefendMapping> a rr:TriplesMap;
+    rml:logicalSource [
+        rml:source "./data/d3fend/d3fend.json"; 
+        rml:referenceFormulation ql:JSONPath;
+        rml:iterator "$[*]"
+    ];
+    rr:predicateObjectMap [
+        rr:predicate <http://example.com/ucoexMITRED3FEND_ID>;
+         rr:objectMap [
+             rml:reference "d3f:f3fend-id'";
+             rr:datatype xsd:string
+         ]
+    ];
+    rr:predicateObjectMap [
+        rr:predicate <http://example.com/ucoexMITRED3FEND_DEFINITION>;
+         rr:objectMap [
+             rml:reference "d3f:definition";
+             rr:datatype xsd:string
+         ]
+    ];
+    rr:predicateObjectMap [
+        rr:predicate <http://example.com/ucoexMITRED3FEND_LABEL>;
+         rr:objectMap [
+             rml:reference "rdfs:label";
+             rr:datatype xsd:string
+         ]
+    ];
+    rr:predicateObjectMap [
                 rr:predicate <http://example.com/ucoexhasMITREATTACK>;
                 rr:objectMap [
                                  rr:template "http://example.com/ucoex#{off_tech_id}";
                                  rr:class <http://example.com/ucoexMITREATTACK>
                              ]
             ];
-          rr:subjectMap [
-                rr:template "http://example.com/ucoex#{@id}";
-                rr:class <http://example.com/ucoexMITRED3FEND>
-            ].
-<#ATTACKMap> a rr:TriplesMap;
-             rml:logicalSource [
-                   rml:source "./data/d3fend/d3fend.json";
-                   rml:referenceFormulation ql:JSONPath;
-                   rml:iterator "$[*]"
-               ];
-             rr:subjectMap [
-                   rr:template "http://example.com/ucoex#{off_tech_id}";
-                   rr:class <http://example.com/ucoexMITREATTACK>
-   ].
+    rr:subjectMap [
+        rr:template "http://example.com/ucoex#{@id}";
+        rr:class <http://example.com/ucoexMITRED3FEND>
+    ].

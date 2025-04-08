@@ -1,75 +1,123 @@
 import os
 import requests
+import json
+import pandas as pd
+import numpy as np
+from io import BytesIO
 from config import LOGGER
 from parse import parse_attack_file
 from process import shared_functions as sf
+from bs4 import BeautifulSoup
 # from utilities import check_status, write_file, calculate_file_hash, call_mapper_update, call_ontology_updater
 
 def download_attack_json_file():
 
-    url = 'https://d3fend.mitre.org/api/offensive-technique/all.json'
-
+    url = 'https://attack.mitre.org/resources/attack-data-and-tools/'
     try:
+        # Download Excel files from the HTML page and convert them to JSON.
+        # Fetch the HTML page from the URL
+        html_response = requests.get(url)
+        html_response.raise_for_status()
+        html = html_response.text
 
-        # Send a GET request to fetch the JSON file
-        response = requests.get(url)
-        response.raise_for_status()  # Raise an exception for HTTP errors
-        json_data = response.json()
+        # Parse HTML using BeautifulSoup
+        soup = BeautifulSoup(html, 'html.parser')
+        # Base URL is needed to build full links from relative paths.
+        base_url = "https://attack.mitre.org"
 
-        # Set the filename
-        vol_path = os.environ['VOL_PATH']
-        final_filename = os.path.join(vol_path, "attack.json")
-        # Check if the request was successful
-        if response.status_code == 200:
-            if sf.check_status("attack") == 0:
-                LOGGER.info("attack.json exists...")
-                filename = os.path.join(vol_path, "tmp_attack.json")
-                LOGGER.info("Writing tmp_attack.json")
-                sf.write_file(filename, json_data)
+        # Define the exact Excel file paths we need
+        excel_paths = [
+            "/docs/enterprise-attack-v16.1/enterprise-attack-v16.1.xlsx",
+            "/docs/mobile-attack-v16.1/mobile-attack-v16.1.xlsx",
+            "/docs/ics-attack-v16.1/ics-attack-v16.1.xlsx"
+        ]
 
-                # Calculate the hashes for tmp and final.
-                tmp_file_hash = sf.calculate_file_hash(filename)
-                final_file_hash = sf.calculate_file_hash(final_filename)
+        # Search for <a> tags whose href matches one of our required paths.
+        excel_files = {}
+        for a in soup.find_all('a', href=True):
+            href = a.get("href")
+            if href in excel_paths:
+                if "enterprise-attack" in href:
+                    excel_files["enterprise-attack"] = base_url + href
+                elif "mobile-attack" in href:
+                    excel_files["mobile-attack"] = base_url + href
+                elif "ics-attack" in href:
+                    excel_files["ics-attack"] = base_url + href
 
-                # Compare hashes
-                if tmp_file_hash == final_file_hash:
-                    # Hashes are the same, delete tmp file
-                    os.remove(filename)
-                    LOGGER.info("The new file is identical to the existing file. Deleted tmp_att&ck.json.")
+        if len(excel_files) < 3:
+            LOGGER.info("Not all required Excel links were found!")
+            # Optionally, you could raise an exception here.
+
+        # For each Excel file, download and convert it to JSON
+        all_data = []
+        for domain, file_url in excel_files.items():
+            LOGGER.info(f"Downloading {file_url}")
+            file_response = requests.get(file_url)
+            file_response.raise_for_status()
+            # Use BytesIO to load the Excel content directly
+            df = pd.read_excel(BytesIO(file_response.content))
+            # Replace any NaN values with None (so they become JSON null)
+            df = df.replace({np.nan: None})
+            # Convert DataFrame rows to dictionaries and add them to our list.
+            records = df.to_dict(orient='records')
+            all_data.extend(records)
+
+        # Set the combined JSON data from the Excel files
+            json_data = {"@graph": all_data}
+
+            # Set the filename and volume path
+            vol_path = os.environ['VOL_PATH']
+            final_filename = os.path.join(vol_path, "attack.json")
+
+            # Check if the file already exists and process accordingly
+            if os.path.exists(final_filename):
+                if sf.check_status("attack") == 0:
+                    LOGGER.info("attack.json exists...")
+                    tmp_filename = os.path.join(vol_path, "tmp_attack.json")
+                    LOGGER.info("Writing tmp_attack.json")
+                    sf.write_file(tmp_filename, json_data)
+
+                    # Calculate the hashes for tmp and final.
+                    tmp_file_hash = sf.calculate_file_hash(tmp_filename)
+                    final_file_hash = sf.calculate_file_hash(final_filename)
+
+                    # Compare hashes and update if necessary.
+                    if tmp_file_hash == final_file_hash:
+                        os.remove(tmp_filename)
+                        LOGGER.info("The new file is identical to the existing file. Deleted tmp_attack.json.")
+                    else:
+                        os.remove(final_filename)
+                        os.rename(tmp_filename, final_filename)
+                        LOGGER.info("The new file is different from the existing file. Replaced attack.json with tmp_attack.json.")
                 else:
-                    # Hashes are different, replace existing file
-                    os.remove(final_filename)
-                    os.rename(filename, "/vol/data/attack.json")
-                    LOGGER.info("The new file is different from the existing file. Replaced attack.json with "
-                                "tmp_att&ck.json.")
+                    LOGGER.info("attack.json DOES NOT exist...")
+                    LOGGER.info("Writing attack.json")
+                    sf.write_file(final_filename, json_data)
+
+                LOGGER.info(f"File '{final_filename}' downloaded and saved successfully.")
             else:
-                LOGGER.info("attack.json DOES NOT exist...")
-                filename = os.path.join(vol_path, "attack.json")
-                LOGGER.info("Writing attack.json")
-                sf.write_file(filename, json_data)
+                # If the file does not exist, simply write the json_data.
+                LOGGER.info("attack.json does not exist. Writing new file.")
+                sf.write_file(final_filename, json_data)
+                LOGGER.info(f"File '{final_filename}' written successfully.")
 
-            LOGGER.info(f"File '{filename}' downloaded and saved successfully.")
-        else:
-            LOGGER.info("Failed to download the ATTACK JSON file.")
-
-        LOGGER.info("Beginning JSON data parse for attack")
-        attack_json_data = parse_attack_file(final_filename)
-        #attack_parsed_filename = os.path.join(os.environ['VOL_PATH'], "attack.json")
-        attack_parsed_filename = "./data/attack/attack.json"
-        LOGGER.info(f"Beginning JSON data parse save {attack_parsed_filename}")
-        sf.write_file(attack_parsed_filename, attack_json_data)
-        LOGGER.info(f"{attack_parsed_filename} saved successfully")
+            LOGGER.info("Beginning JSON data parse for attack")
+            attack_json_data = parse_attack_file(final_filename)
+            #attack_parsed_filename = os.path.join(os.environ['VOL_PATH'], "attack.json")
+            attack_parsed_filename = "./data/attack/attack.json"
+            LOGGER.info(f"Beginning JSON data parse save {attack_parsed_filename}")
+            sf.write_file(attack_parsed_filename, attack_json_data)
+            LOGGER.info(f"{attack_parsed_filename} saved successfully")
     except requests.exceptions.RequestException as e:
         # Handle any API request errors
         LOGGER.info(f"Error making API request: {e}")
-
 
 def attack_init():
     LOGGER.info("############################")
     LOGGER.info("Beginning ATT&CK Data Download")
     LOGGER.info("############################\n")
 
-    # Download latest D3FEND json from mitre.
+    # Download latest ATT&CK data by converting the Excel files to JSON.
     download_attack_json_file()
 
     LOGGER.info("ATT&CK Data Download Complete")

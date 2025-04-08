@@ -78,9 +78,11 @@ def parse_d3fend_file(file_path):
         with open(file_path, 'r') as file:
             json_data = json.load(file)
             for item in json_data['@graph']:
-                entry = {'@id': item.get('@id', ''), '@type': item.get('@type', ''),
-                         '@d3f:f3fend-id': item.get('d3f:d3fend-id', ''),
-                         '@rdfs:label': item.get('rdfs:label', '')}
+                if item.get("d3f:d3fend-id") is None:
+                    continue
+                entry = {'@id': item.get('@id', ''), 'd3f:definition': item.get('d3f:definition', ''),
+                         'd3f:f3fend-id': item.get('d3f:d3fend-id', ''),
+                         'rdfs:label': item.get('rdfs:label', '')}
                 api_url = f"https://d3fend.mitre.org/api/technique/{item['@id']}.json"
 
                 try:
@@ -107,7 +109,6 @@ def parse_d3fend_file(file_path):
         LOGGER.info(f"Error parsing D3FEND file: {e}")
         return None
 
-
 def parse_attack_file(file_path):
 
     parsed_data = []
@@ -118,13 +119,14 @@ def parse_attack_file(file_path):
             graph = json_data.get('@graph', [])
 
             for item in graph:
-                entry = {'@id': item['@id'], 'd3f:attack-id': item['d3f:attack-id'], 'rdfs:label': item['rdfs:label']}
+                #entry = {'@id': item['@id'], 'd3f:attack-id': item['d3f:attack-id'], 'rdfs:label': item['rdfs:label']}
+                entry = {'ID': item['ID'], 'name': item['name'], 'description': item['description'], 'url': item['url'], 'domain': item['domain']}
                 parsed_data.append(entry)
 
         return parsed_data
     except Exception as e:
         # Handle any API request errors
-        LOGGER.info(f"Error parsing D3FEND file: {e}")
+        LOGGER.info(f"Error parsing ATTACK file: {e}")
         return None
 
 

@@ -17,12 +17,41 @@
 @base <http://purl.org/cyber/uco#> .
 
 <#ATTACKMap> a rr:TriplesMap;
-             rml:logicalSource [
-                   rml:source "./data/attack/attack.json";
-                   rml:referenceFormulation ql:JSONPath;
-                   rml:iterator "$[*]"
-               ];
-             rr:subjectMap [
-                   rr:template "http://example.com/ucoex#{d3f:attack-id}";
-                   rr:class <http://example.com/ucoexMITREATTACK>
-   ].
+    rml:logicalSource [
+        rml:source "./data/attack/attack.json";
+        rml:referenceFormulation ql:JSONPath;
+        rml:iterator "$[*]"
+    ];
+    rr:subjectMap [
+     rr:template "http://example.com/ucoex#{ID}";
+     rr:class <http://example.com/ucoexMITREATTACK>
+      ];
+    rr:predicateObjectMap [
+         rr:predicate <http://example.com/ucoexMITREATTACK_NAME>;
+         rr:objectMap [
+             rml:reference "name";
+             rr:datatype xsd:string
+         ]
+    ];
+    rr:predicateObjectMap [
+         rr:predicate <http://example.com/ucoexMITREATTACK_DESCRIPTION>;
+         rr:objectMap [
+             rml:reference "description";
+             rr:datatype xsd:string
+         ]
+    ];
+    rr:predicateObjectMap [
+         rr:predicate <http://example.com/ucoexMITREATTACK_URL>;
+         rr:objectMap [
+             rml:reference "url";
+             rr:datatype xsd:string
+         ]
+    ];
+    rr:predicateObjectMap [
+         rr:predicate <http://example.com/ucoexMITREATTACK_DOMAIN>;
+         rr:objectMap [
+             rml:reference "domain";
+             rr:datatype xsd:string
+         ]
+    ].
+
