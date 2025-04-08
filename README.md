@@ -7,7 +7,7 @@ Unified Cybersecurity Knowledge Graph
 ## Usage
 * First, pull the repository into your file system 
 ```bash
-$  git clone https://github.com/edogdu/UCKG.git .
+$  git clone https://github.com/edogdu/UCKG.git ./UCKG
 ```
 
 * Next, switch to root directory of project
