@@ -128,7 +128,94 @@ def parse_attack_file(file_path):
         # Handle any API request errors
         LOGGER.info(f"Error parsing ATTACK file: {e}")
         return None
+    
+def parse_mitigations_file(file_path):
+    parsed_data = []
 
+    try:
+        with open(file_path, 'r') as file:
+            json_data = json.load(file)
+            graph = json_data.get('@graph', [])
+
+            for item in graph:
+                entry = {'ID': item['ID'], 'name': item['name'], 'description': item['description'], 'url': item['url'], 'domain': item['domain']}
+                parsed_data.append(entry)
+
+        return parsed_data
+    except Exception as e:
+        # Handle any API request errors
+        LOGGER.info(f"Error parsing ATTACK file: {e}")
+        return None
+
+def parse_campaigns_file(file_path):
+    parsed_data = []
+
+    try:
+        with open(file_path, 'r') as file:
+            json_data = json.load(file)
+            graph = json_data.get('@graph', [])
+
+            for item in graph:
+                entry = {'ID': item['ID'], 'name': item['name'], 'description': item['description'], 'url': item['url'], 'domain': item['domain']}
+                parsed_data.append(entry)
+
+        return parsed_data
+    except Exception as e:
+        # Handle any API request errors
+        LOGGER.info(f"Error parsing ATTACK file: {e}")
+        return None
+def parse_groups_file(file_path):
+    parsed_data = []
+
+    try:
+        with open(file_path, 'r') as file:
+            json_data = json.load(file)
+            graph = json_data.get('@graph', [])
+
+            for item in graph:
+                entry = {'ID': item['ID'], 'name': item['name'], 'description': item['description'], 'url': item['url'], 'domain': item['domain']}
+                parsed_data.append(entry)
+
+        return parsed_data
+    except Exception as e:
+        # Handle any API request errors
+        LOGGER.info(f"Error parsing ATTACK file: {e}")
+        return None
+
+def parse_software_file(file_path):
+    parsed_data = []
+
+    try:
+        with open(file_path, 'r') as file:
+            json_data = json.load(file)
+            graph = json_data.get('@graph', [])
+
+            for item in graph:
+                entry = {'ID': item['ID'], 'name': item['name'], 'description': item['description'], 'url': item['url'], 'domain': item['domain']}
+                parsed_data.append(entry)
+
+        return parsed_data
+    except Exception as e:
+        # Handle any API request errors
+        LOGGER.info(f"Error parsing ATTACK file: {e}")
+        return None
+def parse_tactics_file(file_path):
+    parsed_data = []
+
+    try:
+        with open(file_path, 'r') as file:
+            json_data = json.load(file)
+            graph = json_data.get('@graph', [])
+
+            for item in graph:
+                entry = {'ID': item['ID'], 'name': item['name'], 'description': item['description'], 'url': item['url'], 'domain': item['domain']}
+                parsed_data.append(entry)
+
+        return parsed_data
+    except Exception as e:
+        # Handle any API request errors
+        LOGGER.info(f"Error parsing ATTACK file: {e}")
+        return None
 
 import xml.etree.ElementTree as ET
 

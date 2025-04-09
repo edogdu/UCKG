@@ -18,13 +18,13 @@
 
 <#ATTACKMap> a rr:TriplesMap;
     rml:logicalSource [
-        rml:source "./data/attack/attack.json";
+        rml:source "./data/attack/campaigns.json";
         rml:referenceFormulation ql:JSONPath;
         rml:iterator "$[*]"
     ];
     rr:subjectMap [
      rr:template "http://example.com/ucoex#{ID}";
-     rr:class <http://example.com/ucoexMITREATTACK>
+     rr:class <http://example.com/ucoexCAMPAIGNS>
       ];
     rr:predicateObjectMap [
          rr:predicate <http://example.com/ucoexNAME>;
