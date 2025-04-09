@@ -46,16 +46,30 @@
         ]
     ];
     rr:predicateObjectMap [
-        rr:predicate <http://example.com/ucodesciption>;  # Your DatatypeProperty
+        rr:predicate <http://example.com/ucoAbstraction>;  # Your DatatypeProperty
         rr:objectMap [
-                    rml:reference "Description";  # Field in your data source
+                    rml:reference "Abstraction";  # Field in your data source
                     rr:datatype xsd:string  # Specifying that the datatype
         ]
     ];
     rr:predicateObjectMap [
-        rr:predicate <http://example.com/ucoPrerequisites>;  # Your DatatypeProperty
+        rr:predicate <http://example.com/ucoLikelihood>;  # Your DatatypeProperty
         rr:objectMap [
-                    rml:reference "Prerequisites";  # Field in your data source
+                    rml:reference "Likelihood_Of_Attack";  # Field in your data source
+                    rr:datatype xsd:string  # Specifying that the datatype
+        ]
+    ];
+    rr:predicateObjectMap [
+        rr:predicate <http://example.com/ucoSeverity>;  # Your DatatypeProperty
+        rr:objectMap [
+                    rml:reference "Typical_Severity";  # Field in your data source
+                    rr:datatype xsd:string  # Specifying that the datatype
+        ]
+    ];
+    rr:predicateObjectMap [
+        rr:predicate <http://example.com/ucodesciption>;  # Your DatatypeProperty
+        rr:objectMap [
+                    rml:reference "Description";  # Field in your data source
                     rr:datatype xsd:string  # Specifying that the datatype
         ]
     ];
@@ -67,9 +81,9 @@
         ]
     ];
     rr:predicateObjectMap [
-        rr:predicate <http://example.com/ucoRelatedWeaknesses>;  # Your DatatypeProperty
+        rr:predicate <http://example.com/ucoPrerequisites>;  # Your DatatypeProperty
         rr:objectMap [
-                    rml:reference "Related_Weaknesses[*]";  # Field in your data source
+                    rml:reference "Prerequisites";  # Field in your data source
                     rr:datatype xsd:string  # Specifying that the datatype
         ]
     ];
@@ -81,9 +95,30 @@
         ]
     ];
     rr:predicateObjectMap [
+        rr:predicate <http://example.com/ucoResources_Required>;  # Your DatatypeProperty
+        rr:objectMap [
+                    rml:reference "Resources_Required";  # Field in your data source
+                    rr:datatype xsd:string  # Specifying that the datatype
+        ]
+    ];
+    rr:predicateObjectMap [
         rr:predicate <http://example.com/ucoMitigations>;  # Your DatatypeProperty
         rr:objectMap [
                     rml:reference "Mitigations";  # Field in your data source
+                    rr:datatype xsd:string  # Specifying that the datatype
+        ]
+    ];
+    rr:predicateObjectMap [
+        rr:predicate <http://example.com/ucoExample>;  # Your DatatypeProperty
+        rr:objectMap [
+                    rml:reference "Example_Instances";  # Field in your data source
+                    rr:datatype xsd:string  # Specifying that the datatype
+        ]
+    ];
+    rr:predicateObjectMap [
+        rr:predicate <http://example.com/ucoRelatedWeaknesses>;  # Your DatatypeProperty
+        rr:objectMap [
+                    rml:reference "Related_Weaknesses[*]";  # Field in your data source
                     rr:datatype xsd:string  # Specifying that the datatype
         ]
     ];
