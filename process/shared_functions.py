@@ -79,6 +79,16 @@ def call_mapper_update(datasource):
         mapping_file = "./mapping/d3fend/d3fend_rml.ttl"
     elif datasource == "attack":
         mapping_file = "./mapping/attack/attack_rml.ttl"
+    elif datasource == "mitigations":
+        mapping_file = "./mapping/attack/mitigations_rml.ttl"
+    elif datasource == "campaigns":
+        mapping_file = "./mapping/attack/campaigns_rml.ttl"
+    elif datasource == "groups":
+        mapping_file = "./mapping/attack/groups_rml.ttl"
+    elif datasource == "software":
+        mapping_file = "./mapping/attack/software_rml.ttl"
+    elif datasource == "tactics":
+        mapping_file = "./mapping/attack/tactics_rml.ttl"
     elif datasource == "capec":
         mapping_file = "./mapping/capec/capec_rml.ttl"
     else:
@@ -146,6 +156,72 @@ def check_status(data_source):
             return 0  # File exists, return 0
         else:
             return 3  # File doesn't exist, return 3
+    elif data_source == "mitigations":
+        # Get the directory of the currently executing script
+        current_directory = os.path.dirname(os.path.abspath(__file__))
+
+        # Define the relative path to the attack.json file
+        attack_file_path = os.path.join(vol_path, 'mitigations.json')
+
+        # Check if attack.json file exists
+        if os.path.exists(attack_file_path):
+            return 0
+        # File exists, return 0
+        else:
+            return 3  # File doesn't exist, return 3
+    elif data_source == "campaigns":
+        # Get the directory of the currently executing script
+        current_directory = os.path.dirname(os.path.abspath(__file__))
+
+        # Define the relative path to the attack.json file
+        attack_file_path = os.path.join(vol_path, 'campaigns.json')
+
+        # Check if attack.json file exists
+        if os.path.exists(attack_file_path):
+            return 0
+        # File exists, return 0
+        else:
+            return 3  # File doesn't exist, return 3
+    elif data_source == "groups":
+        # Get the directory of the currently executing script
+        current_directory = os.path.dirname(os.path.abspath(__file__))
+
+        # Define the relative path to the attack.json file
+        attack_file_path = os.path.join(vol_path, 'groups.json')
+
+        # Check if attack.json file exists
+        if os.path.exists(attack_file_path):
+            return 0
+        # File exists, return 0
+        else:
+            return 3  # File doesn't exist, return 3
+    elif data_source == "software":
+        # Get the directory of the currently executing script
+        current_directory = os.path.dirname(os.path.abspath(__file__))
+
+        # Define the relative path to the attack.json file
+        attack_file_path = os.path.join(vol_path, 'software.json')
+
+        # Check if attack.json file exists
+        if os.path.exists(attack_file_path):
+            return 0
+        # File exists, return 0
+        else:
+            return 3  # File doesn't exist, return 3
+    elif data_source == "tactics":
+        # Get the directory of the currently executing script
+        current_directory = os.path.dirname(os.path.abspath(__file__))
+
+        # Define the relative path to the attack.json file
+        attack_file_path = os.path.join(vol_path, 'tactics.json')
+
+        # Check if attack.json file exists
+        if os.path.exists(attack_file_path):
+            return 0
+        # File exists, return 0
+        else:
+            return 3
+        
     elif data_source == "capec":
         # Get the directory of the currently executing script
         current_directory = os.path.dirname(os.path.abspath(__file__))
