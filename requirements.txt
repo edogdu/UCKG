@@ -11,3 +11,4 @@ neo4j>=5.14.0
 python-dotenv>=1.0.0
 huggingface-hub>=0.20.0
 accelerate>=0.25.0
+PyPDF2>=3.0.0
