@@ -117,7 +117,7 @@ def campaigns_init():
 
     # Download latest campaigns data by converting the Excel files to JSON.
     download_campaigns_json_file()
-
+    '''
     LOGGER.info("campaigns Data Download Complete")
     LOGGER.info("Beginning campaigns Data Call Mapper Update")
     successfully_mapped = sf.call_mapper_update("campaigns")
@@ -133,3 +133,4 @@ def campaigns_init():
         LOGGER.info("############################")
         LOGGER.info("campaigns Ontology Update Failed")
         LOGGER.info("############################\n")
+    '''

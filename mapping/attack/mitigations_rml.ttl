@@ -1,57 +1,74 @@
-@prefix rml: <http://semweb.mmlab.be/ns/rml#> .
-@prefix rr: <http://www.w3.org/ns/r2rml#> .
-@prefix ql: <http://semweb.mmlab.be/ns/ql#> .
-@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
-@prefix : <http://example.org/rules/> .
-@prefix schema: <http://schema.org/> .
-@prefix dbo: <http://dbpedia.org/ontology/> .
-@prefix cve: <http://purl.org/cyber/cve#> .
-@prefix owl: <http://www.w3.org/2002/07/owl#> .
-@prefix stx: <http://purl.org/cyber/stx#> .
-@prefix uco: <http://purl.org/cyber/uco#> .
-@prefix xml: <http://www.w3.org/XML/1998/namespace> .
-@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
-@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
-@prefix capec: <http://purl.org/cyber/capec#> .
+@prefix rml:    <http://semweb.mmlab.be/ns/rml#> .
+@prefix rr:     <http://www.w3.org/ns/r2rml#> .
+@prefix ql:     <http://semweb.mmlab.be/ns/ql#> .
+@prefix xsd:    <http://www.w3.org/2001/XMLSchema#> .
+@prefix ucoex:  <http://example.com/ucoex#> .
+
+###############################################################################
+# 1 Map Mitigations to nodes (unchanged from your existing map)
+###############################################################################
+<#MITIGATIONSMap> a rr:TriplesMap;
+  rml:logicalSource [
+    rml:source             "./data/attack/mitigations.json";
+    rml:referenceFormulation ql:JSONPath;
+    rml:iterator           "$[*]"
+  ];
+  rr:subjectMap [
+    rr:template            "http://example.com/ucoexMITIGATIONS#{ID}";
+    rr:class               <http://example.com/ucoexMITIGATIONS>
+  ];
+  rr:predicateObjectMap [
+    rr:predicate           ucoex:name;
+    rr:objectMap [ rml:reference "name"; rr:datatype xsd:string ]
+  ];
+  rr:predicateObjectMap [
+    rr:predicate           ucoex:description;
+    rr:objectMap [ rml:reference "description"; rr:datatype xsd:string ]
+  ];
+  rr:predicateObjectMap [
+    rr:predicate           ucoex:url;
+    rr:objectMap [ rml:reference "url"; rr:datatype xsd:string ]
+  ];
+  rr:predicateObjectMap [
+    rr:predicate           ucoex:domain;
+    rr:objectMap [ rml:reference "domain"; rr:datatype xsd:string ]
+  ].
+
+
+###############################################################################
+# 2 Relationship map: Mitigation → Technique
+###############################################################################
+@prefix rml:   <http://semweb.mmlab.be/ns/rml#> .
+@prefix rr:    <http://www.w3.org/ns/r2rml#> .
+@prefix ql:    <http://semweb.mmlab.be/ns/ql#> .
 @prefix ucoex: <http://example.com/ucoex#> .
-@base <http://purl.org/cyber/uco#> .
 
-<#ATTACKMap> a rr:TriplesMap;
-    rml:logicalSource [
-        rml:source "./data/attack/mitigations.json";
-        rml:referenceFormulation ql:JSONPath;
-        rml:iterator "$[*]"
-    ];
-    rr:subjectMap [
-     rr:template "http://example.com/ucoex#{ID}";
-     rr:class <http://example.com/ucoexMITIGATIONS>
-      ];
-    rr:predicateObjectMap [
-         rr:predicate <http://example.com/ucoexNAME>;
-         rr:objectMap [
-             rml:reference "name";
-             rr:datatype xsd:string
-         ]
-    ];
-    rr:predicateObjectMap [
-         rr:predicate <http://example.com/ucoexDESCRIPTION>;
-         rr:objectMap [
-             rml:reference "description";
-             rr:datatype xsd:string
-         ]
-    ];
-    rr:predicateObjectMap [
-         rr:predicate <http://example.com/ucoexURL>;
-         rr:objectMap [
-             rml:reference "url";
-             rr:datatype xsd:string
-         ]
-    ];
-    rr:predicateObjectMap [
-         rr:predicate <http://example.com/ucoexDOMAIN>;
-         rr:objectMap [
-             rml:reference "domain";
-             rr:datatype xsd:string
-         ]
-    ].
+<#MitigationToTechnique> a rr:TriplesMap;
 
+  # 1 only mitigation→technique rows
+  rml:logicalSource [
+    rml:source              "./data/attack/relationships_enriched.json";
+    rml:referenceFormulation ql:JSONPath;
+    rml:iterator            "$[?(@['source type']=='mitigation' && @['target type']=='technique')]"
+  ];
+
+  # 2 subject uses your existing MITIGATIONSMap (you already have this in mitigations.ttl)
+  rr:subjectMap [
+    rr:parentTriplesMap      <#MITIGATIONSMap>;
+    rr:joinCondition [
+      rr:child               "source ID";
+      rr:parent              "ID"
+    ]
+  ];
+
+  # 3 object uses your existing ATTACKMap
+  rr:predicateObjectMap [
+    rr:predicate            ucoex:mitigates;
+    rr:objectMap [
+      rr:parentTriplesMap    <#ATTACKMap>;
+      rr:joinCondition [
+        rr:child             "target ID";
+        rr:parent            "ID"
+      ]
+    ]
+  ].

@@ -79,6 +79,12 @@ def call_mapper_update(datasource):
         mapping_file = "./mapping/d3fend/d3fend_rml.ttl"
     elif datasource == "attack":
         mapping_file = "./mapping/attack/attack_rml.ttl"
+    elif datasource == "capec":
+        mapping_file = "./mapping/capec/capec_rml.ttl"
+    else:
+        logger.info("Not a valid rml source...")
+        return False
+    '''
     elif datasource == "mitigations":
         mapping_file = "./mapping/attack/mitigations_rml.ttl"
     elif datasource == "campaigns":
@@ -89,11 +95,8 @@ def call_mapper_update(datasource):
         mapping_file = "./mapping/attack/software_rml.ttl"
     elif datasource == "tactics":
         mapping_file = "./mapping/attack/tactics_rml.ttl"
-    elif datasource == "capec":
-        mapping_file = "./mapping/capec/capec_rml.ttl"
-    else:
-        logger.info("Not a valid rml source...")
-        return False
+    '''
+    
     # Construct the command
     command = ["java", "-jar", jar_path, "-m", mapping_file, "-s", "turtle"]
 

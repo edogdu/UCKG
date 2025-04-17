@@ -81,27 +81,27 @@ def parse_d3fend_file(file_path):
                 if item.get("d3f:d3fend-id") is None:
                     continue
                 entry = {'@id': item.get('@id', ''), 'd3f:definition': item.get('d3f:definition', ''),
-                         'd3f:f3fend-id': item.get('d3f:d3fend-id', ''),
+                         'd3f:d3fend-id': item.get('d3f:d3fend-id', ''),
                          'rdfs:label': item.get('rdfs:label', '')}
                 api_url = f"https://d3fend.mitre.org/api/technique/{item['@id']}.json"
 
-                try:
-                    # Make API call to retrieve JSON data
-                    response = requests.get(api_url)
-                    response.raise_for_status()  # Raise an exception for HTTP errors
-                    json_data = response.json()
+                #try:
+                # Make API call to retrieve JSON data
+                response = requests.get(api_url)
+                response.raise_for_status()  # Raise an exception for HTTP errors
+                json_data = response.json()
 
-                    # Parse JSON data for off_tech_id
-                    bindings = json_data['def_to_off']['results']['bindings']
-                    off_tech_id = ""
-                    for binding in bindings:
-                        off_tech_id = binding.get('off_tech_id', {}).get('value', '')
-                        if off_tech_id:
-                            break  # Assuming there's only one off_tech_id
-                    entry['off_tech_id'] = off_tech_id
-                except requests.exceptions.RequestException as e:
+                # Parse JSON data for off_tech_id
+                bindings = json_data['def_to_off']['results']['bindings']
+                off_tech_id = ""
+                for binding in bindings:
+                    off_tech_id = binding.get('off_tech_id', {}).get('value', '')
+                    if off_tech_id:
+                        break  # Assuming there's only one off_tech_id
+                entry['off_tech_id'] = off_tech_id
+                #except requests.exceptions.RequestException as e:
                     # Handle any API request errors
-                    print(f"Error making off_tech_id API request: {e}")
+                    #print(f"Error making off_tech_id API request: {e}")
                 parsed_data.append(entry)
             return parsed_data
     except Exception as e:

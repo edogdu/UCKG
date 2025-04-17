@@ -117,7 +117,7 @@ def mitigations_init():
 
     # Download latest MITIGATIONS data by converting the Excel files to JSON.
     download_mitigations_json_file()
-
+    '''
     LOGGER.info("MITIGATIONS Data Download Complete")
     LOGGER.info("Beginning MITIGATIONS Data Call Mapper Update")
     successfully_mapped = sf.call_mapper_update("mitigations")
@@ -133,3 +133,4 @@ def mitigations_init():
         LOGGER.info("############################")
         LOGGER.info("MITIGATIONS Ontology Update Failed")
         LOGGER.info("############################\n")
+    '''

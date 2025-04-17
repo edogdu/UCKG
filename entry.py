@@ -5,7 +5,7 @@ import time
 from process import shared_functions as sf
 
 sys.path.append("./data_collection")
-from data_collection import cpe_collection as cpe, cve_collection as cve, cwe_collection as cwe, d3fend_collection as d3fend, attack_collection as attack, attack_mitigations_collection as mitigations, attack_campaigns_collection as campaigns, attack_groups_collection as groups, attack_software_collection as software, attack_tactics_collection as tactics , capec_collection as capec
+from data_collection import cpe_collection as cpe, cve_collection as cve, cwe_collection as cwe, d3fend_collection as d3fend, attack_collection as attack, attack_mitigations_collection as mitigations, attack_campaigns_collection as campaigns, attack_groups_collection as groups, attack_software_collection as software, attack_tactics_collection as tactics , attack_relationships as relationships, capec_collection as capec
 
 uco_abs_path = os.environ['UCO_ONTO_PATH']
 root_folder_abs_path = os.environ['ROOT_FOLDER']
@@ -19,7 +19,7 @@ logger = logging.getLogger('entry_logger')
 
 # Waiting for neo4j to startup
 logger.info("Waiting 2 minutes for neo4j to startup...")
-time.sleep(120)
+#time.sleep(120)
 
 
 cwe_data_status = cwe.check_cwe_status()
@@ -49,14 +49,6 @@ elif d3fend_data_status == 0:
     logger.info("The D3FEND initialization has not finished yet, continuing now...\n")
     d3fend.d3fend_init()
 
-attack_data_status = sf.check_status("attack")
-
-if attack_data_status == 3:
-    logger.info("The ATT&CK database has not been created yet, starting initialization now...\n")
-    attack.attack_init()
-elif attack_data_status == 0:
-    logger.info("The ATT&CK initialization has not finished yet, continuing now...\n")
-    attack.attack_init()
 
 mitigations_data_status = sf.check_status("mitigations")
 
@@ -112,6 +104,17 @@ if capec_data_status == 3:
 elif capec_data_status == 0:
     logger.info("The CAPEC initialization has not finished yet, continuing now...\n")
     capec.capec_init()
+
+relationships.relationships_init()
+attack_data_status = sf.check_status("attack")
+if attack_data_status == 3:
+    logger.info("The ATT&CK database has not been created yet, starting initialization now...\n")
+    attack.attack_init()
+elif attack_data_status == 0:
+    logger.info("The ATT&CK initialization has not finished yet, continuing now...\n")
+    attack.attack_init()
+
+
 
 # cpe_data_status = cpe.check_cpe_status()
 #

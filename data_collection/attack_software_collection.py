@@ -117,7 +117,7 @@ def software_init():
 
     # Download latest software data by converting the Excel files to JSON.
     download_software_json_file()
-
+    '''
     LOGGER.info("software Data Download Complete")
     LOGGER.info("Beginning software Data Call Mapper Update")
     successfully_mapped = sf.call_mapper_update("software")
@@ -133,3 +133,4 @@ def software_init():
         LOGGER.info("############################")
         LOGGER.info("software Ontology Update Failed")
         LOGGER.info("############################\n")
+    '''

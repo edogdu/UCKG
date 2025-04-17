@@ -117,7 +117,8 @@ def tactics_init():
 
     # Download latest tactics data by converting the Excel files to JSON.
     download_tactics_json_file()
-
+    '''
+    # Check if the tactics.json file exists and process accordingly.'
     LOGGER.info("tactics Data Download Complete")
     LOGGER.info("Beginning tactics Data Call Mapper Update")
     successfully_mapped = sf.call_mapper_update("tactics")
@@ -133,3 +134,4 @@ def tactics_init():
         LOGGER.info("############################")
         LOGGER.info("tactics Ontology Update Failed")
         LOGGER.info("############################\n")
+    '''

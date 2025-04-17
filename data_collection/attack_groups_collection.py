@@ -117,7 +117,7 @@ def groups_init():
 
     # Download latest groups data by converting the Excel files to JSON.
     download_groups_json_file()
-
+    '''
     LOGGER.info("groups Data Download Complete")
     LOGGER.info("Beginning groups Data Call Mapper Update")
     successfully_mapped = sf.call_mapper_update("groups")
@@ -133,3 +133,4 @@ def groups_init():
         LOGGER.info("############################")
         LOGGER.info("groups Ontology Update Failed")
         LOGGER.info("############################\n")
+    '''

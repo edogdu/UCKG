@@ -16,7 +16,7 @@
 @prefix ucoex: <http://example.com/ucoex#> .
 @base <http://purl.org/cyber/uco#> .
 
-<#ATTACKMap> a rr:TriplesMap;
+<#CAMPAIGNSMap> a rr:TriplesMap;
     rml:logicalSource [
         rml:source "./data/attack/campaigns.json";
         rml:referenceFormulation ql:JSONPath;
