@@ -1,15 +1,20 @@
 # Dockerfile.rag
 
-FROM python:3.10-slim
+FROM nvidia/cuda:12.1.0-runtime-ubuntu22.04
 
 WORKDIR /app
 
 # Install system dependencies
 RUN apt-get update && apt-get install -y \
     build-essential \
+    python3.10 \
+    python3-pip \
     && rm -rf /var/lib/apt/lists/*
 
-# Install Python dependencies
+# Set Python 3.10 as default
+RUN ln -s /usr/bin/python3.10 /usr/bin/python
+
+# Copy requirements first to leverage Docker cache
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
@@ -17,7 +22,21 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY uckg_rag/ .
 
 # Set environment variables
-ENV PYTHONUNBUFFERED=1
+ENV PYTHONPATH=/app
+ENV GEN_LLM_MODEL=microsoft/phi-2
+ENV EMBED_MODEL=all-MiniLM-L6-v2
+ENV HUGGINGFACE_HUB_CACHE=/root/.cache/huggingface
+ENV HF_HOME=/root/.cache/huggingface
+ENV CUDA_VISIBLE_DEVICES=0
+
+# Create directories for persistent storage
+RUN mkdir -p /app/chroma
+RUN mkdir -p /app/evaluation_results
+RUN chown -R 1000:1000 /app && \
+    chmod -R 777 /app
 
 # Expose the port
 EXPOSE 8051
+
+# Command to run the application
+CMD ["python", "-m", "uckg_rag.rag_pipeline"]

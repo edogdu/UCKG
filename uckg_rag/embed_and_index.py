@@ -242,8 +242,9 @@ def embed_and_store():
     except Exception as e:
         logger.error(f"Error during processing: {str(e)}")
         raise
-    
-    logger.info("✅ Completed embedding and storing nodes")
+    logger.info("########################################################")
+    logger.info("Completed embedding and storing nodes")
+    logger.info("########################################################")
 
 if __name__ == "__main__":
     embed_and_store()
