@@ -1,0 +1,14 @@
+# Ignore models directory
+uckg_rag/models/
+**/models/
+*.pyc
+__pycache__/
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+.env
+.venv
+*.log
+.DS_Store 
