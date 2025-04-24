@@ -5,12 +5,12 @@ import pandas as pd
 import numpy as np
 from io import BytesIO
 from config import LOGGER
-from parse import parse_attack_file
+from parse import parse_tactics_file
 from process import shared_functions as sf
 from bs4 import BeautifulSoup
 # from utilities import check_status, write_file, calculate_file_hash, call_mapper_update, call_ontology_updater
 
-def download_attack_json_file():
+def download_tactics_json_file():
 
     url = 'https://attack.mitre.org/resources/attack-data-and-tools/'
     try:
@@ -54,7 +54,7 @@ def download_attack_json_file():
             file_response = requests.get(file_url)
             file_response.raise_for_status()
             # Use BytesIO to load the Excel content directly
-            df = pd.read_excel(BytesIO(file_response.content))
+            df = pd.read_excel(BytesIO(file_response.content), sheet_name="tactics")
             # Replace any NaN values with None (so they become JSON null)
             df = df.replace({np.nan: None})
             # Convert DataFrame rows to dictionaries and add them to our list.
@@ -66,14 +66,14 @@ def download_attack_json_file():
 
             # Set the filename and volume path
             vol_path = os.environ['VOL_PATH']
-            final_filename = os.path.join(vol_path, "attack.json")
+            final_filename = os.path.join(vol_path, "tactics.json")
 
             # Check if the file already exists and process accordingly
             if os.path.exists(final_filename):
-                if sf.check_status("attack") == 0:
-                    LOGGER.info("attack.json exists...")
-                    tmp_filename = os.path.join(vol_path, "tmp_attack.json")
-                    LOGGER.info("Writing tmp_attack.json")
+                if sf.check_status("tactics") == 0:
+                    LOGGER.info("tactics.json exists...")
+                    tmp_filename = os.path.join(vol_path, "tmp_tactics.json")
+                    LOGGER.info("Writing tmp_tactics.json")
                     sf.write_file(tmp_filename, json_data)
 
                     # Calculate the hashes for tmp and final.
@@ -83,53 +83,53 @@ def download_attack_json_file():
                     # Compare hashes and update if necessary.
                     if tmp_file_hash == final_file_hash:
                         os.remove(tmp_filename)
-                        LOGGER.info("The new file is identical to the existing file. Deleted tmp_attack.json.")
+                        LOGGER.info("The new file is identical to the existing file. Deleted tmp_tactics.json.")
                     else:
                         os.remove(final_filename)
                         os.rename(tmp_filename, final_filename)
-                        LOGGER.info("The new file is different from the existing file. Replaced attack.json with tmp_attack.json.")
+                        LOGGER.info("The new file is different from the existing file. Replaced tactics.json with tmp_tactics.json.")
                 else:
-                    LOGGER.info("attack.json DOES NOT exist...")
-                    LOGGER.info("Writing attack.json")
+                    LOGGER.info("tactics.json DOES NOT exist...")
+                    LOGGER.info("Writing tactics.json")
                     sf.write_file(final_filename, json_data)
 
                 LOGGER.info(f"File '{final_filename}' downloaded and saved successfully.")
             else:
                 # If the file does not exist, simply write the json_data.
-                LOGGER.info("attack.json does not exist. Writing new file.")
+                LOGGER.info("tactics.json does not exist. Writing new file.")
                 sf.write_file(final_filename, json_data)
                 LOGGER.info(f"File '{final_filename}' written successfully.")
 
-            LOGGER.info("Beginning JSON data parse for attack")
-            attack_json_data = parse_attack_file(final_filename)
-            #attack_parsed_filename = os.path.join(os.environ['VOL_PATH'], "attack.json")
-            attack_parsed_filename = "./data/attack/attack.json"
-            LOGGER.info(f"Beginning JSON data parse save {attack_parsed_filename}")
-            sf.write_file(attack_parsed_filename, attack_json_data)
-            LOGGER.info(f"{attack_parsed_filename} saved successfully")
+            LOGGER.info("Beginning JSON data parse for tactics")
+            tactics_json_data = parse_tactics_file(final_filename)
+            tactics_parsed_filename = "./data/attack/tactics.json"
+            LOGGER.info(f"Beginning JSON data parse save {tactics_parsed_filename}")
+            sf.write_file(tactics_parsed_filename, tactics_json_data)
+            LOGGER.info(f"{tactics_parsed_filename} saved successfully")
     except requests.exceptions.RequestException as e:
         # Handle any API request errors
         LOGGER.info(f"Error making API request: {e}")
 
-def attack_init():
+def tactics_init():
     LOGGER.info("############################")
-    LOGGER.info("Beginning ATT&CK Data Download")
+    LOGGER.info("Beginning tactics Data Download")
     LOGGER.info("############################\n")
 
-    # Download latest ATT&CK data by converting the Excel files to JSON.
-    download_attack_json_file()
+    # Download latest tactics data by converting the Excel files to JSON.
+    download_tactics_json_file()
 
-    LOGGER.info("ATT&CK Data Download Complete")
-    LOGGER.info("Beginning ATT&CK Data Call Mapper Update")
-    successfully_mapped = sf.call_mapper_update("attack")
+    LOGGER.info("tactics Data Download Complete")
+    LOGGER.info("Beginning tactics Data Call Mapper Update")
+    successfully_mapped = sf.call_mapper_update("tactics")
+    LOGGER.info("tactics Data Call Mapper Update Complete")
 
     if successfully_mapped:
-        LOGGER.info("ATT&CK Data Successfully Mapped")
-        LOGGER.info("Beginning ATT&CK Ontology Updater")
+        LOGGER.info("tactics Data Successfully Mapped")
+        LOGGER.info("Beginning tactics Ontology Updater")
         sf.call_ontology_updater(reason=True)
-        LOGGER.info("ATT&CK Ontology Updater Complete")
+        LOGGER.info("tactics Ontology Updater Complete")
         LOGGER.info("############################\n")
     else:
         LOGGER.info("############################")
-        LOGGER.info("ATT&CK Ontology Update Failed")
+        LOGGER.info("tactics Ontology Update Failed")
         LOGGER.info("############################\n")
