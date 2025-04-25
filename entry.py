@@ -19,8 +19,16 @@ logger = logging.getLogger('entry_logger')
 
 # Waiting for neo4j to startup
 logger.info("Waiting 2 minutes for neo4j to startup...")
-#time.sleep(120)
+time.sleep(120)
 
+
+attack_data_status = sf.check_status("attack")
+if attack_data_status == 3:
+    logger.info("The ATT&CK database has not been created yet, starting initialization now...\n")
+    attack.attack_init()
+elif attack_data_status == 0:
+    logger.info("The ATT&CK initialization has not finished yet, continuing now...\n")
+    attack.attack_init()
 
 cwe_data_status = cwe.check_cwe_status()
 if cwe_data_status == 3:
@@ -49,53 +57,6 @@ elif d3fend_data_status == 0:
     logger.info("The D3FEND initialization has not finished yet, continuing now...\n")
     d3fend.d3fend_init()
 
-
-mitigations_data_status = sf.check_status("mitigations")
-
-if mitigations_data_status == 3:
-    logger.info("The MITIGATIONS database has not been created yet, starting initialization now...\n")
-    mitigations.mitigations_init()
-elif mitigations_data_status == 0:
-    logger.info("The MITIGATIONS initialization has not finished yet, continuing now...\n")
-    mitigations.mitigations_init()
-
-campaigns_data_status = sf.check_status("campaigns")
-
-if campaigns_data_status == 3:
-    logger.info("The campaigns database has not been created yet, starting initialization now...\n")
-    campaigns.campaigns_init()
-elif campaigns_data_status == 0:
-    logger.info("The campaigns initialization has not finished yet, continuing now...\n")
-    campaigns.campaigns_init()
-
-groups_data_status = sf.check_status("groups")
-
-if groups_data_status == 3:
-    logger.info("The groups database has not been created yet, starting initialization now...\n")
-    groups.groups_init()
-elif groups_data_status == 0:
-    logger.info("The groups initialization has not finished yet, continuing now...\n")
-    groups.groups_init()
-
-software_data_status = sf.check_status("software")
-
-if software_data_status == 3:
-    logger.info("The software database has not been created yet, starting initialization now...\n")
-    software.software_init()
-elif software_data_status == 0:
-    logger.info("The software initialization has not finished yet, continuing now...\n")
-    software.software_init()
-
-tactics_data_status = sf.check_status("tactics")
-
-if tactics_data_status == 3:
-    logger.info("The tactics database has not been created yet, starting initialization now...\n")
-    tactics.tactics_init()
-elif tactics_data_status == 0:
-    logger.info("The tactics initialization has not finished yet, continuing now...\n")
-    tactics.tactics_init()
-
-
 capec_data_status = sf.check_status("capec")
 
 if capec_data_status == 3:
@@ -104,15 +65,6 @@ if capec_data_status == 3:
 elif capec_data_status == 0:
     logger.info("The CAPEC initialization has not finished yet, continuing now...\n")
     capec.capec_init()
-
-relationships.relationships_init()
-attack_data_status = sf.check_status("attack")
-if attack_data_status == 3:
-    logger.info("The ATT&CK database has not been created yet, starting initialization now...\n")
-    attack.attack_init()
-elif attack_data_status == 0:
-    logger.info("The ATT&CK initialization has not finished yet, continuing now...\n")
-    attack.attack_init()
 
 
 

@@ -27,6 +27,7 @@ import xml.etree.ElementTree as ET
 import json
 from config import LOGGER
 import requests
+import math
 
 
 # Function to parse XML file and extract specific elements
@@ -85,23 +86,23 @@ def parse_d3fend_file(file_path):
                          'rdfs:label': item.get('rdfs:label', '')}
                 api_url = f"https://d3fend.mitre.org/api/technique/{item['@id']}.json"
 
-                #try:
-                # Make API call to retrieve JSON data
-                response = requests.get(api_url)
-                response.raise_for_status()  # Raise an exception for HTTP errors
-                json_data = response.json()
+                try:
+                    # Make API call to retrieve JSON data
+                    response = requests.get(api_url)
+                    response.raise_for_status()  # Raise an exception for HTTP errors
+                    json_data = response.json()
 
-                # Parse JSON data for off_tech_id
-                bindings = json_data['def_to_off']['results']['bindings']
-                off_tech_id = ""
-                for binding in bindings:
-                    off_tech_id = binding.get('off_tech_id', {}).get('value', '')
-                    if off_tech_id:
-                        break  # Assuming there's only one off_tech_id
-                entry['off_tech_id'] = off_tech_id
-                #except requests.exceptions.RequestException as e:
+                    # Parse JSON data for off_tech_id
+                    bindings = json_data['def_to_off']['results']['bindings']
+                    off_tech_id = ""
+                    for binding in bindings:
+                        off_tech_id = binding.get('off_tech_id', {}).get('value', '')
+                        if off_tech_id:
+                            break  # Assuming there's only one off_tech_id
+                    entry['off_tech_id'] = off_tech_id
+                except requests.exceptions.RequestException as e:
                     # Handle any API request errors
-                    #print(f"Error making off_tech_id API request: {e}")
+                    continue  # Skip this entry if API call fails
                 parsed_data.append(entry)
             return parsed_data
     except Exception as e:
@@ -209,6 +210,36 @@ def parse_tactics_file(file_path):
 
             for item in graph:
                 entry = {'ID': item['ID'], 'name': item['name'], 'description': item['description'], 'url': item['url'], 'domain': item['domain']}
+                parsed_data.append(entry)
+
+        return parsed_data
+    except Exception as e:
+        # Handle any API request errors
+        LOGGER.info(f"Error parsing ATTACK file: {e}")
+        return None
+
+
+def parse_relationships_file(file_path):
+    parsed_data = []
+
+    try:
+        with open(file_path, 'r') as file:
+            json_data = json.load(file)
+            graph = json_data.get('@graph', [])
+
+            for item in graph:
+                source_id = item.get('source ID')
+                # skip missing or NaN source IDs
+                if source_id is None or (isinstance(source_id, float) and math.isnan(source_id)):
+                    continue
+
+                # now you know source_id is valid
+                entry = {
+                    'source ID': source_id,
+                    'source type': item.get('source type'),
+                    'target ID': item.get('target ID'),
+                    'target type': item.get('target type')
+                }
                 parsed_data.append(entry)
 
         return parsed_data
