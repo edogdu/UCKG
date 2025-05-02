@@ -18,6 +18,8 @@ RUN pip install owlready2
 RUN pip install rdflib
 RUN pip install beautifulsoup4 html5lib
 
+# Set Java memory options
+ENV JAVA_OPTS="-Xmx12000M -Xms12000M"
 
 # Copy your Python script and any other necessary files
 COPY . /app

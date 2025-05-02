@@ -84,25 +84,80 @@ def call_mapper_update(datasource):
     else:
         logger.info("Not a valid rml source...")
         return False
-    # Construct the command
-    command = ["java", "-jar", jar_path, "-m", mapping_file, "-s", "turtle"]
+    
+    # Get Java options from environment variable with fallback
+    java_opts = os.environ.get('JAVA_OPTS', '')
+    if not java_opts:
+        # Fallback to default values if JAVA_OPTS is not set
+        java_opts = "-Xmx12000M -Xms12000M"
+    
+    # Split Java options and ensure they are properly formatted
+    java_opts_list = []
+    for opt in java_opts.split():
+        if opt.startswith('-Xmx') or opt.startswith('-Xms'):
+            # Ensure the memory value is properly formatted
+            try:
+                value = int(opt[4:-1])  # Extract the number
+                unit = opt[-1]  # Extract the unit (M or G)
+                java_opts_list.append(f"{opt[:4]}{value}{unit}")
+            except ValueError:
+                logger.warning(f"Invalid Java memory option format: {opt}, using default")
+                java_opts_list.extend(["-Xmx12000M", "-Xms12000M"])
+        else:
+            java_opts_list.append(opt)
+    
+    # Construct the command with Java options
+    command = ["java"] + java_opts_list + ["-jar", jar_path, "-m", mapping_file, "-s", "turtle", "-d"]
+    
+    logger.info(f"Running Java command with options: {java_opts}")
+    logger.info(f"Processing {datasource} data with mapping file: {mapping_file}")
+    logger.info(f"Full command: {' '.join(command)}")
+
+    # Check if mapping file exists
+    if not os.path.exists(mapping_file):
+        logger.error(f"Mapping file not found: {mapping_file}")
+        return False
+
+    # Check if jar file exists
+    if not os.path.exists(jar_path):
+        logger.error(f"JAR file not found: {jar_path}")
+        return False
 
     with open(output_file, "w+") as file:
         # Run the command and redirect stdout to the file
         try:
-            process = subprocess.Popen(command, stdout=file, stderr=subprocess.PIPE)
+            process = subprocess.Popen(command, stdout=file, stderr=subprocess.PIPE, universal_newlines=True)
             # Wait for the command to complete and capture stderr
-            _, stderr = process.communicate()
+            stdout, stderr = process.communicate()
+            
             if process.returncode != 0:
-                logger.error("Error running rml mapping: " + str(stderr.decode()))
+                error_msg = stderr if stderr else "No error message available"
+                logger.error(f"Error running RML mapping for {datasource}:")
+                logger.error(f"Command failed with return code: {process.returncode}")
+                logger.error(f"Error message: {error_msg}")
+                
+                # Check for specific error types
+                if "NTriples parsing error" in error_msg:
+                    logger.error("Ontology parsing error detected. Check if the ontology file is accessible and in the correct format.")
+                elif "OutOfMemoryError" in error_msg:
+                    logger.error("Java heap space error detected. Consider increasing the heap size.")
+                elif "FileNotFoundException" in error_msg:
+                    logger.error(f"Mapping file or data file not found. Check if {mapping_file} exists.")
+                elif "JSONPath" in error_msg:
+                    logger.error("JSONPath error detected. Check if the data structure matches the mapping file.")
+                elif not error_msg.strip():
+                    logger.error("Empty error message. This might indicate a silent failure in the Java process.")
+                    logger.error("Check if the input data file exists and is in the correct format.")
+                
                 return False
             else:
-                logger.info("Command executed successfully, output saved to: " + str(output_file))
+                logger.info(f"Successfully processed {datasource} data")
                 return True
         except Exception as e:
-            logger.info("In this error")
-            logger.error(e)
-    return False
+            logger.error(f"Exception occurred while running RML mapping for {datasource}:")
+            logger.error(f"Exception type: {type(e).__name__}")
+            logger.error(f"Exception message: {str(e)}")
+            return False
 
 def check_status(data_source):
     # Get the directory of the currently executing script (sub_script.py)
