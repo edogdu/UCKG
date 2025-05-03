@@ -121,8 +121,8 @@ def cve_init():
 
         # get the data from the website
         cve_api_url = "https://services.nvd.nist.gov/rest/json/cves/2.0?startIndex=" 
-        logger.info(f"{cve_api_url}{start_index}&resultsPerPage=2000")
-        response = requests.get(f"{cve_api_url}{start_index}&resultsPerPage=2000")
+        logger.info(f"{cve_api_url}{start_index}&resultsPerPage=1000")
+        response = requests.get(f"{cve_api_url}{start_index}&resultsPerPage=1000")
         init_finished = False 
         original_offset = start_index
 
@@ -139,7 +139,7 @@ def cve_init():
 
                     logger.info(f"Retry #{i + 1}: Waiting for 10 seconds, due to API throttling...")
                     time.sleep(10)
-                    response = requests.get(f"{cve_api_url}{start_index}&resultsPerPage=2000")
+                    response = requests.get(f"{cve_api_url}{start_index}&resultsPerPage=1000")
                     if response.status_code == 200:
                         logger.info("Retry Successful! Continuing processing...")
                         break
@@ -151,11 +151,11 @@ def cve_init():
             json_data = response.json()
 
             # Check if we are done after this loop
-            # If there are less than 2000 vulnerabilities given from a response,
+            # If there are less than 1000 vulnerabilities given from a response,
             # then that means there are no remaining records to retrieve
             vul_count = len(json_data["vulnerabilities"])
 
-            if vul_count < 2000:
+            if vul_count < 1000:
                 init_finished = True
 
             for cve in json_data["vulnerabilities"]:
@@ -183,14 +183,26 @@ def cve_init():
 
                 start_index += 1
 
-                cves["cves"].append({"cve":{
+                metrics = cve['cve'].get('metrics', {}).get('cvssMetricV2', [{}])[0]
+                cvss_data = metrics.get('cvssData', {})
+                evaluator_solution = cve['cve'].get('evaluatorSolution', "")
+
+                cves["cves"].append({"cve": {
                     "id": cve['cve']["id"],
-                    "lastModified":cve['cve']["lastModified"],
-                    "published":cve['cve']["published"],
+                    "lastModified": cve['cve']["lastModified"],
+                    "published": cve['cve']["published"],
                     "descriptions": cve['cve']['descriptions'],
+                    "vulnStatus": cve['cve'].get("vulnStatus", ""),
+                    "vectorString": cvss_data.get("vectorString", ""),
+                    "baseSeverity": metrics.get("baseSeverity", ""),
+                    "exploitabilityScore": metrics.get("exploitabilityScore", ""),
+                    "impactScore": metrics.get("impactScore", ""),
+                    "obtainAllPrivilege": metrics.get("obtainAllPrivilege", False),
+                    "userInteractionRequired": metrics.get("userInteractionRequired", False),
                     "cwes": cwes,
-                    "cpes": cpes
-                    }})
+                    "cpes": cpes,
+                    "evaluatorSolution": evaluator_solution
+                }})
 
             with open("./data/cve/cves.json", "w+") as json_file:
                 json.dump(cves, json_file, indent=4)
@@ -199,7 +211,7 @@ def cve_init():
             #successfully_mapped2 = sf.call_mapper_update("cpe")
             successfully_mapped2 = True
             if successfully_mapped and successfully_mapped2:
-                if vul_count < 2000:
+                if vul_count < 1000:
                     sf.call_ontology_updater(reason = True)
                 else:
                     sf.call_ontology_updater()
@@ -214,7 +226,7 @@ def cve_init():
             # Wait 5 seconds to avoid throttling
             time.sleep(5)
 
-            response = requests.get(f"{cve_api_url}{start_index}&resultsPerPage=2000")
+            response = requests.get(f"{cve_api_url}{start_index}&resultsPerPage=1000")
 
         
         if init_finished == True:

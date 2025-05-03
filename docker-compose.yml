@@ -36,6 +36,13 @@ services:
     environment:
       NEO4J_URI: bolt://neo4j:abcd90909090@neo4j:7687
       VOL_PATH: /vol/data
+      JAVA_OPTS: "-Xmx12000M -Xms12000M"
+    deploy:
+      resources:
+        limits:
+          memory: 7G
+        reservations:
+          memory: 6G
     volumes:
       - my_volume:/vol/data # Persist data 
     depends_on:

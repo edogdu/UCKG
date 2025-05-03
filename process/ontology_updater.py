@@ -1,7 +1,18 @@
-from owlready2 import *
-from rdflib import *
 import os
 import logging
+
+# Configure the logging module
+logging.basicConfig(level=logging.DEBUG , format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+
+# Create a logger
+logger = logging.getLogger('ontology_updater_logger')
+
+# Set Java heap size for Owlready2
+os.environ['OWLREADY2_JAVA_MEMORY'] = '12000M'
+logger.info("Setting Owlready2 Java memory to 12000M")
+
+from owlready2 import *
+from rdflib import *
 
 def validate_and_fix_datetime_literals(graph):
     # Iterate over all triples in the graph
@@ -28,11 +39,6 @@ def validate_and_fix_datetime_literals(graph):
     else:
         logger.info(f"No malformed dateTime literals found")
 
-# # Configure the logging module
-logging.basicConfig(level=logging.DEBUG , format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-
-# # Create a logger
-logger = logging.getLogger('ontology_updater_logger')
 # Create a graph to convert uco to owl xml format
 def update_ontology(run_reasoner=False):
     try:
@@ -41,6 +47,9 @@ def update_ontology(run_reasoner=False):
         uco_ontology = os.environ['UCO_ONTO_PATH']
         uco_extended_ontology = os.environ['UCO_ONTO_EXTEND_PATH']
         vol_path = os.environ['VOL_PATH']
+        
+        logger.info(f"Using Java heap size: {os.environ.get('OWLREADY2_JAVA_MEMORY', '12000M')}")
+        
         # Adding the base ontology
         g.parse(uco_ontology, format="turtle")
         # Extending the ontology
@@ -50,7 +59,7 @@ def update_ontology(run_reasoner=False):
         logger.info(f"Created file uco.owl")
 
         # Load the ontolgy
-        onto = get_ontology(write_path).load()
+        onto = get_ontology("file://" + write_path).load()
 
         # Switch back to to rdflib so I can add the instances
         graph_2 = onto.world.as_rdflib_graph()
@@ -63,9 +72,9 @@ def update_ontology(run_reasoner=False):
             logger.info(f"Created file uco_with_instances.owl")
 
         # Switch back to owlready2 so I can use the sync_reasoner
-        onto_final = get_ontology(write_path).load()
+        onto_final = get_ontology("file://" + write_path).load()
         if run_reasoner:
-            logger.info(f"Running the reasoner")
+            logger.info(f"Running the reasoner with Java heap size: {os.environ.get('OWLREADY2_JAVA_MEMORY', '12000M')}")
             with onto_final:
                 validate_and_fix_datetime_literals(onto_final.world.as_rdflib_graph())
                 sync_reasoner()
