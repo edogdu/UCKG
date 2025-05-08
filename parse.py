@@ -27,6 +27,7 @@ import xml.etree.ElementTree as ET
 import json
 from config import LOGGER
 import requests
+import math
 
 
 # Function to parse XML file and extract specific elements
@@ -81,7 +82,7 @@ def parse_d3fend_file(file_path):
                 if item.get("d3f:d3fend-id") is None:
                     continue
                 entry = {'@id': item.get('@id', ''), 'd3f:definition': item.get('d3f:definition', ''),
-                         'd3f:f3fend-id': item.get('d3f:d3fend-id', ''),
+                         'd3f:d3fend-id': item.get('d3f:d3fend-id', ''),
                          'rdfs:label': item.get('rdfs:label', '')}
                 api_url = f"https://d3fend.mitre.org/api/technique/{item['@id']}.json"
 
@@ -101,7 +102,7 @@ def parse_d3fend_file(file_path):
                     entry['off_tech_id'] = off_tech_id
                 except requests.exceptions.RequestException as e:
                     # Handle any API request errors
-                    print(f"Error making off_tech_id API request: {e}")
+                    continue  # Skip this entry if API call fails
                 parsed_data.append(entry)
             return parsed_data
     except Exception as e:
@@ -209,6 +210,36 @@ def parse_tactics_file(file_path):
 
             for item in graph:
                 entry = {'ID': item['ID'], 'name': item['name'], 'description': item['description'], 'url': item['url'], 'domain': item['domain']}
+                parsed_data.append(entry)
+
+        return parsed_data
+    except Exception as e:
+        # Handle any API request errors
+        LOGGER.info(f"Error parsing ATTACK file: {e}")
+        return None
+
+
+def parse_relationships_file(file_path):
+    parsed_data = []
+
+    try:
+        with open(file_path, 'r') as file:
+            json_data = json.load(file)
+            graph = json_data.get('@graph', [])
+
+            for item in graph:
+                source_id = item.get('source ID')
+                # skip missing or NaN source IDs
+                if source_id is None or (isinstance(source_id, float) and math.isnan(source_id)):
+                    continue
+
+                # now you know source_id is valid
+                entry = {
+                    'source ID': source_id,
+                    'source type': item.get('source type'),
+                    'target ID': item.get('target ID'),
+                    'target type': item.get('target type')
+                }
                 parsed_data.append(entry)
 
         return parsed_data
