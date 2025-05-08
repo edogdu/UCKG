@@ -13,7 +13,34 @@
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix capec: <http://purl.org/cyber/capec#> .
+@prefix ucoex: <http://example.com/ucoex#> .
 @base <http://purl.org/cyber/uco#> .
+
+# for maping observed examples
+<#observedExampleMap> a rr:TriplesMap;
+    rml:logicalSource [
+        rml:source "./data/cwe/cwes.json";
+        rml:referenceFormulation ql:JSONPath;
+        rml:iterator "cwes[*].cwe.observed_examples.observed_example[*]"
+    ];
+    rr:subjectMap [
+     rr:template "http://example.com/ucoex#{cwe_id}-{Reference}";
+     rr:class <http://example.com/ucoexObservedExample>
+     ];
+   rr:predicateObjectMap [
+         rr:predicate <http://example.com/ucoexDESCRIPTION>;
+         rr:objectMap [
+             rml:reference "Description";
+             rr:datatype xsd:string
+         ]
+    ];
+    rr:predicateObjectMap [
+    rr:predicate <http://purl.org/cyber/ucoexExampleObservedIn>;
+    rr:objectMap [
+            rr:template "http://purl.org/cyber/uco#{Reference}";
+            rr:class <http://purl.org/cyber/ucoCVE>     
+    ] 
+].
 
 # How to read the CWEs from a json file and itterate
 uco:ClassAMap a rr:TriplesMap;
@@ -116,4 +143,136 @@ uco:ClassBMap rr:predicateObjectMap [
             rml:reference "cwe.name";  # Field in your data source
             rr:datatype xsd:string
         ]
+].
+
+#Vulnerability ucoPublishedDate predicate
+uco:ClassBMap rr:predicateObjectMap [
+        rr:predicate <http://purl.org/cyber/ucorelatedWeakness>;  # Your DatatypeProperty for dateTime
+        rr:objectMap [
+            rml:reference "cwe.related_weakness";  # Field in your data source
+            rr:datatype xsd:string
+        ]
+].
+
+uco:ClassBMap rr:predicateObjectMap [
+    rr:predicate <http://purl.org/cyber/ucorelatedWeakness>;
+    rr:objectMap [
+         rr:template "http://purl.org/cyber/uco#{.Related_Weaknesses.related_weakness[*].ID}";
+         rr:class <http://purl.org/cyber/ucoCWE>
+    ]
+].
+
+#Vulnerability ucoPublishedDate predicate
+uco:ClassBMap rr:predicateObjectMap [
+        rr:predicate <http://purl.org/cyber/ucoapplicablePlatform>;  # Your DatatypeProperty for dateTime
+        rr:objectMap [
+            rml:reference "cwe.applicable_platforms";  # Field in your data source
+            rr:datatype xsd:string
+        ]
+].
+
+#Vulnerability ucoPublishedDate predicate
+uco:ClassBMap rr:predicateObjectMap [
+        rr:predicate <http://purl.org/cyber/ucomodesOfIntroduction>;  # Your DatatypeProperty for dateTime
+        rr:objectMap [
+            rml:reference "cwe.modes_of_introduction";  # Field in your data source
+            rr:datatype xsd:string
+        ]
+].
+
+#Vulnerability ucoPublishedDate predicate
+uco:ClassBMap rr:predicateObjectMap [
+        rr:predicate <http://purl.org/cyber/ucolikelihoodOfExploit>;  # Your DatatypeProperty for dateTime
+        rr:objectMap [
+            rml:reference "cwe.likelihood_of_exploit";  # Field in your data source
+            rr:datatype xsd:string
+        ]
+].
+
+#Vulnerability ucoPublishedDate predicate
+uco:ClassBMap rr:predicateObjectMap [
+        rr:predicate <http://purl.org/cyber/ucodetectionMethods>;  # Your DatatypeProperty for dateTime
+        rr:objectMap [
+            rml:reference "cwe.detection_methods";  # Field in your data source
+            rr:datatype xsd:string
+        ]
+].
+
+#Vulnerability ucoPublishedDate predicate
+uco:ClassBMap rr:predicateObjectMap [
+        rr:predicate <http://purl.org/cyber/ucopotentialMitigations>;  # Your DatatypeProperty for dateTime
+        rr:objectMap [
+            rml:reference "cwe.potential_mitigations";  # Field in your data source
+            rr:datatype xsd:string
+        ]
+].
+
+#Vulnerability ucoPublishedDate predicate
+uco:ClassBMap rr:predicateObjectMap [
+        rr:predicate <http://purl.org/cyber/ucodemonstrativeExamples>;  # Your DatatypeProperty for dateTime
+        rr:objectMap [
+            rml:reference "cwe.demonstrative_examples";  # Field in your data source
+            rr:datatype xsd:string
+        ]
+].
+
+#Vulnerability ucoPublishedDate predicate
+uco:ClassBMap rr:predicateObjectMap [
+        rr:predicate <http://purl.org/cyber/ucoreferences>;  # Your DatatypeProperty for dateTime
+        rr:objectMap [
+            rml:reference "cwe.references";  # Field in your data source
+            rr:datatype xsd:string
+        ]
+].
+
+#Vulnerability ucoPublishedDate predicate
+uco:ClassBMap rr:predicateObjectMap [
+        rr:predicate <http://purl.org/cyber/ucomappingNotes>;  # Your DatatypeProperty for dateTime
+        rr:objectMap [
+            rml:reference "cwe.mapping_notes";  # Field in your data source
+            rr:datatype xsd:string
+        ]
+].
+
+#Vulnerability ucoPublishedDate predicate
+uco:ClassBMap rr:predicateObjectMap [
+        rr:predicate <http://purl.org/cyber/ucorelatedAttackPatterns>;  # Your DatatypeProperty for dateTime
+        rr:objectMap [
+            rml:reference "cwe.related_attack_patterns";  # Field in your data source
+            rr:datatype xsd:string
+        ]
+].
+
+
+uco:ClassBMap rr:predicateObjectMap [
+        rr:predicate <http://purl.org/cyber/ucoabstraction>;  
+        rr:objectMap [
+            rml:reference "cwe.abstraction";  
+            rr:datatype xsd:string
+        ]
+].
+
+uco:ClassBMap rr:predicateObjectMap [
+        rr:predicate <http://purl.org/cyber/ucostructure>;  
+        rr:objectMap [
+            rml:reference "cwe.structure";  
+            rr:datatype xsd:string
+        ]
+].
+
+uco:ClassBMap rr:predicateObjectMap [
+        rr:predicate <http://purl.org/cyber/ucostatus>;  
+        rr:objectMap [
+            rml:reference "cwe.status";  
+            rr:datatype xsd:string
+        ]
+].
+
+uco:ClassBMap rr:predicateObjectMap [
+    rr:predicate <http://purl.org/cyber/ucohasObservedExample>;
+    rr:objectMap [
+            rr:template "http://example.com/ucoex#{cwe.id_value}-{.observed_examples.observed_example[*].Reference}";
+            rr:class <http://example.com/ucoexObservedExample>     
+    ]
+    
 ].
