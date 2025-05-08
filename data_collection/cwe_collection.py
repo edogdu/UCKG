@@ -2,7 +2,7 @@ import os
 import json
 import logging
 import xml.etree.ElementTree as ET
-from process import shared_functions as sf  # 이거 코멘트 아니었음
+from process import shared_functions as sf  
 from bs4 import BeautifulSoup
 import requests
 import zipfile
@@ -273,6 +273,7 @@ def cwe_init():
                 observed_examples = {"observed_example": []}
                 for child in oe_elem.findall('{http://cwe.mitre.org/cwe-7}Observed_Example'):
                     ex_dict = {}
+                    ex_dict["cwe_id"] = cwe_id
                     ref_elem = child.find('./{http://cwe.mitre.org/cwe-7}Reference')
                     if ref_elem is not None:
                         ex_dict["Reference"] = get_clean_text(ref_elem)
@@ -407,3 +408,4 @@ def cwe_init():
     logger.info("############################")
     logger.info("CWE Data extraction completed")
     logger.info("############################\n")
+    

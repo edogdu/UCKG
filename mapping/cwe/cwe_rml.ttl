@@ -16,6 +16,32 @@
 @prefix ucoex: <http://example.com/ucoex#> .
 @base <http://purl.org/cyber/uco#> .
 
+# for maping observed examples
+<#observedExampleMap> a rr:TriplesMap;
+    rml:logicalSource [
+        rml:source "./data/cwe/cwes.json";
+        rml:referenceFormulation ql:JSONPath;
+        rml:iterator "cwes[*].cwe.observed_examples.observed_example[*]"
+    ];
+    rr:subjectMap [
+     rr:template "http://example.com/ucoex#{cwe_id}-{Reference}";
+     rr:class <http://example.com/ucoexObservedExample>
+     ];
+   rr:predicateObjectMap [
+         rr:predicate <http://example.com/ucoexDESCRIPTION>;
+         rr:objectMap [
+             rml:reference "Description";
+             rr:datatype xsd:string
+         ]
+    ];
+    rr:predicateObjectMap [
+    rr:predicate <http://purl.org/cyber/ucoexExampleObservedIn>;
+    rr:objectMap [
+            rr:template "http://purl.org/cyber/uco#{Reference}";
+            rr:class <http://purl.org/cyber/ucoCVE>     
+    ] 
+].
+
 # How to read the CWEs from a json file and itterate
 uco:ClassAMap a rr:TriplesMap;
   rml:logicalSource [
@@ -146,15 +172,6 @@ uco:ClassBMap rr:predicateObjectMap [
 ].
 
 #Vulnerability ucoPublishedDate predicate
-#uco:ClassBMap rr:predicateObjectMap [
-#        rr:predicate <http://purl.org/cyber/ucobackgroundDetails>;  # Your DatatypeProperty for dateTime
-#        rr:objectMap [
-#            rml:reference "cwe.background_details";  # Field in your data source
-#            rr:datatype xsd:string
-#        ]
-#].
-
-#Vulnerability ucoPublishedDate predicate
 uco:ClassBMap rr:predicateObjectMap [
         rr:predicate <http://purl.org/cyber/ucomodesOfIntroduction>;  # Your DatatypeProperty for dateTime
         rr:objectMap [
@@ -201,15 +218,6 @@ uco:ClassBMap rr:predicateObjectMap [
 
 #Vulnerability ucoPublishedDate predicate
 uco:ClassBMap rr:predicateObjectMap [
-        rr:predicate <http://purl.org/cyber/ucoobservedExamples>;  # Your DatatypeProperty for dateTime
-        rr:objectMap [
-            rml:reference "cwe.observed_examples";  # Field in your data source
-            rr:datatype xsd:string
-        ]
-].
-
-#Vulnerability ucoPublishedDate predicate
-uco:ClassBMap rr:predicateObjectMap [
         rr:predicate <http://purl.org/cyber/ucoreferences>;  # Your DatatypeProperty for dateTime
         rr:objectMap [
             rml:reference "cwe.references";  # Field in your data source
@@ -235,14 +243,6 @@ uco:ClassBMap rr:predicateObjectMap [
         ]
 ].
 
-#uco:ClassBMap rr:predicateObjectMap [
-#    rr:predicate <http://purl.org/cyber/ucorelatedAttackPatterns>;
-#    rr:objectMap [
-#            rr:template "http://example.com/ucoex#{.related_attack_patterns.related_attack_pattern[*]}";
-#            rr:class <http://example.com/ucoexCAPEC>
-#
-#    ]
-#].
 
 uco:ClassBMap rr:predicateObjectMap [
         rr:predicate <http://purl.org/cyber/ucoabstraction>;  
@@ -269,34 +269,10 @@ uco:ClassBMap rr:predicateObjectMap [
 ].
 
 uco:ClassBMap rr:predicateObjectMap [
-    rr:predicate <http://purl.org/cyber/ucoobserved_example>;
+    rr:predicate <http://purl.org/cyber/ucohasObservedExample>;
     rr:objectMap [
-            rr:template "http://purl.org/cyber/uco#{.observed_examples.observed_example[*].Reference}";
-            rr:class <http://purl.org/cyber/ucoCVE>	     
+            rr:template "http://example.com/ucoex#{cwe.id_value}-{.observed_examples.observed_example[*].Reference}";
+            rr:class <http://example.com/ucoexObservedExample>     
     ]
     
-].
-
-uco:ClassBMap rr:predicateObjectMap [
-    rr:predicate <http://purl.org/cyber/ucoobserved_example>;
-    uco:relationshipPropertyMap [
-        uco:propertyName "observed_example_description";
-        rr:template "{.observed_examples.observed_example[*].Description}"
-    ]    
-].
-
-uco:ClassBMap rr:predicateObjectMap [
-    rr:predicate <http://purl.org/cyber/ucoobserved_example>;
-    uco:relationshipPropertyMap [
-        uco:propertyName "observed_example_link";
-        rr:template "{.observed_examples.observed_example[*].Link}"
-    ]    
-].
-
-uco:ClassBMap rr:predicateObjectMap [
-        rr:predicate <http://purl.org/cyber/ucoalternative_terms>;  
-        rr:objectMap [
-            rml:reference "cwe.alternative_terms";  
-            rr:datatype xsd:string
-        ]
 ].
