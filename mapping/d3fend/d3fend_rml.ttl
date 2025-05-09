@@ -14,6 +14,7 @@
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix capec: <http://purl.org/cyber/capec#> .
 @prefix ucoex: <http://example.com/ucoex#> .
+@prefix d3f: <http://d3fend.mitre.org/ontologies/d3fend.owl#> .
 @base <http://purl.org/cyber/uco#> .
 
 <#DefendMapping> a rr:TriplesMap;
@@ -25,7 +26,7 @@
     rr:predicateObjectMap [
         rr:predicate <http://example.com/ucoexMITRED3FEND_ID>;
          rr:objectMap [
-             rml:reference "d3f:f3fend-id'";
+             rml:reference "d3f:d3fend-id'";
              rr:datatype xsd:string
          ]
     ];
