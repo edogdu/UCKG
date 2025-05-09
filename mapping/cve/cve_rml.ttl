@@ -23,7 +23,7 @@
     rml:referenceFormulation ql:JSONPath;
     rml:iterator "cves[*]"
   ];
-
+  
 #Vulnerability Class mapping
 rr:subjectMap [
   rr:template "http://purl.org/cyber/uco#VULN-{cve.id}";
@@ -79,17 +79,120 @@ rr:predicateObjectMap [
 rr:subjectMap [
   rr:template "http://purl.org/cyber/uco#{cve.id}";
   rr:class <http://purl.org/cyber/ucoCVE>
+];
+rr:predicateObjectMap [
+  rr:predicate rdfs:label;
+  rr:objectMap [ 
+                  rml:reference "cve.id"; 
+                  rr:datatype xsd:string 
+                ]
+];
+rr:predicateObjectMap [
+  rr:predicate <http://purl.org/cyber/ucovulnStatus>;
+  rr:objectMap [ 
+                  rml:reference "cve.vulnStatus"; 
+                  rr:datatype xsd:string 
+                ]
+];
+rr:predicateObjectMap [
+  rr:predicate <http://purl.org/cyber/ucovectorString>;
+  rr:objectMap [ 
+                  rml:reference "cve.vectorString"; 
+                  rr:datatype xsd:string 
+                ]
+];
+rr:predicateObjectMap [
+  rr:predicate <http://purl.org/cyber/ucobaseSeverity>;
+  rr:objectMap [ 
+                  rml:reference "cve.baseSeverity"; 
+                  rr:datatype xsd:string 
+                ]
+];
+rr:predicateObjectMap [
+  rr:predicate <http://purl.org/cyber/ucoexploitabilityScore>;
+  rr:objectMap [ 
+                  rml:reference "cve.exploitabilityScore"; 
+                  rr:datatype xsd:string 
+                ]
+];
+rr:predicateObjectMap [
+  rr:predicate <http://purl.org/cyber/ucoimpactScore>;
+  rr:objectMap [ 
+                  rml:reference "cve.impactScore"; 
+                  rr:datatype xsd:string 
+                ]
+];
+rr:predicateObjectMap [
+  rr:predicate <http://purl.org/cyber/ucoobtainAllPrivilege>;
+  rr:objectMap [ 
+                  rml:reference "cve.obtainAllPrivilege"; 
+                  rr:datatype xsd:string 
+                ]
+];
+rr:predicateObjectMap [
+  rr:predicate <http://purl.org/cyber/ucouserInteractionRequired>;
+  rr:objectMap [ 
+                  rml:reference "cve.userInteractionRequired"; 
+                  rr:datatype xsd:string 
+                ]
+];
+rr:predicateObjectMap [
+  rr:predicate <http://purl.org/cyber/ucoevaluatorSolution>;
+  rr:objectMap [ 
+                  rml:reference "cve.evaluatorSolution"; 
+                  rr:datatype xsd:string 
+                ]
 ].
+
 
 <#CPEMap> a rr:TriplesMap;
     rml:logicalSource [
         rml:source "./data/cve/cves.json";
         rml:referenceFormulation ql:JSONPath;
-        rml:iterator "$.cves[*].cpes[*]"
+        rml:iterator "$.cves[*].cve.cpes[*].cpe"
     ];
     rr:subjectMap [
-        rr:template "http://example.com/ucoex#{cpe.cpeName}";
+        rr:template "http://example.com/ucoex#{cpeName}";
         rr:class <http://example.com/ucoexCPE>
+    ];
+    rr:predicateObjectMap [
+      rr:predicate <http://example.com/cpeName>;
+      rr:objectMap [
+        rml:reference "cpeName";
+        rr:datatype xsd:string;
+        rr:termType rr:Literal
+      ]
+    ];
+    rr:predicateObjectMap [
+      rr:predicate <http://example.com/cpeNameId>;
+      rr:objectMap [
+        rml:reference "cpeNameId";
+        rr:datatype xsd:string;
+        rr:termType rr:Literal
+      ]
+    ];
+    rr:predicateObjectMap [
+      rr:predicate <http://example.com/lastModified>;
+      rr:objectMap [
+        rml:reference "lastModified";
+        rr:datatype xsd:dateTime;
+        rr:termType rr:Literal
+      ]
+    ];
+    rr:predicateObjectMap [
+      rr:predicate <http://example.com/titles>;
+      rr:objectMap [
+        rml:reference "titles";
+        rr:termType rr:Literal;
+        rr:datatype rdf:JSON
+      ]
+    ];
+    rr:predicateObjectMap [
+      rr:predicate <http://example.com/dictionary_found>;
+      rr:objectMap [
+        rml:reference "dictionary_found";
+        rr:datatype xsd:boolean
+      ]
     ].
 
 
@@ -130,14 +233,3 @@ rr:subjectMap [
     rr:template "http://purl.org/cyber/uco#{id}";
     rr:class <http://purl.org/cyber/ucoCWE>  # This ensures every CWE ID is declared as an instance of uco:ucoCWE
 ].
-
-<#CPETypeMap> a rr:TriplesMap;
- rml:logicalSource [
-       rml:source "./data/cve/cves.json";
-       rml:referenceFormulation ql:JSONPath;
-       rml:iterator "$.cves[*].cve.cpes[*].cpe"
-   ];
- rr:subjectMap [
-       rr:template "http://example.com/ucoex#{cpeName}";
-       rr:class <http://example.com/ucoexCPE>
-   ].
