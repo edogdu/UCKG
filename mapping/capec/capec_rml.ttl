@@ -16,7 +16,7 @@
 @prefix ucoex: <http://example.com/ucoex#> .
 @base <http://purl.org/cyber/uco#> .
 
-#CVE Class mapping
+# CAPEC Class mapping
 <#CAPECMap> a rr:TriplesMap;
     rml:logicalSource [
         rml:source "./data/capec/capec.json";
@@ -26,10 +26,11 @@
     rr:predicateObjectMap [
         rr:predicate rdfs:label ;
         rr:objectMap [
-            rr:template "CAPEC-{ID}: {Name}" ;
+            rr:template "CAPEC-{ID}: {Name}" ; # Label Node
             rr:datatype xsd:string
         ]
     ];
+    # Define Mapping Relationship to CWE
     rr:predicateObjectMap [
         rr:predicate <http://example.com/ucoexhasRelatedWeakness>;
         rr:objectMap [
@@ -37,106 +38,126 @@
             rr:class <http://purl.org/cyber/ucoCWE>
         ]
     ];
-    # ################   Addding part to test out the adding detial of node in CAPEC
     rr:predicateObjectMap [
-        rr:predicate <http://example.com/ucoCAPEC_id>;  # Your DatatypeProperty
+        rr:predicate <http://example.com/ucoexCAPEC_id>;  # Custom property name
         rr:objectMap [
-                    rml:reference "ID";  # Field in your data source
+                    rml:reference "ID";
                     rr:datatype xsd:string  # Specifying that the datatype
         ]
     ];
     rr:predicateObjectMap [
-        rr:predicate <http://example.com/ucoCAPEC_name>;  # Your DatatypeProperty
+        rr:predicate <http://example.com/ucoexCAPEC_name>; # Custom property name
         rr:objectMap [
-                    rml:reference "Name";  # Field in your data source
+                    rml:reference "Name";
                     rr:datatype xsd:string  # Specifying that the datatype
         ]
     ];
     rr:predicateObjectMap [
-        rr:predicate <http://example.com/ucoAbstraction>;  # Your DatatypeProperty
+        rr:predicate <http://example.com/ucoexAbstraction>;  # Custom property name
         rr:objectMap [
-                    rml:reference "Abstraction";  # Field in your data source
+                    rml:reference "Abstraction";
                     rr:datatype xsd:string  # Specifying that the datatype
         ]
     ];
     rr:predicateObjectMap [
-        rr:predicate <http://example.com/ucoLikelihood>;  # Your DatatypeProperty
+        rr:predicate <http://example.com/ucoexLikelihood>;  # Custom property name
         rr:objectMap [
-                    rml:reference "Likelihood_Of_Attack";  # Field in your data source
+                    rml:reference "Likelihood_Of_Attack";
                     rr:datatype xsd:string  # Specifying that the datatype
         ]
     ];
     rr:predicateObjectMap [
-        rr:predicate <http://example.com/ucoSeverity>;  # Your DatatypeProperty
+        rr:predicate <http://example.com/ucoexSeverity>;  # Custom property name
         rr:objectMap [
-                    rml:reference "Typical_Severity";  # Field in your data source
+                    rml:reference "Typical_Severity";
                     rr:datatype xsd:string  # Specifying that the datatype
         ]
     ];
     rr:predicateObjectMap [
-        rr:predicate <http://example.com/ucodescription>;  # Your DatatypeProperty
+        rr:predicate <http://example.com/ucoexDescription>;  # Custom property name
         rr:objectMap [
-            rml:reference "Description";  # Field in your data source
+            rml:reference "Description";
             rr:datatype xsd:string  # Specifying that the datatype
         ]
     ];
     rr:predicateObjectMap [
-        rr:predicate <http://example.com/ucoRelatedAttPattern>;  # Your DatatypeProperty
+        rr:predicate <http://example.com/ucoexExtendedDescription>;  # Custom property name
         rr:objectMap [
-            rml:reference "Related_Attack_Patterns[*]";  # Field in your data source
+            rml:reference "Extended_Description[*]";
             rr:datatype xsd:string  # Specifying that the datatype
         ]
     ];
     rr:predicateObjectMap [
-        rr:predicate <http://example.com/ucoExecutionTechnique> ;
+        rr:predicate <http://example.com/ucoexRelatedAttPattern>;  # Custom property name
         rr:objectMap [
-            rml:reference "Execution_Flow[*].Techniques[*]" ;
+            rml:reference "Related_Attack_Patterns[*]";
+            rr:datatype xsd:string  # Specifying that the datatype
+        ]
+    ];
+    rr:predicateObjectMap [
+        rr:predicate <http://example.com/ucoexExecutionFlowTechnique> ; # Custom property name
+        rr:objectMap [
+            rml:reference "Execution_Flow[*]" ;
             rr:datatype xsd:string
         ]
     ]; 
     rr:predicateObjectMap [
-        rr:predicate <http://example.com/ucoPrerequisites>;  # Your DatatypeProperty
+        rr:predicate <http://example.com/ucoexPrerequisites>; # Custom property name
         rr:objectMap [
-            rml:reference "Prerequisites";  # Field in your data source
+            rml:reference "Prerequisites";
             rr:datatype xsd:string  # Specifying that the datatype
         ]
     ];
     rr:predicateObjectMap [
-        rr:predicate <http://example.com/ucoSkills_Required>;  # Your DatatypeProperty
+        rr:predicate <http://example.com/ucoexSkills_Required>; # Custom property name
         rr:objectMap [
-            rml:reference "Skills_Required[*]";  # Field in your data source
+            rml:reference "Skills_Required[*]";
             rr:datatype xsd:string  # Specifying that the datatype
         ]
     ];
     rr:predicateObjectMap [
-        rr:predicate <http://example.com/ucoResources_Required>;  # Your DatatypeProperty
+        rr:predicate <http://example.com/ucoexResources_Required>;  # Custom property name
         rr:objectMap [
-            rml:reference "Resources_Required";  # Field in your data source
+            rml:reference "Resources_Required";
             rr:datatype xsd:string  # Specifying that the datatype
         ]
     ];
     rr:predicateObjectMap [
-        rr:predicate <http://example.com/ucoMitigations>;  # Your DatatypeProperty
+        rr:predicate <http://example.com/ucoexMitigations>;  # Custom property name
         rr:objectMap [
-            rml:reference "Mitigations";  # Field in your data source
+            rml:reference "Mitigations";
             rr:datatype xsd:string  # Specifying that the datatype
         ]
     ];
     rr:predicateObjectMap [
-        rr:predicate <http://example.com/ucoExample>;  # Your DatatypeProperty
+        rr:predicate <http://example.com/ucoexExample>;  # Custom property name
         rr:objectMap [
-            rml:reference "Example_Instances";  # Field in your data source
+            rml:reference "Example_Instances";
             rr:datatype xsd:string  # Specifying that the datatype
         ]
     ];
     rr:predicateObjectMap [
-        rr:predicate <http://example.com/ucoRelatedWeaknesses>;  # Your DatatypeProperty
+        rr:predicate <http://example.com/ucoexRelatedWeaknesses>;  # Custom property name
         rr:objectMap [
-            rml:reference "Related_Weaknesses[*]";  # Field in your data source
+            rml:reference "Related_Weaknesses[*]";
             rr:datatype xsd:string  # Specifying that the datatype
         ]
     ];
-    # #############################################################
+    rr:predicateObjectMap [
+        rr:predicate <http://example.com/ucoexTaxonomyMappingATT&CK>;  # Custom property name
+        rr:objectMap [
+            rml:reference "Taxonomy_Mappings[*]";  # This pulls each taxonomy mapping string
+            rr:datatype xsd:string
+            ]
+    ];
+    rr:predicateObjectMap [
+        rr:predicate <http://example.com/ucoexConsequences>;  # Custom property name
+        rr:objectMap [
+            rml:reference "Consequences[*]";  # This pulls each Consequences string
+            rr:datatype xsd:string
+            ]
+    ];
+    # Define Mapping Relationship to MITRE ATT&CK
     rr:predicateObjectMap [
         rr:predicate <http://example.com/ucoexhasTaxonomyMapping> ;
         rr:objectMap [
@@ -144,10 +165,13 @@
             rr:class <http://example.com/ucoexMITREATTACK>
         ]
     ];
+    # Customize uri link of CAPEC note
     rr:subjectMap [
         rr:template "https://capec.mitre.org/data/definitions/{ID}.html";
         rr:class <http://example.com/ucoexCAPEC>
     ].
+
+# Mapping between CAPEC to MITRE ATTACKMap
 <#ATTACKMap> a rr:TriplesMap;
     rml:logicalSource [
         rml:source "./data/capec/capec.json";
@@ -159,6 +183,7 @@
         rr:class <http://example.com/ucoexMITREATTACK>
     ].
 
+# Mapping between CAPEC to CWEMap
 <#CWEMap> a rr:TriplesMap;
     rml:logicalSource [
         rml:source "./data/capec/capec.json";
