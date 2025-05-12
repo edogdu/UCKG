@@ -32,6 +32,48 @@ def try_call(api_url, parameters_arg, header):
         time.sleep(10)  # Wait before retrying
     return response  # Return the last response, even if it failed
 
+def count_cpes_in_sqlite(db_path):
+    """Count total CPEs in SQLite database."""
+    try:
+        # Check if database file exists
+        if not os.path.exists(db_path):
+            logger.info("CPE database does not exist yet.")
+            return 0
+            
+        conn = sqlite3.connect(db_path)
+        cursor = conn.cursor()
+        
+        # Check if table exists
+        cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='cpe_data'")
+        if not cursor.fetchone():
+            logger.info("CPE data table does not exist yet.")
+            conn.close()
+            return 0
+            
+        cursor.execute("SELECT COUNT(*) FROM cpe_data")
+        count = cursor.fetchone()[0]
+        conn.close()
+        logger.info(f"Total CPEs in SQLite database: {count}")
+        return count
+    except Exception as e:
+        logger.error(f"Error counting CPEs in SQLite: {e}")
+        return 0
+
+def count_cpes_in_nvd():
+    """Get total CPEs from NVD API."""
+    header = {
+        'apiKey': 'ccba97f5-3cb8-4bec-bd96-f5084eb8034e'
+    }
+    response = requests.get('https://services.nvd.nist.gov/rest/json/cpes/2.0?resultsPerPage=1', headers=header)
+    if response.status_code != 200:
+        logger.warning(f"NVD API returned error code {response.status_code}")
+        return None
+    
+    data = response.json()
+    nvd_total = data.get('totalResults', 0)
+    logger.info(f"Total CPEs in NVD: {nvd_total}")
+    return nvd_total
+
 # Function to download and save CPE data into SQLite
 def download_cpe_data_to_db(db_path):
     """Download CPE data from the NVD API and save it into the SQLite database."""
@@ -48,15 +90,29 @@ def download_cpe_data_to_db(db_path):
             titles TEXT
         )
     """)
-    cursor.execute("SELECT COUNT(*) FROM cpe_data")
-    row_count = cursor.fetchone()[0]
     
-    if row_count > 0:
-        logger.info(f"CPE data already exists in the database with {row_count} records. Skipping download.")
+    # Get current count from SQLite
+    sqlite_count = count_cpes_in_sqlite(db_path)
+    nvd_count = count_cpes_in_nvd()
+    
+    if nvd_count is None:
+        logger.error("Failed to fetch NVD data. Skipping collection.")
+        conn.close()
+        return
+        
+    if nvd_count <= sqlite_count and sqlite_count > 0:
+        logger.info(f"No need to update CPE data. NVD has {nvd_count} CPEs vs SQLite's {sqlite_count}")
         conn.close()
         return
     
-    logger.info("No CPE data found in the database. Starting download...")
+    # If we have no data yet or NVD has more, proceed with download
+    if sqlite_count == 0:
+        logger.info("No existing CPE data found. Starting fresh download...")
+        start_index = 0
+    else:
+        logger.info(f"Running CPE collection - NVD has {nvd_count} CPEs vs SQLite's {sqlite_count}")
+        logger.info(f"Will update CPEs starting from index {sqlite_count + 1}")
+        start_index = sqlite_count + 1
     
     # CPE API URL and headers
     cpe_url = 'https://services.nvd.nist.gov/rest/json/cpes/2.0'
@@ -64,12 +120,12 @@ def download_cpe_data_to_db(db_path):
         'apiKey': 'ccba97f5-3cb8-4bec-bd96-f5084eb8034e'
     }
     parameters = {
-        'startIndex': '0',
+        'startIndex': str(start_index),  # Start from 0 for fresh download or next index for update
         'resultsPerPage': '10000'  # Explicitly set the maximum limit per request
     }
 
     # Initial API call to get total results
-    logger.info("Starting initial API call to determine total results...")
+    logger.info("Starting API call to fetch CPEs...")
     cpe_response = requests.get(cpe_url, params=parameters, headers=header)
     if cpe_response.status_code != 200:
         cpe_response = try_call(cpe_url, parameters, header)
@@ -80,10 +136,11 @@ def download_cpe_data_to_db(db_path):
     # Parse the response to get total results
     cpe_dict = cpe_response.json()
     total_results = cpe_dict.get('totalResults', 0)
-    logger.info(f"Total CPE records to fetch: {total_results}")
+    remaining_results = total_results - start_index
+    logger.info(f"Remaining CPE records to fetch: {remaining_results}")
 
-    # Pagination setup
-    increments = [str(num * 10000) for num in range((total_results // 10000) + 1)]
+    # Pagination setup for remaining results
+    increments = [str(num * 10000 + start_index) for num in range((remaining_results // 10000) + 1)]
 
     # Multithreading setup
     logger.info("Starting multithreaded CPE data collection...")
