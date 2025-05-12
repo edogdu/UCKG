@@ -275,9 +275,30 @@ def parse_capec_file(file_path):
             attack['Abstraction'] = attack_pattern.get('Abstraction')
             attack['Status'] = attack_pattern.get('Status')
 
-            # Description
+           # Description
             description = attack_pattern.find('.//xmlns:Description', namespaces)
-            attack['Description'] = description.text if description is not None else ''
+            if description is not None:
+                # Try direct text first
+                description_text = description.text.strip() if description.text else ""
+
+                # If no direct text, look for all <xhtml:p> children
+                if not description_text:
+                    paras = description.findall('.//xhtml:p', namespaces)
+                    description_texts = [p.text.strip() for p in paras if p is not None and p.text]
+                    description_text = " ".join(description_texts)
+            else:
+                description_text = ""
+            attack['Description'] = description_text
+
+            # Extended Description
+            extended_description = attack_pattern.find('.//xmlns:Extended_Description', namespaces)
+            # If not directly, check nested xhtml:p for it
+            if extended_description is not None:
+                extendeds = extended_description.findall('.//xhtml:p', namespaces)
+                extended_texts = [p.text.strip() for p in extendeds if p is not None and p.text]
+            else:
+                extended_texts = []
+            attack['Extended_Description'] = extended_texts
 
             # Likelihood of Attack
             likelihood = attack_pattern.find('.//xmlns:Likelihood_Of_Attack', namespaces)
@@ -289,18 +310,40 @@ def parse_capec_file(file_path):
 
             # Related Attack Patterns
             related_patterns = attack_pattern.findall('.//xmlns:Related_Attack_Patterns/xmlns:Related_Attack_Pattern',
-                                                      namespaces)
-            attack['Related_Attack_Patterns'] = [related_pattern.get('CAPEC_ID') for related_pattern in
-                                                 related_patterns]
+                                                    namespaces)
+            # Related patterns are stored as a list of strings with format "{Nature} CAPEC-{ID}"
+            attack['Related_Attack_Patterns'] = [f"{related_pattern.get('Nature')} CAPEC-{related_pattern.get('CAPEC_ID')}" for related_pattern in
+                                               related_patterns if related_pattern.get('CAPEC_ID')]
 
             # Execution Flow
             execution_flow = attack_pattern.findall('.//xmlns:Execution_Flow/xmlns:Attack_Step', namespaces)
-            attack['Execution_Flow'] = [{'Step': step.findtext('xmlns:Step', namespaces),
-                                         'Phase': step.findtext('xmlns:Phase', namespaces),
-                                         'Description': step.findtext('xmlns:Description', namespaces),
-                                         'Techniques': [technique.text for technique in
-                                                        step.findall('xmlns:Technique', namespaces)]}
-                                        for step in execution_flow]
+            flow_items = []
+            # Reconstruct the execution flow, including techniques, and Clean up the text
+            for step in execution_flow:
+                # Extract step elements directly using findtext
+                step_num = step.findtext('./xmlns:Step', '', namespaces)
+                phase = step.findtext('./xmlns:Phase', '', namespaces)
+                desc = step.findtext('./xmlns:Description', '', namespaces)
+                
+                # Clean up the text values
+                step_num = step_num.strip() if isinstance(step_num, str) else ''
+                phase = phase.strip() if isinstance(phase, str) else ''
+                desc = desc.strip() if isinstance(desc, str) else ''
+                
+                if step_num and phase and desc:
+                    # Start with the step information
+                    step_info = [f"STEP-{step_num} ({phase}): {desc}"]
+                    # Collect all techniques for this step
+                    techniques = step.findall('./xmlns:Technique', namespaces)
+                    for idx, technique in enumerate(techniques, 1):
+                        if technique is not None and technique.text:
+                            tech_text = technique.text.strip()
+                            if tech_text:
+                                step_info.append(f"TECHNIQUE-{idx}: {tech_text}")
+                    
+                    # Join all information with semicolons
+                    flow_items.append(" | ".join(step_info))
+            attack['Execution_Flow'] = flow_items
 
             # Prerequisites
             prerequisites = attack_pattern.findall('.//xmlns:Prerequisites/xmlns:Prerequisite', namespaces)
@@ -308,18 +351,45 @@ def parse_capec_file(file_path):
 
             # Skills Required
             skills_required = attack_pattern.findall('.//xmlns:Skills_Required/xmlns:Skill', namespaces)
-            attack['Skills_Required'] = [{'Level': skill.get('Level'), 'Description': skill.text} for skill in
-                                         skills_required]
+            attack['Skills_Required'] = []
+            # Clean up the text values and format as "Level:level - Description:description"
+            for skill in skills_required:
+                level = skill.get('Level', '')
+                description = skill.text.strip() if skill.text else ''
+                if level and description:
+                    attack['Skills_Required'].append(f"Level:{level} - Description:{description}")
 
             # Resources Required
             resources_required = attack_pattern.findall('.//xmlns:Resources_Required/xmlns:Resource', namespaces)
-            attack['Resources_Required'] = [resource.text for resource in resources_required]
+            resource_texts = []
+            # Flatten all <xhtml:p> from each <Resource> into a list of strings
+            for resource in resources_required:
+                paras = resource.findall('.//xhtml:p', namespaces)
+                for p in paras:
+                    if p is not None and p.text:
+                        resource_texts.append(p.text.strip())
+            attack['Resources_Required'] = resource_texts
 
             # Consequences
             consequences = attack_pattern.findall('.//xmlns:Consequences/xmlns:Consequence', namespaces)
-            attack['Consequences'] = [{'Scope': consequence.findtext('xmlns:Scope', namespaces),
-                                       'Impact': consequence.findtext('xmlns:Impact', namespaces)}
-                                      for consequence in consequences]
+            attack['Consequences'] = []
+            # Clean up the text values and format as "SCOPE:scope1,scope2,scope3 - IMPACT:impact_text"
+            for consequence in consequences:
+                # Get all scopes for this consequence
+                scopes = consequence.findall('./xmlns:Scope', namespaces)
+                impact = consequence.findtext('./xmlns:Impact', '', namespaces)
+                
+                if scopes and impact:
+                    # Clean and collect all scope texts
+                    scope_texts = []
+                    for idx, scope in enumerate(scopes, 1):
+                        if scope.text:
+                            scope_texts.append(scope.text.strip())
+                    
+                    if scope_texts:
+                        # Format as "SCOPE:scope1,scope2,scope3 - IMPACT:impact_text"
+                        scope_str = ",".join(scope_texts)
+                        attack['Consequences'].append(f"SCOPE:{scope_str} - IMPACT:{impact.strip()}")
 
             # Mitigations
             mitigations = attack_pattern.findall('.//xmlns:Mitigations/xmlns:Mitigation', namespaces)
@@ -327,19 +397,35 @@ def parse_capec_file(file_path):
 
             # Example Instances
             example_instances = attack_pattern.findall('.//xmlns:Example_Instances/xmlns:Example', namespaces)
-            attack['Example_Instances'] = [example.text for example in example_instances]
+            attack['Example_Instances'] = []
+            for example in example_instances:
+                # Try to get direct text first
+                example_text = example.text.strip() if example.text else ""
+                
+                # If direct text is empty, try nested <xhtml:p>
+                if not example_text:
+                    para = example.find('.//xhtml:p', namespaces)
+                    example_text = para.text.strip() if para is not None and para.text else ""
+
+                # Only add non-empty examples
+                if example_text:
+                    attack['Example_Instances'].append(example_text)
 
             # Related Weaknesses
-            related_weaknesses = attack_pattern.findall('.//xmlns:Related_Weaknesses/xmlns:Related_Weakness',
-                                                        namespaces)
+            related_weaknesses = attack_pattern.findall('.//xmlns:Related_Weaknesses/xmlns:Related_Weakness', namespaces)
             attack['Related_Weaknesses'] = ["CWE-" + weakness.get('CWE_ID') for weakness in related_weaknesses]
 
             # Taxonomy Mappings
-            taxonomy_mappings = attack_pattern.findall('.//xmlns:Taxonomy_Mappings/xmlns:Taxonomy_Mapping', namespaces)
+            taxonomy_mappings = attack_pattern.findall('.//xmlns:Taxonomy_Mappings/xmlns:Taxonomy_Mapping[@Taxonomy_Name="ATTACK"]', namespaces)
             attack['Taxonomy_Mappings'] = []
+            # Extract Entry_ID and Entry_Name from each mapping only to those with ATTACK taxonomy of MITRE ATT&CK
             for mapping in taxonomy_mappings:
-                entry_ids = mapping.findall('xmlns:Entry_ID', namespaces)
-                attack['Taxonomy_Mappings'].extend([entry_id.text for entry_id in entry_ids])
+                entry_id = mapping.findtext('./xmlns:Entry_ID', '', namespaces)
+                entry_name = mapping.findtext('./xmlns:Entry_Name', '', namespaces)
+                if entry_id and entry_name:
+                    if isinstance(entry_id, str) and isinstance(entry_name, str):
+                        # Combine ID and Name into a single string
+                        attack['Taxonomy_Mappings'].append(f"T{entry_id.strip()}")
 
             # Append parsed attack pattern to list
             parsed_data.append(attack)
