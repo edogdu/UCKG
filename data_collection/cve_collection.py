@@ -144,23 +144,31 @@ def download_cpe_data_to_db(db_path):
 
     # Multithreading setup
     logger.info("Starting multithreaded CPE data collection...")
-    with concurrent.futures.ThreadPoolExecutor() as executor:
-        future_to_api_call = []
-        for increment in increments:
-            parameters['startIndex'] = increment
-            parameters_arg = parameters.copy()
-            future_to_api_call.append(executor.submit(try_call, cpe_url, parameters_arg, header))
+    with concurrent.futures.ThreadPoolExecutor(max_workers=2) as executor:
+        # Submit all API call tasks
+        # Store futures mapped to their parameters for contextual logging on error/completion
+        future_to_params = {}
+        for increment_val in increments:
+            # Create a distinct copy of parameters for each submitted task
+            current_parameters = parameters.copy()
+            current_parameters['startIndex'] = increment_val
+            
+            future = executor.submit(try_call, cpe_url, current_parameters, header)
+            future_to_params[future] = current_parameters
 
-            # Wait for 11 calls to finish (rate limit: 50 calls per 30 seconds)
-            if len(future_to_api_call) % 11 == 0:
-                logger.info(f"Waiting for batch of 11 API calls to complete...")
-                concurrent.futures.wait(future_to_api_call, timeout=None, return_when='ALL_COMPLETED')
+        processed_count = 0
+        total_calls = len(future_to_params)
+        if total_calls == 0:
+            logger.info("No new CPE records to fetch based on current startIndex and totalResults.")
+        else:
+            logger.info(f"All {total_calls} CPE API calls submitted. Processing responses as they arrive...")
 
-        # Process completed futures
-        for future in future_to_api_call:
+        # Process futures as they complete
+        for future in concurrent.futures.as_completed(future_to_params):
+            params_for_this_call = future_to_params[future] # Get original params for this future
             try:
-                response = future.result()
-                if response.status_code == 200:
+                response = future.result()  # Blocks until this specific future is done
+                if response and response.status_code == 200:
                     cpe_data = response.json()
                     for product in cpe_data.get("products", []):
                         cpe = product.get("cpe", {})
@@ -168,17 +176,30 @@ def download_cpe_data_to_db(db_path):
                         cpe_name_id = cpe.get("cpeNameId")
                         last_modified = cpe.get("lastModified")
                         
-                        # Store titles as-is without transforming
-                        titles = json.dumps(cpe.get("titles", []))
+                        # Store titles as JSON string of the list of title objects
+                        titles_list = cpe.get("titles", [])
+                        titles_json_string = json.dumps(titles_list)
 
                         if cpe_name:
                             # Insert or replace the data into the database
                             cursor.execute("""
                                 INSERT OR REPLACE INTO cpe_data (cpeName, cpeNameId, lastModified, titles)
                                 VALUES (?, ?, ?, ?)
-                            """, (cpe_name, cpe_name_id, last_modified, titles))
+                            """, (cpe_name, cpe_name_id, last_modified, titles_json_string))
+                elif response: # try_call returned a response, but it's an error
+                    logger.error(f"API call for startIndex {params_for_this_call['startIndex']} failed with status {response.status_code} after retries.")
+                else: # try_call failed all retries and returned None
+                    logger.error(f"API call for startIndex {params_for_this_call['startIndex']} failed catastrophically (no response object returned from try_call).")
+
             except Exception as e:
-                logger.error(f"Error processing API response: {e}")
+                # Catches exceptions from future.result() (e.g., task raised an exception) or from the processing block
+                logger.error(f"Error processing result for API call (startIndex {params_for_this_call['startIndex']}): {e}", exc_info=True)
+            
+            processed_count += 1
+            # Log progress periodically and at the very end
+            if processed_count % 100 == 0 or processed_count == total_calls:
+                if total_calls > 0 : # Avoid division by zero or logging if no calls made
+                    logger.info(f"Processed {processed_count}/{total_calls} CPE API responses.")
 
     conn.commit()
     conn.close()
