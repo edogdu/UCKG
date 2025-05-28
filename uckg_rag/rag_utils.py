@@ -49,7 +49,7 @@ def get_cwe_from_query(query: str) -> Optional[str]:
     cwe_match = re.search(cwe_pattern, query, re.IGNORECASE)
     return cwe_match.group() if cwe_match else None
 
-def get_graph_context(query: str, driver) -> Optional[str]:
+def get_graph_context(query: str, driver, nearest_neighbors) -> Optional[str]:
     cypher = get_graph_context_query()
     
     # Check for CVE/CWE patterns in query
@@ -68,10 +68,10 @@ def get_graph_context(query: str, driver) -> Optional[str]:
         try:
             if cve_uri:
                 logger.info(f"Running query for CVE: {cve_uri}")
-                results = session.run(cypher, {"uri": cve_uri})
+                results = session.run(cypher, {"uri": cve_uri, "nearest_neighbors": nearest_neighbors})
             elif cwe_uri:
                 logger.info(f"Running query for CWE: {cwe_uri}")
-                results = session.run(cypher, {"uri": cwe_uri})
+                results = session.run(cypher, {"uri": cwe_uri, "nearest_neighbors": nearest_neighbors})
             else:
                 logger.warning(f"No URI found for query: {query}")
                 return None

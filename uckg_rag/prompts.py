@@ -64,7 +64,7 @@ def get_graph_context_query() -> str:
        OR related.ucodescription IS NOT NULL
     WITH source, related, length(path) as distance
     ORDER BY distance
-    LIMIT 3
+    LIMIT $nearest_neighbors
     WITH source, collect({
         uri: related.uri,
         label: labels(related)[0],

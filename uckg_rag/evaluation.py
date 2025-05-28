@@ -43,9 +43,9 @@ def truncate_to_n_sentences(text: str, n: int = 2) -> str:
     return ' '.join(sentences[:n])
 
 class ModelEvaluator:
-    def __init__(self, csv_path: str = "Full_Gold_Standard_RAG_Evaluation_Set.csv"):
+    def __init__(self, csv_path: str = "Full_Gold_Standard_RAG_Evaluation_Set.csv", model_registry: ModelRegistry = None):
         # Initialize the model registry
-        self.model_registry = ModelRegistry()
+        self.model_registry = model_registry
         # Initialize the embedding model
         self.embedding_model = SentenceTransformer('all-MiniLM-L6-v2')
         # Load the test cases from the CSV file
@@ -68,11 +68,10 @@ class ModelEvaluator:
         # Calculate semantic similarity between two texts
         embeddings = self.embedding_model.encode([text1, text2])
         # Cosine similarity is a measure of the cosine of the angle between two vectors.
-        # It ranges from -1 to 1, where 1 indicates the vectors are identical, -1 indicates they are opposite, and 0 indicates they are orthogonal.
-        # Orthogonal vectors are at right angles to each other.
+        # It ranges from -1 to 1, where 1 indicates the vectors are identical, -1 indicates they are opposite, and 0 indicates no correlation.
         return cosine_similarity([embeddings[0]], [embeddings[1]])[0][0]
 
-    def evaluate_model(self, model_name: str, test_cases: Optional[List[Dict]] = None, use_rag: bool = False) -> Dict:
+    def evaluate_model(self, model_name: str, test_cases: Optional[List[Dict]] = None, use_rag: bool = False, nearest_neighbors: int = 3) -> Dict:
         # Evaluate a model on test cases, optionally using RAG context
         test_cases = test_cases or self.test_cases
         results = []
@@ -83,11 +82,11 @@ class ModelEvaluator:
             context = []
             # If RAG is used, get the graph context
             if use_rag:
-                graph_context = get_graph_context(case["Question"], driver)
+                graph_context = get_graph_context(case["Question"], driver, nearest_neighbors)
             # If RAG is used and no graph context is found, get the semantic context
             if use_rag and graph_context is None:
                 logger.warning(f"No graph context found for question: {case['Question']} \n Getting semantic context instead...")
-                context = get_relevant_context(case["Question"])
+                context = get_relevant_context(case["Question"], n_results=nearest_neighbors)
             
             response = generate_response(
                 query=case["Question"],
@@ -106,7 +105,8 @@ class ModelEvaluator:
                 "expected_answer": case["Gold_Answer"],
                 "model_response": response,
                 "similarity_score": float(similarity),
-                "used_rag": use_rag
+                "used_rag": use_rag,
+                "nearest_neighbors": nearest_neighbors if use_rag else None
             })
 
         return {

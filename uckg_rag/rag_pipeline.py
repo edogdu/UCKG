@@ -108,6 +108,7 @@ async def root():
 class QueryRequest(BaseModel):
     query: str
     graph_context: bool = False
+    nearest_neighbors: int = 3
     model_name: Optional[str] = None
 
 class QueryResponse(BaseModel):
@@ -136,6 +137,7 @@ class EvaluationRequest(BaseModel):
     models: Optional[List[str]] = None
     use_rag: bool = True
     csv_path: Optional[str] = None
+    nearest_neighbors: int = 3
 
 class EvaluationResponse(BaseModel):
     results: Dict
@@ -237,10 +239,10 @@ async def process_query(request: QueryRequest):
         # First try to get graph context if requested
         graph_context = None
         if request.graph_context:
-            graph_context = get_graph_context(request.query, driver)
+            graph_context = get_graph_context(request.query, driver, request.nearest_neighbors)
             
         # Get semantic context (will be used as supplementary if we have graph context)
-        context = get_relevant_context(request.query, n_results=5)
+        context = get_relevant_context(request.query, request.nearest_neighbors)
             
         # Generate response, where context is the semantic context if no graph context is requested, or the graph context if it is requested
         response = generate_response(
@@ -284,7 +286,7 @@ async def process_aar(request: AARRequest):
 async def evaluate_models(request: EvaluationRequest):
     """Evaluate models on provided test cases"""
     try:
-        evaluator = ModelEvaluator(csv_path=request.csv_path) if request.csv_path else ModelEvaluator()
+        evaluator = ModelEvaluator(csv_path=request.csv_path, model_registry=model_registry)
         
         if request.models:
             results = {}
@@ -292,7 +294,8 @@ async def evaluate_models(request: EvaluationRequest):
                 if model_name in model_registry.available_models:
                     results[model_name] = evaluator.evaluate_model(
                         model_name=model_name,
-                        use_rag=request.use_rag
+                        use_rag=request.use_rag,
+                        nearest_neighbors=request.nearest_neighbors
                     )
         else:
             logger.warning("No models provided for evaluation. Exiting...")
