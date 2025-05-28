@@ -144,7 +144,7 @@
         ]
     ];
     rr:predicateObjectMap [
-        rr:predicate <http://example.com/ucoexTaxonomyMappingATT&CK>;  # Custom property name
+        rr:predicate <http://example.com/ucoexTaxonomyMappingATTACK>;  # Custom property name
         rr:objectMap [
             rml:reference "Taxonomy_Mappings[*]";  # This pulls each taxonomy mapping string
             rr:datatype xsd:string

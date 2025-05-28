@@ -68,13 +68,11 @@ def download_cwe_xml_file():
         logger.info(f"Failed to access URL: {url}")
     return path
 
-## MODIFICATION: Helper to get clean text
 def get_clean_text(element):
     if element is None:
         return None
     return ''.join(element.itertext()).strip()
 
-## MODIFICATION: Helper to convert a set of XML elements (children) into a list of dicts
 def parse_children_as_list(parent, child_tag, mapping):
     """
     mapping: dict mapping child XML tag to the key name in output.

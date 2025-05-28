@@ -13,6 +13,7 @@ from fnmatch import fnmatch
 # Import your parse functions
 from parse import (
     parse_attack_file,
+    parse_mitigations_file,
     parse_campaigns_file,
     parse_software_file,
     parse_tactics_file,
@@ -28,6 +29,12 @@ DATASETS = [
         "sheet_name":  None,
         "parse_fn":    parse_attack_file,
         "output_json": "attack.json",
+    },
+    {
+        "name":        "mitigations",
+        "sheet_name":  "mitigations",
+        "parse_fn":    parse_mitigations_file,
+        "output_json": "mitigations.json",
     },
     {
         "name":        "campaigns",

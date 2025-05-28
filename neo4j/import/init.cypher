@@ -10,7 +10,7 @@ CALL n10s.graphconfig.init({
       'http://example.com/ucoexMitigations',
       'http://example.com/ucoexConsequences',
       'http://example.com/ucoexExample',
-      'http://example.com/ucoexTaxonomyMappingATT&CK',
+      'http://example.com/ucoexTaxonomyMappingATTACK',
       'http://example.com/ucoexRelatedWeaknesses',
       'http://example.com/ucoexExtendedDescription'
   ],
