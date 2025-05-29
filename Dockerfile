@@ -20,6 +20,7 @@ RUN pip install beautifulsoup4 html5lib
 RUN pip install pandas
 RUN pip install numpy
 RUN pip install openpyxl
+RUN pip install prometheus_client
 # Copy your Python script and any other necessary files
 COPY . /app
 

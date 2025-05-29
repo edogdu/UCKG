@@ -1,0 +1,19 @@
+global:
+  scrape_interval: 15s  # Adjust the frequency of data collection
+
+scrape_configs:
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+  
+  - job_name: 'neo4j'
+    static_configs:
+      - targets: ['neo4j:2004']
+
+  - job_name: 'uckg-scripts'
+    static_configs:
+      - targets: ['uckg-scripts:8000']  # Adjust port if different
+
+  - job_name: 'airflow'
+    static_configs:
+      - targets: ['statsd:9102']  # Adjust port if different

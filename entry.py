@@ -2,6 +2,7 @@ import sys
 import os
 import logging
 import time
+import network
 from process import shared_functions as sf
 
 sys.path.append("./data_collection")
@@ -16,6 +17,9 @@ logging.basicConfig(level=logging.INFO,
 
 # Create a logger
 logger = logging.getLogger('entry_logger')
+
+# Start the network script to expose scripts to prometheus
+network.signal_network_start()
 
 # Waiting for neo4j to startup
 logger.info("Waiting 2 minutes for neo4j to startup...")
