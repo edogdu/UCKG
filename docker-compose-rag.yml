@@ -1,0 +1,86 @@
+version: '3.8'
+
+services:
+  embed-service:
+    build:
+      context: .
+      dockerfile: Dockerfile.rag
+    container_name: embed-service
+    volumes:
+      - ./uckg_rag:/app
+      - ./chroma:/app/chroma
+      - ./checkpoints:/app/checkpoints
+    environment:
+      - NEO4J_URI=bolt://neo4j:7687
+      - NEO4J_USER=neo4j
+      - NEO4J_PASS=abcd90909090
+      - CHROMA_PATH=/app/chroma
+      - EMBED_MODEL=all-MiniLM-L6-v2
+      - BATCH_SIZE=100
+      - MAX_WORKERS=4
+      - OMP_NUM_THREADS=4
+      - MKL_NUM_THREADS=4
+      - VECLIB_MAXIMUM_THREADS=4
+      - NUMEXPR_NUM_THREADS=4
+      - PYTHONUNBUFFERED=1
+    depends_on:
+      neo4j:
+        condition: service_healthy
+    deploy:
+      resources:
+        limits:
+          memory: 8G
+        reservations:
+          memory: 4G
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+      restart_policy:
+        condition: on-failure
+        max_attempts: 3
+    ulimits:
+      nofile:
+        soft: 65536
+        hard: 65536
+    networks:
+      - monitoring
+    command: python /app/embed_and_index.py
+
+  rag-service:
+    build:
+      context: .
+      dockerfile: Dockerfile.rag
+    container_name: rag-service
+    volumes:
+      - ./uckg_rag:/app
+      - ./chroma:/app/chroma
+      - ./checkpoints:/app/checkpoints
+      - ~/.cache/huggingface:/root/.cache/huggingface
+    environment:
+      - TRANSFORMERS_OFFLINE=1
+      - NEO4J_URI=bolt://neo4j:7687
+      - NEO4J_USER=neo4j
+      - NEO4J_PASS=abcd90909090
+      - CHROMA_PATH=/app/chroma
+      - EMBED_MODEL=all-MiniLM-L6-v2
+      - GEN_LLM_MODEL=microsoft/phi-2
+      - PYTHONUNBUFFERED=1
+    depends_on:
+      neo4j:
+        condition: service_healthy
+    ports:
+      - "8051:8051"
+    networks:
+      - monitoring
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    command: python /app/rag_pipeline.py
+
+networks:
+  monitoring: {}
