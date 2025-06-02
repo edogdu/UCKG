@@ -27,10 +27,23 @@ sys.path.append(os.path.join(root_folder, "/process"))
 from process import graph_updater
 
 def call_ontology_updater(reason=False):
+    # Run the ontology updater in a subprocess to avoid heap size issues
     if reason:
-        successfully_updated_ontology = ontology_updater.update_ontology(run_reasoner = reason)
+        result = subprocess.run(
+            ["python3", os.path.join(root_folder, "process", "ontology_updater.py"), "--reason"],
+            capture_output=True, text=True
+        )
+        successfully_updated_ontology = (result.returncode == 0)
+        if not successfully_updated_ontology:
+            logger.error(f"Ontology updater failed:\n{result.stderr}")
     else:
-        successfully_updated_ontology = ontology_updater.update_ontology()
+        result = subprocess.run(
+            ["python3", os.path.join(root_folder, "process", "ontology_updater.py")],
+            capture_output=True, text=True
+        )
+        successfully_updated_ontology = (result.returncode == 0)
+        if not successfully_updated_ontology:
+            logger.error(f"Ontology updater failed:\n{result.stderr}")
     if successfully_updated_ontology:
         logger.info("successfully updated the ontology now going to try to insert into the db")
         graph_updater.update_graph()
@@ -84,6 +97,7 @@ def call_mapper_update(datasource):
     else:
         logger.info("Not a valid rml source...")
         return False
+    
     # Construct the command
     command = ["java", "-jar", jar_path, "-m", mapping_file, "-s", "turtle"]
 

@@ -1,6 +1,7 @@
 from owlready2 import *
 from rdflib import *
 import os
+import sys
 import logging
 
 def validate_and_fix_datetime_literals(graph):
@@ -45,6 +46,8 @@ def update_ontology(run_reasoner=False):
         g.parse(uco_ontology, format="turtle")
         # Extending the ontology
         g.parse(uco_extended_ontology)
+        # Remove redundant imports which cause NTriples Parse error
+        g.remove((None, OWL.imports, None))
         write_path = os.path.join(vol_path, "uco.owl")
         g.serialize(write_path, format="xml")
         logger.info(f"Created file uco.owl")
@@ -93,4 +96,5 @@ def update_ontology(run_reasoner=False):
         return False
 
 if __name__ == "__main__":
-    update_ontology()
+    success = update_ontology()
+    sys.exit(0 if success else 1)

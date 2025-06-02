@@ -17,9 +17,10 @@ RUN pip install neo4j
 RUN pip install owlready2
 RUN pip install rdflib
 RUN pip install beautifulsoup4 html5lib
+RUN pip install pandas
+RUN pip install numpy
+RUN pip install openpyxl
 RUN pip install prometheus_client
-
-
 # Copy your Python script and any other necessary files
 COPY . /app
 
@@ -33,6 +34,7 @@ ENV ROOT_FOLDER=/app
 
 # Set the Python script as the entry point
 CMD ["python", "entry.py"]
+
 # Stage 1: Build the custom Neo4j image
 # FROM neo4j:4.4 AS neo4j-builder
 

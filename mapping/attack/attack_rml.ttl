@@ -16,13 +16,388 @@
 @prefix ucoex: <http://example.com/ucoex#> .
 @base <http://purl.org/cyber/uco#> .
 
+
+
 <#ATTACKMap> a rr:TriplesMap;
-             rml:logicalSource [
-                   rml:source "./data/attack/attack.json";
-                   rml:referenceFormulation ql:JSONPath;
-                   rml:iterator "$[*]"
-               ];
-             rr:subjectMap [
-                   rr:template "http://example.com/ucoex#{d3f:attack-id}";
-                   rr:class <http://example.com/ucoexMITREATTACK>
-   ].
+    rml:logicalSource [
+        rml:source "./data/attack/attack.json";
+        rml:referenceFormulation ql:JSONPath;
+        rml:iterator "$[*]"
+    ];
+    rr:subjectMap [
+     rr:template "http://example.com/ucoex#{ID}";
+     rr:class <http://example.com/ucoexMITREATTACK>
+      ];
+    rr:predicateObjectMap [
+         rr:predicate <http://example.com/ucoexNAME>;
+         rr:objectMap [
+             rml:reference "name";
+             rr:datatype xsd:string
+         ]
+    ];
+    rr:predicateObjectMap [
+         rr:predicate <http://example.com/ucoexDESCRIPTION>;
+         rr:objectMap [
+             rml:reference "description";
+             rr:datatype xsd:string
+         ]
+    ];
+    rr:predicateObjectMap [
+         rr:predicate <http://example.com/ucoexURL>;
+         rr:objectMap [
+             rml:reference "url";
+             rr:datatype xsd:string
+         ]
+    ];
+    rr:predicateObjectMap [
+         rr:predicate <http://example.com/ucoexDOMAIN>;
+         rr:objectMap [
+             rml:reference "domain";
+             rr:datatype xsd:string
+         ]
+    ].
+
+
+<#MITIGATIONSMap> a rr:TriplesMap;
+  rml:logicalSource [
+    rml:source             "./data/attack/mitigations.json";
+    rml:referenceFormulation ql:JSONPath;
+    rml:iterator           "$[*]"
+  ];
+  rr:subjectMap [
+    rr:template            "http://example.com/ucoex#{ID}";
+    rr:class               <http://example.com/ucoexMITIGATIONS>
+  ];
+  rr:predicateObjectMap [
+    rr:predicate           <http://example.com/ucoexNAME>;
+    rr:objectMap [ rml:reference "name"; rr:datatype xsd:string ]
+  ];
+  rr:predicateObjectMap [
+    rr:predicate           <http://example.com/ucoexDESCRIPTION>;
+    rr:objectMap [ rml:reference "description"; rr:datatype xsd:string ]
+  ];
+  rr:predicateObjectMap [
+    rr:predicate           <http://example.com/ucoexURL>;
+    rr:objectMap [ rml:reference "url"; rr:datatype xsd:string ]
+  ];
+  rr:predicateObjectMap [
+    rr:predicate           <http://example.com/ucoexDOMAIN>;
+    rr:objectMap [ rml:reference "domain"; rr:datatype xsd:string ]
+  ].
+
+
+
+<#CAMPAIGNSMap> a rr:TriplesMap;
+    rml:logicalSource [
+        rml:source "./data/attack/campaigns.json";
+        rml:referenceFormulation ql:JSONPath;
+        rml:iterator "$[*]"
+    ];
+    rr:subjectMap [
+     rr:template "http://example.com/ucoex#{ID}";
+     rr:class <http://example.com/ucoexCAMPAIGNS>
+      ];
+    rr:predicateObjectMap [
+         rr:predicate <http://example.com/ucoexNAME>;
+         rr:objectMap [
+             rml:reference "name";
+             rr:datatype xsd:string
+         ]
+    ];
+    rr:predicateObjectMap [
+         rr:predicate <http://example.com/ucoexDESCRIPTION>;
+         rr:objectMap [
+             rml:reference "description";
+             rr:datatype xsd:string
+         ]
+    ];
+    rr:predicateObjectMap [
+         rr:predicate <http://example.com/ucoexURL>;
+         rr:objectMap [
+             rml:reference "url";
+             rr:datatype xsd:string
+         ]
+    ];
+    rr:predicateObjectMap [
+         rr:predicate <http://example.com/ucoexDOMAIN>;
+         rr:objectMap [
+             rml:reference "domain";
+             rr:datatype xsd:string
+         ]
+    ].
+
+
+
+<#GROUPSMap> a rr:TriplesMap;
+    rml:logicalSource [
+        rml:source "./data/attack/groups.json";
+        rml:referenceFormulation ql:JSONPath;
+        rml:iterator "$[*]"
+    ];
+    rr:subjectMap [
+     rr:template "http://example.com/ucoex#{ID}";
+     rr:class <http://example.com/ucoexGROUPS>
+      ];
+    rr:predicateObjectMap [
+         rr:predicate <http://example.com/ucoexNAME>;
+         rr:objectMap [
+             rml:reference "name";
+             rr:datatype xsd:string
+         ]
+    ];
+    rr:predicateObjectMap [
+         rr:predicate <http://example.com/ucoexDESCRIPTION>;
+         rr:objectMap [
+             rml:reference "description";
+             rr:datatype xsd:string
+         ]
+    ];
+    rr:predicateObjectMap [
+         rr:predicate <http://example.com/ucoexURL>;
+         rr:objectMap [
+             rml:reference "url";
+             rr:datatype xsd:string
+         ]
+    ];
+    rr:predicateObjectMap [
+         rr:predicate <http://example.com/ucoexDOMAIN>;
+         rr:objectMap [
+             rml:reference "domain";
+             rr:datatype xsd:string
+         ]
+    ].
+
+
+
+<#SOFTWAREMap> a rr:TriplesMap;
+    rml:logicalSource [
+        rml:source "./data/attack/software.json";
+        rml:referenceFormulation ql:JSONPath;
+        rml:iterator "$[*]"
+    ];
+    rr:subjectMap [
+     rr:template "http://example.com/ucoex#{ID}";
+     rr:class <http://example.com/ucoexSOFTWARE>
+      ];
+    rr:predicateObjectMap [
+         rr:predicate <http://example.com/ucoexNAME>;
+         rr:objectMap [
+             rml:reference "name";
+             rr:datatype xsd:string
+         ]
+    ];
+    rr:predicateObjectMap [
+         rr:predicate <http://example.com/ucoexDESCRIPTION>;
+         rr:objectMap [
+             rml:reference "description";
+             rr:datatype xsd:string
+         ]
+    ];
+    rr:predicateObjectMap [
+         rr:predicate <http://example.com/ucoexURL>;
+         rr:objectMap [
+             rml:reference "url";
+             rr:datatype xsd:string
+         ]
+    ];
+    rr:predicateObjectMap [
+         rr:predicate <http://example.com/ucoexDOMAIN>;
+         rr:objectMap [
+             rml:reference "domain";
+             rr:datatype xsd:string
+         ]
+    ].
+
+
+<#TACTICSMap> a rr:TriplesMap;
+    rml:logicalSource [
+        rml:source "./data/attack/tactics.json";
+        rml:referenceFormulation ql:JSONPath;
+        rml:iterator "$[*]"
+    ];
+    rr:subjectMap [
+     rr:template "http://example.com/ucoex#{ID}";
+     rr:class <http://example.com/ucoexTACTICS>
+      ];
+    rr:predicateObjectMap [
+         rr:predicate <http://example.com/ucoexNAME>;
+         rr:objectMap [
+             rml:reference "name";
+             rr:datatype xsd:string
+         ]
+    ];
+    rr:predicateObjectMap [
+         rr:predicate <http://example.com/ucoexDESCRIPTION>;
+         rr:objectMap [
+             rml:reference "description";
+             rr:datatype xsd:string
+         ]
+    ];
+    rr:predicateObjectMap [
+         rr:predicate <http://example.com/ucoexURL>;
+         rr:objectMap [
+             rml:reference "url";
+             rr:datatype xsd:string
+         ]
+    ];
+    rr:predicateObjectMap [
+         rr:predicate <http://example.com/ucoexDOMAIN>;
+         rr:objectMap [
+             rml:reference "domain";
+             rr:datatype xsd:string
+         ]
+    ].
+
+
+
+<#MitigationToTechnique> a rr:TriplesMap;
+  rml:logicalSource [
+    rml:source              "./data/attack/relationships.json";
+    rml:referenceFormulation ql:JSONPath;
+    rml:iterator            "$[?(@['source type']=='mitigation' && @['target type']=='technique')]"
+  ];
+  rr:subjectMap [
+    rr:template          "http://example.com/ucoex#{source ID}";
+    rr:class             <http://example.com/ucoexMITIGATIONS>
+  ];
+  rr:predicateObjectMap [
+    rr:predicate            <http://example.com/ucoexMITIGATES>;
+    rr:objectMap [
+      rr:parentTriplesMap    <#ATTACKMap>;
+      rr:joinCondition [
+        rr:child             "target ID";
+        rr:parent            "ID"
+      ]
+    ]
+  ].
+
+
+<#CampaignToGroup> a rr:TriplesMap;
+  rml:logicalSource [
+    rml:source              "./data/attack/relationships.json";
+    rml:referenceFormulation ql:JSONPath;
+    rml:iterator            "$[?(@['source type']=='campaign' && @['target type']=='group')]"
+  ];
+  rr:subjectMap [
+    rr:template          "http://example.com/ucoex#{source ID}";
+    rr:class             <http://example.com/ucoexCAMPAIGNS>
+  ];
+  rr:predicateObjectMap [
+    rr:predicate            <http://example.com/ucoexATTRIBUTEDTO>;
+    rr:objectMap [
+      rr:parentTriplesMap    <#GROUPSMap>;
+      rr:joinCondition [
+        rr:child             "target ID";
+        rr:parent            "ID"
+      ]
+    ]
+  ].
+
+
+<#CampaignToSoftware> a rr:TriplesMap;
+  rml:logicalSource [
+    rml:source              "./data/attack/relationships.json";
+    rml:referenceFormulation ql:JSONPath;
+    rml:iterator            "$[?(@['source type']=='campaign' && @['target type']=='software')]"
+  ];
+  rr:subjectMap [
+    rr:template          "http://example.com/ucoex#{source ID}";
+    rr:class             <http://example.com/ucoexCAMPAIGNS>
+  ];
+  rr:predicateObjectMap [
+    rr:predicate            <http://example.com/ucoexCampaignUsesSoftware>;
+    rr:objectMap [
+      rr:parentTriplesMap    <#SOFTWAREMap>;
+      rr:joinCondition [
+        rr:child             "target ID";
+        rr:parent            "ID"
+      ]
+    ]
+  ].
+
+
+<#CampaignToTechnique> a rr:TriplesMap;
+  rml:logicalSource [
+    rml:source              "./data/attack/relationships.json";
+    rml:referenceFormulation ql:JSONPath;
+    rml:iterator            "$[?(@['source type']=='campaign' && @['target type']=='technique')]"
+  ];
+  rr:subjectMap [
+    rr:template          "http://example.com/ucoex#{source ID}";
+    rr:class             <http://example.com/ucoexCAMPAIGNS>
+  ];
+  rr:predicateObjectMap [
+    rr:predicate            <http://example.com/ucoexCampaignUsesTechnique>;
+    rr:objectMap [
+      rr:parentTriplesMap    <#ATTACKMap>;
+      rr:joinCondition [
+        rr:child             "target ID";
+        rr:parent            "ID"
+      ]
+    ]
+  ].
+
+
+<#GroupToSoftware> a rr:TriplesMap;
+  rml:logicalSource [
+    rml:source              "./data/attack/relationships.json";
+    rml:referenceFormulation ql:JSONPath;
+    rml:iterator            "$[?(@['source type']=='group' && @['target type']=='software')]"
+  ];
+  rr:subjectMap [
+    rr:template          "http://example.com/ucoex#{source ID}";
+    rr:class             <http://example.com/ucoexGROUPS>
+  ];
+  rr:predicateObjectMap [
+    rr:predicate            <http://example.com/ucoexGroupUsesSoftware>;
+    rr:objectMap [
+      rr:parentTriplesMap    <#SOFTWAREMap>;
+      rr:joinCondition [
+        rr:child             "target ID";
+        rr:parent            "ID"
+      ]
+    ]
+  ].
+
+
+<#GroupToTechnique> a rr:TriplesMap;
+  rml:logicalSource [
+    rml:source              "./data/attack/relationships.json";
+    rml:referenceFormulation ql:JSONPath;
+    rml:iterator            "$[?(@['source type']=='group' && @['target type']=='technique')]"
+  ];
+  rr:subjectMap [
+    rr:template          "http://example.com/ucoex#{source ID}";
+    rr:class             <http://example.com/ucoexGROUPS>
+  ];
+  rr:predicateObjectMap [
+    rr:predicate            <http://example.com/ucoexGroupUsesTechnique>;
+    rr:objectMap [
+      rr:parentTriplesMap    <#ATTACKMap>;
+      rr:joinCondition [
+        rr:child             "target ID";
+        rr:parent            "ID"
+      ]
+    ]
+  ].
+
+<#SoftwareToTechnique> a rr:TriplesMap;
+  rml:logicalSource [
+    rml:source              "./data/attack/relationships.json";
+    rml:referenceFormulation ql:JSONPath;
+    rml:iterator            "$[?(@['source type']=='software' && @['target type']=='technique')]"
+  ];
+  rr:subjectMap [
+    rr:template          "http://example.com/ucoex#{source ID}";
+    rr:class             <http://example.com/ucoexSOFTWARE>
+  ];
+  rr:predicateObjectMap [
+    rr:predicate            <http://example.com/ucoexSoftwareUsesTechnique>;
+    rr:objectMap [
+      rr:parentTriplesMap    <#ATTACKMap>;
+      rr:joinCondition [
+        rr:child             "target ID";
+        rr:parent            "ID"
+      ]
+    ]
+  ].

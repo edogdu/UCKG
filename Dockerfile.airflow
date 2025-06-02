@@ -19,7 +19,7 @@ RUN apt-get update && apt-get install -y openjdk-17-jdk
 USER airflow
 
 RUN pip install neo4j prometheus_client
-RUN pip install owlready2
+RUN pip install "owlready2<0.48"
 RUN pip install rdflib
 
 ENV UCO_ONTO_PATH=/app/data/UCKG_Snapshots/uco2.ttl

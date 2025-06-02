@@ -1,0 +1,10 @@
+# Ignore Python cache files and folders
+__pycache__/
+*.pyc
+
+# Ignore downloaded files
+*.json
+*.xml
+
+# Ignore VSCode folders
+.vscode/
