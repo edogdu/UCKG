@@ -71,6 +71,7 @@ elif capec_data_status == 0:
     capec.capec_init()
 
 
+
 logger.info("###############################################")
 logger.info("All Data Sources Have Been Initialized!")
 logger.info("###############################################")
