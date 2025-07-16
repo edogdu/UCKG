@@ -6,7 +6,7 @@ Provides efficient, scalable embedding generation with database-level pagination
 
 ## 🎯 What It Does
 
-- ✅ Processes **all 737K+ cybersecurity nodes** efficiently
+- ✅ Processes **all 738K+ cybersecurity nodes** efficiently
 - ✅ **Continuous processing** - completes entire datasets in single runs
 - ✅ **Graceful interruption handling** - Ctrl+C safely stops after current batch
 - ✅ **Database-level pagination** for unlimited scalability
@@ -15,7 +15,7 @@ Provides efficient, scalable embedding generation with database-level pagination
 - ✅ **Dynamic property extraction** - discovers all node properties automatically
 - ✅ **Comprehensive searchContent generation** for Graph RAG applications
 - ✅ **768-dimensional embeddings** using Ollama embedding models
-- ✅ **Support for all 6 node types** (CVE, CWE, CPE, CAPEC, MITRE ATT&CK, Vulnerability)
+- ✅ **Support for all 12 node types** (CVE, CWE, CPE, CAPEC, MITRE ATT&CK, Vulnerability, D3FEND, Software, Groups, Mitigations, Campaigns, Tactics)
 - ✅ **Robust error handling** with automatic fallback mechanisms
 - ✅ **Professional CLI interface** with comprehensive options
 
@@ -39,7 +39,7 @@ python uckg_embedding_processor.py --stats
 
 ### 2. Process Small Test Batch
 ```bash
-python uckg_embedding_processor.py --node-type UcoexCAPEC --limit 10
+python uckg_embedding_processor.py --node-type UcoexMITRED3FEND --limit 10
 ```
 
 ### 3. Process All Nodes (Production)
@@ -129,69 +129,86 @@ python uckg_embedding_processor.py --all --batch-size 100 --api-batch-size 8
 
 ## 🎯 What Gets Extracted
 
-**All properties dynamically discovered**, including:
+**All properties dynamically discovered using hybrid approach with smart ordering**, including:
 
-### UcoCVE (299K nodes)
-- Core: `label`, `ucovectorString`, `ucobaseSeverity`
-- Scores: `ucoexploitabilityScore`, `ucoimpactScore`
-- Details: `ucovulnStatus`, `ucouserInteractionRequired`, `ucoevaluatorSolution`
+### Core Vulnerability Data
+- **UcoCVE** (299K nodes): `label`, `ucovectorString`, `ucobaseSeverity`, `ucoexploitabilityScore`, `ucoimpactScore`
+- **UcoVulnerability** (299K nodes): `ucosummary`, `ucopublishedDateTime`, `ucolastModifiedDateTime`
+- **UcoexCPE** (137K nodes): `cpeName`, `dictionary_found`, platform identification
 
-### UcoCWE (968 nodes)  
-- Core: `ucocweID`, `ucocweName`, `ucodescription`
-- Extended: `ucocweSummary`, `ucocweExtendedSummary`
-- Technical: `ucopotentialMitigations`, `ucocommonConsequences`, `ucoapplicablePlatform`
+### Weakness & Attack Intelligence  
+- **UcoCWE** (968 nodes): `ucocweID`, `ucocweName`, `ucodescription`, `ucopotentialMitigations`
+- **UcoexCAPEC** (559 nodes): `ucoexCAPEC_id`, `ucoexCAPEC_name`, `ucoexDescription`, `ucoexMitigations`
+- **UcoexMITREATTACK** (884 nodes): `ucoexNAME`, `ucoexDESCRIPTION`, `ucoexDOMAIN`
 
-### UcoexCAPEC (559 nodes)
-- Core: `ucoexCAPEC_id`, `ucoexCAPEC_name`, `ucoexDescription`
-- Classification: `ucoexAbstraction`, `ucoexSeverity`, `ucoexLikelihood`
-- Details: `ucoexPrerequisites`, `ucoexSkills_Required`, `ucoexMitigations`
+### Defense & Threat Actor Data
+- **UcoexMITRED3FEND** (244 nodes): `ucoexMITRED3FEND_LABEL`, `ucoexMITRED3FEND_DEFINITION`
+- **UcoexSOFTWARE** (877 nodes): `ucoexNAME`, `ucoexDESCRIPTION`, `ucoexDOMAIN`
+- **UcoexGROUPS** (170 nodes): `ucoexNAME`, `ucoexDESCRIPTION`, threat actor information
+- **UcoexMITIGATIONS** (108 nodes): `ucoexNAME`, `ucoexDESCRIPTION`, security measures
+- **UcoexCAMPAIGNS** (50 nodes): `ucoexNAME`, `ucoexDESCRIPTION`, campaign details
+- **UcoexTACTICS** (38 nodes): `ucoexNAME`, `ucoexDESCRIPTION`, tactical information
 
-**And ALL other properties found in each node type!**
+**Smart property ordering ensures important identifiers and descriptions appear first, while including all available properties.**
 
 ## 📋 Sample Output
 
-**Generated searchContent example:**
+**Generated searchContent examples:**
+
+**D3FEND Countermeasure:**
 ```
-CYBERSECURITY ATTACK PATTERN ENUMERATION | LABEL: CAPEC-519: Documentation Alteration to Cause Errors in System Design | UCOEXCAPEC_ID: 519 | Name: Documentation Alteration to Cause Errors in System Design | Description: An adversary intentionally alters documentation to introduce errors... | Severity: Medium | Likelihood: Low | Keywords: attack pattern, attack method, exploitation technique | DOMAIN: UcoexCAPEC | GRAPH: UCKG
+CYBERSECURITY DEFENSE COUNTERMEASURE | ucoexMITRED3FEND_LABEL: Network Traffic Filtering | ucoexMITRED3FEND_DEFINITION: Restricting network traffic based on defined rules and policies | DOMAIN: UcoexMITRED3FEND | GRAPH: UCKG | Keywords: defense, countermeasure, mitigation, security control, protection
+```
+
+**Attack Pattern:**
+```
+CYBERSECURITY ATTACK PATTERN ENUMERATION | ucoexCAPEC_name: Documentation Alteration | ucoexDescription: An adversary intentionally alters documentation to introduce errors... | ucoexSeverity: Medium | DOMAIN: UcoexCAPEC | GRAPH: UCKG | Keywords: attack pattern, attack method, exploitation technique
 ```
 
 ## 🔍 Statistics Output
 
 ```
-📊 EMBEDDING STATISTICS
+📊 EMBEDDING COVERAGE STATISTICS
 ==================================================
 UcoCVE          | Total: 299,050 | Embeddings:       0 (  0.0%) | SearchContent:       0 (  0.0%)
 UcoVulnerability | Total: 299,050 | Embeddings:       0 (  0.0%) | SearchContent:       0 (  0.0%)
-UcoexCPE        | Total: 136,667 | Embeddings:       0 (  0.0%) | SearchContent:       0 (  0.0%)
-UcoCWE          | Total:     968 | Embeddings:     968 (100.0%) | SearchContent:       3 (  0.3%)
-UcoexMITREATTACK | Total:     884 | Embeddings:     884 (100.0%) | SearchContent:       0 (  0.0%)
-UcoexCAPEC      | Total:     559 | Embeddings:     559 (100.0%) | SearchContent:      13 (  2.3%)
+UcoexCPE        | Total: 136,667 | Embeddings:     550 (  0.4%) | SearchContent:     550 (  0.4%)
+UcoCWE          | Total:     968 | Embeddings:     968 (100.0%) | SearchContent:     968 (100.0%)
+UcoexMITREATTACK | Total:     884 | Embeddings:     884 (100.0%) | SearchContent:     884 (100.0%)
+UcoexCAPEC      | Total:     559 | Embeddings:     559 (100.0%) | SearchContent:     559 (100.0%)
+UcoexMITRED3FEND | Total:     244 | Embeddings:       5 (  2.0%) | SearchContent:       5 (  2.0%)
+UcoexSOFTWARE   | Total:     877 | Embeddings:       5 (  0.6%) | SearchContent:       5 (  0.6%)
+UcoexGROUPS     | Total:     170 | Embeddings:       0 (  0.0%) | SearchContent:       0 (  0.0%)
+UcoexMITIGATIONS | Total:     108 | Embeddings:       0 (  0.0%) | SearchContent:       0 (  0.0%)
+UcoexCAMPAIGNS  | Total:      50 | Embeddings:       0 (  0.0%) | SearchContent:       0 (  0.0%)
+UcoexTACTICS    | Total:      38 | Embeddings:       3 (  7.9%) | SearchContent:       3 (  7.9%)
 --------------------------------------------------
-TOTAL           | Total: 737,178 | Embeddings:   2,411 (  0.3%) | SearchContent:      16 (  0.0%)
+TOTAL           | Total: 738,665 | Embeddings:   2,974 (  0.4%) | SearchContent:   2,974 (  0.4%)
 ```
 
 ## 🛠️ How It Works
 
-1. **Dynamic Property Discovery**: Automatically discovers all properties in each node type
-2. **Intelligent Prioritization**: Orders properties by importance (IDs first, descriptions second, etc.)
-3. **Comprehensive Text Generation**: Creates rich, contextual searchContent using all available properties
-4. **Continuous Processing**: Processes entire datasets without interruption until completion
-5. **Efficient Batching**: Groups nodes for optimal database and API performance
-6. **Incremental Processing**: Only processes nodes that need embeddings, enabling safe restarts
-7. **Simple Storage**: Adds `embedding` and `searchContent` properties to existing nodes
+1. **Hybrid Property Processing**: Uses smart ordering to prioritize important properties (label, name, id, description, summary, definition) while including all available properties
+2. **Universal Text Generation**: Single method handles all 12 node types with appropriate cybersecurity contexts
+3. **Database-Level Pagination**: Processes nodes in batches with automatic pagination for scalability
+4. **Batch API Processing**: Groups multiple nodes for efficient embedding generation via Ollama
+5. **Incremental Processing**: Only processes nodes that need embeddings, enabling safe restarts
+6. **Graceful Interruption**: Ctrl+C stops processing after current batch completes
+7. **Comprehensive Coverage**: Processes all cybersecurity entity types in optimal order
 
 ## 🔧 Customization
 
 ### Add New Node Type
 1. Add to `node_types` list in `process_all_types()`
-2. Add appropriate identifier logic in `save_node_embedding()`
+2. Add context mapping in `create_comprehensive_text()`
 3. Add keywords in `_get_keywords()`
+4. Add identifier logic in `save_node_embedding()` if needed
 
 ### Modify Text Generation
-Edit the `create_comprehensive_text()` method - centralized location for all text generation logic
+Edit the `create_comprehensive_text()` method - single location handles all node types with hybrid approach
 
 ### Change Processing Order
-Modify the `node_types` list in `process_all_types()` (smaller datasets first is recommended)
+Modify the `node_types` list in `process_all_types()` (smaller datasets first recommended for faster feedback)
 
 ## ❓ Troubleshooting
 

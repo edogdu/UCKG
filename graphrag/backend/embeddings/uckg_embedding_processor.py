@@ -164,62 +164,54 @@ class UCKGEmbeddingProcessor:
         return nodes
     
     def create_comprehensive_text(self, node_data: Dict, node_type: str) -> str:
-        """Create comprehensive searchContent from ALL node properties."""
+        """Create comprehensive searchContent using hybrid approach with smart ordering."""
         
-        # Universal cybersecurity contexts
+        # Context mapping for all node types (including missing ones)
         contexts = {
             "UcoCVE": "CYBERSECURITY VULNERABILITY EXPOSURE",
             "UcoVulnerability": "CYBERSECURITY SECURITY VULNERABILITY INFORMATION", 
             "UcoexCPE": "CYBERSECURITY PLATFORM SOFTWARE IDENTIFICATION",
             "UcoCWE": "CYBERSECURITY SOFTWARE WEAKNESS CLASSIFICATION",
             "UcoexMITREATTACK": "CYBERSECURITY ATTACK TECHNIQUE METHODOLOGY",
-            "UcoexCAPEC": "CYBERSECURITY ATTACK PATTERN ENUMERATION"
+            "UcoexCAPEC": "CYBERSECURITY ATTACK PATTERN ENUMERATION",
+            "UcoexMITRED3FEND": "CYBERSECURITY DEFENSE COUNTERMEASURE",
+            "UcoexSOFTWARE": "CYBERSECURITY MALWARE/TOOL",
+            "UcoexGROUPS": "CYBERSECURITY THREAT ACTOR GROUP",
+            "UcoexMITIGATIONS": "CYBERSECURITY MITIGATION STRATEGY",
+            "UcoexCAMPAIGNS": "CYBERSECURITY ATTACK CAMPAIGN",
+            "UcoexTACTICS": "CYBERSECURITY ATTACK TACTIC"
         }
         
-        # Start with context
         text_parts = [contexts.get(node_type, "CYBERSECURITY RESOURCE")]
         
-        # Property prioritization by importance
-        priority_props = {
-            # High priority (core identifiers and descriptions)
-            10: ['label', 'ucocweID', 'ucoexCAPEC_id', 'ucoexCAPEC_name', 'ucocweName', 
-                 'ucoexNAME', 'ucosummary', 'ucodescription', 'ucoexDescription'],
-            
-            # Medium priority (scores, severity, technical details)
-            8: ['ucobaseSeverity', 'ucoexploitabilityScore', 'ucoimpactScore', 'ucovectorString',
-                'ucoexSeverity', 'ucoexLikelihood', 'ucoexAbstraction', 'ucoexDOMAIN'],
-            
-            # Lower priority (everything else)
-            5: []  # Will be filled with remaining properties
-        }
+        # Smart ordering: important properties first, but include ALL properties
+        important_keywords = ['label', 'name', 'id', 'description', 'summary', 'definition']
         
-        # Get all properties not already categorized
-        all_props = set(node_data.keys())
-        categorized_props = set()
-        for props in priority_props.values():
-            categorized_props.update(props)
-        
-        priority_props[5] = list(all_props - categorized_props - {'embedding', 'searchContent'})
-        
-        # Process properties by priority
-        for priority in sorted(priority_props.keys(), reverse=True):
-            for prop in priority_props[priority]:
-                value = node_data.get(prop)
-                if value is not None and str(value).strip():
-                    # Clean the value
+        # Add important properties first (if they exist)
+        for prop, value in node_data.items():
+            if any(keyword in prop.lower() for keyword in important_keywords):
+                if prop not in ['embedding', 'searchContent'] and value is not None:
                     clean_value = self._clean_property_value(value, prop)
                     if clean_value:
                         text_parts.append(clean_value)
         
-        # Add domain and keywords
-        text_parts.append(f"DOMAIN: {node_type}")
-        text_parts.append(f"GRAPH: UCKG")
-        text_parts.append(self._get_keywords(node_type))
+        # Add all other properties
+        for prop, value in node_data.items():
+            if not any(keyword in prop.lower() for keyword in important_keywords):
+                if prop not in ['embedding', 'searchContent'] and value is not None:
+                    clean_value = self._clean_property_value(value, prop)
+                    if clean_value:
+                        text_parts.append(clean_value)
         
-        # Join and limit length
+        # Add metadata
+        text_parts.extend([
+            f"DOMAIN: {node_type}",
+            f"GRAPH: UCKG",
+            self._get_keywords(node_type)
+        ])
+        
+        # Truncate if needed
         full_text = " | ".join(text_parts)
-        
-        # Simple truncation if too long
         if len(full_text) > 2000:
             full_text = full_text[:1997] + "..."
         
@@ -270,7 +262,13 @@ class UCKGEmbeddingProcessor:
             "UcoexCPE": "software platform, application, version, configuration",
             "UcoCWE": "software weakness, design flaw, coding error, vulnerability class",
             "UcoexMITREATTACK": "attack technique, adversary tactics, threat actor method",
-            "UcoexCAPEC": "attack pattern, attack method, exploitation technique"
+            "UcoexCAPEC": "attack pattern, attack method, exploitation technique",
+            "UcoexMITRED3FEND": "defense, countermeasure, mitigation, security control, protection",
+            "UcoexSOFTWARE": "malware, tool, software, threat actor tool, malicious software",
+            "UcoexGROUPS": "threat actor group, APT, cybercriminal organization, hacker group",
+            "UcoexMITIGATIONS": "mitigation, security measure, defense strategy, protection method",
+            "UcoexCAMPAIGNS": "attack campaign, threat campaign, coordinated attack, operation",
+            "UcoexTACTICS": "attack tactic, adversary tactic, threat technique, attack method"
         }
         return f"Keywords: {keywords.get(node_type, 'cybersecurity, security, threat')}"
     
@@ -362,6 +360,11 @@ class UCKGEmbeddingProcessor:
         elif node_type == "UcoCWE":
             node_id = node_data.get("ucocweID")
             query = f"MATCH (n:{node_type} {{ucocweID: $node_id}})"
+        elif node_type in ["UcoexMITRED3FEND", "UcoexSOFTWARE", "UcoexGROUPS", 
+                          "UcoexMITIGATIONS", "UcoexCAMPAIGNS", "UcoexTACTICS"]:
+            # All new node types use 'uri' as identifier
+            node_id = node_data.get("uri")
+            query = f"MATCH (n:{node_type} {{uri: $node_id}})"
         else:
             node_id = node_data.get("label") or node_data.get("uri")
             if node_data.get("label"):
@@ -480,12 +483,21 @@ class UCKGEmbeddingProcessor:
             api_batch_size: API batch size for embedding requests
         """
         node_types = [
-            "UcoexCAPEC",      # Attack patterns (smallest dataset)
-            "UcoexMITREATTACK", # Attack techniques
-            "UcoCWE",          # Common weaknesses
-            "UcoexCPE",        # Platform enumerations
-            "UcoCVE",          # Vulnerabilities (largest dataset)
-            "UcoVulnerability" # Additional vulnerabilities
+            # Existing node types
+            "UcoexCAPEC",      # Attack patterns (559 nodes)
+            "UcoexMITREATTACK", # Attack techniques (884 nodes)
+            "UcoCWE",          # Common weaknesses (968 nodes)
+            "UcoexCPE",        # Platform enumerations (136,667 nodes)
+            "UcoCVE",          # Vulnerabilities (299,050 nodes)
+            "UcoVulnerability", # Additional vulnerabilities (299,050 nodes)
+            
+            # New node types (missing from previous implementation)
+            "UcoexTACTICS",    # Attack tactics (38 nodes) - Smallest first
+            "UcoexCAMPAIGNS",  # Attack campaigns (50 nodes)
+            "UcoexMITIGATIONS", # Security mitigations (108 nodes)
+            "UcoexGROUPS",     # Threat actor groups (170 nodes)
+            "UcoexMITRED3FEND", # Defense countermeasures (244 nodes)
+            "UcoexSOFTWARE",   # Malware/Tools (877 nodes)
         ]
         
         self.stats['start_time'] = time.time()
@@ -536,7 +548,9 @@ class UCKGEmbeddingProcessor:
             stats = {}
             
             node_types = ["UcoCVE", "UcoVulnerability", "UcoexCPE", 
-                         "UcoCWE", "UcoexMITREATTACK", "UcoexCAPEC"]
+                         "UcoCWE", "UcoexMITREATTACK", "UcoexCAPEC",
+                         "UcoexMITRED3FEND", "UcoexSOFTWARE", "UcoexGROUPS",
+                         "UcoexMITIGATIONS", "UcoexCAMPAIGNS", "UcoexTACTICS"]
             
             total_nodes = 0
             total_embeddings = 0
