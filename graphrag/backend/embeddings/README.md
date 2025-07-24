@@ -97,7 +97,25 @@ export NEO4J_URI="bolt://localhost:7687"
 export NEO4J_PASSWORD="your_password"
 export OLLAMA_URL="http://localhost:11434"
 export EMBEDDING_MODEL="nomic-embed-text"
+export EMBED_ENV="true"  # Enable/disable embedding generation
 ```
+
+### Docker Environment Control
+
+The system uses `EMBED_ENV` environment variable to control whether embeddings are generated during system initialization:
+
+- **`EMBED_ENV="true"`**: Enables embedding generation (default in production)
+- **`EMBED_ENV="false"`**: Disables embedding generation (useful for testing or when embeddings aren't needed)
+
+Configure in `docker-compose.yml`:
+```yaml
+uckg-scripts:
+  environment:
+    EMBED_ENV: "true"   # Change to "false" to disable
+    # ... other variables
+```
+
+This allows you to control embedding generation without code changes - simply update the environment variable and restart the container.
 
 ## 📖 CLI Options
 
@@ -165,7 +183,7 @@ CYBERSECURITY DEFENSE COUNTERMEASURE | ucoexMITRED3FEND_LABEL: Network Traffic F
 CYBERSECURITY ATTACK PATTERN ENUMERATION | ucoexCAPEC_name: Documentation Alteration | ucoexDescription: An adversary intentionally alters documentation to introduce errors... | ucoexSeverity: Medium | DOMAIN: UcoexCAPEC | GRAPH: UCKG | Keywords: attack pattern, attack method, exploitation technique
 ```
 
-## 🔍 Statistics Output
+## 🔍 Statistics Output Example
 
 ```
 📊 EMBEDDING COVERAGE STATISTICS

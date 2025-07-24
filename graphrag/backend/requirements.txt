@@ -19,6 +19,7 @@ pydantic-settings==2.10.0
 
 # Data handling
 numpy>=1.24.0
+scikit-learn>=1.3.0
 
 # Performance optimizations
 cachetools>=5.0.0

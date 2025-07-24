@@ -21,6 +21,10 @@ RUN pip install pandas
 RUN pip install numpy
 RUN pip install openpyxl
 RUN pip install prometheus_client
+
+# Install embedding dependencies
+RUN pip install asyncio
+
 # Copy your Python script and any other necessary files
 COPY . /app
 

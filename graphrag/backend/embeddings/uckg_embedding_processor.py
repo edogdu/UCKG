@@ -74,16 +74,16 @@ class UCKGEmbeddingProcessor:
         
         # Connect to Neo4j
         self.driver = GraphDatabase.driver(neo4j_uri, auth=neo4j_auth)
-        logger.info(f"✅ Connected to Neo4j at {neo4j_uri}")
+        logger.info(f"Connected to Neo4j at {neo4j_uri}")
         
         # Validate Ollama connection
         self._validate_ollama_connection()
         
     def _handle_interruption(self, signum, frame):
         """Handle interruption signals gracefully."""
-        logger.info("\n🛑 Interruption received (Ctrl+C). Finishing current batch...")
-        logger.info("💡 The process will stop gracefully after the current batch completes.")
-        logger.info("💾 All completed work has been saved to the database.")
+        logger.info("\nInterruption received (Ctrl+C). Finishing current batch...")
+        logger.info("The process will stop gracefully after the current batch completes.")
+        logger.info("All completed work has been saved to the database.")
         self.interrupted = True
     
     def _validate_ollama_connection(self):
@@ -91,11 +91,11 @@ class UCKGEmbeddingProcessor:
         try:
             response = requests.get(f"{self.ollama_url}/api/tags", timeout=5)
             if response.status_code == 200:
-                logger.info(f"✅ Connected to Ollama at {self.ollama_url}")
+                logger.info(f"Connected to Ollama at {self.ollama_url}")
             else:
                 raise ConnectionError(f"Ollama responded with status {response.status_code}")
         except Exception as e:
-            logger.error(f"❌ Cannot connect to Ollama: {e}")
+            logger.error(f"Cannot connect to Ollama: {e}")
             raise
     
     def get_all_node_properties(self, node_type: str, limit: Optional[int] = None) -> List[Dict]:
@@ -128,7 +128,7 @@ class UCKGEmbeddingProcessor:
                 node = dict(record['n'])
                 nodes.append(node)
             
-        logger.info(f"📊 Retrieved {len(nodes)} {node_type} nodes needing embeddings")
+        logger.info(f"Retrieved {len(nodes)} {node_type} nodes needing embeddings")
         return nodes
     
     def get_batch_from_db(self, node_type: str, batch_size: int, offset: int) -> List[Dict]:
@@ -294,7 +294,7 @@ class UCKGEmbeddingProcessor:
             return embeddings[0]
             
         except Exception as e:
-            logger.error(f"❌ Embedding failed: {e}")
+            logger.error(f"Embedding failed: {e}")
             raise
     
     def create_batch_embeddings(self, texts: List[str], api_batch_size: int = 8) -> List[List[float]]:
@@ -333,7 +333,7 @@ class UCKGEmbeddingProcessor:
                     all_embeddings.extend(batch_embeddings)
                     
             except Exception as e:
-                logger.error(f"❌ Batch embedding failed: {e}")
+                logger.error(f"Batch embedding failed: {e}")
                 # Fallback to individual embeddings
                 logger.info(f"📝 Falling back to individual embeddings for batch of {len(batch_texts)}")
                 for text in batch_texts:
@@ -341,7 +341,7 @@ class UCKGEmbeddingProcessor:
                         embedding = self.create_embedding(text)
                         all_embeddings.append(embedding)
                     except Exception as e2:
-                        logger.error(f"❌ Individual embedding fallback failed: {e2}")
+                        logger.error(f"Individual embedding fallback failed: {e2}")
                         raise
         
         return all_embeddings
@@ -373,7 +373,7 @@ class UCKGEmbeddingProcessor:
                 query = f"MATCH (n:{node_type} {{uri: $node_id}})"
         
         if not node_id:
-            logger.error(f"❌ No identifier found for {node_type} node")
+            logger.error(f"No identifier found for {node_type} node")
             return False
         
         query += " SET n.embedding = $embedding, n.searchContent = $search_content RETURN n"
@@ -389,16 +389,16 @@ class UCKGEmbeddingProcessor:
                 if result.single():
                     return True
                 else:
-                    logger.error(f"❌ Node not found: {node_type}-{node_id}")
+                    logger.error(f"Node not found: {node_type}-{node_id}")
                     return False
                     
         except Exception as e:
-            logger.error(f"❌ Save failed for {node_type}-{node_id}: {e}")
+            logger.error(f"Save failed for {node_type}-{node_id}: {e}")
             return False
     
     def process_node_type(self, node_type: str, batch_size: int = 50, limit: Optional[int] = None, api_batch_size: int = 8):
         """Process all nodes of a specific type using database-level pagination."""
-        logger.info(f"🔄 Processing {node_type}...")
+        logger.info(f"Processing {node_type}...")
         
         # Set up signal handler for graceful interruption
         signal.signal(signal.SIGINT, self._handle_interruption)
@@ -410,7 +410,7 @@ class UCKGEmbeddingProcessor:
         while True:
             # Check for interruption
             if self.interrupted:
-                logger.info(f"🛑 Processing interrupted. Processed {processed} {node_type} nodes before interruption.")
+                logger.info(f"Processing interrupted. Processed {processed} {node_type} nodes before interruption.")
                 break
                 
             # Get batch from database - always gets the next unprocessed nodes
@@ -444,12 +444,12 @@ class UCKGEmbeddingProcessor:
                             errors += 1
                             self.stats['errors'] += 1
                     except Exception as e:
-                        logger.error(f"❌ Error saving node embedding: {e}")
+                        logger.error(f"Error saving node embedding: {e}")
                         errors += 1
                         self.stats['errors'] += 1
                         
             except Exception as e:
-                logger.error(f"❌ Error processing batch: {e}")
+                logger.error(f"Error processing batch: {e}")
                 errors += len(batch)
                 self.stats['errors'] += len(batch)
             
@@ -457,7 +457,7 @@ class UCKGEmbeddingProcessor:
             batch_time = time.time() - batch_start
             rate = len(batch) / batch_time if batch_time > 0 else 0
             
-            logger.info(f"📊 {node_type}: {processed} processed, "
+            logger.info(f"{node_type}: {processed} processed, "
                        f"Rate: {rate:.1f} nodes/sec, Errors: {errors}")
             
             # Removed: offset += batch_size (no longer needed)
@@ -469,7 +469,7 @@ class UCKGEmbeddingProcessor:
         if self.interrupted:
             logger.info(f"⚡ {node_type} processing interrupted: {processed} processed, {errors} errors")
         else:
-            logger.info(f"✅ {node_type} completed: {processed} processed, {errors} errors")
+            logger.info(f"{node_type} completed: {processed} processed, {errors} errors")
     
     def process_all_types(self, batch_size: int = 50, api_batch_size: int = 8):
         """
@@ -501,8 +501,8 @@ class UCKGEmbeddingProcessor:
         ]
         
         self.stats['start_time'] = time.time()
-        logger.info("🚀 Starting comprehensive embedding processing for all node types...")
-        logger.info("💡 Press Ctrl+C anytime to stop gracefully after the current batch")
+        logger.info("Starting comprehensive embedding processing for all node types...")
+        logger.info("Press Ctrl+C anytime to stop gracefully after the current batch")
         
         completed_types = []
         
@@ -515,7 +515,7 @@ class UCKGEmbeddingProcessor:
                     # Interruption occurred
                     break
             except Exception as e:
-                logger.error(f"❌ Failed to process {node_type}: {e}")
+                logger.error(f"Failed to process {node_type}: {e}")
                 continue
         
         # Final summary
@@ -523,19 +523,19 @@ class UCKGEmbeddingProcessor:
         rate = self.stats['processed'] / total_time if total_time > 0 else 0
         
         if self.interrupted:
-            logger.info("🛑 EMBEDDING PROCESSING INTERRUPTED!")
-            logger.info(f"✅ Completed types: {', '.join(completed_types) if completed_types else 'None'}")
-            logger.info(f"📊 Processed before interruption: {self.stats['processed']} nodes")
-            logger.info(f"❌ Errors encountered: {self.stats['errors']}")
+            logger.info("EMBEDDING PROCESSING INTERRUPTED!")
+            logger.info(f"Completed types: {', '.join(completed_types) if completed_types else 'None'}")
+            logger.info(f"Processed before interruption: {self.stats['processed']} nodes")
+            logger.info(f"Errors encountered: {self.stats['errors']}")
             logger.info(f"⏱️  Processing time: {total_time:.1f}s")
-            logger.info(f"🚀 Average rate: {rate:.1f} nodes/sec")
-            logger.info("💾 All completed work has been saved. You can resume by running the command again.")
+            logger.info(f"Average rate: {rate:.1f} nodes/sec")
+            logger.info("All completed work has been saved. You can resume by running the command again.")
         else:
-            logger.info("🎉 EMBEDDING PROCESSING COMPLETE!")
-            logger.info(f"📊 Total nodes processed: {self.stats['processed']}")
-            logger.info(f"❌ Total errors encountered: {self.stats['errors']}")
+            logger.info("EMBEDDING PROCESSING COMPLETE!")
+            logger.info(f"Total nodes processed: {self.stats['processed']}")
+            logger.info(f"Total errors encountered: {self.stats['errors']}")
             logger.info(f"⏱️  Total processing time: {total_time:.1f}s")
-            logger.info(f"🚀 Average processing rate: {rate:.1f} nodes/sec")
+            logger.info(f"Average processing rate: {rate:.1f} nodes/sec")
     
     def get_stats(self) -> Dict:
         """
@@ -592,7 +592,7 @@ class UCKGEmbeddingProcessor:
         """Clean up resources and close database connection."""
         if self.driver:
             self.driver.close()
-            logger.info("✅ Database connection closed successfully")
+            logger.info("Database connection closed successfully")
 
 def main():
     """Command line interface for UCKG embedding processing."""
@@ -613,7 +613,7 @@ def main():
         if args.stats:
             # Display comprehensive statistics
             stats = embedder.get_stats()
-            print("\n📊 EMBEDDING COVERAGE STATISTICS")
+            print("\nEMBEDDING COVERAGE STATISTICS")
             print("=" * 50)
             
             for node_type, node_stats in stats.items():
@@ -642,11 +642,11 @@ def main():
     
     except KeyboardInterrupt:
         # This shouldn't normally happen due to signal handling, but just in case
-        logger.info("\n🛑 Process interrupted by user")
-        logger.info("💾 All completed work has been saved to the database")
+        logger.info("\nProcess interrupted by user")
+        logger.info("All completed work has been saved to the database")
         sys.exit(0)
     except Exception as e:
-        logger.error(f"❌ Unexpected error: {e}")
+        logger.error(f"Unexpected error: {e}")
         sys.exit(1)
     finally:
         embedder.close()
