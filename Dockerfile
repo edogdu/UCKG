@@ -24,9 +24,14 @@ RUN pip install prometheus_client
 
 # Install embedding dependencies
 RUN pip install asyncio
+RUN pip install langchain
+RUN pip install langchain-text-splitters
 
 # Copy your Python script and any other necessary files
 COPY . /app
+
+# Create logs directory for embedding process
+RUN mkdir -p /app/logs
 
 # Set permissions for the JAR and data directory
 RUN chmod 755 /app/mapping/mapper.jar

@@ -8,9 +8,8 @@ from process import shared_functions as sf
 sys.path.append("./data_collection")
 from data_collection import cve_collection as cve, cwe_collection as cwe, d3fend_collection as d3fend, attack_collection as attack, capec_collection as capec
 
-# Add embedding processor import
-sys.path.append("./graphrag/backend/embeddings")
-from uckg_embedding_processor import UCKGEmbeddingProcessor
+# Add embedding processor import from new location
+from process.embedding_functions import run_embedding_processing
 
 uco_abs_path = os.environ['UCO_ONTO_PATH']
 root_folder_abs_path = os.environ['ROOT_FOLDER']
@@ -79,24 +78,12 @@ logger.info("###############################################")
 logger.info("All Data Sources Have Been Initialized!")
 logger.info("###############################################")
 
-# Check if embedding generation is enabled
-embed_enabled = os.environ.get('EMBED_ENV', 'false').lower() == 'true'
-if embed_enabled:
-    logger.info("Starting embedding generation for all cybersecurity nodes...")
-    try:
-        processor = UCKGEmbeddingProcessor(
-            neo4j_uri=os.environ.get('NEO4J_URI', 'bolt://neo4j:7687'),
-            neo4j_auth=(os.environ.get('NEO4J_USER', 'neo4j'), os.environ.get('NEO4J_PASSWORD', 'abcd90909090')),
-            ollama_url=os.environ.get('OLLAMA_URL', 'http://ollama:11434'),
-            embedding_model=os.environ.get('EMBEDDING_MODEL', 'nomic-embed-text')
-        )
-        processor.process_all_types()
-        processor.close()
-        logger.info("Embedding generation completed successfully")
-    except Exception as e:
-        logger.error(f"Error during embedding generation: {e}")
-        logger.info("System will continue without embeddings - they can be generated later")
-else:
-    logger.info("Embedding generation disabled via EMBED_ENV")
+# Run embedding processing if enabled
+logger.info("Checking embedding processing configuration...")
+try:
+    run_embedding_processing()
+except Exception as e:
+    logger.error(f"Error during embedding generation: {e}")
+    logger.info("System will continue without embeddings - they can be generated later")
 
 logger.info("Complete system initialization finished!")
