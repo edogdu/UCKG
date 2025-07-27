@@ -1,4 +1,4 @@
-### Dowload the packages
+### Download the packages
 ```bash
 $  npm install
 ```
