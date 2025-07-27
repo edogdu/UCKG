@@ -89,7 +89,8 @@ class UCKGEmbedder:
             try:
                 self._driver = GraphDatabase.driver(
                     self.config['neo4j_uri'],
-                    auth=(self.config['neo4j_user'], self.config['neo4j_password'])
+                    auth=(self.config['neo4j_user'], self.config['neo4j_password']),
+                    notifications_disabled_categories=['UNRECOGNIZED']
                 )
                 # Validate connection
                 with self._driver.session() as session:
@@ -235,7 +236,7 @@ class UCKGEmbedder:
                     
                     session.run(f"""
                         MATCH (original) WHERE elementId(original) = $node_id
-                        CREATE (chunk:{node_type}Chunk {{
+                        CREATE (chunk:{node_type}Chunk:Vectorized {{
                             text: $chunk_text,
                             embedding: $embedding,
                             chunkIndex: $chunk_idx,
@@ -348,12 +349,12 @@ class UCKGEmbedder:
                         summaries = [node[2] for node in nodes]
                         embeddings = self._create_batch_embeddings_bulk(summaries)
                         
-                        # Store results in streaming transaction
+                        # Store results in streaming transaction with real-time tagging
                         for (node_id, size, _), embedding in zip(nodes, embeddings):
                             if embedding:
                                 session.run("""
                                     MATCH (n) WHERE elementId(n) = $node_id
-                                    SET n.embedding = $embedding
+                                    SET n.embedding = $embedding, n:Vectorized
                                 """, {'node_id': node_id, 'embedding': embedding})
                                 
                                 if size == 'small':
@@ -419,6 +420,41 @@ class UCKGEmbedder:
                 except Exception as e:
                     raise EmbeddingError(f"Large node processing failed: {e}")
     
+    def _create_global_vector_index(self):
+        """Create unified vector index for all embedding-enabled nodes and chunks"""
+        logger.info("Creating global vector index for unified semantic search")
+        
+        with self._neo4j_driver() as driver:
+            with driver.session() as session:
+                try:
+                    # Check if index already exists
+                    result = session.run("""
+                        SHOW VECTOR INDEXES 
+                        WHERE name = 'global_vec_idx'
+                        RETURN count(*) as exists
+                    """)
+                    
+                    if result.single()['exists'] > 0:
+                        logger.info("Global vector index already exists, skipping creation")
+                        return
+                    
+                    # Create global vector index for vectorized nodes
+                    session.run("""
+                        CREATE VECTOR INDEX global_vec_idx
+                        FOR (n:Vectorized) ON (n.embedding)
+                        OPTIONS {
+                          indexConfig: {
+                            `vector.dimensions`: 768,
+                            `vector.similarity_function`: 'cosine'
+                          }
+                        }
+                    """)
+                    
+                    logger.info("Global vector index created successfully")
+                    
+                except Exception as e:
+                    raise EmbeddingError(f"Vector index creation failed: {e}")
+    
     def run_complete_pipeline(self):
         """Execute complete embedding pipeline"""
         logger.info("Starting UCKG embedding pipeline")
@@ -432,6 +468,9 @@ class UCKGEmbedder:
             
             # Phase 3: Process large nodes with chunking
             chunks = self._process_large_nodes()
+            
+            # Phase 4: Create global vector index for all Vectorized nodes
+            self._create_global_vector_index()
             
             logger.info("Embedding pipeline completed successfully")
             logger.info(f"Processing summary: {small:,} small, {medium:,} medium nodes, {chunks:,} chunks")
