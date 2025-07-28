@@ -24,8 +24,9 @@ export const executeQuery = async (query) => {
       // Map to get the nodes from the query
       const nodes = data.nodes.map((n) => {
          const { properties, labels } = data.recordObjectMap.get(n.id ?? n.identity);
-         // Use the first label as the main label
-         const mainLabel = labels?.[0] ?? "Node";
+         // Use the second label as the main label
+         const mainLabel = labels?.[1];
+         const firstLabel = labels?.[0];
          // Assign a color if this label hasn't been seen yet
          if (!labelColorMap[mainLabel]) {
             labelColorMap[mainLabel] = getRandomColor();
@@ -33,7 +34,8 @@ export const executeQuery = async (query) => {
          return {
             ...n,
             id: String(n.id ?? n.identity),
-            caption: properties.label ?? properties.ucocweID ?? mainLabel,
+            // caption: properties.label ?? properties.ucocweID ?? mainLabel ?? firstLabel,
+            caption: mainLabel ?? firstLabel,
             color: labelColorMap[mainLabel],
             label: mainLabel,
             uri: properties.uri,
