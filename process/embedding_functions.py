@@ -252,6 +252,13 @@ class UCKGEmbedder:
                     })
                     chunks_created += 1
         
+        # Mark the original large node as processed after successful chunking
+        if chunks_created > 0:
+            session.run("""
+                MATCH (original) WHERE elementId(original) = $node_id
+                SET original:Vectorized, original.chunked = true
+            """, {'node_id': node_id})
+        
         return chunks_created
     
     def _classify_content_size(self):
@@ -268,7 +275,7 @@ class UCKGEmbedder:
                     while True:
                         result = session.run("""
                             MATCH (n)
-                            WHERE n.embedding IS NULL 
+                            WHERE NOT n:Vectorized 
                               AND NOT labels(n)[0] = '_GraphConfig'
                               AND n.contentSize IS NULL
                             WITH n LIMIT $batch_size
@@ -314,7 +321,7 @@ class UCKGEmbedder:
         logger.info("Processing small and medium nodes with improved batch processing")
         
         small_count = medium_count = 0
-        batch_size = min(self.batch_size, 50)  # Use configurable batch size with upper limit
+        batch_size = min(self.batch_size, 150)  # Use configurable batch size with upper limit
         
         with self._neo4j_driver() as driver:
             with driver.session() as session:
@@ -375,7 +382,7 @@ class UCKGEmbedder:
         logger.info("Processing large nodes with improved chunking")
         
         chunks_created = 0
-        batch_size = min(self.batch_size // 10, 10)  # Smaller batch for large nodes
+        batch_size = min(self.batch_size // 4, 50)  # Smaller batch for large nodes
         
         with self._neo4j_driver() as driver:
             with driver.session() as session:
@@ -384,7 +391,7 @@ class UCKGEmbedder:
                         # Get small batch of large nodes with property-aware content
                         result = session.run("""
                             MATCH (n)
-                            WHERE n.contentSize = 'large' AND n.embedding IS NULL
+                            WHERE n.contentSize = 'large' AND NOT n:Vectorized
                             WITH n, elementId(n) as nodeId, labels(n)[0] as nodeType,
                                  reduce(content = '', prop IN keys(n) | 
                                      CASE WHEN NOT (prop IN ['embedding', 'contentSize', 'estimatedTokens'])

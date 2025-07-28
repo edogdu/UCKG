@@ -92,10 +92,10 @@ services:
       NEO4J_PASSWORD: abcd90909090
       VOL_PATH: /vol/data
       OLLAMA_URL: http://ollama:11434
-      EMBEDDING_MODEL: nomic-embed-text
+      EMBEDDING_MODEL: nomic-embed-text:latest
       EMBED_ENV: "true"
       LOG_LEVEL: "INFO"
-      EMBEDDING_BATCH_SIZE: "100"
+      EMBEDDING_BATCH_SIZE: "200"
     volumes:
       - my_volume:/vol/data # Persist data
       - ./logs:/app/logs # Mount logs directory for embedding process
