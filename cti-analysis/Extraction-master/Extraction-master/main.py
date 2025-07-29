@@ -54,7 +54,7 @@ class CyberTripleExtractor:
         matcher.add("MALONT", self.patterns)
         
         
-        self.malont_objects = [
+        self.malont_predicates = [
             "targets", "communicatesWith", "uses", "has", "hasAlias",
             "hasVulnerability", "indicates", "exploits", "hasAuthor", "belongsTo"
         ]
@@ -64,15 +64,15 @@ class CyberTripleExtractor:
         self.chunk_data = []
 
     def generate_prompt(self, text):
-        subject_types = ", ".join(self.malont_classes)
-        predicates = ", ".join(self.malont_objects)
+        object_types = ", ".join(self.malont_classes)
+        predicates = ", ".join(self.malont_predicates)
         return f"""
 You are a cybersecurity analyst.
 
 From the text below, extract cybersecurity-relevant knowledge as subject-predicate-object triples.
 Only extract triples that meet ALL of the following:
 - The predicate is one of the following relationships: {predicates}
-- The subject corresponds to one of the following entity types: {subject_types}
+- The object corresponds to one of the following entity types: {object_types}
 - The triple is clearly stated in the sentence (not inferred)
 - Do not return duplicate or vague triples
 - Limit to one triple per sentence
@@ -153,7 +153,7 @@ Analyze this text:
                     print("Raw LLM response:")
                     print(response)
                     triples = json.loads(response)
-                    chunk_results.append((sentence,page_no, i,))
+                    chunk_results.append((sentence, page_no, i, triples))
                     for t in triples:
                         if not all(isinstance(t.get(k), str) for k in ("subject", "predicate", "object")):
                             print(f" Skipping invalid triple (non-string values): {t}")
@@ -171,10 +171,11 @@ Analyze this text:
 
     def build_dict(self, chunk_results):
         self.chunk_data = []
-        for sentence, page_no, i in chunk_results:
+        for sentence, page_no, i, triples in chunk_results:
             self.chunk_data.append({
                 "context": sentence,
                 "technique": None,
+                "triple": triples,
                 "metadata": {
                     "page_number": page_no,
                     "id": str(i).zfill(3),  # pad with zeros like "001", "002"
@@ -208,7 +209,7 @@ Analyze this text:
 
 if __name__ == "__main__":
     ensure_mistral_model("mistral")
-    extractor = CyberTripleExtractor("cti-analysis/Extraction-master/Extraction-master/AnalysisOfCyberattackOnUS.pdf")
+    extractor = CyberTripleExtractor("cti-analysis/Extraction-master/Extraction-master/AnalysisOfCyberattackOnUS-3.pdf")
     raw_chunk_results = extractor.run()
     extractor.build_dict(raw_chunk_results)
     extractor.save_to_json("chunk_data.json")
