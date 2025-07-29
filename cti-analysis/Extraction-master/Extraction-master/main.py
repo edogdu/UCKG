@@ -1,14 +1,32 @@
 import json
+import subprocess
 from docling.document_converter import DocumentConverter
 from collections import defaultdict
 from langchain_community.llms import Ollama
-from nltk.tokenize import sent_tokenize
 import spacy    
+try:
+    nlp = spacy.load("en_core_web_sm")
+except OSError:
+    from spacy.cli import download
+    download("en_core_web_sm")
+    nlp = spacy.load("en_core_web_sm")
 from spacy.matcher import PhraseMatcher
 nlp = spacy.load("en_core_web_sm")
+if "sentencizer" not in nlp.pipe_names:
+    nlp.add_pipe("sentencizer")
 matcher = PhraseMatcher(nlp.vocab, attr = "LOWER")
 
-
+def ensure_mistral_model(model_name="mistral"):
+    try:
+        result = subprocess.run(["ollama", "list"], capture_output=True, text=True, check=True)
+        if model_name not in result.stdout:
+            print(f"Model '{model_name}' not found. Downloading...")
+            subprocess.run(["ollama", "pull", model_name], check=True)
+            print(f"Model '{model_name}' downloaded.")
+        else:
+            print(f"Model '{model_name}' already available.")
+    except subprocess.CalledProcessError as e:
+        print("Error checking or downloading model:", e)
 
 class CyberTripleExtractor:
     def __init__(self, file_path, model_name="mistral"):
@@ -17,7 +35,6 @@ class CyberTripleExtractor:
         self.llm = Ollama(model=model_name)
         
         
-
         self.malont_classes = [
             'Staging', 'Adware', 'CommandAndControl', 'Spyware', 'DDoS', 'DomainName', 'Dropper', 'Port', 'MD5',
             'Protocol', 'VirusScanner', 'Downloader', 'Ransomware', 'OperatingSystem', 'Rootkit',
@@ -43,29 +60,40 @@ class CyberTripleExtractor:
         ]
         
         
-        self.prompt_template = f"""
-           You are a cybersecurity analyst.
-
-        From the text below, extract all cybersecurity-relevant knowledge in the form of subject-predicate-object triples.
-        Only extract triples that meet ALL of the following:
-        - Reference a known attacker, malware, tool, vulnerability, or MITRE technique
-        - Are clearly stated in the sentence (not inferred or vague)
-        - Are not duplicated or restated in a different way
-        Limit to a maximum of 1 triple per sentence.
-        If no valid triples are found, return: No related entities and relations.
-
-
-
-
-        Output as a JSON array of objects with keys: "subject", "predicate", "object".
-
-        Do not add any explanation. Just return valid JSON.
-
-        Now extract from this:
-        \"\"\"{{text}}\"\"\"
-        """
         self.valid_triples = []
         self.chunk_data = []
+
+    def generate_prompt(self, text):
+        subject_types = ", ".join(self.malont_classes)
+        predicates = ", ".join(self.malont_objects)
+        return f"""
+You are a cybersecurity analyst.
+
+From the text below, extract cybersecurity-relevant knowledge as subject-predicate-object triples.
+Only extract triples that meet ALL of the following:
+- The predicate is one of the following relationships: {predicates}
+- The subject corresponds to one of the following entity types: {subject_types}
+- The triple is clearly stated in the sentence (not inferred)
+- Do not return duplicate or vague triples
+- Limit to one triple per sentence
+
+Output as a JSON array:
+[
+  {{
+    "subject": "...",
+    "predicate": "...",
+    "object": "..."
+  }}
+]
+
+If no valid triples are found, return:
+"No related entities and relations."
+
+Do not add any explanation. Just return valid JSON.
+
+Analyze this text:
+\"\"\"{text}\"\"\"
+"""
 
     def is_relevant_with_ner(self, sentence):
         doc = nlp(sentence)
@@ -105,43 +133,40 @@ class CyberTripleExtractor:
 
         print("Extracting triples sentence-by-sentence...")
         for page_no, chunk_text in page_chunks:
-            sentences = sent_tokenize(chunk_text)
+            doc = nlp(chunk_text)
+            sentences = [sent.text for sent in doc.sents]
             
 
             for i, sentence in enumerate(sentences):
                 if len(sentence.strip()) < 40:
                     continue  # skip short or uninformative lines
-                if self.rule_based_filter(sentence) or self.is_relevant_with_ner(sentence):
-                      # Skip unimportant sentences
+                if not (self.rule_based_filter(sentence) or self.is_relevant_with_ner(sentence)):
+                    continue
 
-                    try:
-                        prompt = self.prompt_template.format(text=sentence)
-                        print(f"\n--- Page {page_no} | Sentence {i} ---")
-                        print("Prompt sent to LLM:")
-                        
+                try:
+                    prompt = self.generate_prompt(sentence)
+                    print(f"\n--- Page {page_no} | Sentence {i} ---")
+                    print("Prompt sent to LLM:")
+                    
 
-                        response = self.llm.invoke(prompt)
-                        print("Raw LLM response:")
-                        print(response)
-                        triples = json.loads(response)
-                        chunk_results.append((sentence,page_no, i,))
-                        continue
-                        # for t in triples:
-                        #     if not all(isinstance(t.get(k), str) for k in ("subject", "predicate", "object")):
-                        #         print(f" Skipping invalid triple (non-string values): {t}")
-                        #         continue
+                    response = self.llm.invoke(prompt)
+                    print("Raw LLM response:")
+                    print(response)
+                    triples = json.loads(response)
+                    chunk_results.append((sentence,page_no, i,))
+                    for t in triples:
+                        if not all(isinstance(t.get(k), str) for k in ("subject", "predicate", "object")):
+                            print(f" Skipping invalid triple (non-string values): {t}")
+                            continue
 
-                        #     if self._is_valid_triple(t):
-                               
-                        #         print(f"{t['subject']} —{t['predicate']}→ {t['object']}")
-                        #         break
-                        #     else:
-                        #         print(f"Suspicious triple: {t}")
-                                
-                        
-
-                    except Exception as e:
-                        print(f"LLM error on page {page_no} sentence {i}: {e}")
+                        if self._is_valid_triple(t):
+                            print(f"{t['subject']} —{t['predicate']}→ {t['object']}")
+                            self.valid_triples.append(t)
+                        else:
+                            print(f"Suspicious triple: {t}")
+                    
+                except Exception as e:
+                    print(f"LLM error on page {page_no} sentence {i}: {e}")
         return chunk_results
 
     def build_dict(self, chunk_results):
@@ -181,9 +206,8 @@ class CyberTripleExtractor:
              any(cls.lower() in triple.get("subject", "").lower() for cls in self.malont_classes)
         )
 
-
-
 if __name__ == "__main__":
+    ensure_mistral_model("mistral")
     extractor = CyberTripleExtractor("cti-analysis/Extraction-master/Extraction-master/AnalysisOfCyberattackOnUS.pdf")
     raw_chunk_results = extractor.run()
     extractor.build_dict(raw_chunk_results)
