@@ -1,4 +1,5 @@
 import json
+import os
 import subprocess
 from docling.document_converter import DocumentConverter
 from collections import defaultdict
@@ -16,7 +17,7 @@ if "sentencizer" not in nlp.pipe_names:
     nlp.add_pipe("sentencizer")
 matcher = PhraseMatcher(nlp.vocab, attr = "LOWER")
 
-def ensure_mistral_model(model_name="mistral"):
+def ensure_ollama_model(model_name="mistral"):
     try:
         result = subprocess.run(["ollama", "list"], capture_output=True, text=True, check=True)
         if model_name not in result.stdout:
@@ -33,8 +34,8 @@ class CyberTripleExtractor:
         self.file_path = file_path
         self.converter = DocumentConverter()
         self.llm = Ollama(model=model_name)
-        
-        
+        self.model_name = model_name
+        self.suspicious_triples = 0
         self.malont_classes = [
             'Staging', 'Adware', 'CommandAndControl', 'Spyware', 'DDoS', 'DomainName', 'Dropper', 'Port', 'MD5',
             'Protocol', 'VirusScanner', 'Downloader', 'Ransomware', 'OperatingSystem', 'Rootkit',
@@ -62,27 +63,38 @@ class CyberTripleExtractor:
         
         self.valid_triples = []
         self.chunk_data = []
+        self.sentences_total = 0
+        self.sentences_used = 0
+        self.raw_triples = 0
+        self.rejection_stats = {
+            "bad_structure": 0,
+            "invalid_class_or_predicate": 0
+        }
+        self.pages_parsed = 0
+        self.runtime_seconds = 0
 
     def generate_prompt(self, text):
-        object_types = ", ".join(self.malont_classes)
+        entity_types = ", ".join(self.malont_classes)
         predicates = ", ".join(self.malont_predicates)
         return f"""
 You are a cybersecurity analyst.
 
-From the text below, extract cybersecurity-relevant knowledge as subject-predicate-object triples.
-Only extract triples that meet ALL of the following:
-- The predicate is one of the following relationships: {predicates}
-- The object corresponds to one of the following entity types: {object_types}
-- The triple is clearly stated in the sentence (not inferred)
-- Do not return duplicate or vague triples
-- Limit to one triple per sentence
+From the text below, extract structured cybersecurity-relevant knowledge as subject–predicate–object triples.
 
-Output as a JSON array:
+Each triple must meet these criteria:
+- The subject and object must be specific cybersecurity entities.
+- You must assign a **type** (entity class) to each subject and object from this list: [{entity_types}]
+- The predicate must be one of the following: [{predicates}]
+- Do not infer unstated relationships; extract only what's clearly expressed.
+- Do not include vague or generic triples.
+- Each name must be a string. Each type must match one of the types listed above exactly.
+
+Format your output as a JSON array:
 [
   {{
-    "subject": "...",
+    "subject": {{ "name": "...", "type": "..." }},
     "predicate": "...",
-    "object": "..."
+    "object": {{ "name": "...", "type": "..." }}
   }}
 ]
 
@@ -124,49 +136,61 @@ Analyze this text:
 
 
     def run(self):
+        import time
+        start_time = time.time()
         print("Loading and converting document...")
         result = self.converter.convert(self.file_path)
         doc = result.document
 
         page_chunks = self.chunk_by_page(doc)
         chunk_results = []
+        self.pages_parsed = len(page_chunks)
 
         print("Extracting triples sentence-by-sentence...")
         for page_no, chunk_text in page_chunks:
             doc = nlp(chunk_text)
             sentences = [sent.text for sent in doc.sents]
-            
 
             for i, sentence in enumerate(sentences):
+                self.sentences_total += 1
                 if len(sentence.strip()) < 40:
                     continue  # skip short or uninformative lines
                 if not (self.rule_based_filter(sentence) or self.is_relevant_with_ner(sentence)):
                     continue
+                self.sentences_used += 1
 
                 try:
                     prompt = self.generate_prompt(sentence)
                     print(f"\n--- Page {page_no} | Sentence {i} ---")
                     print("Prompt sent to LLM:")
-                    
 
                     response = self.llm.invoke(prompt)
                     print("Raw LLM response:")
                     print(response)
                     triples = json.loads(response)
+                    self.raw_triples += len(triples)
                     chunk_results.append((sentence, page_no, i, triples))
                     for t in triples:
-                        if not all(isinstance(t.get(k), str) for k in ("subject", "predicate", "object")):
-                            print(f" Skipping invalid triple (non-string values): {t}")
-                            continue
-
                         if self._is_valid_triple(t):
                             print(f"{t['subject']} —{t['predicate']}→ {t['object']}")
                             self.valid_triples.append(t)
                         else:
                             print(f"Suspicious triple: {t}")
-                    
+                            self.suspicious_triples += 1
+                            # Determine rejection reason
+                            s = t.get("subject", {})
+                            o = t.get("object", {})
+                            p = t.get("predicate", "")
+                            if not (isinstance(p, str) and p.strip() in self.malont_predicates):
+                                self.rejection_stats["invalid_class_or_predicate"] += 1
+                            elif s.get("type", "") not in self.malont_classes or o.get("type", "") not in self.malont_classes:
+                                self.rejection_stats["invalid_class_or_predicate"] += 1
+                            else:
+                                self.rejection_stats["bad_structure"] += 1
+
                 except Exception as e:
                     print(f"LLM error on page {page_no} sentence {i}: {e}")
+        self.runtime_seconds = time.time() - start_time
         return chunk_results
 
     def build_dict(self, chunk_results):
@@ -174,42 +198,72 @@ Analyze this text:
         for sentence, page_no, i, triples in chunk_results:
             self.chunk_data.append({
                 "context": sentence,
-                "technique": None,
                 "triple": triples,
                 "metadata": {
                     "page_number": page_no,
-                    "id": str(i).zfill(3),  # pad with zeros like "001", "002"
-                    "source": "TEXT",
-                    "tactic_name": [],
-                    "tactic": [],
-                    "technique_name": None,
-                    "sub_technique_name": None,
-                    "sub_technique": None,
-                    "description": None,
-                    "tool_name": [],
-                    "tool": [],
-                    "note": None,
-                    "link": None
+                    "id": str(i).zfill(3),
+                    "source": "TEXT"
                 }
             })
         return self.chunk_data
 
-    def save_to_json(self, output_path="chunk_data.json"):
+    def save_to_json(self, output_filename="chunk_data.json"):
         try:
+            input_dir = os.path.dirname(self.file_path)
+            output_dir = os.path.join(input_dir, "extracted_triples")
+            output_path = os.path.join(output_dir, output_filename)
+
+            metrics = {
+                "file_name": os.path.basename(self.file_path),
+                "model_used": self.model_name,
+                "num_pages": self.pages_parsed,
+                "num_sentences_total": self.sentences_total,
+                "num_sentences_used": self.sentences_used,
+                "num_raw_triples": self.raw_triples,
+                "num_valid_triples": len(self.valid_triples),
+                "num_suspicious_triples": self.suspicious_triples,
+                "avg_triples_per_sentence": self.raw_triples / self.sentences_used if self.sentences_used else 0,
+                "rejection_stats": self.rejection_stats,
+                "runtime_seconds": self.runtime_seconds,
+            }
+
+            metadata = {
+                "metrics": metrics,
+                "data": self.chunk_data
+            }
+
             with open(output_path, "w", encoding="utf-8") as f:
-                json.dump(self.chunk_data, f, indent=2, ensure_ascii=False)
-            print("File saved successfully.")
+                json.dump(metadata, f, indent=2, ensure_ascii=False)
+            print(f"File saved successfully to: {output_path}")
         except Exception as e:
             print(f"Failed to save JSON: {e}")
 
     def _is_valid_triple(self, triple):
+        s = triple.get("subject", {})
+        o = triple.get("object", {})
+        p = triple.get("predicate", "")
+
+        subject_type = s.get("type", "")
+        object_type = o.get("type", "")
+
         return (
-             any(cls.lower() in triple.get("subject", "").lower() for cls in self.malont_classes)
+            isinstance(p, str) and p.strip() in self.malont_predicates and
+            subject_type in self.malont_classes and
+            object_type in self.malont_classes
         )
 
 if __name__ == "__main__":
-    ensure_mistral_model("mistral")
-    extractor = CyberTripleExtractor("cti-analysis/Extraction-master/Extraction-master/AnalysisOfCyberattackOnUS-3.pdf")
-    raw_chunk_results = extractor.run()
-    extractor.build_dict(raw_chunk_results)
-    extractor.save_to_json("chunk_data.json")
+    models = [
+        "openhermes",
+        "mistral:7b",
+        "zephyr:7b",
+        "qwen3:4b",
+        "phi-3:3.8b",
+        "gemma2:9b"
+    ]
+    for model in models:
+        ensure_ollama_model(model)
+        extractor = CyberTripleExtractor("cti-analysis/AnalysisOfCyberattackOnUS.pdf", model)
+        raw_chunk_results = extractor.run()
+        extractor.build_dict(raw_chunk_results)
+        extractor.save_to_json(f"chunk_data_{model}.json")
