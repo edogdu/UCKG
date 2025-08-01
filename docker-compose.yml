@@ -79,11 +79,20 @@ services:
       - OLLAMA_LOG_LEVEL=ERROR
       - LLAMA_LOG_DISABLE=1
       - GIN_MODE=release
+      - NVIDIA_VISIBLE_DEVICES=all
+      - NVIDIA_DRIVER_CAPABILITIES=compute,utility
     logging:
       driver: "json-file"
       options:
         max-size: "10m"
         max-file: "3"
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
   uckg-scripts:
     build: .
     environment:
