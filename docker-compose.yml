@@ -104,7 +104,7 @@ services:
       EMBEDDING_MODEL: nomic-embed-text:latest
       EMBED_ENV: "true"
       LOG_LEVEL: "INFO"
-      EMBEDDING_BATCH_SIZE: "200"
+      EMBEDDING_BATCH_SIZE: "1500"
     volumes:
       - my_volume:/vol/data # Persist data
       - ./logs:/app/logs # Mount logs directory for embedding process

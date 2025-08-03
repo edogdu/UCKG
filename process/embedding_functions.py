@@ -1,90 +1,66 @@
 #!/usr/bin/env python3
 """
-UCKG Embedding Functions
+UCKG Embedding Processor
 
-Essential embedding processor for cybersecurity knowledge graphs.
-Optimized for nomic-embed-text performance with property-aware chunking.
+Embedding processor for cybersecurity knowledge graphs.
+Direct property-based embedding with batch processing via Ollama API.
 
-Core features:
-- Content size classification (small/medium/large nodes)
-- Property-aware text generation for better embeddings
-- Batch processing with Ollama API
-- Optimized chunking (1200 chars ≈ 300 tokens) with context preservation
-- Property metadata extraction for precise RAG queries
-- Connection pooling and error recovery
-
-Environment variables:
-- EMBEDDING_BATCH_SIZE: Batch size for embedding requests (default: 100)
-
-Chunk storage includes:
-- text: Full chunk content with property names
-- embedding: Vector representation
-- properties: List of property names for targeted queries
-- chunkIndex: Sequential position
+Features:
+- Property-selective text extraction by node type
+- Batch processing for performance
+- No chunking required (nomic-embed-text 8K context)
+- Unified processing pipeline
 """
 
 import os
 import logging
 import requests
-from typing import List, Tuple, Optional
+import json
+from typing import List, Optional
 from contextlib import contextmanager
 
 from neo4j import GraphDatabase
 
-# Configure logging
 logging.basicConfig(level=os.getenv('LOG_LEVEL', 'INFO').upper())
 logger = logging.getLogger(__name__)
 
-# Simplified error handling for essential cases
 class EmbeddingError(Exception):
-    """Base embedding error for operational issues"""
+    """Embedding processing error"""
     pass
 
 class ConfigError(ValueError):
-    """Configuration validation error - critical failure"""
+    """Configuration error"""
     pass
 
-# Environment configuration
 def get_config():
-    """Load and validate configuration from environment variables"""
+    """Load configuration from environment"""
     config = {
-        'neo4j_uri': os.getenv('NEO4J_URI', 'bolt://neo4j:7687'),
+        'neo4j_uri': os.getenv('NEO4J_URI', 'bolt://localhost:7687'),
         'neo4j_user': os.getenv('NEO4J_USER', 'neo4j'),
         'neo4j_password': os.getenv('NEO4J_PASSWORD', 'abcd90909090'),
-        'ollama_url': os.getenv('OLLAMA_URL', 'http://ollama:11434').rstrip('/'),
+        'ollama_url': os.getenv('OLLAMA_URL', 'http://localhost:11434').rstrip('/'),
         'embedding_model': os.getenv('EMBEDDING_MODEL', 'nomic-embed-text'),
         'embed_enabled': os.getenv('EMBED_ENV', 'false').lower() in ['true', '1', 'yes']
     }
     
-    # Validate critical configuration
     if not all([config['neo4j_uri'], config['ollama_url']]):
         raise ConfigError("Missing required configuration: NEO4J_URI or OLLAMA_URL")
     
     return config
 
 class UCKGEmbedder:
-    """
-    UCKG embedding processor with conditional processing strategy.
-    
-    Processing approach:
-    - Small/medium nodes: Direct summary embedding
-    - Large nodes: Text chunking with multiple embeddings
-    """
+    """Simplified UCKG embedding processor"""
     
     def __init__(self):
         self.config = get_config()
         self._driver = None
         self._session = requests.Session()
         self._session.headers.update({'Content-Type': 'application/json'})
-        
-        # Essential performance settings optimized for embeddings
         self.batch_size = int(os.getenv('EMBEDDING_BATCH_SIZE', '100'))
-        self.chunk_size = 1200  # ~300 tokens - optimal for nomic-embed-text
-        self.chunk_overlap = 240  # 20% overlap for context preservation
-        
+    
     @contextmanager
     def _neo4j_driver(self):
-        """Neo4j driver context manager with connection pooling"""
+        """Neo4j driver context manager"""
         if not self._driver:
             try:
                 self._driver = GraphDatabase.driver(
@@ -92,7 +68,6 @@ class UCKGEmbedder:
                     auth=(self.config['neo4j_user'], self.config['neo4j_password']),
                     notifications_disabled_categories=['UNRECOGNIZED']
                 )
-                # Validate connection
                 with self._driver.session() as session:
                     session.run("RETURN 1").single()
             except Exception as e:
@@ -101,31 +76,13 @@ class UCKGEmbedder:
         try:
             yield self._driver
         finally:
-            pass  # Keep connection alive for reuse
+            pass
     
-    def _create_embedding(self, text: str) -> List[float]:
-        """Generate single embedding vector via Ollama API"""
-        try:
-            response = self._session.post(
-                f"{self.config['ollama_url']}/api/embed",
-                json={"model": self.config['embedding_model'], "input": text},
-                timeout=30
-            )
-            response.raise_for_status()
-            
-            embeddings = response.json().get('embeddings', [])
-            if not embeddings or not embeddings[0]:
-                raise EmbeddingError("Empty embedding response from Ollama")
-            return embeddings[0]
-            
-        except requests.RequestException as e:
-            raise EmbeddingError(f"Ollama API request failed: {e}")
-    
-    def _create_batch_embeddings_bulk(self, texts: List[str]) -> List[List[float]]:
-        """Generate embeddings using batch API with fallback"""
+    def _create_batch_embeddings(self, texts: List[str]) -> List[List[float]]:
+        """Generate embeddings using Ollama batch API"""
         if not texts:
             return []
-            
+        
         try:
             response = self._session.post(
                 f"{self.config['ollama_url']}/api/embed",
@@ -138,394 +95,356 @@ class UCKGEmbedder:
             if len(embeddings) == len(texts):
                 return embeddings
             
-            logger.warning(f"Batch size mismatch, using individual fallback")
-            return self._create_batch_embeddings(texts)
+            logger.warning(f"Batch embedding size mismatch: got {len(embeddings)}, expected {len(texts)}")
+            return []
             
         except requests.RequestException as e:
-            logger.warning(f"Batch API failed: {e}")
-            return self._create_batch_embeddings(texts)
+            logger.error(f"Ollama API request failed: {e}")
+            return []
     
-    def _create_batch_embeddings(self, texts: List[str]) -> List[List[float]]:
-        """Generate embeddings for multiple texts with error tolerance"""
-        embeddings = []
-        failed = 0
+    def _extract_node_text(self, node_type: str, node_props: dict) -> str:
+        """Extract text for embedding based on node type and selected properties"""
         
-        for i, text in enumerate(texts):
-            try:
-                embedding = self._create_embedding(text)
-                embeddings.append(embedding)
+        # Property selection map based on analysis
+        property_map = {
+            'UcoCWE': ['ucocweSummary', 'ucocweExtendedSummary', 'ucocweName'],
+            'UcoCVE': ['label', 'ucobaseSeverity'],
+            'UcoVulnerability': ['ucosummary'],
+            'UcoexCAPEC': ['label', 'ucoexDescription'],
+            'UcoexSOFTWARE': ['ucoexDESCRIPTION', 'ucoexDOMAIN'],
+            'UcoexGROUPS': ['ucoexDESCRIPTION', 'ucoexDOMAIN'],
+            'UcoexCAMPAIGNS': ['ucoexDESCRIPTION', 'ucoexDOMAIN'],
+            'UcoexMITIGATIONS': ['ucoexDESCRIPTION', 'ucoexDOMAIN', 'ucoexNAME'],
+            'UcoexMITREATTACK': ['ucoexDESCRIPTION', 'ucoexDOMAIN', 'ucoexNAME'],
+            'UcoexObservedExample': ['ucoexDESCRIPTION'],
+            'UcoexTACTICS': ['ucoexDESCRIPTION', 'ucoexDOMAIN'],
+            'UcoexMITRED3FEND': ['ucoexMITRED3FEND_DEFINITION', 'ucoexMITRED3FEND_LABEL'],
+            'UcoexCPE': ['cpeName', 'titles'],
+        }
+        
+        properties = property_map.get(node_type, [])
+        if not properties:
+            # Fallback for unknown node types
+            return str(node_props.get('name', node_props.get('label', '')))
+        
+        # Extract and combine selected properties in natural language format
+        text_parts = []
+        for prop in properties:
+            value = node_props.get(prop)
+            if value is not None:
+                # Clean property name by removing common prefixes
+                clean_prop = self._clean_property_name(prop)
                 
-                if (i + 1) % 50 == 0:
-                    logger.info(f"Processed {i + 1}/{len(texts)} embeddings")
-                    
-            except EmbeddingError as e:
-                logger.warning(f"Embedding failed for text {i + 1}: {e}")
-                embeddings.append([])  # Maintain list alignment
-                failed += 1
+                # Special handling for titles property (JSON with language keys)
+                if prop == 'titles':
+                    try:
+                        titles_json = json.loads(value)
+                        if isinstance(titles_json, dict):
+                            # Prefer English, fallback to any available language
+                            title_text = titles_json.get('en')
+                            if not title_text and titles_json:
+                                # Use first available language if no English
+                                title_text = next(iter(titles_json.values()))
+                            
+                            if title_text:
+                                text_parts.append(f"{clean_prop}: {title_text}")
+                        # If not a dict or empty, skip titles property
+                    except (json.JSONDecodeError, TypeError):
+                        # Skip titles if JSON parsing fails
+                        pass
+                elif isinstance(value, list):
+                    # Handle list values
+                    list_items = [str(item) for item in value if item]
+                    if list_items:
+                        text_parts.append(f"{clean_prop}: {' '.join(list_items)}")
+                else:
+                    text_parts.append(f"{clean_prop}: {str(value)}")
         
-        if failed > 0:
-            logger.warning(f"Failed to generate {failed}/{len(texts)} embeddings")
-        
-        return embeddings
+        return '. '.join(text_parts).strip()
     
-    def _chunk_text(self, text: str, node_type: str = None) -> List[str]:
-        """Split text into chunks with optional node context"""
-        try:
-            from langchain_text_splitters import RecursiveCharacterTextSplitter
-            splitter = RecursiveCharacterTextSplitter(
-                chunk_size=self.chunk_size,
-                chunk_overlap=self.chunk_overlap,
-                length_function=len,
-                separators=[". ", "\n\n", "\n", " ", ""]  # Property-aware separators
-            )
-            chunks = splitter.split_text(text)
-            
-            # Add node context if provided and not already present
-            if node_type and chunks:
-                context_prefix = f"{node_type} node. "
-                enhanced_chunks = []
-                for chunk in chunks:
-                    if not chunk.strip().startswith(f"{node_type} node"):
-                        enhanced_chunks.append(context_prefix + chunk.strip())
-                    else:
-                        enhanced_chunks.append(chunk)
-                chunks = enhanced_chunks
+    def _clean_property_name(self, prop: str) -> str:
+        """Clean property names by removing common prefixes and formatting"""
+        # Remove common prefixes (order matters - longer prefixes first)
+        prefixes_to_remove = [
+            'ucoexMITRED3FEND_',
+            'ucocweExtended',
+            'ucocwe',
+            'ucoex',
+            'ucobase',  # For ucobaseSeverity
+            'uco',
+            'cpe'
+        ]
+        
+        clean_name = prop
+        for prefix in prefixes_to_remove:
+            if clean_name.lower().startswith(prefix.lower()):
+                clean_name = clean_name[len(prefix):]
+                break
+        
+        # Handle special cases and capitalize
+        if clean_name.upper() in ['DESCRIPTION', 'DOMAIN', 'NAME']:
+            return clean_name.capitalize()
+        elif clean_name in ['summary', 'Summary']:
+            return 'Summary'
+        elif clean_name in ['DEFINITION', 'LABEL']:
+            return clean_name.capitalize()
+        elif clean_name == 'Name':  # for cpeName
+            return 'Name'
+        
+        # Default: capitalize first letter
+        return clean_name.capitalize() if clean_name else prop
+    
+    def _process_all_nodes(self) -> int:
+        """Process all unvectorized nodes with sequential batch embedding by node type"""
+        
+        # Node types ordered by count (largest first)
+        node_types = [
+            'UcoCVE', 'UcoVulnerability', 'UcoexCPE', 'UcoexObservedExample', 
+            'UcoCWE', 'UcoexMITREATTACK', 'UcoexSOFTWARE', 'UcoexCAPEC',
+            'UcoexMITRED3FEND', 'UcoexGROUPS', 'UcoexMITIGATIONS', 
+            'UcoexCAMPAIGNS', 'UcoexTACTICS'
+        ]
+        
+        total_processed = 0
+        
+        with self._neo4j_driver() as driver:
+            with driver.session() as session:
+                # Count already embedded nodes
+                embedded_result = session.run("""
+                    MATCH (n) WHERE n.embedding IS NOT NULL
+                    RETURN count(n) as embedded_count
+                """)
+                embedded_count = embedded_result.single()['embedded_count']
+                logger.info(f"Found {embedded_count:,} nodes already embedded")
                 
-            return chunks
-        except ImportError:
-            # Simple fallback chunking
-            context_prefix = f"{node_type} node. " if node_type else ""
-            if len(text) <= self.chunk_size:
-                if node_type and not text.startswith(f"{node_type} node"):
-                    return [context_prefix + text]
-                return [text]
-            
-            chunks = []
-            for i in range(0, len(text), self.chunk_size - self.chunk_overlap):
-                chunk = text[i:i + self.chunk_size]
-                chunks.append(context_prefix + chunk if node_type else chunk)
-            
-            return chunks
+                # Process each node type sequentially
+                for node_type in node_types:
+                    type_processed = self._process_node_type(session, node_type)
+                    total_processed += type_processed
+        
+        return total_processed
     
-    def _extract_properties_from_chunk(self, chunk_text: str) -> List[str]:
-        """Extract property names from chunk text for metadata"""
-        import re
-        # Find all patterns like "property_name:" in the text
-        property_pattern = r'([a-zA-Z_][a-zA-Z0-9_]*)\s*:'
-        properties = re.findall(property_pattern, chunk_text)
-        return list(set(properties))
-    
-    def _process_single_large_node(self, session, node_id: str, node_type: str, content: str) -> int:
-        """Process a single large node with chunking and embedding"""
-        chunks = self._chunk_text(content, node_type)
-        if not chunks:
+    def _process_node_type(self, session, node_type: str) -> int:
+        """Process all nodes of a specific type"""
+        
+        # Count remaining nodes for this type
+        count_result = session.run("""
+            MATCH (n)
+            WHERE n.embedding IS NULL 
+              AND n.embedding_processed IS NULL
+              AND NOT labels(n)[0] = '_GraphConfig'
+            WITH n, [label IN labels(n) WHERE label <> 'Resource'][0] as nodeType
+            WHERE nodeType = $node_type
+            RETURN count(n) as node_count
+        """, {'node_type': node_type})
+        
+        node_count = count_result.single()['node_count']
+        if node_count == 0:
             return 0
         
-        chunks_created = 0
-        chunk_batch_size = min(self.batch_size // 4, 20)
+        # Start processing this node type
+        estimated_batches = (node_count + self.batch_size - 1) // self.batch_size
+        logger.info(f"Starting {node_type}: {node_count:,} nodes (~{estimated_batches} batches)")
         
-        for i in range(0, len(chunks), chunk_batch_size):
-            chunk_batch = chunks[i:i + chunk_batch_size]
-            embeddings = self._create_batch_embeddings_bulk(chunk_batch)
+        processed_count = 0
+        batch_num = 0
+        
+        while True:
+            # Get batch of nodes for this specific type
+            result = session.run("""
+                MATCH (n)
+                WHERE n.embedding IS NULL 
+                  AND n.embedding_processed IS NULL
+                  AND NOT labels(n)[0] = '_GraphConfig'
+                WITH n, elementId(n) as nodeId, 
+                     [label IN labels(n) WHERE label <> 'Resource'][0] as nodeType
+                WHERE nodeType = $node_type
+                RETURN nodeId, nodeType, properties(n) as props
+                LIMIT $batch_size
+            """, {'node_type': node_type, 'batch_size': self.batch_size})
             
-            # Store chunks with embeddings and property metadata
-            for chunk_idx, (chunk_text, embedding) in enumerate(zip(chunk_batch, embeddings)):
-                if embedding:
-                    # Extract property names for metadata
-                    properties = self._extract_properties_from_chunk(chunk_text)
+            batch_data = [(r['nodeId'], r['nodeType'], r['props']) for r in result]
+            if not batch_data:
+                break
+            
+            batch_num += 1
+            
+            # Extract texts for embedding
+            texts = []
+            valid_nodes = []
+            empty_text_nodes = []
+            
+            for node_id, node_type_result, props in batch_data:
+                text = self._extract_node_text(node_type_result, props)
+                if text:
+                    texts.append(text)
+                    valid_nodes.append((node_id, node_type_result))
+                else:
+                    # Track nodes with no extractable text
+                    empty_text_nodes.append(node_id)
+            
+            if not texts:
+                continue
+            
+            # Check if we need to limit batch size for large text content
+            total_chars = sum(len(text) for text in texts)
+            if total_chars > 500000:  # If total characters exceed 500K, use smaller batch
+                logger.info(f"{node_type} batch {batch_num} is large ({total_chars:,} chars), using reduced batch size")
+                # Process in chunks of 200 for large content
+                embeddings = []
+                chunk_failed = False
+                for i in range(0, len(texts), 200):
+                    chunk_texts = texts[i:i + 200]
+                    chunk_embeddings = self._create_batch_embeddings(chunk_texts)
+                    if len(chunk_embeddings) == len(chunk_texts):
+                        embeddings.extend(chunk_embeddings)
+                        logger.info(f"{node_type} batch {batch_num} chunk {(i//200)+1}: {len(chunk_embeddings)} embeddings")
+                    else:
+                        logger.warning(f"{node_type} batch {batch_num} chunk {(i//200)+1} failed")
+                        chunk_failed = True
+                        break
+                
+                if chunk_failed:
+                    logger.warning(f"{node_type} batch {batch_num} failed due to chunk failure, skipping")
+                    continue
+            else:
+                # Generate embeddings normally
+                embeddings = self._create_batch_embeddings(texts)
+            
+            if len(embeddings) != len(texts):
+                logger.warning(f"{node_type} batch {batch_num} failed, skipping {len(texts)} nodes")
+                continue
+            
+            # Process ALL nodes in this batch (mark as processed with or without embeddings)
+            def process_batch_tx(tx):
+                # Set embeddings for nodes with valid text content
+                if valid_nodes and embeddings:
+                    embedding_updates = []
+                    for (node_id, _), embedding in zip(valid_nodes, embeddings):
+                        if embedding:
+                            embedding_updates.append({'node_id': node_id, 'embedding': embedding})
                     
-                    session.run(f"""
-                        MATCH (original) WHERE elementId(original) = $node_id
-                        CREATE (chunk:{node_type}Chunk:Vectorized {{
-                            text: $chunk_text,
-                            embedding: $embedding,
-                            chunkIndex: $chunk_idx,
-                            properties: $properties
-                        }})
-                        CREATE (original)-[:HAS_CHUNK]->(chunk)
-                    """, {
-                        'node_id': node_id,
-                        'chunk_text': chunk_text,
-                        'embedding': embedding,
-                        'chunk_idx': i + chunk_idx,
-                        'properties': properties
-                    })
-                    chunks_created += 1
+                    if embedding_updates:
+                        tx.run("""
+                            UNWIND $updates as update
+                            MATCH (n) WHERE elementId(n) = update.node_id
+                            SET n.embedding = update.embedding, n.embedding_processed = true
+                        """, {'updates': embedding_updates})
+                
+                # Mark nodes without text content as processed (no embedding property)
+                if empty_text_nodes:
+                    tx.run("""
+                        UNWIND $node_ids as node_id
+                        MATCH (n) WHERE elementId(n) = node_id
+                        SET n.embedding_processed = true, n.no_text_content = true
+                    """, {'node_ids': empty_text_nodes})
+                
+                return len(valid_nodes) + len(empty_text_nodes)
+            
+            if valid_nodes or empty_text_nodes:
+                batch_processed = session.execute_write(process_batch_tx)
+                processed_count += batch_processed
+                
+                # Log progress with breakdown - only show when there are empty nodes
+                embedding_count = len([e for e in embeddings if e]) if embeddings else 0
+                empty_count = len(empty_text_nodes)
+                
+                if empty_count > 0:
+                    logger.info(f"{node_type} batch {batch_num}: processed {batch_processed} nodes ({embedding_count} with embeddings, {empty_count} no content)")
+            
+            total_processed = len(valid_nodes) + len(empty_text_nodes)
+            logger.info(f"{node_type} batch {batch_num}/{estimated_batches}: {total_processed} nodes")
         
-        # Mark the original large node as processed after successful chunking
-        if chunks_created > 0:
-            session.run("""
-                MATCH (original) WHERE elementId(original) = $node_id
-                SET original:Vectorized, original.chunked = true
-            """, {'node_id': node_id})
-        
-        return chunks_created
+        # Completion logging for this node type
+        logger.info(f"Completed {node_type}: {processed_count:,} nodes embedded")
+        return processed_count
     
-    def _classify_content_size(self):
-        """Classify nodes by estimated content size using memory-efficient batch processing"""
-        logger.info("Starting content size classification for unprocessed nodes")
+    def _create_vector_index(self):
+        """Create global vector index for all vectorized nodes"""
+        
+        logger.info("Creating global vector index")
         
         with self._neo4j_driver() as driver:
             with driver.session() as session:
-                try:
-                    total_classified = 0
-                    batch_size = 500  # Optimized batch size for efficient processing
-                    next_milestone = 50000  # Log every 50k nodes for large datasets
-                    
-                    while True:
-                        result = session.run("""
-                            MATCH (n)
-                            WHERE NOT n:Vectorized 
-                              AND NOT labels(n)[0] = '_GraphConfig'
-                              AND n.contentSize IS NULL
-                            WITH n LIMIT $batch_size
-                            WITH n, reduce(totalChars = 0, prop IN keys(n) | 
-                                CASE WHEN NOT (prop IN ['embedding', 'contentSize', 'estimatedTokens'])
-                                     AND n[prop] IS NOT NULL
-                                THEN totalChars + size(
-                                    CASE 
-                                        WHEN valueType(n[prop]) STARTS WITH 'LIST' 
-                                        THEN reduce(listStr = '', item IN n[prop] | listStr + ' ' + toString(item))
-                                        ELSE toString(n[prop]) 
-                                    END
-                                )
-                                ELSE totalChars END
-                            ) as charCount
-                            SET n.contentSize = 
-                                CASE 
-                                    WHEN charCount * 0.75 <= 200 THEN 'small'
-                                    WHEN charCount * 0.75 <= 400 THEN 'medium'
-                                    ELSE 'large'
-                                END
-                            RETURN count(n) as batch_count
-                        """, {'batch_size': batch_size})
-                        
-                        batch_count = result.single()['batch_count']
-                        if batch_count == 0:
-                            break
-                            
-                        total_classified += batch_count
-                        
-                        # Progress logging at defined milestones
-                        if total_classified >= next_milestone:
-                            logger.info(f"Content classification progress: {total_classified:,} nodes processed")
-                            next_milestone += 50000
-                    
-                    logger.info(f"Content classification completed: {total_classified:,} nodes processed")
-                    
-                except Exception as e:
-                    raise EmbeddingError(f"Content classification failed: {e}")
+                
+                # Check if index exists using proper syntax
+                result = session.run("""
+                    SHOW VECTOR INDEXES YIELD name
+                    WHERE name = 'global_embedding_idx'
+                """)
+                
+                if list(result):
+                    logger.info("Vector index already exists")
+                    return
+                
+                # Create vector index for nodes with embeddings
+                session.run("""
+                    CREATE VECTOR INDEX global_embedding_idx IF NOT EXISTS
+                    FOR (n:Resource) ON (n.embedding)
+                    OPTIONS {
+                      indexConfig: {
+                        `vector.dimensions`: 768,
+                        `vector.similarity_function`: 'cosine'
+                      }
+                    }
+                """)
+                
+                logger.info("Vector index created successfully")
     
-    def _process_small_medium_nodes(self) -> Tuple[int, int]:
-        """Process small and medium nodes using memory-efficient streaming"""
-        logger.info("Processing small and medium nodes with improved batch processing")
-        
-        small_count = medium_count = 0
-        batch_size = min(self.batch_size, 150)  # Use configurable batch size with upper limit
-        
-        with self._neo4j_driver() as driver:
-            with driver.session() as session:
-                try:
-                    while True:
-                        # Get batch of nodes with property-aware summaries
-                        result = session.run("""
-                            MATCH (n)
-                            WHERE n.embedding IS NULL 
-                              AND n.contentSize IN ['small', 'medium']
-                            WITH n, elementId(n) as nodeId, n.contentSize as size, labels(n)[0] as nodeType,
-                                 reduce(summary = '', prop IN keys(n) | 
-                                     CASE WHEN NOT (prop IN ['embedding', 'contentSize', 'estimatedTokens'])
-                                          AND n[prop] IS NOT NULL
-                                     THEN summary + ' ' + prop + ': ' + 
-                                         CASE 
-                                             WHEN valueType(n[prop]) STARTS WITH 'LIST' 
-                                             THEN reduce(listStr = '', item IN n[prop] | listStr + ' ' + toString(item))
-                                             ELSE toString(n[prop]) 
-                                         END + '.'
-                                     ELSE summary END
-                                 ) as summary
-                            RETURN nodeId, size, nodeType + ' node. ' + summary as summary
-                            LIMIT $batch_size
-                        """, {'batch_size': batch_size})
-                        
-                        nodes = [(r['nodeId'], r['size'], r['summary']) for r in result]
-                        if not nodes:
-                            break
-                        
-                        # Process batch with embeddings using bulk method
-                        summaries = [node[2] for node in nodes]
-                        embeddings = self._create_batch_embeddings_bulk(summaries)
-                        
-                        # Store results in streaming transaction with real-time tagging
-                        for (node_id, size, _), embedding in zip(nodes, embeddings):
-                            if embedding:
-                                session.run("""
-                                    MATCH (n) WHERE elementId(n) = $node_id
-                                    SET n.embedding = $embedding, n:Vectorized
-                                """, {'node_id': node_id, 'embedding': embedding})
-                                
-                                if size == 'small':
-                                    small_count += 1
-                                else:
-                                    medium_count += 1
-                        
-                        logger.info(f"Processed batch: {len(nodes)} nodes (total: {small_count + medium_count})")
-                    
-                    logger.info(f"Completed processing: {small_count} small, {medium_count} medium nodes")
-                    return small_count, medium_count
-                    
-                except Exception as e:
-                    raise EmbeddingError(f"Small/medium node processing failed: {e}")
-    
-    def _process_large_nodes(self) -> int:
-        """Process large nodes using memory-efficient chunking with streaming"""
-        logger.info("Processing large nodes with improved chunking")
-        
-        chunks_created = 0
-        batch_size = min(self.batch_size // 4, 50)  # Smaller batch for large nodes
-        
-        with self._neo4j_driver() as driver:
-            with driver.session() as session:
-                try:
-                    while True:
-                        # Get small batch of large nodes with property-aware content
-                        result = session.run("""
-                            MATCH (n)
-                            WHERE n.contentSize = 'large' AND NOT n:Vectorized
-                            WITH n, elementId(n) as nodeId, labels(n)[0] as nodeType,
-                                 reduce(content = '', prop IN keys(n) | 
-                                     CASE WHEN NOT (prop IN ['embedding', 'contentSize', 'estimatedTokens'])
-                                          AND n[prop] IS NOT NULL
-                                     THEN content + ' ' + prop + ': ' + 
-                                         CASE 
-                                             WHEN valueType(n[prop]) STARTS WITH 'LIST' 
-                                             THEN reduce(listStr = '', item IN n[prop] | listStr + ' ' + toString(item))
-                                             ELSE toString(n[prop]) 
-                                         END + '.'
-                                     ELSE content END
-                                 ) as content
-                            RETURN nodeId, nodeType, nodeType + ' node. ' + content as content
-                            LIMIT $batch_size
-                        """, {'batch_size': batch_size})
-                        
-                        nodes = [(r['nodeId'], r['nodeType'], r['content']) for r in result]
-                        if not nodes:
-                            break
-                        
-                        # Process each node with chunking and embedding
-                        for node_id, node_type, content in nodes:
-                            node_chunks = self._process_single_large_node(
-                                session, node_id, node_type, content.strip()
-                            )
-                            chunks_created += node_chunks
-                        
-                        logger.info(f"Processed batch: {len(nodes)} large nodes (total chunks: {chunks_created})")
-                    
-                    logger.info(f"Completed processing large nodes: {chunks_created} chunks created")
-                    return chunks_created
-                    
-                except Exception as e:
-                    raise EmbeddingError(f"Large node processing failed: {e}")
-    
-    def _create_global_vector_index(self):
-        """Create unified vector index for all embedding-enabled nodes and chunks"""
-        logger.info("Creating global vector index for unified semantic search")
-        
-        with self._neo4j_driver() as driver:
-            with driver.session() as session:
-                try:
-                    # Check if index already exists
-                    result = session.run("""
-                        SHOW VECTOR INDEXES 
-                        WHERE name = 'global_vec_idx'
-                        RETURN count(*) as exists
-                    """)
-                    
-                    if result.single()['exists'] > 0:
-                        logger.info("Global vector index already exists, skipping creation")
-                        return
-                    
-                    # Create global vector index for vectorized nodes
-                    session.run("""
-                        CREATE VECTOR INDEX global_vec_idx
-                        FOR (n:Vectorized) ON (n.embedding)
-                        OPTIONS {
-                          indexConfig: {
-                            `vector.dimensions`: 768,
-                            `vector.similarity_function`: 'cosine'
-                          }
-                        }
-                    """)
-                    
-                    logger.info("Global vector index created successfully")
-                    
-                except Exception as e:
-                    raise EmbeddingError(f"Vector index creation failed: {e}")
-    
-    def run_complete_pipeline(self):
+    def run_embedding_pipeline(self):
         """Execute complete embedding pipeline"""
+        
         logger.info("Starting UCKG embedding pipeline")
         
         try:
-            # Phase 1: Content size classification
-            self._classify_content_size()
+            # Process all nodes with direct embedding
+            processed_count = self._process_all_nodes()
             
-            # Phase 2: Process small and medium nodes
-            small, medium = self._process_small_medium_nodes()
+            # Create vector index
+            self._create_vector_index()
             
-            # Phase 3: Process large nodes with chunking
-            chunks = self._process_large_nodes()
+            logger.info(f"Embedding pipeline completed: {processed_count:,} nodes processed")
+            return processed_count
             
-            # Phase 4: Create global vector index for all Vectorized nodes
-            self._create_global_vector_index()
-            
-            logger.info("Embedding pipeline completed successfully")
-            logger.info(f"Processing summary: {small:,} small, {medium:,} medium nodes, {chunks:,} chunks")
-            
-        except (ConfigError, ValueError) as e:
-            logger.critical(f"Configuration error: {e}")
-            raise
         except Exception as e:
-            logger.error(f"Pipeline error: {e}")
-            raise EmbeddingError(f"Pipeline execution failed: {e}")
+            logger.error(f"Pipeline failed: {e}")
+            raise EmbeddingError(f"Embedding pipeline failed: {e}")
     
     def close(self):
-        """Clean up database connections and resources"""
+        """Clean up resources"""
         if self._driver:
             self._driver.close()
             self._driver = None
         if self._session:
             self._session.close()
 
-# Docker integration entry point
 def run_embedding_processing():
-    """Main embedding processing function for Docker container integration"""
+    """Main entry point for embedding processing"""
+    
     config = get_config()
     
     if not config['embed_enabled']:
-        logger.info("Embedding processing disabled via EMBED_ENV configuration")
+        logger.info("Embedding processing disabled")
         return
     
-    logger.info("Initializing UCKG embedding processing")
+    logger.info("Initializing UCKG embedding processor")
     
     embedder = UCKGEmbedder()
     try:
-        embedder.run_complete_pipeline()
+        embedder.run_embedding_pipeline()
     except KeyboardInterrupt:
-        logger.info("Embedding processing interrupted by user")
+        logger.info("Processing interrupted")
     except Exception as e:
-        logger.error(f"Embedding processing failed: {e}")
-        # Continue system operation without embeddings
+        logger.error(f"Processing failed: {e}")
     finally:
         embedder.close()
 
-# Docker health check function
 def health_check() -> bool:
-    """System health check for Docker container monitoring"""
+    """System health check"""
     try:
         config = get_config()
         
-        # Verify Neo4j connectivity
+        # Test Neo4j connection
         driver = GraphDatabase.driver(
             config['neo4j_uri'],
             auth=(config['neo4j_user'], config['neo4j_password'])
@@ -534,7 +453,7 @@ def health_check() -> bool:
             session.run("RETURN 1").single()
         driver.close()
         
-        # Verify Ollama API connectivity
+        # Test Ollama API
         response = requests.get(f"{config['ollama_url']}/api/tags", timeout=5)
         response.raise_for_status()
         
