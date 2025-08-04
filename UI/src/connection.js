@@ -72,3 +72,28 @@ export const executeQuery = async (query) => {
       if (driver) await driver.close();
    }
 };
+
+// New function specifically for count queries
+export const executeCountQuery = async (query) => {
+   let driver;
+   try {
+      // Connect to neo4j database
+      driver = neo4j.driver(URI, neo4j.auth.basic(USER, PASSWORD));
+      const result = await driver.executeQuery(query);
+      
+      // Extract the count value from the result
+      if (result.records && result.records.length > 0) {
+         const record = result.records[0];
+         const count = record.get('count');
+         return count.toNumber ? count.toNumber() : count;
+      }
+      
+      return 0;
+   } catch (err) {
+      console.log(`Count query error\n${err}\nCause: ${err.cause}`);
+      return 0;
+   } finally {
+      // End the connection
+      if (driver) await driver.close();
+   }
+};

@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { InteractiveNvlWrapper } from '@neo4j-nvl/react';
-import { executeQuery } from './connection';
+import { executeQuery, executeCountQuery } from './connection';
 
 // Merges arrays of nodes/relationships by ID, avoiding duplicates.
 function mergeElements(oldArr, newArr, key = 'id') {
@@ -25,12 +25,12 @@ function filterValidRelationships(nodes, relationships) {
 
 // Core label configurations
 const coreLabels = [
-  { name: 'UcoCWE', query: 'MATCH (n:UcoCWE) RETURN n LIMIT 5', description: 'Common Weakness Enumeration' },
-  { name: 'UcoCVE', query: 'MATCH (n:UcoCVE) RETURN n LIMIT 5', description: 'Common Vulnerabilities and Exposures' },
-  { name: 'UcoexCPE', query: 'MATCH (n:UcoexCPE) RETURN n LIMIT 5', description: 'Common Platform Enumeration' },
-  { name: 'UcoexCAPEC', query: 'MATCH (n:UcoexCAPEC) RETURN n LIMIT 5', description: 'Common Attack Pattern Enumeration' },
-  { name: 'UcoexMITREATTACK', query: 'MATCH (n:UcoexMITREATTACK) RETURN n LIMIT 5', description: 'MITRE ATT&CK' },
-  { name: 'UcoexMITRED3FEND', query: 'MATCH (n:UcoexMITRED3FEND) RETURN n LIMIT 5', description: 'D3FEND' }
+  { name: 'UcoCWE', query: 'MATCH (n:UcoCWE) RETURN n LIMIT 5', countQuery: 'MATCH (n:UcoCWE) RETURN count(n) as count', description: 'Common Weakness Enumeration' },
+  { name: 'UcoCVE', query: 'MATCH (n:UcoCVE) RETURN n LIMIT 5', countQuery: 'MATCH (n:UcoCVE) RETURN count(n) as count', description: 'Common Vulnerabilities and Exposures' },
+  { name: 'UcoexCPE', query: 'MATCH (n:UcoexCPE) RETURN n LIMIT 5', countQuery: 'MATCH (n:UcoexCPE) RETURN count(n) as count', description: 'Common Platform Enumeration' },
+  { name: 'UcoexCAPEC', query: 'MATCH (n:UcoexCAPEC) RETURN n LIMIT 5', countQuery: 'MATCH (n:UcoexCAPEC) RETURN count(n) as count', description: 'Common Attack Pattern Enumeration and Classification' },
+  { name: 'UcoexMITREATTACK', query: 'MATCH (n:UcoexMITREATTACK) RETURN n LIMIT 5', countQuery: 'MATCH (n:UcoexMITREATTACK) RETURN count(n) as count', description: 'MITRE ATT&CK' },
+  { name: 'UcoexMITRED3FEND', query: 'MATCH (n:UcoexMITRED3FEND) RETURN n LIMIT 5', countQuery: 'MATCH (n:UcoexMITRED3FEND) RETURN count(n) as count', description: 'D3FEND' }
 ];
 
 export default function Nvl() {
@@ -42,10 +42,11 @@ export default function Nvl() {
   const [leftPanelOpen, setLeftPanelOpen] = useState(true);
   const [expandedNodes, setExpandedNodes] = useState(new Set()); // Track expanded nodes
   const [previousStates, setPreviousStates] = useState(new Map()); // Store previous states for each node
+  const [labelCounts, setLabelCounts] = useState({});
   const chatContainerRef = useRef();
   const wrapperRef = useRef();
 
-  // Only fetch initial data once on mount
+  // Fetch initial data and label counts
   useEffect(() => {
     let cancelled = false;
     const fetchData = async () => {
@@ -55,7 +56,25 @@ export default function Nvl() {
         setRels(filterValidRelationships(nodes, relationships));
       }
     };
+    
+    const fetchLabelCounts = async () => {
+      const counts = {};
+      for (const label of coreLabels) {
+        try {
+          const count = await executeCountQuery(label.countQuery);
+          counts[label.name] = count;
+        } catch (error) {
+          console.error(`Error fetching count for ${label.name}:`, error);
+          counts[label.name] = 0;
+        }
+      }
+      if (!cancelled) {
+        setLabelCounts(counts);
+      }
+    };
+    
     fetchData();
+    fetchLabelCounts();
     return () => { cancelled = true; };
   }, []); // empty dependency array: only run once on mount
 
@@ -70,10 +89,24 @@ export default function Nvl() {
   const handleLabelClick = async (labelConfig) => {
     const query = labelConfig.query;
     setCypher(query);
+    
+    // Generate a unique key for this query
+    const queryKey = `search_${Date.now()}_${query.trim()}`;
+    
     const { nodes, relationships } = await executeQuery(query);
     setNodes(nodes);
     setRels(filterValidRelationships(nodes, relationships));
-    setChatHistory(prev => [...prev, { type: 'user', text: query }]);
+    
+    // Store the result in session storage
+    const searchResult = {
+      query: query,
+      nodes: nodes,
+      relationships: relationships,
+      timestamp: Date.now()
+    };
+    sessionStorage.setItem(queryKey, JSON.stringify(searchResult));
+    
+    setChatHistory(prev => [...prev, { type: 'user', text: query, queryKey }]);
   };
 
   const mouseEventCallbacks = {
@@ -161,21 +194,54 @@ export default function Nvl() {
   // Runs the current Cypher query and updates the graph/chat history.
   const handleSearch = async () => {
     if (!cypher.trim()) return;
+    
+    // Generate a unique key for this query
+    const queryKey = `search_${Date.now()}_${cypher.trim()}`;
+    
     const { nodes, relationships } = await executeQuery(cypher);
     setNodes(nodes);
     setRels(filterValidRelationships(nodes, relationships));
-    setChatHistory(prev => [...prev, { type: 'user', text: cypher }]);
+    
+    // Store the result in session storage
+    const searchResult = {
+      query: cypher,
+      nodes: nodes,
+      relationships: relationships,
+      timestamp: Date.now()
+    };
+    sessionStorage.setItem(queryKey, JSON.stringify(searchResult));
+    
+    setChatHistory(prev => [...prev, { type: 'user', text: cypher, queryKey }]);
     setChatHistory(prev => [...prev, { type: 'answer', text: 'answer' }]);
   };
 
   // Handle clicking on chat history (user message click)
-  const handleHistorySearch = async (query) => {
+  const handleHistorySearch = async (query, queryKey) => {
     setCypher(query);
-    const { nodes, relationships } = await executeQuery(query);
-    setNodes(nodes);
-    setRels(filterValidRelationships(nodes, relationships));
-    setChatHistory(prev => [...prev, { type: 'user', text: query }]);
-    setChatHistory(prev => [...prev, { type: 'answer', text: 'answer' }]);
+    
+    // Try to retrieve from session storage first
+    if (queryKey && sessionStorage.getItem(queryKey)) {
+      try {
+        const storedResult = JSON.parse(sessionStorage.getItem(queryKey));
+        setNodes(storedResult.nodes);
+        setRels(filterValidRelationships(storedResult.nodes, storedResult.relationships));
+        console.log('Retrieved result from session storage');
+      } catch (error) {
+        console.error('Error parsing stored result:', error);
+        // Fallback to fresh query if parsing fails
+        const { nodes, relationships } = await executeQuery(query);
+        setNodes(nodes);
+        setRels(filterValidRelationships(nodes, relationships));
+      }
+    } else {
+      // No stored result, fetch fresh data
+      const { nodes, relationships } = await executeQuery(query);
+      setNodes(nodes);
+      setRels(filterValidRelationships(nodes, relationships));
+    }
+    
+    // setChatHistory(prev => [...prev, { type: 'user', text: query, queryKey }]);
+    // setChatHistory(prev => [...prev, { type: 'answer', text: 'answer' }]);
   };
 
   return (
@@ -199,7 +265,7 @@ export default function Nvl() {
               onClick={() => handleLabelClick(label)}
               title={label.description}
             >
-              <span className="label-name">{label.name}</span>
+              <span className="label-name">{label.name} ({labelCounts[label.name] || 0})</span>
               <span className="label-desc">{label.description}</span>
             </button>
           ))}
@@ -243,7 +309,7 @@ export default function Nvl() {
               <li
                 key={i}
                 className={msg.type === 'user' ? 'Chat-list-user' : 'Chat-list-answer'}
-                onClick={msg.type === 'user' ? () => handleHistorySearch(msg.text) : undefined}
+                onClick={msg.type === 'user' ? () => handleHistorySearch(msg.text, msg.queryKey) : undefined}
               >
                 {msg.text}
               </li>
