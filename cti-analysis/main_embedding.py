@@ -37,7 +37,6 @@ def store_in_neo4j(chunk_data, uri="bolt://localhost:7687", user="neo4j", passwo
                         subj = triple['subject']
                         obj = triple['object']
 
-                        # Null checks for subject and object
                         if subj is None or obj is None:
                             print("Skipping triple due to null subject or object.")
                             continue
@@ -47,7 +46,6 @@ def store_in_neo4j(chunk_data, uri="bolt://localhost:7687", user="neo4j", passwo
                         obj_name = obj['name'] if isinstance(obj, dict) and 'name' in obj else obj
                         obj_type = obj.get('type', '') if isinstance(obj, dict) else ''
 
-                        # Additional null/empty checks for names
                         if not subj_name or not obj_name:
                             print("Skipping triple due to empty subject or object name.")
                             continue
@@ -65,7 +63,7 @@ def store_in_neo4j(chunk_data, uri="bolt://localhost:7687", user="neo4j", passwo
                 subj = triples['subject']
                 obj = triples['object']
 
-                # Null checks for subject and object
+
                 if subj is None or obj is None:
                     print("Skipping triple due to null subject or object.")
                     continue
@@ -75,7 +73,6 @@ def store_in_neo4j(chunk_data, uri="bolt://localhost:7687", user="neo4j", passwo
                 obj_name = obj['name'] if isinstance(obj, dict) and 'name' in obj else obj
                 obj_type = obj.get('type', '') if isinstance(obj, dict) else ''
 
-                # Additional null/empty checks for names
                 if not subj_name or not obj_name:
                     print("Skipping triple due to empty subject or object name.")
                     continue
@@ -112,11 +109,10 @@ if __name__ == "__main__":
     store_in_neo4j(chunk_data)
     print("Triples stored in Neo4j.\n")
 
-    # --- Embedding steps: only nodes (subject/object), not relationships ---
+
     node_texts = []
     node_refs = []
 
-    # Collect unique nodes with their type and all contexts
     node_dict = {}
     for t in chunk_data:
         triples = t.get('triple', [])
@@ -157,7 +153,7 @@ if __name__ == "__main__":
                     node_dict[key].add(context)
 
     for (name, ntype), contexts in node_dict.items():
-        # Combine all contexts for this node
+
         context_str = " | ".join(sorted(contexts))
         text = f"type: {ntype}\nname: {name}\ncontext: {context_str}"
         node_texts.append(text)
@@ -172,6 +168,24 @@ if __name__ == "__main__":
         embedding = embedder.embed([text])[0]
         embeddings.append(embedding)
     print("All node embeddings generated.\n")
+
+    driver = GraphDatabase.driver("bolt://localhost:7687", auth=("neo4j", "abcd90909090"))
+    with driver.session() as session:
+        for idx, node in enumerate(node_refs):
+            name = node['name']
+            ntype = node['type']
+            embedding = embeddings[idx]
+            print(f"Storing embedding for node: name='{name}', type='{ntype}'")
+            session.run(
+                """
+                MATCH (n:Entity {name: $name, type: $ntype})
+                SET n.embedding = $embedding, n:Vectorized
+                """,
+                name=name,
+                ntype=ntype,
+                embedding=embedding
+            )
+    driver.close()
 
     embedding_results = []
     for idx, node in enumerate(node_refs):
