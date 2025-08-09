@@ -4,7 +4,9 @@ import subprocess
 from docling.document_converter import DocumentConverter
 from collections import defaultdict
 from langchain_community.llms import Ollama
-import spacy    
+import spacy   
+import re
+
 try:
     nlp = spacy.load("en_core_web_sm")
 except OSError:
@@ -73,39 +75,39 @@ class CyberTripleExtractor:
         self.pages_parsed = 0
         self.runtime_seconds = 0
 
-    def generate_prompt(self, text):
+    def generate_prompt(self, text,):
         entity_types = ", ".join(self.malont_classes)
         predicates = ", ".join(self.malont_predicates)
         return f"""
-You are a cybersecurity analyst.
+You are a cybersecurity analyst extracting structured intelligence.
 
-From the text below, extract structured cybersecurity-relevant knowledge as subject–predicate–object triples.
+TASK:
+From the sentence below, extract at most 5 subject–predicate–object triples.
 
-Each triple must meet these criteria:
-- The subject and object must be specific cybersecurity entities.
-- You must assign a **type** (entity class) to each subject and object from this list: [{entity_types}]
-- The predicate must be one of the following: [{predicates}]
-- Do not infer unstated relationships; extract only what's clearly expressed.
-- Do not include vague or generic triples.
-- Each name must be a string. Each type must match one of the types listed above exactly.
+RULES:
+1. Subject.type and Object.type MUST be in: [{entity_types}]
+2. Predicate MUST be in: [{predicates}]
+3. Use ONLY explicit relationships stated in the text (no guesses).
+4. Return "NO_TRIPLES" if no valid relationships exist.
+5. All names must be strings exactly as they appear in the sentence (no paraphrasing).
+6. Each triple must include a direct quote from the sentence that supports it.
 
-Format your output as a JSON array:
+OUTPUT FORMAT (JSON array only, no text outside the array):
 [
   {{
-    "subject": {{ "name": "...", "type": "..." }},
-    "predicate": "...",
-    "object": {{ "name": "...", "type": "..." }}
+    "subject": {{"name": "<string>", "type": "<type-from-list>"}},
+    "predicate": "<predicate-from-list>",
+    "object": {{"name": "<string>", "type": "<type-from-list>"}},
+    "evidence": {{
+      "quote": "<exact substring from sentence>",
+    }}
   }}
 ]
 
-If no valid triples are found, return:
-"No related entities and relations."
-
-Do not add any explanation. Just return valid JSON.
-
-Analyze this text:
+Sentence:
 \"\"\"{text}\"\"\"
 """
+
 
     def is_relevant_with_ner(self, sentence):
         doc = nlp(sentence)
@@ -206,11 +208,18 @@ Analyze this text:
                 }
             })
         return self.chunk_data
-
+    
+    def safe_filename(self, name: str) -> str:
+   
+        return re.sub(r'[<>:"/\\|?*]', '_', name)
+     
     def save_to_json(self, output_filename="chunk_data.json"):
         try:
             input_dir = os.path.dirname(self.file_path)
             output_dir = os.path.join(input_dir, "extracted_triples")
+            os.makedirs(output_dir, exist_ok=True)
+
+            output_filename = self.safe_filename(output_filename)
             output_path = os.path.join(output_dir, output_filename)
 
             metrics = {
@@ -227,10 +236,7 @@ Analyze this text:
                 "runtime_seconds": self.runtime_seconds,
             }
 
-            metadata = {
-                "metrics": metrics,
-                "data": self.chunk_data
-            }
+            metadata = {"metrics": metrics, "data": self.chunk_data}
 
             with open(output_path, "w", encoding="utf-8") as f:
                 json.dump(metadata, f, indent=2, ensure_ascii=False)
@@ -251,6 +257,10 @@ Analyze this text:
             subject_type in self.malont_classes and
             object_type in self.malont_classes
         )
+    
+    
+
+
 
 if __name__ == "__main__":
     models = [
@@ -266,4 +276,5 @@ if __name__ == "__main__":
         extractor = CyberTripleExtractor("cti-analysis/AnalysisOfCyberattackOnUS.pdf", model)
         raw_chunk_results = extractor.run()
         extractor.build_dict(raw_chunk_results)
-        extractor.save_to_json(f"chunk_data_{model}.json")
+        out_name = extractor.safe_filename(f"chunk_data_{model}.json")
+        extractor.save_to_json(out_name)
