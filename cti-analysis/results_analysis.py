@@ -3,11 +3,13 @@ import os
 import matplotlib.pyplot as plt
 from tabulate import tabulate
 
+dir = "cti-analysis/extracted_triples"
+
 # Step 1: Collect metrics from all chunk_data_*.json files
 metrics = []
-for filename in os.listdir():
+for filename in os.listdir(dir):
     if filename.startswith("chunk_data_") and filename.endswith(".json"):
-        with open(filename, "r", encoding="utf-8") as f:
+        with open(os.path.join(dir, filename), "r", encoding="utf-8") as f:
             content = json.load(f)
             if "metrics" in content:
                 metrics.append(content["metrics"])

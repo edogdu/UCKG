@@ -407,8 +407,8 @@ def write_xlsx(out_path, matches_rows, unmatched_rows):
 
 # -------- Main (auto-run from extracted_triples) --------
 if __name__ == "__main__":
-    current_dir = os.path.abspath(os.getcwd())
-    gold_file = os.path.join(os.path.dirname(current_dir), "MICROSOFT.json")
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    gold_file = os.path.join(current_dir, "MICROSOFT.json")
     pred_files = sorted(glob.glob(os.path.join(current_dir, "chunk_data_*.json")))
     out_dir = os.path.join(current_dir, "matched_csv")  # folder for the Excel files
 

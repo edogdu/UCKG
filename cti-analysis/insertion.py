@@ -3,6 +3,7 @@ import requests
 from typing import List, Any
 import json
 import numpy as np
+import hashlib
 
 class OllamaEmbedder:
     def __init__(self, model: str = "nomic-embed-text", ollama_url: str = "http://localhost:11434/api/embeddings"):
@@ -21,6 +22,15 @@ class OllamaEmbedder:
             data = response.json()
             embeddings.append(data["embedding"])
         return embeddings
+
+def make_det_id(name: str, ntype: str) -> str:
+    """
+    Build a deterministic ID from node type and name. We normalize by
+    trimming and lowercasing, then SHA-256 hash the concatenation.
+    This ensures a stable, compact identifier and avoids pathologically long IDs.
+    """
+    key = f"{(ntype or '').strip().lower()}|{(name or '').strip().lower()}"
+    return hashlib.sha256(key.encode("utf-8")).hexdigest()
 
 def store_in_neo4j(chunk_data, uri="bolt://localhost:7687", user="neo4j", password="abcd90909090"):
     driver = GraphDatabase.driver(uri, auth=(user, password))
@@ -50,11 +60,17 @@ def store_in_neo4j(chunk_data, uri="bolt://localhost:7687", user="neo4j", passwo
                             print("Skipping triple due to empty subject or object name.")
                             continue
 
-                        print(f"Adding subject node: name='{subj_name}', type='{subj_type}', context='{context}'")
-                        print(f"Adding object node: name='{obj_name}', type='{obj_type}', context='{context}'")
+                        print(f"Adding subject node: name='{subj_name}', class='{subj_type}', context='{context}'")
+                        print(f"Adding object node: name='{obj_name}', class='{obj_type}', context='{context}'")
                         print(f"Adding relationship: {subj_name} -[{triple['predicate']}]-> {obj_name}")
-                        session.write_transaction(
-                            create_triple, subj_name, subj_type, triple['predicate'], obj_name, obj_type, context
+                        subj_id = make_det_id(subj_name, subj_type)
+                        obj_id = make_det_id(obj_name, obj_type)
+                        session.execute_write(
+                            create_triple,
+                            subj_id, subj_name, subj_type,
+                            triple['predicate'],
+                            obj_id, obj_name, obj_type,
+                            context,
                         )
             elif (
                 isinstance(triples, dict) and
@@ -80,23 +96,50 @@ def store_in_neo4j(chunk_data, uri="bolt://localhost:7687", user="neo4j", passwo
                 print(f"Adding subject node: name='{subj_name}', type='{subj_type}', context='{context}'")
                 print(f"Adding object node: name='{obj_name}', type='{obj_type}', context='{context}'")
                 print(f"Adding relationship: {subj_name} -[{triples['predicate']}]-> {obj_name}")
-                session.write_transaction(
-                    create_triple, subj_name, subj_type, triples['predicate'], obj_name, obj_type, context
+                subj_id = make_det_id(subj_name, subj_type)
+                obj_id = make_det_id(obj_name, obj_type)
+                session.execute_write(
+                    create_triple,
+                    subj_id, subj_name, subj_type,
+                    triples['predicate'],
+                    obj_id, obj_name, obj_type,
+                    context,
                 )
     driver.close()
 
-def create_triple(tx, subject, sub_type, predicate, object_, obj_type, context):
+def create_triple(tx, subject_id, subject, sub_type, predicate, object_id, object_, obj_type, context):
     tx.run(
         """
-        MERGE (s:Entity {type: $sub_type, name: $subject})
-        ON CREATE SET s.context = $context
-        ON MATCH SET s.context = coalesce(s.context, $context)
-        MERGE (o:Entity {type: $obj_type, name: $object})
-        ON CREATE SET o.context = $context
-        ON MATCH SET o.context = coalesce(o.context, $context)
+        MERGE (s:CTIEntity {id: $subject_id})
+        ON CREATE SET s.name = $subject,
+                      s.type = $sub_type,
+                      s.contexts = [$context]
+        ON MATCH  SET s.type = coalesce(s.type, $sub_type),
+                      s.name = coalesce(s.name, $subject),
+                      s.contexts = CASE
+                          WHEN s.contexts IS NULL THEN [$context]
+                          ELSE s.contexts + CASE WHEN $context IN s.contexts THEN [] ELSE [$context] END
+                      END
+        MERGE (o:CTIEntity {id: $object_id})
+        ON CREATE SET o.name = $object,
+                      o.type = $obj_type,
+                      o.contexts = [$context]
+        ON MATCH  SET o.type = coalesce(o.type, $obj_type),
+                      o.name = coalesce(o.name, $object),
+                      o.contexts = CASE
+                          WHEN o.contexts IS NULL THEN [$context]
+                          ELSE o.contexts + CASE WHEN $context IN o.contexts THEN [] ELSE [$context] END
+                      END
         MERGE (s)-[r:RELATION {type: $predicate}]->(o)
         """,
-        subject=subject, sub_type=sub_type, predicate=predicate, object=object_, obj_type=obj_type, context=context
+        subject_id=subject_id,
+        subject=subject,
+        sub_type=sub_type,
+        predicate=predicate,
+        object_id=object_id,
+        object=object_,
+        obj_type=obj_type,
+        context=context,
     )
 
 if __name__ == "__main__":
@@ -152,12 +195,27 @@ if __name__ == "__main__":
                 if context:
                     node_dict[key].add(context)
 
+    # Persist aggregated contexts arrays to Neo4j (ensures all sentences are captured)
+    driver = GraphDatabase.driver("bolt://localhost:7687", auth=("neo4j", "abcd90909090"))
+    with driver.session() as session:
+        for (name, ntype), contexts in node_dict.items():
+            nid = make_det_id(name, ntype)
+            session.run(
+                """
+                MATCH (n:CTIEntity {id:$id})
+                SET n.contexts = coalesce(n.contexts, []) + [x IN $contexts WHERE NOT x IN coalesce(n.contexts, [])]
+                """,
+                id=nid,
+                contexts=sorted(contexts),
+            )
+    driver.close()
+
     for (name, ntype), contexts in node_dict.items():
 
-        context_str = " | ".join(sorted(contexts))
-        text = f"type: {ntype}\nname: {name}\ncontext: {context_str}"
+        context_text = "\n".join(sorted(contexts))
+        text = f"name: {name}\ntype: {ntype}\ncontexts:\n{context_text}".strip()
         node_texts.append(text)
-        node_refs.append({'name': name, 'type': ntype, 'contexts': context_str})
+        node_refs.append({'name': name, 'type': ntype, 'contexts': context_text})
 
     print(f"Preparing to embed {len(node_texts)} unique nodes...")
 
@@ -175,15 +233,15 @@ if __name__ == "__main__":
             name = node['name']
             ntype = node['type']
             embedding = embeddings[idx]
+            nid = make_det_id(name, ntype)
             print(f"Storing embedding for node: name='{name}', type='{ntype}'")
             session.run(
                 """
-                MATCH (n:Entity {name: $name, type: $ntype})
+                MATCH (n:CTIEntity {id: $id})
                 SET n.embedding = $embedding, n:Vectorized
                 """,
-                name=name,
-                ntype=ntype,
-                embedding=embedding
+                id=nid,
+                embedding=embedding,
             )
     driver.close()
 

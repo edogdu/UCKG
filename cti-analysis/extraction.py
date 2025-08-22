@@ -1,5 +1,6 @@
 import json
 import os
+import requests
 import subprocess
 from docling.document_converter import DocumentConverter
 from collections import defaultdict
@@ -19,23 +20,34 @@ if "sentencizer" not in nlp.pipe_names:
     nlp.add_pipe("sentencizer")
 matcher = PhraseMatcher(nlp.vocab, attr = "LOWER")
 
-def ensure_ollama_model(model_name="mistral"):
+def ensure_ollama_model(model_name="mistral", base_url="http://localhost:11434"):
     try:
-        result = subprocess.run(["ollama", "list"], capture_output=True, text=True, check=True)
-        if model_name not in result.stdout:
+        # Check if the model is available
+        resp = requests.get(f"{base_url}/api/tags")
+        resp.raise_for_status()
+        models = [m["name"] for m in resp.json().get("models", [])]
+
+        if model_name not in models:
             print(f"Model '{model_name}' not found. Downloading...")
-            subprocess.run(["ollama", "pull", model_name], check=True)
+            pull_resp = requests.post(f"{base_url}/api/pull", json={"name": model_name})
+            pull_resp.raise_for_status()
             print(f"Model '{model_name}' downloaded.")
         else:
             print(f"Model '{model_name}' already available.")
-    except subprocess.CalledProcessError as e:
+    except Exception as e:
         print("Error checking or downloading model:", e)
 
 class CyberTripleExtractor:
     def __init__(self, file_path, model_name="mistral"):
         self.file_path = file_path
         self.converter = DocumentConverter()
-        self.llm = Ollama(model=model_name)
+        self.llm = Ollama(
+            model=model_name,
+            base_url="http://localhost:11434",
+            num_ctx=2048,
+            format="json",
+            stop=["</think>", "<think>"]
+        )
         self.model_name = model_name
         self.suspicious_triples = 0
         self.malont_classes = [
@@ -170,6 +182,20 @@ Sentence:
                     print("Raw LLM response:")
                     print(response)
                     triples = json.loads(response)
+                    # Normalize to a list of triples
+                    if isinstance(triples, dict):
+                        triples = [triples]
+                    elif isinstance(triples, str):
+                        # Treat string outputs like "NO_TRIPLES" as no results
+                        triples_upper = triples.strip().upper()
+                        if triples_upper in {"NO_TRIPLES", "NO RELATED ENTITIES AND RELATIONS.", "NONE"}:
+                            triples = []
+                        else:
+                            # Unexpected string payload; ignore safely
+                            triples = []
+                    elif not isinstance(triples, list):
+                        # Any other JSON type -> ignore
+                        triples = []
                     self.raw_triples += len(triples)
                     chunk_results.append((sentence, page_no, i, triples))
                     for t in triples:
@@ -196,11 +222,16 @@ Sentence:
         return chunk_results
 
     def build_dict(self, chunk_results):
+        """Build chunk_data using only valid triples (suspicious ones are excluded)."""
         self.chunk_data = []
         for sentence, page_no, i, triples in chunk_results:
+            # Filter to valid triples only
+            valid_only = [t for t in triples if self._is_valid_triple(t)]
+            if not valid_only:
+                continue  # skip sentences with no valid triples
             self.chunk_data.append({
                 "context": sentence,
-                "triple": triples,
+                "triple": valid_only,
                 "metadata": {
                     "page_number": page_no,
                     "id": str(i).zfill(3),
@@ -257,19 +288,15 @@ Sentence:
             subject_type in self.malont_classes and
             object_type in self.malont_classes
         )
-    
-    
-
-
 
 if __name__ == "__main__":
     models = [
-        "openhermes",
-        "mistral:7b",
-        "zephyr:7b",
-        "qwen3:4b",
-        "phi-3:3.8b",
-        "gemma2:9b"
+        # "openhermes",
+        # "mistral:7b",
+        # "zephyr:7b",
+        # "qwen3:4b",
+        "phi3:3.8b",
+        # "gemma2:9b"
     ]
     for model in models:
         ensure_ollama_model(model)
