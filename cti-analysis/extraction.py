@@ -38,17 +38,20 @@ def ensure_ollama_model(model_name="mistral", base_url="http://localhost:11434")
         print("Error checking or downloading model:", e)
 
 class CyberTripleExtractor:
-    def __init__(self, file_path, model_name="mistral"):
+    def __init__(self, file_path, model_name="mistral", ollama_base_url="http://localhost:11434"):
         self.file_path = file_path
+        self.ollama_base_url = ollama_base_url
         self.converter = DocumentConverter()
+        self.model_name = model_name
+        # Ensure the Ollama model is present before constructing the client
+        ensure_ollama_model(model_name=self.model_name, base_url=self.ollama_base_url)
         self.llm = Ollama(
             model=model_name,
-            base_url="http://localhost:11434",
+            base_url=self.ollama_base_url,
             num_ctx=2048,
             format="json",
             stop=["</think>", "<think>"]
         )
-        self.model_name = model_name
         self.suspicious_triples = 0
         self.malont_classes = [
             'Staging', 'Adware', 'CommandAndControl', 'Spyware', 'DDoS', 'DomainName', 'Dropper', 'Port', 'MD5',
@@ -294,13 +297,12 @@ if __name__ == "__main__":
         # "openhermes",
         # "mistral:7b",
         # "zephyr:7b",
-        # "qwen3:4b",
-        "phi3:3.8b",
+        "qwen3:4b",
+        # "phi3:3.8b",
         # "gemma2:9b"
     ]
     for model in models:
-        ensure_ollama_model(model)
-        extractor = CyberTripleExtractor("cti-analysis/AnalysisOfCyberattackOnUS.pdf", model)
+        extractor = CyberTripleExtractor("cti-analysis/AnalysisOfCyberattackOnUS.pdf", model, "http://localhost:11434")
         raw_chunk_results = extractor.run()
         extractor.build_dict(raw_chunk_results)
         out_name = extractor.safe_filename(f"chunk_data_{model}.json")
