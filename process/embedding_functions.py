@@ -53,6 +53,8 @@ class UCKGEmbedder:
     
     def __init__(self):
         self.config = get_config()
+        
+        ensure_ollama_model(self.config['embedding_model'], self.config['ollama_url'])
         self._driver = None
         self._session = requests.Session()
         self._session.headers.update({'Content-Type': 'application/json'})
@@ -84,6 +86,8 @@ class UCKGEmbedder:
             return []
         
         try:
+            
+            
             response = self._session.post(
                 f"{self.config['ollama_url']}/api/embed",
                 json={"model": self.config['embedding_model'], "input": texts},
@@ -193,6 +197,8 @@ class UCKGEmbedder:
         
         # Default: capitalize first letter
         return clean_name.capitalize() if clean_name else prop
+    
+
     
     def _process_all_nodes(self) -> int:
         """Process all unvectorized nodes with sequential batch embedding by node type"""
@@ -417,6 +423,23 @@ class UCKGEmbedder:
             self._driver = None
         if self._session:
             self._session.close()
+
+def ensure_ollama_model(model_name="nomic-embed-text", base_url="http://localhost:11434"):
+    try:
+        # Check if the model is available
+        resp = requests.get(f"{base_url}/api/tags")
+        resp.raise_for_status()
+        models = [m["name"] for m in resp.json().get("models", [])]
+
+        if model_name not in models:
+            logger.info(f"Model '{model_name}' not found. Downloading...")
+            pull_resp = requests.post(f"{base_url}/api/pull", json={"name": model_name})
+            pull_resp.raise_for_status()
+            logger.info(f"Model '{model_name}' downloaded.")
+        else:
+            logger.info(f"Model '{model_name}' already available.")
+    except Exception as e:
+        logger.info("Error checking or downloading model:", e)
 
 def run_embedding_processing():
     """Main entry point for embedding processing"""
