@@ -14,13 +14,6 @@ until /usr/bin/ollama list >/dev/null 2>&1; do\n\
     sleep 2\n\
 done\n\
 echo "Ollama server is ready"\n\
-if ! /usr/bin/ollama list | grep -q "nomic-embed-text"; then\n\
-    echo "Downloading nomic-embed-text model..."\n\
-    /usr/bin/ollama pull nomic-embed-text\n\
-    echo "Model download completed"\n\
-else\n\
-    echo "Model nomic-embed-text already exists"\n\
-fi\n\
 echo "Ollama ready for connections"\n\
 wait "$pid"' > /usr/local/bin/start-ollama.sh && \
     chmod +x /usr/local/bin/start-ollama.sh
