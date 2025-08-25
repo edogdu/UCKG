@@ -69,6 +69,17 @@ def _save_progress(obj: dict, path: Path) -> None:
 import subprocess
 import os
 
+def clear_cti_entities(neo4j_uri: str, neo4j_user: str, neo4j_pass: str) -> None:
+    # Deletes all CTIEntity nodes and any attached relationships
+    from neo4j import GraphDatabase
+    driver = GraphDatabase.driver(neo4j_uri, auth=(neo4j_user, neo4j_pass))
+    try:
+        with driver.session() as session:
+            session.run("MATCH (n:CTIEntity) DETACH DELETE n")
+    finally:
+        driver.close()
+    log("[DB] Cleared :CTIEntity nodes")
+
 def ensure_repo(repo_url: str, dest: Path) -> None:
     dest_parent = dest.parent
     dest_parent.mkdir(parents=True, exist_ok=True)
@@ -135,6 +146,9 @@ def stage_insertion(chunk_json: Path, neo4j_uri: str, neo4j_user: str, neo4j_pas
     insertion.store_in_neo4j(chunk_data, uri=neo4j_uri, user=neo4j_user, password=neo4j_pass)
     log("[Insertion] complete")
 
+def stage_clear_cti_entities() -> None:
+    clear_cti_entities(NEO4J_URI, NEO4J_USER, NEO4J_PASS)
+
 def stage_embed_cti_entities(chunk_json_path: Path, model: str, ollama_base_url: str,
                              neo4j_uri: str, neo4j_user: str, neo4j_pass: str) -> None:
     import insertion  # local module
@@ -178,6 +192,9 @@ def process_single_pdf(pdf: Path, group: str, ann_L: Path, ann_S: Path) -> dict:
     out_dir = WORKDIR / "CTI-HAL" / group / pdf.stem
     out_dir.mkdir(parents=True, exist_ok=True)
     started_ts = time.strftime("%Y-%m-%d %H:%M:%S")
+
+    # Ensure per-file isolation: start with no CTIEntity nodes
+    stage_clear_cti_entities()
 
     # Extract -> chunk json in out_dir
     chunk_json = stage_extraction(pdf, MODEL_NAME, OLLAMA_BASE_URL, out_dir)
