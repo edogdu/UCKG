@@ -24,6 +24,9 @@ NEO4J_PASS = os.getenv("NEO4J_PASS", "abcd90909090")
 # Toggle enrichment on/off cleanly
 ENRICH_WITH_UCKG = True
 
+# Candidate URI properties to pull from UCKG nodes (first non-null wins)
+URI_PROP_KEYS = ["uri"]
+
 LIKELY_ENTITY_KEYS = {
     # flat lists of strings
     "entities", "entity_names", "tools", "groups", "malware", "software",
@@ -272,15 +275,17 @@ def _enrich_similarity_with_uckg(sim_dir: Path) -> Optional[Path]:
     uid_to_uri: Dict[str, Optional[str]] = {}
     try:
         with driver.session() as session:
-            # Adjust the match pattern if your uid property or label differs
-            res = session.run(
-                """
-                UNWIND $uids AS u
-                MATCH (n {uid: u})
-                RETURN u AS uid, n.uri AS uri
-                """,
-                uids=list(uids)
-            )
+            # Build COALESCE(n.`uri`, n.`iri`, ...) dynamically
+            coalesce_expr = ", ".join([f"n.`{k}`" for k in URI_PROP_KEYS])
+            cypher = f"""
+            UNWIND $uids AS u
+            MATCH (n)
+            WHERE elementId(n) = u
+            RETURN u AS uid,
+                   coalesce({coalesce_expr}) AS uri,
+                   labels(n) AS labels
+            """
+            res = session.run(cypher, uids=list(uids))
             for rec in res:
                 uid_to_uri[rec["uid"]] = rec.get("uri")
     finally:
@@ -309,6 +314,10 @@ def _enrich_similarity_with_uckg(sim_dir: Path) -> Optional[Path]:
                 attach(it)
 
     attach(sim_obj)
+    # Debug summary
+    total_targets = len(uids)
+    enriched_count = sum(1 for _u, _v in uid_to_uri.items() if _v)
+    log(f"[Enrich] Targets: {total_targets}, with URI: {enriched_count}, without URI: {total_targets - enriched_count}")
     out_path = base.with_name(base.stem + "_with_ids.json")
     _write_json(sim_obj, out_path)
     return out_path
