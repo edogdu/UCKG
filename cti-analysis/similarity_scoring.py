@@ -3,6 +3,7 @@ import json
 from typing import List, Dict, Any
 import numpy as np
 from neo4j import GraphDatabase
+from pathlib import Path
 
 # Config
 NEO4J_URI = os.getenv("NEO4J_URI", "bolt://localhost:7687")
@@ -94,7 +95,7 @@ def topk_from_db(session, embedding: List[float], src_uid: str, k: int) -> List[
     """
     return [dict(r) for r in session.run(query, kplus=k + 1, embedding=embedding, src_id=src_uid, k=k)]
 
-def run_similarity() -> None:
+def run_similarity(output_dir: str = "outputs") -> None:
     ensure_output_dir()
     driver = GraphDatabase.driver(NEO4J_URI, auth=(NEO4J_USER, NEO4J_PASS))
 
@@ -176,13 +177,16 @@ def run_similarity() -> None:
         reverse=True,
     )
 
-    with open(BY_NODE_JSON, "w", encoding="utf-8") as f:
+    by_node_path = Path(output_dir) / "similarity_per_node.json"
+    leaderboard_path = Path(output_dir) / "similarity_leaderboard.json"
+
+    with open(by_node_path, "w") as f:
         json.dump(by_node, f, ensure_ascii=False, indent=2)
-    with open(LEADERBOARD_JSON, "w", encoding="utf-8") as f:
+    with open(leaderboard_path, "w", encoding="utf-8") as f:
         json.dump(leaderboard_sorted, f, ensure_ascii=False, indent=2)
 
-    print(f"Saved per-node results to: {BY_NODE_JSON}")
-    print(f"Saved global leaderboard to: {LEADERBOARD_JSON}")
+    print(f"Saved per-node results to: {by_node_path}")
+    print(f"Saved global leaderboard to: {leaderboard_path}")
 
 
 if __name__ == "__main__":
