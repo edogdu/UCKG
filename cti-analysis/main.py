@@ -7,7 +7,8 @@ import sys
 BASE_DIR = Path(__file__).parent.resolve()
 
 # CONFIG (edit these)
-MODEL_NAME        = "phi3:3.8b"
+MODEL_NAME        = "gemma2:9b"
+EMBED_MODEL_NAME  = "nomic-embed-text"
 OLLAMA_BASE_URL   = "http://localhost:11434"
 NEO4J_URI         = "bolt://localhost:7687"
 NEO4J_USER        = "neo4j"
@@ -124,12 +125,11 @@ def stage_extraction(input_path: Path, model: str, ollama_base_url: str, out_dir
     log(f"[Extraction] wrote {chunk_json}")
     return chunk_json
 
-def stage_insertion(chunk_json: Path, neo4j_uri: str, neo4j_user: str, neo4j_pass: str) -> None:
+def stage_insertion(chunk_json_path: Path, neo4j_uri: str, neo4j_user: str, neo4j_pass: str) -> None:
     import insertion  # local module
 
-    chunk_data = _load_json(chunk_json)
-    if not hasattr(insertion, "store_in_neo4j"):
-        raise RuntimeError("insertion.store_in_neo4j not found")
+    chunk_obj = _load_json(chunk_json_path)
+    chunk_data = chunk_obj.get("data", chunk_obj)
 
     log("[Insertion] inserting triples into Neo4j…")
     insertion.store_in_neo4j(chunk_data, uri=neo4j_uri, user=neo4j_user, password=neo4j_pass)
@@ -138,8 +138,10 @@ def stage_insertion(chunk_json: Path, neo4j_uri: str, neo4j_user: str, neo4j_pas
 def stage_embed_cti_entities(chunk_json_path: Path, model: str, ollama_base_url: str,
                              neo4j_uri: str, neo4j_user: str, neo4j_pass: str) -> None:
     import insertion  # local module
+
     chunk_obj = _load_json(chunk_json_path)
     chunk_data = chunk_obj.get("data", chunk_obj)
+    log("[Embedding] embedding CTIEntity nodes...")
     insertion.embed_cti_entities_from_chunk(
         chunk_data,
         uri=neo4j_uri,
@@ -156,20 +158,20 @@ def stage_similarity(sim_output_dir: Path) -> None:
     os.environ["SIM_OUTPUT_DIR"] = str(sim_output_dir)
     from similarity_scoring import run_similarity  # local module (reads SIM_OUTPUT_DIR at import/run time)
     log(f"[Similarity] running vector top-k scoring via Neo4j index… -> {sim_output_dir}")
-    run_similarity()
+    run_similarity(sim_output_dir)
     log("[Similarity] results saved under similarity_scoring outputs/")
 
 def stage_analysis() -> None:
     try:
-        import results_analysis  # local module
+        import extraction_analysis  # local module
     except Exception:
         log("[Analysis] results_analysis.py not found; skipping")
         return
 
     for fn in ("main", "run", "analyze", "entrypoint"):
-        if hasattr(results_analysis, fn):
+        if hasattr(extraction_analysis, fn):
             log(f"[Analysis] results_analysis.{fn}()")
-            getattr(results_analysis, fn)()
+            getattr(extraction_analysis, fn)()
             log("[Analysis] complete")
             return
     log("[Analysis] no callable entrypoint found; skipping")
@@ -186,7 +188,7 @@ def process_single_pdf(pdf: Path, group: str, ann_L: Path, ann_S: Path) -> dict:
     stage_insertion(chunk_json, NEO4J_URI, NEO4J_USER, NEO4J_PASS)
 
     # Embed CTIEntity nodes after insertion
-    stage_embed_cti_entities(chunk_json, MODEL_NAME, OLLAMA_BASE_URL, NEO4J_URI, NEO4J_USER, NEO4J_PASS)
+    stage_embed_cti_entities(chunk_json, EMBED_MODEL_NAME, OLLAMA_BASE_URL, NEO4J_URI, NEO4J_USER, NEO4J_PASS)
 
     # Similarity: per-PDF results go to out_dir/vec_results
     sim_dir = out_dir / "vec_results"
