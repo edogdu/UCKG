@@ -1,0 +1,72 @@
+Title,Document,Identifier,Group
+"Analysis of cyberattack on U.S. think tanks, non-profits, public sector by unidentified attackers",AnalysisOfCyberattackOnUS.pdf,MICROSOFT,APT29
+COSMICDUKE Cosmu with a twist of MiniDuke,CosmicDuke.pdf,COSMIC,APT29
+CrowdStrike’s work with the Democratic National Committee: Setting the record straight,CrowdStrike.pdf,CROWD,APT29
+THE DUKES 7 YEARS OF RUSSIAN CYBERESPIONAGE,F-Secure_Dukes_Whitepaper.pdf,DUKES,APT29
+"“Forkmeiamfamous”: Seaduke, latest weapon in the Duke armory",ForkMeIAmFamous.pdf,FORK,APT29
+GRIZZLY STEPPE – Russian Malicious Cyber Activity,GrizzlySteppe.pdf,GRIZZLY,APT29
+Not So Cozy: An Uncomfortable Examination of a Suspected APT29 Phishing Campaign,NotSoCozy.pdf,COZY,APT29
+PowerDuke: Widespread Post-Election Spear Phishing Campaigns Targeting Think Tanks and NGOs,PowerDukeWidespreadSpearPhishingCampaigns.pdf,POWER,APT29
+Unit 42 Technical Analysis: Seaduke,Seaduke.pdf,SEA,APT29
+The CozyDuke APT,TheCozyDukeAPT.pdf,COZY2,APT29
+The MiniDuke Mystery: PDF 0-day Government Spy Assembler 0x29A Micro Backdoor,TheMiniDukeMystery.pdf,MYSTERY,APT29
+Dissecting One of APT29's Fileless WMI and PowerShell Backdoors (POSHSPY),WMIPowerShellBackdoors_POSHSPY.pdf,POSH,APT29
+An APT Blueprint: Gaining New Visibility into Financial Threats,Bitdefender-WhitePaper-An-APT-Blueprint-Gaining-New-Visibility-into-Financial-Threats-interactive.pdf,BITDEFENDER,CARBANAK
+Alleged Mastermind Behind Carbanak Crime Gang Arrested,Alleged Mastermind Behind Carbanak Crime Gang Arrested - Threatpost.pdf,THREATPOST,CARBANAK
+Arrests Put New Focus on CARBON SPIDER Adversary Group,Arrests Put New Focus on CARBON SPIDER Adversary Group.pdf,CROWD,CARBANAK
+Operation Grand Mars: a comprehensive profile of Carbanak activity in 2016/17,Operation Grand Mars a comprehensive profile of Carbanak activity in 2016-17.pdf,TRUSTWAVE1,CARBANAK
+The Great Bank Robbery: the Carbanak APT,The Great Bank Robbery the Carbanak APT - Securelist.pdf,KASPERSKY1,CARBANAK
+CARBANAK APT THE GREAT BANK ROBBERY,Carbanak_APT_eng.pdf,KASPERSKY2,CARBANAK
+Behind the CARBANAK Backdoor,Behind the CARBANAK Backdoor - Mandiant.pdf,FIREEYE1,CARBANAK
+New Carbanak / Anunak Attack Methodology,New Carbanak - Anunak Attack Methodology.pdf,TRUSTWAVE2,CARBANAK
+Carbanak Continues To Evolve: Quietly Creeping into Remote Hosts,Carbanak Continues To Evolve_ Quietly Creeping into Remote Hosts.pdf,TRUSTWAVE3,CARBANAK
+Carbanak Group uses Google for malware command-and-control,Carbanak Group uses Google for Malware C&C - Forcepoint.pdf,FORCEPOINT,CARBANAK
+FOLLOW THE MONEY: DISSECTING THE OPERATIONS OF THE CYBER CRIME GROUP FIN6,rpt-fin6-1.pdf,RPT1,FIN6
+FIN6 Cybercrime Group Expands Threat to eCommerce Merchants,fin6-cybercrime-group-expands-threat-To-ecommerce-merchants.pdf,VISA,FIN6
+FIN6 group goes from compromising PoS systems to deploying ransomware,FIN6-Cyware.pdf,CYWARE,FIN6
+"Navigating the MAZE: Tactics, Techniques and Procedures Associated With MAZE Ransomware Incidents",FIN6-Maze.pdf,MAZE,FIN6
+New Global Cyber Attack on Point of Sale Systems,FIN6-Morphisec.pdf,MORPHISEC,FIN6
+"ITG08 (aka FIN6) Partners With TrickBot Gang, Uses Anchor Framework",FIN6-Security_Intelligence_8.pdf,SECURITYINTELLIGENCE8,FIN6
+"More_eggs, Anyone? Threat Actor ITG08 Strikes Again",FIN6-SecurityIntelligence_9.pdf,SECURITYINTELLIGENCE9,FIN6
+"Pick-Six: Intercepting a FIN6 Intrusion, an Actor Recently Tied to Ryuk and LockerGoga Ransomware",Pick-Six Intercepting a FIN6 Intrusion.pdf,PICK,FIN6
+Another Victim Of The Magecart Assault Emerges: Newegg,AnotherVictimOfTheMagecartAssaultEmerges.pdf,ANOTHERVICTIM,FIN6
+"Inside the Breach of British Airways: How 22 Lines of Code Claimed 380,000 Victims. How We Used Machine Learning to to Pinpoint the Magecart Crime Syndicate.",InsideTheBreachOfBritishAirways.pdf,INSIDETHEBREACH,FIN6
+Magecart Card Skimmers Injected Into Online Shops,MagecartCardSkimmersInjectedIntoOnlineShops.pdf,MAGECART,FIN6
+Fake Jobs: Campaigns Delivering More_eggs Backdoor via Fake Job Offers,MoreEggsBackdoorProofpoint.pdf,MOREEGGS,FIN6
+Cyberthreats to financial institutions 2020: Overview and predictions,Cyberthreats to financial institutions 2020_ Overview and predictions _ Securelist.pdf,KASPERKY1,FIN7
+Mahalo FIN7: Responding to the Criminal Operators’ New Tools and Techniques,Mahalo FIN7_ Responding to the Criminal Operators' New Tools and Techniques _ Mandiant _ Google Cloud Blog.pdf,FIREEYE1,FIN7
+Deep Insight into “FIN7” Malware Chain: From Office Macro Malware to Lightweight JS Loader,Deep Insight into “FIN7” Malware Chain_ From Office Macro Malware to Lightweight JS Loader - SentinelLabs.pdf,SENTINELONE,FIN7
+FIN7.5: the infamous cybercrime rig “FIN7” continues its activities,FIN7.5_ the infamous cybercrime rig “FIN7” continues its activities _ Securelist.pdf,KASPERKY2,FIN7
+FIN7 Revisited: Inside Astra Panel and SQLRat Malware,Tesi — FIN7 Revisited_ Inside Astra Panel and SQLRat Malware _ Flashpoint.pdf,KASPERKY3,FIN7
+Profile of an Adversary – FIN7,Profile of an Adversary - FIN7 _ Deepwatch.pdf,DEEPWATCH,FIN7
+FIN7 Not Finished – Morphisec Spots New Campaign,FIN7 Not Finished – Morphisec Spots New Campaign.pdf,FIREEYE3,FIN7
+On the Hunt for FIN7: Pursuing an Enigmatic and Evasive Global Criminal Operation,On the Hunt for FIN7_ Pursuing an Enigmatic and Evasive Global Criminal Operation _ Mandiant _ Google Cloud Blog.pdf,FIREEYE2,FIN7
+HOW FIN7 ATTACKED AND STOLE DATA,fact_sheet_how_fin7_attached_and_stole_data_0.pdf,DOJ,FIN7
+Footprints of Fin7: Pushing New Techniques to Evade Detection,Footprints of Fin7_ Pushing New Techniques to Evade Detection - Gigamon Blog.pdf,GIGAMON1,FIN7
+FIN7 Group Uses JavaScript and Stealer DLL Variant in New Attacks,FIN7 Group Uses JavaScript and Stealer DLL Variant in New Attacks.pdf,TALOS,FIN7
+FIN7/Carbanak threat actor unleashes Bateleur JScript backdoor,FIN7_Carbanak threat actor unleashes Bateleur JScript backdoor _ Proofpoint US.pdf,PROOFPOINT,FIN7
+Footprints of FIN7: Tracking Actor Patterns (Part 2),Footprints of FIN7_ Tracking Actor Patterns (Part 2) - Gigamon Blog.pdf,GIGAMON2,FIN7
+Footprints of Fin7: Tracking Actor Patterns (Part 1),Footprints of Fin7_ Tracking Actor Patterns (Part 1) - Gigamon Blog.pdf,GIGAMON3,FIN7
+Behind the CARBANAK Backdoor,Behind the CARBANAK Backdoor _ Mandiant _ Google Cloud Blog.pdf,FIREEYE4,FIN7
+FIN7 Takes Another Bite at the Restaurant Industry,FIN7 Takes Another Bite at the Restaurant Industry.pdf,MORPHISEC,FIN7
+"To SDB, Or Not To SDB: FIN7 Leveraging Shim Databases for Persistence","To SDB, Or Not To SDB_ FIN7 Leveraging Shim Databases for Persistence _ Google Cloud Blog.pdf",FIREEYE5,FIN7
+FIN7 Evolution and the Phishing LNK,FIN7 Evolution and the Phishing LNK _ Mandiant _ Google Cloud Blog.pdf,FIREEYE6,FIN7
+APT34: The Helix Kitten Cybercriminal Group Loves to Meow Middle Eastern and International Organizations,APT34 The Helix Kitten Cybercriminal Group Loves to Meow Middle Eastern and International Organizations.pdf,CYWARE,OILRIG
+Threat Brief: Iranian-Linked Cyber Operations,Threat Brief_ Iranian-Linked Cyber Operations.pdf,UNIT42_1,OILRIG
+Please Confirm You Received Our APT,Please Confirm You Received Our APT _ FortiGuard Labs .pdf,FORTINET,OILRIG
+"New Targeted Attack in the Middle East by APT34, a Suspected Iranian Threat Group, Using CVE-2017-11882 Exploit","New Targeted Attack in the Middle East by APT34, a Suspected Iranian Threat Group, Using CVE-2017-11882 Exploit _ Google Cloud Blog.pdf",MANDIANT,OILRIG
+New Iranian Campaign Tailored to US Companies Utilizes an Updated Toolset,Iranian Campaign Tailored to US Companies Uses Updated Toolset - Intezer.pdf,INTEZER,OILRIG
+IRAN’S APT34 RETURNS WITH AN UPDATED ARSENAL,Iran’s APT34 Returns with an Updated Arsenal - Check Point Research.pdf,RESEARCH,OILRIG
+APT34 targets Jordan Government using new Saitama backdoor,APT34 targets Jordan Government using new Saitama backdoor.pdf,THREATDOWN,OILRIG
+Behind the Scenes with OilRig,Behind the Scenes with OilRig.pdf,UNIT42_2,OILRIG
+Six Russian GRU Officers Charged in Connection with Worldwide Deployment of Destructive Malware and Other Disruptive Actions in Cyberspace,SixRussianGRUOfficers.pdf,SIXRUSSIANGRUOFFICERS,SANDWORM
+Carbon Black Threat Research Technical Analysis: Petya / NotPetya Ransomware,CarbonBlack.pdf,CARBONBLACK,SANDWORM
+CRASHOVERRIDE Analysis of the Threat to Electric Grid Operations,CrashOverride.pdf,CRASHOVERRIDE,SANDWORM
+Mapping MITRE ATT&CK to SandWorm APT’s Global Campaign,MappingMITREToSandWormAPT.pdf,MAPPINGMITRETOSANDWORMAPT,SANDWORM
+"ExPetr/Petya/NotPetya is a Wiper, Not Ransomware",NotPetya.pdf,NOTPETYA,SANDWORM
+Olympic Destroyer Takes Aim At Winter Olympics,OlympicDestroyer.pdf,OLYMPICDESTROYER,SANDWORM
+Cyber-Attack Against Ukrainian Critical Infrastructure,UkrainianCriticalInfrastructure.pdf,UKRAINIANCRITICALINFRASTRUCTURE,SANDWORM
+Sandworm Team and the Ukrainian Power Authority Attacks,UkrainianPowerAuthorityAttacks.pdf,UKRAININAPOWERAUTHORITYATTACKS,SANDWORM
+Trickbot Adds Credential-Grabbing Capabilities,Trickbot Adds Credential-Grabbing Capabilities - Trend Micro (US).pdf,TRENDMICRO,WIZARDSPIDER
+Big Game Hunting with Ryuk: Another Lucrative Targeted Ransomware,What is Ryuk Ransomware_ The Complete Breakdown.pdf,CROWD,WIZARDSPIDER
+"Ryuk wakes from hibernation; FBI, DHS warn of healthcare attacks","Ryuk wakes from hibernation; FBI, DHS warn of healthcare attacks - Cybersecurity Dive.pdf",DIVE,WIZARDSPIDER
