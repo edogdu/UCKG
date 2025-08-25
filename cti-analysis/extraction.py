@@ -247,14 +247,25 @@ Sentence:
    
         return re.sub(r'[<>:"/\\|?*]', '_', name)
      
-    def save_to_json(self, output_filename="chunk_data.json"):
+    def save_to_json(self, output_filename="chunk_data.json", base_dir=None):
         try:
-            input_dir = os.path.dirname(self.file_path)
-            output_dir = os.path.join(input_dir, "extracted_triples")
-            os.makedirs(output_dir, exist_ok=True)
-
-            output_filename = self.safe_filename(output_filename)
-            output_path = os.path.join(output_dir, output_filename)
+            # Decide where to write the file
+            if base_dir is not None:
+                # Caller provided a directory; we respect it
+                os.makedirs(base_dir, exist_ok=True)
+                filename = self.safe_filename(os.path.basename(output_filename))
+                output_path = os.path.join(base_dir, filename)
+            elif os.path.isabs(output_filename) or os.path.dirname(output_filename):
+                # Caller provided an absolute path or a path with directories; use it as-is
+                os.makedirs(os.path.dirname(output_filename), exist_ok=True)
+                output_path = output_filename
+            else:
+                # Default: write next to the input file, under extracted_triples/
+                input_dir = os.path.dirname(self.file_path)
+                output_dir = os.path.join(input_dir, "extracted_triples")
+                os.makedirs(output_dir, exist_ok=True)
+                filename = self.safe_filename(output_filename)
+                output_path = os.path.join(output_dir, filename)
 
             metrics = {
                 "file_name": os.path.basename(self.file_path),
@@ -297,9 +308,9 @@ if __name__ == "__main__":
         # "openhermes",
         # "mistral:7b",
         # "zephyr:7b",
-        "qwen3:4b",
+        # "qwen3:4b",
         # "phi3:3.8b",
-        # "gemma2:9b"
+        "gemma2:9b"
     ]
     for model in models:
         extractor = CyberTripleExtractor("cti-analysis/AnalysisOfCyberattackOnUS.pdf", model, "http://localhost:11434")
