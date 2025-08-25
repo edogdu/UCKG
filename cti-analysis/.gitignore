@@ -1,0 +1,6 @@
+# Ignore cti pdfs
+cti-analysis/*.pdf
+
+# Ignore datasets folder
+datasets/
+datasets/*

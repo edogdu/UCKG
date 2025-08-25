@@ -135,6 +135,20 @@ def stage_insertion(chunk_json: Path, neo4j_uri: str, neo4j_user: str, neo4j_pas
     insertion.store_in_neo4j(chunk_data, uri=neo4j_uri, user=neo4j_user, password=neo4j_pass)
     log("[Insertion] complete")
 
+def stage_embed_cti_entities(chunk_json_path: Path, model: str, ollama_base_url: str,
+                             neo4j_uri: str, neo4j_user: str, neo4j_pass: str) -> None:
+    import insertion  # local module
+    chunk_obj = _load_json(chunk_json_path)
+    chunk_data = chunk_obj.get("data", chunk_obj)
+    insertion.embed_cti_entities_from_chunk(
+        chunk_data,
+        uri=neo4j_uri,
+        user=neo4j_user,
+        password=neo4j_pass,
+        model=model,
+        ollama_url=f"{ollama_base_url.rstrip('/')}/api/embeddings",
+    )
+    log("[Embedding] CTIEntity nodes embedded")
 
 # Similarity 
 def stage_similarity(sim_output_dir: Path) -> None:
@@ -170,6 +184,9 @@ def process_single_pdf(pdf: Path, group: str, ann_L: Path, ann_S: Path) -> dict:
 
     # Insert into Neo4j
     stage_insertion(chunk_json, NEO4J_URI, NEO4J_USER, NEO4J_PASS)
+
+    # Embed CTIEntity nodes after insertion
+    stage_embed_cti_entities(chunk_json, MODEL_NAME, OLLAMA_BASE_URL, NEO4J_URI, NEO4J_USER, NEO4J_PASS)
 
     # Similarity: per-PDF results go to out_dir/vec_results
     sim_dir = out_dir / "vec_results"
