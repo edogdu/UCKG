@@ -208,13 +208,18 @@ Sentence:
                         else:
                             print(f"Suspicious triple: {t}")
                             self.suspicious_triples += 1
-                            # Determine rejection reason
-                            s = t.get("subject", {})
-                            o = t.get("object", {})
-                            p = t.get("predicate", "")
-                            if not (isinstance(p, str) and p.strip() in self.malont_predicates):
+                            # Determine rejection reason (robust to malformed entries)
+                            if not isinstance(t, dict):
+                                self.rejection_stats["bad_structure"] += 1
+                                continue
+
+                            s = t.get("subject") if isinstance(t.get("subject"), dict) else {}
+                            o = t.get("object") if isinstance(t.get("object"), dict) else {}
+                            p = t.get("predicate")
+
+                            if not isinstance(p, str) or p.strip() not in self.malont_predicates:
                                 self.rejection_stats["invalid_class_or_predicate"] += 1
-                            elif s.get("type", "") not in self.malont_classes or o.get("type", "") not in self.malont_classes:
+                            elif s.get("type") not in self.malont_classes or o.get("type") not in self.malont_classes:
                                 self.rejection_stats["invalid_class_or_predicate"] += 1
                             else:
                                 self.rejection_stats["bad_structure"] += 1
@@ -290,15 +295,25 @@ Sentence:
             print(f"Failed to save JSON: {e}")
 
     def _is_valid_triple(self, triple):
-        s = triple.get("subject", {})
-        o = triple.get("object", {})
-        p = triple.get("predicate", "")
+        if not isinstance(triple, dict):
+            return False
 
-        subject_type = s.get("type", "")
-        object_type = o.get("type", "")
+        s = triple.get("subject")
+        o = triple.get("object")
+        p = triple.get("predicate")
+
+        if not isinstance(p, str):
+            return False
+        if not isinstance(s, dict) or not isinstance(o, dict):
+            return False
+
+        subject_type = s.get("type")
+        object_type = o.get("type")
+        if not isinstance(subject_type, str) or not isinstance(object_type, str):
+            return False
 
         return (
-            isinstance(p, str) and p.strip() in self.malont_predicates and
+            p.strip() in self.malont_predicates and
             subject_type in self.malont_classes and
             object_type in self.malont_classes
         )
