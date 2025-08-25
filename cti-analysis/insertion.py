@@ -24,11 +24,6 @@ class OllamaEmbedder:
         return embeddings
 
 def make_det_id(name: str, ntype: str) -> str:
-    """
-    Build a deterministic ID from node type and name. We normalize by
-    trimming and lowercasing, then SHA-256 hash the concatenation.
-    This ensures a stable, compact identifier and avoids pathologically long IDs.
-    """
     key = f"{(ntype or '').strip().lower()}|{(name or '').strip().lower()}"
     return hashlib.sha256(key.encode("utf-8")).hexdigest()
 
@@ -142,61 +137,42 @@ def create_triple(tx, subject_id, subject, sub_type, predicate, object_id, objec
         context=context,
     )
 
-if __name__ == "__main__":
-    
-    with open("cti-analysis/extracted_triples/chunk_data_gemma2_9b.json", "r", encoding="utf-8") as f:
-        chunk_json = json.load(f)
-        chunk_data = chunk_json["data"] if "data" in chunk_json else chunk_json
+def embed_cti_entities_from_chunk(chunk_data,
+                                  uri: str = "bolt://localhost:7687",
+                                  user: str = "neo4j",
+                                  password: str = "abcd90909090",
+                                  model: str = "nomic-embed-text",
+                                  ollama_url: str = "http://localhost:11434/api/embeddings"):
 
-    print("Storing triples in Neo4j...")
-    store_in_neo4j(chunk_data)
-    print("Triples stored in Neo4j.\n")
-
-
-    node_texts = []
-    node_refs = []
-
+    # Aggregate contexts per (name, type)
     node_dict = {}
     for t in chunk_data:
         triples = t.get('triple', [])
         context = t.get('context', '')
         if isinstance(triples, list):
-            for triple in triples:
-                if (
-                    isinstance(triple, dict) and
-                    all(k in triple for k in ['subject', 'predicate', 'object'])
-                ):
-                    for node, node_type in [(triple['subject'], 'subject'), (triple['object'], 'object')]:
-                        if node is None:
-                            continue
-                        name = node['name'] if isinstance(node, dict) and 'name' in node else node
-                        ntype = node.get('type', '') if isinstance(node, dict) else ''
-                        key = (name, ntype)
-                        if not name:
-                            continue
-                        if key not in node_dict:
-                            node_dict[key] = set()
-                        if context:
-                            node_dict[key].add(context)
-        elif (
-            isinstance(triples, dict) and
-            all(k in triples for k in ['subject', 'predicate', 'object'])
-        ):
-            for node, node_type in [(triples['subject'], 'subject'), (triples['object'], 'object')]:
+            it = triples
+        elif isinstance(triples, dict) and all(k in triples for k in ['subject','predicate','object']):
+            it = [triples]
+        else:
+            it = []
+        for triple in it:
+            if not (isinstance(triple, dict) and all(k in triple for k in ['subject','predicate','object'])):
+                continue
+            for node in (triple['subject'], triple['object']):
                 if node is None:
                     continue
                 name = node['name'] if isinstance(node, dict) and 'name' in node else node
                 ntype = node.get('type', '') if isinstance(node, dict) else ''
-                key = (name, ntype)
                 if not name:
                     continue
+                key = (name, ntype)
                 if key not in node_dict:
                     node_dict[key] = set()
                 if context:
                     node_dict[key].add(context)
 
-    # Persist aggregated contexts arrays to Neo4j (ensures all sentences are captured)
-    driver = GraphDatabase.driver("bolt://localhost:7687", auth=("neo4j", "abcd90909090"))
+    # Persist aggregated contexts into Neo4j (idempotent add)
+    driver = GraphDatabase.driver(uri, auth=(user, password))
     with driver.session() as session:
         for (name, ntype), contexts in node_dict.items():
             nid = make_det_id(name, ntype)
@@ -208,62 +184,59 @@ if __name__ == "__main__":
                 id=nid,
                 contexts=sorted(contexts),
             )
-    driver.close()
 
+    # Build texts for embedding
+    node_texts = []
+    node_refs = []
     for (name, ntype), contexts in node_dict.items():
-
         context_text = "\n".join(sorted(contexts))
         text = f"name: {name}\ntype: {ntype}\ncontexts:\n{context_text}".strip()
         node_texts.append(text)
         node_refs.append({'name': name, 'type': ntype, 'contexts': context_text})
 
-    print(f"Preparing to embed {len(node_texts)} unique nodes...")
+    # Compute embeddings
+    embedder = OllamaEmbedder(model=model, ollama_url=ollama_url)
+    embeddings = embedder.embed(node_texts) if node_texts else []
 
-    embedder = OllamaEmbedder()
-    embeddings = []
-    for idx, text in enumerate(node_texts, 1):
-        print(f"Embedding node {idx}/{len(node_texts)}: {text[:60]}{'...' if len(text) > 60 else ''}")
-        embedding = embedder.embed([text])[0]
-        embeddings.append(embedding)
-    print("All node embeddings generated.\n")
-
-    driver = GraphDatabase.driver("bolt://localhost:7687", auth=("neo4j", "abcd90909090"))
+    # Write embeddings back
     with driver.session() as session:
         for idx, node in enumerate(node_refs):
             name = node['name']
             ntype = node['type']
-            embedding = embeddings[idx]
             nid = make_det_id(name, ntype)
-            print(f"Storing embedding for node: name='{name}', type='{ntype}'")
             session.run(
                 """
                 MATCH (n:CTIEntity {id: $id})
                 SET n.embedding = $embedding, n:Vectorized
                 """,
                 id=nid,
-                embedding=embedding,
+                embedding=embeddings[idx],
             )
     driver.close()
 
-    embedding_results = []
-    for idx, node in enumerate(node_refs):
-        result = {
-            'name': node['name'],
-            'type': node['type'],
-            'contexts': node['contexts'],
-            'text': node_texts[idx],
-            'embedding': embeddings[idx]
-        }
-        embedding_results.append(result)
+    # Return a simple summary for callers if they want it
+    return [{
+        'name': ref['name'],
+        'type': ref['type'],
+        'embedding_len': len(embeddings[i]) if i < len(embeddings) else 0
+    } for i, ref in enumerate(node_refs)]
 
-    print(f"Successfully generated embeddings for {len(embedding_results)} nodes")
-    print("\n" + "="*50)
-    print("NODE EMBEDDING RESULTS:")
-    print("="*50)
+if __name__ == "__main__":
+    
+    with open("cti-analysis/extracted_triples/chunk_data_gemma2_9b.json", "r", encoding="utf-8") as f:
+        chunk_json = json.load(f)
+        chunk_data = chunk_json["data"] if "data" in chunk_json else chunk_json
 
-    for i, result in enumerate(embedding_results):
-        print(f"\n{i+1}. Node: {result['name']} (type: {result['type']})")
-        print(f"   Context(s): {result['contexts']}")
-        print(f"   Embedding (first 10 values): {result['embedding'][:10]}")
-        print(f"   Embedding length: {len(result['embedding'])}")
-        print("-" * 30)
+    print("Storing triples in Neo4j...")
+    store_in_neo4j(chunk_data)
+    print("Triples stored in Neo4j. Now embedding CTIEntity nodes...")
+
+    results = embed_cti_entities_from_chunk(
+        chunk_data,
+        uri="bolt://localhost:7687",
+        user="neo4j",
+        password="abcd90909090",
+        model="nomic-embed-text",
+        ollama_url="http://localhost:11434/api/embeddings",
+    )
+    print(f"Embedded {len(results)} CTIEntity nodes.")
