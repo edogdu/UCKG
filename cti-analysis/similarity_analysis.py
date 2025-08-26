@@ -17,15 +17,6 @@ MANIFEST_PATH = WORKDIR / Path("manifest.json")
 ANALYSIS_OUT  = WORKDIR / Path("analysis")
 MAPPINGS_CSV  = BASE_DIR / Path("CTI_HAL_mappings.csv")
 
-# Neo4j (UCKG) connection for enrichment
-NEO4J_URI  = os.getenv("NEO4J_URI", "bolt://localhost:7687")
-NEO4J_USER = os.getenv("NEO4J_USER", "neo4j")
-NEO4J_PASS = os.getenv("NEO4J_PASS", "abcd90909090")
-# Toggle enrichment on/off cleanly
-ENRICH_WITH_UCKG = True
-
-# Candidate URI properties to pull from UCKG nodes (first non-null wins)
-URI_PROP_KEYS = ["uri"]
 
 LIKELY_ENTITY_KEYS = {
     # flat lists of strings
@@ -47,15 +38,14 @@ ATTACK_ID_PATTERNS = {
 }
 def extract_attack_ids_from_results(sim_dir: Path) -> Set[str]:
     ids: Set[str] = set()
-    enriched = sim_dir / "similarity_per_node_with_ids.json"
-    per_node = enriched if enriched.exists() else (sim_dir / "similarity_per_node.json")
+    per_node = sim_dir / "similarity_per_node.json"
     if not per_node.exists():
         log(f"[warn] No similarity_per_node.json in {sim_dir}")
         return ids
 
     obj = _read_json(per_node)
 
-    # First preference: harvested clean_id on ATT&CK targets
+    # First preference: use clean_id already present on ATT&CK targets (emitted by similarity_scoring)
     def collect_clean_ids(v: Any):
         if isinstance(v, dict):
             # a node with top_k
@@ -180,14 +170,6 @@ def _write_json(obj: Any, p: Path) -> None:
 
 ATTACK_LABELS = {"UcoexMITREATTACK", "UcoexTACTICS", "UcoexSOFTWARE"}
 
-def _extract_clean_id_from_uri(uri: Optional[str]) -> Optional[str]:
-    if not uri:
-        return None
-    if "#" in uri:
-        return uri.rsplit("#", 1)[-1] or None
-    # fallback: last path segment
-    seg = uri.rstrip("/").rsplit("/", 1)[-1]
-    return seg or None
 
 
 # --- Path normalization helpers ---
@@ -204,23 +186,6 @@ def _basename_any(p: Any) -> str:
     s = s.split('\\')[-1]
     return s
 
-def _collect_target_uids(sim_obj: Any) -> Set[str]:
-    uids: Set[str] = set()
-    if isinstance(sim_obj, dict):
-        values = sim_obj.values()
-    elif isinstance(sim_obj, list):
-        values = sim_obj
-    else:
-        return uids
-    for node in values:
-        if not isinstance(node, dict):
-            continue
-        for hit in node.get("top_k") or []:
-            target = hit.get("target") or {}
-            uid = target.get("uid")
-            if isinstance(uid, str) and uid:
-                uids.add(uid)
-    return uids
 
 def _read_mappings_csv(path: Path) -> Dict[str, Dict[str, str]]:
     """Return mapping from document filename (lowercased) -> {identifier, group, title}.
@@ -245,82 +210,6 @@ def _read_mappings_csv(path: Path) -> Dict[str, Dict[str, str]]:
                 mapping[doc.lower()[:-4]] = {"identifier": ident, "group": group, "title": title}
     return mapping
 
-def _enrich_similarity_with_uckg(sim_dir: Path) -> Optional[Path]:
-    """Load similarity_per_node.json, query UCKG by target uid to fetch uri, attach clean_id.
-    Writes similarity_per_node_with_ids.json next to the original and returns its path.
-    If enrichment is disabled or the base file is missing, returns None.
-    """
-    base = sim_dir / "similarity_per_node.json"
-    if not base.exists():
-        log(f"[warn] No similarity_per_node.json in {sim_dir}")
-        return None
-    if not ENRICH_WITH_UCKG:
-        return None
-
-    try:
-        sim_obj = _read_json(base)
-    except Exception as e:
-        log(f"[warn] Failed to read {base}: {e}")
-        return None
-
-    uids = _collect_target_uids(sim_obj)
-    if not uids:
-        # nothing to enrich, but still write a copy with _with_ids suffix
-        out_path = base.with_name(base.stem + "_with_ids.json")
-        _write_json(sim_obj, out_path)
-        return out_path
-
-    from neo4j import GraphDatabase
-    driver = GraphDatabase.driver(NEO4J_URI, auth=(NEO4J_USER, NEO4J_PASS))
-    uid_to_uri: Dict[str, Optional[str]] = {}
-    try:
-        with driver.session() as session:
-            # Build COALESCE(n.`uri`, n.`iri`, ...) dynamically
-            coalesce_expr = ", ".join([f"n.`{k}`" for k in URI_PROP_KEYS])
-            cypher = f"""
-            UNWIND $uids AS u
-            MATCH (n)
-            WHERE elementId(n) = u
-            RETURN u AS uid,
-                   coalesce({coalesce_expr}) AS uri,
-                   labels(n) AS labels
-            """
-            res = session.run(cypher, uids=list(uids))
-            for rec in res:
-                uid_to_uri[rec["uid"]] = rec.get("uri")
-    finally:
-        driver.close()
-
-    # Attach uri & clean_id to each target
-    def attach(obj: Any) -> None:
-        if isinstance(obj, dict):
-            if "top_k" in obj and isinstance(obj["top_k"], list):
-                for hit in obj["top_k"]:
-                    if not isinstance(hit, dict):
-                        continue
-                    target = hit.get("target") or {}
-                    if not isinstance(target, dict):
-                        continue
-                    uid = target.get("uid")
-                    if isinstance(uid, str) and uid in uid_to_uri:
-                        uri = uid_to_uri.get(uid)
-                        target["uri"] = uri
-                        target["clean_id"] = _extract_clean_id_from_uri(uri)
-            # walk deeper
-            for v in obj.values():
-                attach(v)
-        elif isinstance(obj, list):
-            for it in obj:
-                attach(it)
-
-    attach(sim_obj)
-    # Debug summary
-    total_targets = len(uids)
-    enriched_count = sum(1 for _u, _v in uid_to_uri.items() if _v)
-    log(f"[Enrich] Targets: {total_targets}, with URI: {enriched_count}, without URI: {total_targets - enriched_count}")
-    out_path = base.with_name(base.stem + "_with_ids.json")
-    _write_json(sim_obj, out_path)
-    return out_path
 
 def _parse_readme_mapping(readme_path: Path) -> Dict[str, str]:
     """Parse a Markdown table that maps PDF filenames to annotation JSON base names.
@@ -701,8 +590,6 @@ def analyze() -> None:
             continue
 
         log(f"[Analysis] {r.pdf.name}: L={L_json.name if L_json else '—'}, S={S_json.name if S_json else '—'}")
-        # Enrich similarity results with UCKG clean IDs (writes *_with_ids.json)
-        _enrich_similarity_with_uckg(r.similarity_dir)
         scores = score_single(r, ann_list)
         per_pdf.append(scores)
 

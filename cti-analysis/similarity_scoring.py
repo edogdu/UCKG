@@ -14,13 +14,13 @@ OUTPUT_DIR = os.getenv("SIM_OUTPUT_DIR", os.path.join(os.path.dirname(__file__),
 BY_NODE_JSON = os.path.join(OUTPUT_DIR, "similarity_results_by_node.json")
 LEADERBOARD_JSON = os.path.join(OUTPUT_DIR, "similarity_leaderboard.json")
 TOP_K = int(os.getenv("SIM_TOP_K", "5"))
-INDEX_NAME = os.getenv("SIM_INDEX_NAME", "node_embedding_vec")
-INDEX_LABEL = os.getenv("SIM_INDEX_LABEL", "Vectorized")
+INDEX_NAME = os.getenv("SIM_INDEX_NAME", "attack_vec")
+INDEX_LABEL = os.getenv("SIM_INDEX_LABEL", "SimilarityTarget")
 INDEX_PROPERTY = os.getenv("SIM_INDEX_PROPERTY", "embedding")
 SIM_FUNC = os.getenv("SIM_FUNC", "cosine")  # cosine | euclidean | dot (Neo4j supports cosine and euclidean)
 
-def ensure_output_dir():
-    os.makedirs(OUTPUT_DIR, exist_ok=True)
+def ensure_output_dir(output_dir):
+    os.makedirs(output_dir, exist_ok=True)
 
 
 def _get_any_vector_dim(session) -> int:
@@ -38,12 +38,15 @@ def _get_any_vector_dim(session) -> int:
     return int(rec["dim"])
 
 
-def ensure_vectorized_label(session) -> None:
-    """Ensure all nodes with embeddings carry the INDEX_LABEL for indexing."""
+
+def ensure_similarity_target_label(session) -> None:
+    """Tag all ATT&CK target classes with the dedicated index label so the ANN search pool is limited."""
     session.run(
         f"""
         MATCH (n)
-        WHERE n.{INDEX_PROPERTY} IS NOT NULL AND NOT n:{INDEX_LABEL}
+        WHERE n.{INDEX_PROPERTY} IS NOT NULL
+          AND (n:UcoexMITREATTACK OR n:UcoexSOFTWARE OR n:UcoexTACTICS)
+          AND NOT n:{INDEX_LABEL}
         SET n:{INDEX_LABEL}
         """
     )
@@ -78,30 +81,33 @@ def fetch_sources(session) -> List[Dict[str, Any]]:
 
 
 def topk_from_db(session, embedding: List[float], src_uid: str, k: int) -> List[Dict[str, Any]]:
-    # Ask for K+1, exclude self, then take K
+    # Ask for a larger candidate pool from the target-only index
     query = f"""
     CALL db.index.vector.queryNodes('{INDEX_NAME}', $kplus, $embedding)
     YIELD node, score
     WITH node, score
-    WHERE NOT node:CTIEntity AND coalesce(node.id, elementId(node)) <> $src_id
+    WHERE coalesce(node.id, elementId(node)) <> $src_id
     RETURN coalesce(node.id, elementId(node)) AS uid,
            node.name AS name,
            node.type AS type,
+           node.uri  AS uri,
            labels(node) AS labels,
            node.{INDEX_PROPERTY} AS embedding,
            score AS cosine
     ORDER BY cosine DESC
     LIMIT $k
     """
-    return [dict(r) for r in session.run(query, kplus=k + 1, embedding=embedding, src_id=src_uid, k=k)]
+    kplus = max(k + 1, 20 * k)  # fetch a larger candidate pool from the target-only index
+    return [dict(r) for r in session.run(query, kplus=kplus, embedding=embedding, src_id=src_uid, k=k)]
 
 def run_similarity(output_dir: str = "outputs") -> None:
-    ensure_output_dir()
+    ensure_output_dir(output_dir)
     driver = GraphDatabase.driver(NEO4J_URI, auth=(NEO4J_USER, NEO4J_PASS))
 
     with driver.session() as session:
-        # Make sure label & index are present
-        ensure_vectorized_label(session)
+        # Make sure labels & index are present
+        # (Similarity target ensures index searches only target node types)
+        ensure_similarity_target_label(session)
         dim = _get_any_vector_dim(session)
         ensure_vector_index(session, dim)
 
@@ -137,6 +143,14 @@ def run_similarity(output_dir: str = "outputs") -> None:
                 t_norm = float(np.linalg.norm(t_np)) or 1.0
                 cos = float(dot / (s_norm * t_norm))
 
+                uri_val = c.get("uri")
+                clean_id = None
+                if uri_val:
+                    if "#" in uri_val:
+                        clean_id = uri_val.split("#")[-1]
+                    else:
+                        clean_id = uri_val.rstrip("/").split("/")[-1]
+
                 entry = {
                     "source": {
                         "uid": s_id,
@@ -148,6 +162,8 @@ def run_similarity(output_dir: str = "outputs") -> None:
                         "uid": str(c["uid"]),
                         "name": c.get("name"),
                         "type": c.get("type"),
+                        "uri": uri_val,
+                        "clean_id": clean_id,
                         "labels": c.get("labels", []),
                     },
                     "scores": {
@@ -180,7 +196,7 @@ def run_similarity(output_dir: str = "outputs") -> None:
     by_node_path = Path(output_dir) / "similarity_per_node.json"
     leaderboard_path = Path(output_dir) / "similarity_leaderboard.json"
 
-    with open(by_node_path, "w") as f:
+    with open(by_node_path, "w", encoding="utf-8") as f:
         json.dump(by_node, f, ensure_ascii=False, indent=2)
     with open(leaderboard_path, "w", encoding="utf-8") as f:
         json.dump(leaderboard_sorted, f, ensure_ascii=False, indent=2)
