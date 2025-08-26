@@ -2,6 +2,7 @@ from __future__ import annotations
 import json
 import re
 import os
+import shutil
 from pathlib import Path
 from typing import Dict, List, Set, Tuple, Any, Optional
 from dataclasses import dataclass, asdict
@@ -14,7 +15,13 @@ BASE_DIR = Path(__file__).parent.resolve()
 WORKDIR       = BASE_DIR / "output" / "CTI-HAL"
 MANIFEST_PATH = WORKDIR / Path("manifest.json")
 ANALYSIS_OUT  = WORKDIR / Path("analysis")
+# Second candidate analysis folder under datasets (for cleaning)
+DATASET_ANALYSIS = BASE_DIR / "datasets" / "CTI-HAL" / "analysis"
+# List of analysis paths to clean
+ANALYSIS_PATHS_TO_CLEAN = [ANALYSIS_OUT, DATASET_ANALYSIS]
 MAPPINGS_CSV  = BASE_DIR / Path("CTI_HAL_mappings.csv")
+# If true, delete CTI-HAL/analysis before running (can override via env SIM_CLEAN_ANALYSIS=1)
+CLEAN_ANALYSIS = os.getenv("SIM_CLEAN_ANALYSIS", "1") == "1"
 
 # Hit@k configuration (comma-separated env var or default)
 _HIT_KS_ENV = os.getenv("SIM_HIT_KS", "1,3,5")
@@ -645,7 +652,17 @@ def score_single(pdf_run: PdfRun, ann_paths: List[Path]) -> PdfScores:
 
 
 def analyze() -> None:
+    # Optionally wipe previous analysis outputs for a clean run (both output/ and datasets/ locations)
+    if CLEAN_ANALYSIS:
+        for ap in ANALYSIS_PATHS_TO_CLEAN:
+            try:
+                if ap.exists() and ap.is_dir():
+                    log(f"[Analysis] CLEAN_ANALYSIS=1; removing: {ap}")
+                    shutil.rmtree(ap, ignore_errors=True)
+            except Exception as e:
+                log(f"[warn] Failed to remove {ap}: {e}")
     ANALYSIS_OUT.mkdir(parents=True, exist_ok=True)
+    log(f"[Analysis] Writing fresh analysis to: {ANALYSIS_OUT}")
 
     if not MANIFEST_PATH.exists():
         raise FileNotFoundError(f"manifest not found: {MANIFEST_PATH}")
