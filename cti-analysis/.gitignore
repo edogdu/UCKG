@@ -4,3 +4,9 @@ cti-analysis/*.pdf
 # Ignore datasets folder
 datasets/
 datasets/*
+
+# Ignore output folder
+output/
+
+# Ignore tsv
+*.tsv

@@ -11,11 +11,14 @@ BASE_DIR = Path(__file__).parent.resolve()
 # -----------------------------
 # CONFIG
 # -----------------------------
-# You can change these three if needed
 WORKDIR       = BASE_DIR / "output" / "CTI-HAL"
 MANIFEST_PATH = WORKDIR / Path("manifest.json")
 ANALYSIS_OUT  = WORKDIR / Path("analysis")
 MAPPINGS_CSV  = BASE_DIR / Path("CTI_HAL_mappings.csv")
+
+# Hit@k configuration (comma-separated env var or default)
+_HIT_KS_ENV = os.getenv("SIM_HIT_KS", "1,3,5")
+HIT_KS: Tuple[int, ...] = tuple(sorted({int(x) for x in _HIT_KS_ENV.split(',') if x.strip().isdigit()})) or (1, 3, 5)
 
 
 LIKELY_ENTITY_KEYS = {
@@ -121,6 +124,68 @@ class PdfScores:
     matched_list: List[str]
     missed_list: List[str]
     spurious_list: List[str]
+    # hit@k metrics (generic)
+    queries: int
+    hit_rates: Dict[int, float]      # e.g., {1: 0.42, 3: 0.57}
+    hit_counts: Dict[int, int]       # e.g., {1: 12, 3: 18}
+def compute_hits_multi(sim_dir: Path, gt_ids: Set[str], ks: Tuple[int, ...] = HIT_KS) -> Tuple[int, Dict[int, int]]:
+    """Single-pass computation of hit@k for k in ks.
+    Returns (queries, hits_by_k) where hits_by_k[k] is the number of queries with at least one GT ID in top-k.
+    Only counts targets whose labels intersect ATTACK_LABELS, using target.clean_id.
+    """
+    per_node = sim_dir / "similarity_per_node.json"
+    if not per_node.exists():
+        return (0, {k: 0 for k in ks})
+    obj = _read_json(per_node)
+
+    max_k = max(ks) if ks else 5
+    hits_by_k = {k: 0 for k in ks}
+    queries = 0
+
+    def process_entry(entry: Any) -> None:
+        nonlocal queries
+        if not isinstance(entry, dict):
+            return
+        topk = entry.get("top_k")
+        if not isinstance(topk, list) or not topk:
+            return
+        seq: List[str] = []
+        for hit in topk[:max_k]:
+            if not isinstance(hit, dict):
+                continue
+            target = hit.get("target") or {}
+            if not isinstance(target, dict):
+                continue
+            labels = set(target.get("labels") or [])
+            if not (ATTACK_LABELS & labels):
+                continue
+            cid = target.get("clean_id")
+            if isinstance(cid, str) and cid.strip():
+                seq.append(cid.strip().upper())
+        if not seq:
+            return
+        queries += 1
+        # Compute hits for each k
+        sset = set(seq)  # used if len(seq) < k
+        for k in ks:
+            top_set = set(seq[:k]) if len(seq) >= k else sset
+            if top_set & gt_ids:
+                hits_by_k[k] += 1
+
+    if isinstance(obj, dict):
+        for v in obj.values():
+            if isinstance(v, dict) and "top_k" in v:
+                process_entry(v)
+            elif isinstance(v, list):
+                for it in v:
+                    if isinstance(it, dict) and "top_k" in it:
+                        process_entry(it)
+    elif isinstance(obj, list):
+        for entry in obj:
+            if isinstance(entry, dict) and "top_k" in entry:
+                process_entry(entry)
+
+    return (queries, hits_by_k)
 
 # -----------------------------
 # Helpers
@@ -555,6 +620,10 @@ def score_single(pdf_run: PdfRun, ann_paths: List[Path]) -> PdfScores:
     recall = (n_matched / n_gt) if n_gt else 0.0
     f1 = (2 * precision * recall / (precision + recall)) if (precision + recall) else 0.0
 
+    # Efficient multi-k hits in a single pass
+    queries, hits_by_k = compute_hits_multi(pdf_run.similarity_dir, gt_ids, HIT_KS)
+    hit_rates = {k: (hits_by_k.get(k, 0) / queries) if queries else 0.0 for k in HIT_KS}
+
     return PdfScores(
         pdf=str(pdf_run.pdf),
         group=pdf_run.group,
@@ -569,6 +638,9 @@ def score_single(pdf_run: PdfRun, ann_paths: List[Path]) -> PdfScores:
         matched_list=matched_ids,
         missed_list=missed_ids,
         spurious_list=spurious_ids,
+        queries=queries,
+        hit_rates={k: round(v, 4) for k, v in hit_rates.items()},
+        hit_counts={k: int(hits_by_k.get(k, 0)) for k in HIT_KS},
     )
 
 
@@ -612,19 +684,75 @@ def analyze() -> None:
             "f1": scores.f1,
             "n_gt": scores.n_gt,
             "n_found": scores.n_found,
+            "queries": scores.queries,
+            "hit_at_k": scores.hit_rates,     # rates per k
+            "hit_counts": scores.hit_counts,  # counts per k
         }
         out_dir = ANALYSIS_OUT / r.group / r.pdf.stem
         _write_json(out_payload, out_dir / "entity_scoring.json")
+
+    # Group-level and overall summaries (dynamic over HIT_KS)
+    group_totals: Dict[str, Dict[str, Any]] = {}
+    overall = {"pdfs": 0, "queries": 0, "matched": 0, "missed": 0, "spurious": 0, "n_gt": 0, "n_found": 0}
+    for k in HIT_KS:
+        overall[f"hit{k}_count"] = 0
+
+    for s in per_pdf:
+        g = s.group or "unknown"
+        if g not in group_totals:
+            gt = {"pdfs": 0, "queries": 0, "matched": 0, "missed": 0, "spurious": 0, "n_gt": 0, "n_found": 0}
+            for k in HIT_KS:
+                gt[f"hit{k}_count"] = 0
+            group_totals[g] = gt
+        else:
+            gt = group_totals[g]
+        gt["pdfs"] += 1
+        gt["queries"] += s.queries
+        for k in HIT_KS:
+            gt[f"hit{k}_count"] += s.hit_counts.get(k, 0)
+        # other totals
+        gt["matched"] += s.matched
+        gt["missed"] += s.missed
+        gt["spurious"] += s.spurious
+        gt["n_gt"] += s.n_gt
+        gt["n_found"] += s.n_found
+
+        overall["pdfs"] += 1
+        overall["queries"] += s.queries
+        for k in HIT_KS:
+            overall[f"hit{k}_count"] += s.hit_counts.get(k, 0)
+        overall["matched"] += s.matched
+        overall["missed"] += s.missed
+        overall["spurious"] += s.spurious
+        overall["n_gt"] += s.n_gt
+        overall["n_found"] += s.n_found
+
+    def finalize_counts_dynamic(d: Dict[str, Any]) -> Dict[str, Any]:
+        q = d.get("queries", 0) or 0
+        for k in HIT_KS:
+            key = f"hit{k}"
+            cnt_key = f"hit{k}_count"
+            d[key] = round((d.get(cnt_key, 0) / q), 4) if q else 0.0
+        return d
+
+    overall = finalize_counts_dynamic(overall)
+    for g in list(group_totals.keys()):
+        group_totals[g] = finalize_counts_dynamic(group_totals[g])
+
+    _write_json(group_totals, ANALYSIS_OUT / "group_summary.json")
+    _write_json(overall, ANALYSIS_OUT / "overall_summary.json")
 
     # aggregate leaderboard across PDFs
     leaderboard = sorted(per_pdf, key=lambda s: (s.f1, s.recall, s.precision), reverse=True)
     _write_json([asdict(s) for s in leaderboard], ANALYSIS_OUT / "leaderboard.json")
 
-    # quick TSV for eyeballing
-    tsv_lines = ["pdf\tgroup\tmatched\tmissed\tspurious\tgt\tfound\tprecision\trecall\tf1"]
+    # quick TSV for eyeballing (dynamic hit@k columns)
+    hit_cols = "\t".join([f"hit@{k}" for k in HIT_KS])
+    tsv_lines = [f"pdf\tgroup\tmatched\tmissed\tspurious\tgt\tfound\tprecision\trecall\tf1\tqueries\t{hit_cols}"]
     for s in leaderboard:
+        hit_vals = "\t".join(str(s.hit_rates.get(k, 0.0)) for k in HIT_KS)
         tsv_lines.append(
-            f"{Path(s.pdf).name}\t{s.group}\t{s.matched}\t{s.missed}\t{s.spurious}\t{s.n_gt}\t{s.n_found}\t{s.precision}\t{s.recall}\t{s.f1}"
+            f"{Path(s.pdf).name}\t{s.group}\t{s.matched}\t{s.missed}\t{s.spurious}\t{s.n_gt}\t{s.n_found}\t{s.precision}\t{s.recall}\t{s.f1}\t{s.queries}\t{hit_vals}"
         )
     (ANALYSIS_OUT / "summary.tsv").write_text("\n".join(tsv_lines), encoding="utf-8")
 
