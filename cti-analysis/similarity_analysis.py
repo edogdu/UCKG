@@ -131,26 +131,31 @@ class PdfScores:
     matched_list: List[str]
     missed_list: List[str]
     spurious_list: List[str]
-    # hit@k metrics (generic)
     queries: int
-    hit_rates: Dict[int, float]      # e.g., {1: 0.42, 3: 0.57}
-    hit_counts: Dict[int, int]       # e.g., {1: 12, 3: 18}
-def compute_hits_multi(sim_dir: Path, gt_ids: Set[str], ks: Tuple[int, ...] = HIT_KS) -> Tuple[int, Dict[int, int]]:
-    """Single-pass computation of hit@k for k in ks.
-    Returns (queries, hits_by_k) where hits_by_k[k] is the number of queries with at least one GT ID in top-k.
-    Only counts targets whose labels intersect ATTACK_LABELS, using target.clean_id.
+    metrics_at_k: Dict[int, Dict[str,float]]  # e.g., {1: {"hit":0.4,"precision":0.3,...}, ...}
+    # per-k ID lists: {k: {"matched_ids": [...], "missed_ids": [...], "spurious_ids": [...]}}
+    ids_at_k: Dict[int, Dict[str, List[str]]]
+
+# --- Richer metrics by k ---
+
+def compute_metrics_by_k(sim_dir: Path, gt_ids: Set[str], ks: Tuple[int, ...] = HIT_KS) -> Dict[int, Dict[str, float]]:
+    """
+    For each k, compute hit@k, precision@k, recall@k, and spurious@k.
+    - hit@k: fraction of queries with at least one GT in top-k
+    - precision@k: fraction of returned items in top-k that are GT
+    - spurious@k: fraction of returned items in top-k that are NOT GT
+    - recall@k: fraction of GT covered (simplified, per query max 1)
     """
     per_node = sim_dir / "similarity_per_node.json"
     if not per_node.exists():
-        return (0, {k: 0 for k in ks})
-    obj = _read_json(per_node)
+        return {k: {"hit": 0.0, "precision": 0.0, "spurious": 0.0, "recall": 0.0, "queries": 0} for k in ks}
 
+    obj = _read_json(per_node)
     max_k = max(ks) if ks else 5
-    hits_by_k = {k: 0 for k in ks}
-    queries = 0
+    results = {k: {"hits": 0, "tp": 0, "fp": 0, "queries": 0} for k in ks}
+    total_gt = len(gt_ids)
 
     def process_entry(entry: Any) -> None:
-        nonlocal queries
         if not isinstance(entry, dict):
             return
         topk = entry.get("top_k")
@@ -171,13 +176,15 @@ def compute_hits_multi(sim_dir: Path, gt_ids: Set[str], ks: Tuple[int, ...] = HI
                 seq.append(cid.strip().upper())
         if not seq:
             return
-        queries += 1
-        # Compute hits for each k
-        sset = set(seq)  # used if len(seq) < k
-        for k in ks:
-            top_set = set(seq[:k]) if len(seq) >= k else sset
-            if top_set & gt_ids:
-                hits_by_k[k] += 1
+        for kk in ks:
+            cut = seq[:kk]
+            tp = sum(1 for c in cut if c in gt_ids)
+            fp = len(cut) - tp
+            if tp > 0:
+                results[kk]["hits"] += 1
+            results[kk]["tp"] += tp
+            results[kk]["fp"] += fp
+            results[kk]["queries"] += 1
 
     if isinstance(obj, dict):
         for v in obj.values():
@@ -192,7 +199,71 @@ def compute_hits_multi(sim_dir: Path, gt_ids: Set[str], ks: Tuple[int, ...] = HI
             if isinstance(entry, dict) and "top_k" in entry:
                 process_entry(entry)
 
-    return (queries, hits_by_k)
+    metrics: Dict[int, Dict[str, float]] = {}
+    for kk, v in results.items():
+        q = v["queries"] or 1
+        denom = (v["tp"] + v["fp"]) or 1
+        metrics[kk] = {
+            "hit": v["hits"] / q,
+            "precision": v["tp"] / denom,
+            "spurious": v["fp"] / denom,
+            "recall": (v["tp"] / total_gt) if total_gt else 0.0,
+            "queries": v["queries"],
+        }
+    return metrics
+
+
+def collect_ids_by_k(sim_dir: Path, ks: Tuple[int, ...] = HIT_KS) -> Dict[int, Set[str]]:
+    """Return, for each k, the UNION of target.clean_id values that appear within top-k across all queries.
+    Filters targets to ATTACK_LABELS and upper-cases IDs. Single pass over the file.
+    """
+    per_node = sim_dir / "similarity_per_node.json"
+    if not per_node.exists():
+        return {k: set() for k in ks}
+
+    obj = _read_json(per_node)
+    max_k = max(ks) if ks else 5
+    ids_by_k: Dict[int, Set[str]] = {k: set() for k in ks}
+
+    def process_entry(entry: Any) -> None:
+        if not isinstance(entry, dict):
+            return
+        topk = entry.get("top_k")
+        if not isinstance(topk, list) or not topk:
+            return
+        seq: List[str] = []
+        for hit in topk[:max_k]:
+            if not isinstance(hit, dict):
+                continue
+            target = hit.get("target") or {}
+            if not isinstance(target, dict):
+                continue
+            labels = set(target.get("labels") or [])
+            if not (ATTACK_LABELS & labels):
+                continue
+            cid = target.get("clean_id")
+            if isinstance(cid, str) and cid.strip():
+                seq.append(cid.strip().upper())
+        if not seq:
+            return
+        for kk in ks:
+            cut = seq[:kk]
+            ids_by_k[kk].update(cut)
+
+    if isinstance(obj, dict):
+        for v in obj.values():
+            if isinstance(v, dict) and "top_k" in v:
+                process_entry(v)
+            elif isinstance(v, list):
+                for it in v:
+                    if isinstance(it, dict) and "top_k" in it:
+                        process_entry(it)
+    elif isinstance(obj, list):
+        for entry in obj:
+            if isinstance(entry, dict) and "top_k" in entry:
+                process_entry(entry)
+
+    return ids_by_k
 
 # -----------------------------
 # Helpers
@@ -280,65 +351,6 @@ def _read_mappings_csv(path: Path) -> Dict[str, Dict[str, str]]:
             # also allow stem-only match
             if doc.lower().endswith(".pdf"):
                 mapping[doc.lower()[:-4]] = {"identifier": ident, "group": group, "title": title}
-    return mapping
-
-
-def _parse_readme_mapping(readme_path: Path) -> Dict[str, str]:
-    """Parse a Markdown table that maps PDF filenames to annotation JSON base names.
-    Returns a dict where keys are lowercased PDF filenames (with or without .pdf) and
-    values are lowercased JSON basenames (with or without .json).
-    The function looks for the first table whose header contains both 'pdf' and 'annot' tokens.
-    """
-    mapping: Dict[str, str] = {}
-    if not readme_path.exists():
-        return mapping
-    text = readme_path.read_text(encoding="utf-8", errors="ignore")
-    lines = [ln.strip() for ln in text.splitlines()]
-
-    # Find table header line
-    header_idx = -1
-    for i, ln in enumerate(lines):
-        if ln.startswith("|") and "|" in ln:
-            hdr = [h.strip().lower() for h in ln.strip("|").split("|")]
-            if any("pdf" in h or "report" in h for h in hdr) and any("annot" in h for h in hdr):
-                header_idx = i
-                break
-    if header_idx == -1:
-        return mapping
-
-    # Determine column indexes
-    header = [h.strip().lower() for h in lines[header_idx].strip("|").split("|")]
-    try:
-        pdf_col = next(i for i, h in enumerate(header) if ("pdf" in h or "report" in h))
-        ann_col = next(i for i, h in enumerate(header) if "annot" in h)
-    except StopIteration:
-        return mapping
-
-    # Walk rows until a non-table line
-    for ln in lines[header_idx+1:]:
-        if not ln.startswith("|"):
-            break
-        # skip separator rows like |---|
-        if set(ln.replace("|", "").strip()) <= set("-: "):
-            continue
-        cells = [c.strip() for c in ln.strip("|").split("|")]
-        if len(cells) <= max(pdf_col, ann_col):
-            continue
-        pdf_cell = cells[pdf_col].strip()
-        ann_cell = cells[ann_col].strip()
-        if not pdf_cell or not ann_cell:
-            continue
-        # Clean extensions and lowercase
-        pdf_key = pdf_cell.lower()
-        ann_val = ann_cell.lower()
-        mapping[pdf_key] = ann_val
-        # also store stem-only variants for convenience
-        if pdf_key.endswith(".pdf"):
-            mapping[pdf_key[:-4]] = ann_val
-        if ann_val.endswith(".json"):
-            mapping[pdf_key] = ann_val[:-5]
-            if pdf_key.endswith(".pdf"):
-                mapping[pdf_key[:-4]] = ann_val[:-5]
     return mapping
 
 
@@ -627,9 +639,22 @@ def score_single(pdf_run: PdfRun, ann_paths: List[Path]) -> PdfScores:
     recall = (n_matched / n_gt) if n_gt else 0.0
     f1 = (2 * precision * recall / (precision + recall)) if (precision + recall) else 0.0
 
-    # Efficient multi-k hits in a single pass
-    queries, hits_by_k = compute_hits_multi(pdf_run.similarity_dir, gt_ids, HIT_KS)
-    hit_rates = {k: (hits_by_k.get(k, 0) / queries) if queries else 0.0 for k in HIT_KS}
+    # Compute richer metrics at k
+    metrics_at_k = compute_metrics_by_k(pdf_run.similarity_dir, gt_ids, HIT_KS)
+    queries = metrics_at_k[min(HIT_KS)]["queries"] if HIT_KS else 0
+
+    # Per-k ID unions -> per-k matched/missed/spurious lists
+    ids_by_k = collect_ids_by_k(pdf_run.similarity_dir, HIT_KS)
+    ids_at_k: Dict[int, Dict[str, List[str]]] = {}
+    for k, foundk in ids_by_k.items():
+        mk = sorted((foundk & gt_ids))
+        missk = sorted((gt_ids - foundk))
+        spk = sorted((foundk - gt_ids))
+        ids_at_k[k] = {
+            "matched_ids": mk,
+            "missed_ids": missk,
+            "spurious_ids": spk,
+        }
 
     return PdfScores(
         pdf=str(pdf_run.pdf),
@@ -646,8 +671,8 @@ def score_single(pdf_run: PdfRun, ann_paths: List[Path]) -> PdfScores:
         missed_list=missed_ids,
         spurious_list=spurious_ids,
         queries=queries,
-        hit_rates={k: round(v, 4) for k, v in hit_rates.items()},
-        hit_counts={k: int(hits_by_k.get(k, 0)) for k in HIT_KS},
+        metrics_at_k=metrics_at_k,
+        ids_at_k=ids_at_k,
     )
 
 
@@ -702,77 +727,70 @@ def analyze() -> None:
             "n_gt": scores.n_gt,
             "n_found": scores.n_found,
             "queries": scores.queries,
-            "hit_at_k": scores.hit_rates,     # rates per k
-            "hit_counts": scores.hit_counts,  # counts per k
+            "metrics_at_k": scores.metrics_at_k,
+            "ids_at_k": {str(k): v for k, v in scores.ids_at_k.items()},
         }
         out_dir = ANALYSIS_OUT / r.group / r.pdf.stem
         _write_json(out_payload, out_dir / "entity_scoring.json")
 
     # Group-level and overall summaries (dynamic over HIT_KS)
-    group_totals: Dict[str, Dict[str, Any]] = {}
-    overall = {"pdfs": 0, "queries": 0, "matched": 0, "missed": 0, "spurious": 0, "n_gt": 0, "n_found": 0}
-    for k in HIT_KS:
-        overall[f"hit{k}_count"] = 0
-
+    # Compute group and overall metrics by averaging per-pdf metrics
+    group_metrics = {g: {k: {"hit":0.0,"precision":0.0,"spurious":0.0,"recall":0.0,"count":0} for k in HIT_KS} for g in set(s.group for s in per_pdf)}
     for s in per_pdf:
-        g = s.group or "unknown"
-        if g not in group_totals:
-            gt = {"pdfs": 0, "queries": 0, "matched": 0, "missed": 0, "spurious": 0, "n_gt": 0, "n_found": 0}
-            for k in HIT_KS:
-                gt[f"hit{k}_count"] = 0
-            group_totals[g] = gt
-        else:
-            gt = group_totals[g]
-        gt["pdfs"] += 1
-        gt["queries"] += s.queries
+        g = s.group
+        for k, m in s.metrics_at_k.items():
+            for key in ("hit","precision","spurious","recall"):
+                group_metrics[g][k][key] += m[key]
+            group_metrics[g][k]["count"] += 1
+    # average
+    for g in group_metrics:
         for k in HIT_KS:
-            gt[f"hit{k}_count"] += s.hit_counts.get(k, 0)
-        # other totals
-        gt["matched"] += s.matched
-        gt["missed"] += s.missed
-        gt["spurious"] += s.spurious
-        gt["n_gt"] += s.n_gt
-        gt["n_found"] += s.n_found
-
-        overall["pdfs"] += 1
-        overall["queries"] += s.queries
-        for k in HIT_KS:
-            overall[f"hit{k}_count"] += s.hit_counts.get(k, 0)
-        overall["matched"] += s.matched
-        overall["missed"] += s.missed
-        overall["spurious"] += s.spurious
-        overall["n_gt"] += s.n_gt
-        overall["n_found"] += s.n_found
-
-    def finalize_counts_dynamic(d: Dict[str, Any]) -> Dict[str, Any]:
-        q = d.get("queries", 0) or 0
-        for k in HIT_KS:
-            key = f"hit{k}"
-            cnt_key = f"hit{k}_count"
-            d[key] = round((d.get(cnt_key, 0) / q), 4) if q else 0.0
-        return d
-
-    overall = finalize_counts_dynamic(overall)
-    for g in list(group_totals.keys()):
-        group_totals[g] = finalize_counts_dynamic(group_totals[g])
-
-    _write_json(group_totals, ANALYSIS_OUT / "group_summary.json")
-    _write_json(overall, ANALYSIS_OUT / "overall_summary.json")
+            c = group_metrics[g][k]["count"] or 1
+            for key in ("hit","precision","spurious","recall"):
+                group_metrics[g][k][key] = round(group_metrics[g][k][key]/c,4)
+    # Write group-level summary
+    _write_json(group_metrics, ANALYSIS_OUT / "group_summary.json")
+    # Compute overall summary
+    overall_metrics = {k: {"hit":0.0,"precision":0.0,"spurious":0.0,"recall":0.0,"count":0} for k in HIT_KS}
+    for s in per_pdf:
+        for k, m in s.metrics_at_k.items():
+            for key in ("hit","precision","spurious","recall"):
+                overall_metrics[k][key] += m[key]
+            overall_metrics[k]["count"] += 1
+    for k in HIT_KS:
+        c = overall_metrics[k]["count"] or 1
+        for key in ("hit","precision","spurious","recall"):
+            overall_metrics[k][key] = round(overall_metrics[k][key]/c,4)
+    _write_json(overall_metrics, ANALYSIS_OUT / "overall_summary.json")
 
     # aggregate leaderboard across PDFs
     leaderboard = sorted(per_pdf, key=lambda s: (s.f1, s.recall, s.precision), reverse=True)
     _write_json([asdict(s) for s in leaderboard], ANALYSIS_OUT / "leaderboard.json")
 
-    # quick TSV for eyeballing (dynamic hit@k columns)
-    hit_cols = "\t".join([f"hit@{k}" for k in HIT_KS])
-    tsv_lines = [f"pdf\tgroup\tmatched\tmissed\tspurious\tgt\tfound\tprecision\trecall\tf1\tqueries\t{hit_cols}"]
+    # quick TSV for eyeballing (dynamic columns for hit@k, precision@k, spurious@k)
+    cols = []
+    for k in HIT_KS:
+        cols.extend([f"hit@{k}", f"prec@{k}", f"spur@{k}"])
+    tsv_lines = [f"pdf\tgroup\tmatched\tmissed\tspurious\tgt\tfound\tprecision\trecall\tf1\tqueries\t" + "\t".join(cols)]
     for s in leaderboard:
-        hit_vals = "\t".join(str(s.hit_rates.get(k, 0.0)) for k in HIT_KS)
+        vals = []
+        for k in HIT_KS:
+            m = s.metrics_at_k.get(k, {})
+            vals.append(str(round(m.get("hit",0.0),4)))
+            vals.append(str(round(m.get("precision",0.0),4)))
+            vals.append(str(round(m.get("spurious",0.0),4)))
         tsv_lines.append(
-            f"{Path(s.pdf).name}\t{s.group}\t{s.matched}\t{s.missed}\t{s.spurious}\t{s.n_gt}\t{s.n_found}\t{s.precision}\t{s.recall}\t{s.f1}\t{s.queries}\t{hit_vals}"
+            f"{Path(s.pdf).name}\t{s.group}\t{s.matched}\t{s.missed}\t{s.spurious}\t{s.n_gt}\t{s.n_found}\t{s.precision}\t{s.recall}\t{s.f1}\t{s.queries}\t" + "\t".join(vals)
         )
     (ANALYSIS_OUT / "summary.tsv").write_text("\n".join(tsv_lines), encoding="utf-8")
 
+    # Generate charts from analysis outputs (optional)
+    try:
+        import similarity_charts  # local module to render figures
+        log("[Analysis] Generating charts from analysis outputs...")
+        similarity_charts.main()
+    except Exception as e:
+        log(f"[warn] Charts stage skipped/failed: {e}")
     log(f"[Analysis] Wrote {len(per_pdf)} per-PDF reports + leaderboard + TSV to {ANALYSIS_OUT}")
 
 
