@@ -140,11 +140,11 @@ class PdfScores:
 
 def compute_metrics_by_k(sim_dir: Path, gt_ids: Set[str], ks: Tuple[int, ...] = HIT_KS) -> Dict[int, Dict[str, float]]:
     """
-    For each k, compute hit@k, precision@k, recall@k, and spurious@k.
+    For each k, compute hit@k, precision@k, spurious@k, and recall@k.
     - hit@k: fraction of queries with at least one GT in top-k
-    - precision@k: fraction of returned items in top-k that are GT
-    - spurious@k: fraction of returned items in top-k that are NOT GT
-    - recall@k: fraction of GT covered (simplified, per query max 1)
+    - precision@k: fraction of returned items in top-k that are GT (micro over queries)
+    - spurious@k: fraction of returned items in top-k that are NOT GT (micro over queries)
+    - recall@k: **coverage-style recall** = fraction of UNIQUE ground-truth IDs covered by the UNION of all top-k predictions across queries in this PDF. Always in [0,1].
     """
     per_node = sim_dir / "similarity_per_node.json"
     if not per_node.exists():
@@ -210,6 +210,18 @@ def compute_metrics_by_k(sim_dir: Path, gt_ids: Set[str], ks: Tuple[int, ...] = 
             "recall": (v["tp"] / total_gt) if total_gt else 0.0,
             "queries": v["queries"],
         }
+
+    # Overwrite recall using coverage-style recall based on unique IDs recovered at k
+    try:
+        ids_union_by_k = collect_ids_by_k(sim_dir, ks)
+    except Exception:
+        ids_union_by_k = {k: set() for k in ks}
+    for kk in ks:
+        if total_gt:
+            tp_unique = len((ids_union_by_k.get(kk, set()) or set()) & gt_ids)
+            metrics[kk]["recall"] = tp_unique / total_gt
+        else:
+            metrics[kk]["recall"] = 0.0
     return metrics
 
 

@@ -189,7 +189,7 @@ def run_similarity(output_dir: str = "outputs") -> None:
     # Sort leaderboard by cosine desc, then dot desc (consistent with NumPy post-metrics)
     leaderboard_sorted = sorted(
         leaderboard,
-        key=lambda x: (x["scores"]["cosine"], x["scores"]["dot"]),
+        key=lambda x: (x["scores"]["cosine"], x["scores"]["dot"], x["scores"]["euclidean"]),
         reverse=True,
     )
 
