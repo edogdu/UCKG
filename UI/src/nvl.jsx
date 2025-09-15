@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { InteractiveNvlWrapper } from '@neo4j-nvl/react';
-import { executeQuery, executeCountQuery } from './connection';
+import { executeQuery } from './connection';
 
 // Merges arrays of nodes/relationships by ID, avoiding duplicates.
 function mergeElements(oldArr, newArr, key = 'id') {
@@ -23,6 +23,58 @@ function filterValidRelationships(nodes, relationships) {
   return relationships.filter(r => nodeIds.has(String(r.from)) && nodeIds.has(String(r.to)));
 }
 
+// Converts graph data to table format for data view
+function convertGraphToTableData(nodes, relationships) {
+  const tableData = [];
+  
+  // Add nodes as records - format similar to data query results
+  nodes.forEach(node => {
+    const record = {
+      id: node.id,
+      label: node.label || node.caption,
+      ...node.properties
+    };
+    tableData.push(record);
+  });
+  
+  // Add relationships as records - format similar to data query results
+  relationships.forEach(rel => {
+    const record = {
+      id: rel.id,
+      from: rel.from,
+      to: rel.to,
+      type: rel.caption || rel.type,
+      ...rel.properties
+    };
+    tableData.push(record);
+  });
+  
+  return tableData;
+}
+
+// Formats values for display in a more readable way
+function formatValue(value) {
+  if (value === null || value === undefined) {
+    return 'null';
+  }
+  if (typeof value === 'string') {
+    return value;
+  }
+  if (typeof value === 'number') {
+    return value.toString();
+  }
+  if (typeof value === 'boolean') {
+    return value.toString();
+  }
+  if (Array.isArray(value)) {
+    return `[${value.map(v => formatValue(v)).join(', ')}]`;
+  }
+  if (typeof value === 'object') {
+    return JSON.stringify(value, null, 2);
+  }
+  return String(value);
+}
+
 // Core label configurations
 const coreLabels = [
   { name: 'UcoCWE', query: 'MATCH (n:UcoCWE) RETURN n LIMIT 5', countQuery: 'MATCH (n:UcoCWE) RETURN count(n) as count', description: 'Common Weakness Enumeration' },
@@ -43,6 +95,10 @@ export default function Nvl() {
   const [expandedNodes, setExpandedNodes] = useState(new Set()); // Track expanded nodes
   const [previousStates, setPreviousStates] = useState(new Map()); // Store previous states for each node
   const [labelCounts, setLabelCounts] = useState({});
+  const [queryResult, setQueryResult] = useState(null); // Store non-graph query results
+  const [resultType, setResultType] = useState('graph'); // 'graph' or 'data'
+  const [viewMode, setViewMode] = useState('graph'); // 'graph' or 'data' - for toggling view
+  const [graphData, setGraphData] = useState({ nodes: [], relationships: [] }); // Store original graph data
   const chatContainerRef = useRef();
   const wrapperRef = useRef();
 
@@ -50,10 +106,22 @@ export default function Nvl() {
   useEffect(() => {
     let cancelled = false;
     const fetchData = async () => {
-      const { nodes, relationships } = await executeQuery(cypher);
+      const result = await executeQuery(cypher);
       if (!cancelled) {
-        setNodes(nodes);
-        setRels(filterValidRelationships(nodes, relationships));
+        if (result.type === 'graph') {
+          setNodes(result.nodes);
+          setRels(filterValidRelationships(result.nodes, result.relationships));
+          setGraphData({ nodes: result.nodes, relationships: result.relationships });
+          setResultType('graph');
+          setQueryResult(null);
+          setViewMode('graph');
+        } else if (result.type === 'data') {
+          setQueryResult(result.records);
+          setResultType('data');
+          setNodes([]);
+          setRels([]);
+          setViewMode('data');
+        }
       }
     };
     
@@ -61,8 +129,13 @@ export default function Nvl() {
       const counts = {};
       for (const label of coreLabels) {
         try {
-          const count = await executeCountQuery(label.countQuery);
-          counts[label.name] = count;
+          const result = await executeQuery(label.countQuery);
+          if (result.type === 'data' && result.records && result.records.length > 0) {
+            const count = result.records[0].count;
+            counts[label.name] = count;
+          } else {
+            counts[label.name] = 0;
+          }
         } catch (error) {
           console.error(`Error fetching count for ${label.name}:`, error);
           counts[label.name] = 0;
@@ -93,18 +166,42 @@ export default function Nvl() {
     // Generate a unique key for this query
     const queryKey = `search_${Date.now()}_${query.trim()}`;
     
-    const { nodes, relationships } = await executeQuery(query);
-    setNodes(nodes);
-    setRels(filterValidRelationships(nodes, relationships));
+    const result = await executeQuery(query);
     
-    // Store the result in session storage
-    const searchResult = {
-      query: query,
-      nodes: nodes,
-      relationships: relationships,
-      timestamp: Date.now()
-    };
-    sessionStorage.setItem(queryKey, JSON.stringify(searchResult));
+    if (result.type === 'graph') {
+      setNodes(result.nodes);
+      setRels(filterValidRelationships(result.nodes, result.relationships));
+      setGraphData({ nodes: result.nodes, relationships: result.relationships });
+      setResultType('graph');
+      setQueryResult(null);
+      setViewMode('graph');
+      
+      // Store the result in session storage
+      const searchResult = {
+        query: query,
+        type: 'graph',
+        nodes: result.nodes,
+        relationships: result.relationships,
+        timestamp: Date.now()
+      };
+      sessionStorage.setItem(queryKey, JSON.stringify(searchResult));
+    } else if (result.type === 'data') {
+      setQueryResult(result.records);
+      setResultType('data');
+      setNodes([]);
+      setRels([]);
+      setViewMode('data');
+      
+      // Store the result in session storage
+      const searchResult = {
+        query: query,
+        type: 'data',
+        records: result.records,
+        summary: result.summary,
+        timestamp: Date.now()
+      };
+      sessionStorage.setItem(queryKey, JSON.stringify(searchResult));
+    }
     
     setChatHistory(prev => [...prev, { type: 'user', text: query, queryKey }]);
   };
@@ -155,16 +252,18 @@ export default function Nvl() {
         // Expand: show this node and its relationships
         const query = `MATCH p = (a)-[r]-(b) WHERE id(a) = ${nodeId} RETURN p`;
         const result = await executeQuery(query);
-        setNodes(prevNodes => {
-          const mergedNodes = mergeElements(prevNodes, result.nodes);
-          setRels(prevRels =>
-            filterValidRelationships(
-              mergedNodes,
-              mergeElements(prevRels, result.relationships)
-            )
-          );
-          return mergedNodes;
-        });
+        if (result.type === 'graph') {
+          setNodes(prevNodes => {
+            const mergedNodes = mergeElements(prevNodes, result.nodes);
+            setRels(prevRels =>
+              filterValidRelationships(
+                mergedNodes,
+                mergeElements(prevRels, result.relationships)
+              )
+            );
+            return mergedNodes;
+          });
+        }
         setExpandedNodes(prev => new Set([...prev, nodeId]));
       }
     },
@@ -198,18 +297,51 @@ export default function Nvl() {
     // Generate a unique key for this query
     const queryKey = `search_${Date.now()}_${cypher.trim()}`;
     
-    const { nodes, relationships } = await executeQuery(cypher);
-    setNodes(nodes);
-    setRels(filterValidRelationships(nodes, relationships));
+    const result = await executeQuery(cypher);
     
-    // Store the result in session storage
-    const searchResult = {
-      query: cypher,
-      nodes: nodes,
-      relationships: relationships,
-      timestamp: Date.now()
-    };
-    sessionStorage.setItem(queryKey, JSON.stringify(searchResult));
+    if (result.type === 'graph') {
+      // Handle graph results
+      setNodes(result.nodes);
+      setRels(filterValidRelationships(result.nodes, result.relationships));
+      setGraphData({ nodes: result.nodes, relationships: result.relationships });
+      setResultType('graph');
+      setQueryResult(null);
+      setViewMode('graph');
+      
+      // Store the result in session storage
+      const searchResult = {
+        query: cypher,
+        type: 'graph',
+        nodes: result.nodes,
+        relationships: result.relationships,
+        timestamp: Date.now()
+      };
+      sessionStorage.setItem(queryKey, JSON.stringify(searchResult));
+    } else if (result.type === 'data') {
+      // Handle non-graph results (count, sum, etc.)
+      setQueryResult(result.records);
+      setResultType('data');
+      setNodes([]);
+      setRels([]);
+      setViewMode('data');
+      
+      // Store the result in session storage
+      const searchResult = {
+        query: cypher,
+        type: 'data',
+        records: result.records,
+        summary: result.summary,
+        timestamp: Date.now()
+      };
+      sessionStorage.setItem(queryKey, JSON.stringify(searchResult));
+    } else if (result.type === 'error') {
+      // Handle errors
+      setQueryResult([{ error: result.error }]);
+      setResultType('data');
+      setNodes([]);
+      setRels([]);
+      setViewMode('data');
+    }
     
     setChatHistory(prev => [...prev, { type: 'user', text: cypher, queryKey }]);
     setChatHistory(prev => [...prev, { type: 'answer', text: 'answer' }]);
@@ -223,25 +355,87 @@ export default function Nvl() {
     if (queryKey && sessionStorage.getItem(queryKey)) {
       try {
         const storedResult = JSON.parse(sessionStorage.getItem(queryKey));
-        setNodes(storedResult.nodes);
-        setRels(filterValidRelationships(storedResult.nodes, storedResult.relationships));
+        
+        if (storedResult.type === 'graph') {
+          setNodes(storedResult.nodes);
+          setRels(filterValidRelationships(storedResult.nodes, storedResult.relationships));
+          setGraphData({ nodes: storedResult.nodes, relationships: storedResult.relationships });
+          setResultType('graph');
+          setQueryResult(null);
+          setViewMode('graph');
+        } else if (storedResult.type === 'data') {
+          setQueryResult(storedResult.records);
+          setResultType('data');
+          setNodes([]);
+          setRels([]);
+          setViewMode('data');
+        }
+        
         console.log('Retrieved result from session storage');
       } catch (error) {
         console.error('Error parsing stored result:', error);
         // Fallback to fresh query if parsing fails
-        const { nodes, relationships } = await executeQuery(query);
-        setNodes(nodes);
-        setRels(filterValidRelationships(nodes, relationships));
+        const result = await executeQuery(query);
+        
+        if (result.type === 'graph') {
+          setNodes(result.nodes);
+          setRels(filterValidRelationships(result.nodes, result.relationships));
+          setGraphData({ nodes: result.nodes, relationships: result.relationships });
+          setResultType('graph');
+          setQueryResult(null);
+          setViewMode('graph');
+        } else if (result.type === 'data') {
+          setQueryResult(result.records);
+          setResultType('data');
+          setNodes([]);
+          setRels([]);
+          setViewMode('data');
+        }
       }
     } else {
       // No stored result, fetch fresh data
-      const { nodes, relationships } = await executeQuery(query);
-      setNodes(nodes);
-      setRels(filterValidRelationships(nodes, relationships));
+      const result = await executeQuery(query);
+      
+      if (result.type === 'graph') {
+        setNodes(result.nodes);
+        setRels(filterValidRelationships(result.nodes, result.relationships));
+        setGraphData({ nodes: result.nodes, relationships: result.relationships });
+        setResultType('graph');
+        setQueryResult(null);
+        setViewMode('graph');
+      } else if (result.type === 'data') {
+        setQueryResult(result.records);
+        setResultType('data');
+        setNodes([]);
+        setRels([]);
+        setViewMode('data');
+      }
     }
     
     // setChatHistory(prev => [...prev, { type: 'user', text: query, queryKey }]);
     // setChatHistory(prev => [...prev, { type: 'answer', text: 'answer' }]);
+  };
+
+  // Toggle between graph and data view
+  const toggleViewMode = () => {
+    if (resultType === 'graph') {
+      if (viewMode === 'graph') {
+        // Switch to data view
+        const tableData = convertGraphToTableData(graphData.nodes, graphData.relationships);
+        setQueryResult(tableData);
+        setViewMode('data');
+      } else {
+        // Switch to graph view
+        setViewMode('graph');
+        setQueryResult(null);
+      }
+    } else if (resultType === 'data') {
+      if (viewMode === 'data') {
+        // For data queries, we can't switch to graph view, but we can show a message
+        // or keep the current data view
+        console.log('Data query results cannot be displayed as a graph');
+      }
+    }
   };
 
   return (
@@ -273,30 +467,65 @@ export default function Nvl() {
       </div>
 
       <div className='graph'>
-        <InteractiveNvlWrapper
-          ref={wrapperRef}
-          nodes={nodes}
-          rels={rels}
-          mouseEventCallbacks={mouseEventCallbacks}
-          nvlOptions={{
-            layout: { name: 'forceDirected' },
-            relationship: { showArrows: true, arrowColor: 'black', arrowSize: 12 },
-            interaction: { dragBackground: true, zoom: true, dragNodes: true },
-            node: { 
-              preserveColors: true,
-              color: 'auto',
-              hoverColor: 'auto',
-              selectedColor: 'auto',
-              expandedColor: 'auto',
-              useNodeColors: true,
-              maintainOriginalColors: true
-            },
-            styling: {
-              preserveNodeColors: true,
-              disableColorChanges: true
-            }
-          }}
-        />
+        {/* View mode toggle button - show for both graph and data results */}
+        {(resultType === 'graph' || resultType === 'data') && (
+          <div className='view-toggle-container'>
+            <button 
+              className={`view-toggle-btn ${viewMode === 'graph' ? 'active' : ''}`}
+              onClick={toggleViewMode}
+              title={viewMode === 'graph' ? 'Switch to Data View' : 'Switch to Graph View'}
+              disabled={resultType === 'data'}
+            >
+              {viewMode === 'graph' ? 'Table' : 'Graph'}
+            </button>
+          </div>
+        )}
+        
+        {viewMode === 'graph' ? (
+          <InteractiveNvlWrapper
+            ref={wrapperRef}
+            nodes={nodes}
+            rels={rels}
+            mouseEventCallbacks={mouseEventCallbacks}
+            nvlOptions={{
+              layout: { name: 'forceDirected' },
+              relationship: { showArrows: true, arrowColor: 'black', arrowSize: 12 },
+              interaction: { dragBackground: true, zoom: true, dragNodes: true },
+              node: { 
+                preserveColors: true,
+                color: 'auto',
+                hoverColor: 'auto',
+                selectedColor: 'auto',
+                expandedColor: 'auto',
+                useNodeColors: true,
+                maintainOriginalColors: true
+              },
+              styling: {
+                preserveNodeColors: true,
+                disableColorChanges: true
+              }
+            }}
+          />
+        ) : (
+          <div className='data-result'>
+            <h3>Query Result</h3>
+            {queryResult && queryResult.length > 0 ? (
+              <div className='result-table'>
+                {queryResult.map((record, index) => (
+                  <div key={index} className='result-record'>
+                    {Object.entries(record).map(([key, value]) => (
+                      <div key={key} className='result-field'>
+                        <strong>{key}:</strong> {formatValue(value)}
+                      </div>
+                    ))}
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className='no-results'>No results found</div>
+            )}
+          </div>
+        )}
         {/* Overlay for sidePanel in upper right of graph area */}
         {sidePanel && (
           <div className='props' dangerouslySetInnerHTML={{ __html: sidePanel }} />
