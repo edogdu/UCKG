@@ -1,12 +1,17 @@
 FROM ollama/ollama:latest
 
-# Create a startup script that downloads the model on first run
+# Create a startup script that ensures the model is available then starts Ollama
 RUN echo '#!/bin/bash\n\
+# Fail fast\n\
+set -euo pipefail\n\
+# Resolve model to pull (default: llama3)\n\
+MODEL="${OLLAMA_MODEL:-llama3}"\n\
 echo "Starting Ollama server..."\n\
 export LLAMA_LOG_DISABLE=1\n\
 export GIN_MODE=release\n\
 /usr/bin/ollama serve >/dev/null 2>&1 &\n\
 pid=$!\n\
+# Wait for the server to come up\n\
 echo "Waiting for Ollama server to be ready..."\n\
 sleep 5\n\
 until /usr/bin/ollama list >/dev/null 2>&1; do\n\
@@ -14,6 +19,12 @@ until /usr/bin/ollama list >/dev/null 2>&1; do\n\
     sleep 2\n\
 done\n\
 echo "Ollama server is ready"\n\
+# Pull the model if it is not present\n\
+if ! /usr/bin/ollama list | grep -q "^${MODEL} "; then\n\
+    echo "Model ${MODEL} not found locally. Downloading..."\n\
+    /usr/bin/ollama pull "${MODEL}"\n\
+fi\n\
+echo "Model ${MODEL} is ready"\n\
 echo "Ollama ready for connections"\n\
 wait "$pid"' > /usr/local/bin/start-ollama.sh && \
     chmod +x /usr/local/bin/start-ollama.sh
