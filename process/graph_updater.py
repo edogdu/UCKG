@@ -31,7 +31,7 @@ def create_constraint_if_not_exists(driver):
     label = 'Resource'
     property_name = 'uri'
     constraint_name = 'n10s_unique_uri'
-    constraint_description = f"CONSTRAINT ON ({label.lower()}:{label}) ASSERT {label.lower()}.{property_name} IS UNIQUE"
+    constraint_description = f"CONSTRAINT FOR ({label.lower()}:{label}) REQUIRE {label.lower()}.{property_name} IS UNIQUE"
 
     with driver.session() as session:
         # Query to check if the specific constraint exists
@@ -41,8 +41,8 @@ def create_constraint_if_not_exists(driver):
         if any(constraint_name in constraint for constraint in constraints):
             logger.info("Constraint already exists.")
         else:
-            # Create the constraint as it does not exist
-            session.run(f"CREATE CONSTRAINT {constraint_name} ON ({label.lower()}:{label}) ASSERT {label.lower()}.{property_name} IS UNIQUE")
+            # Create the constraint using Neo4j 5.x syntax
+            session.run(f"CREATE CONSTRAINT {constraint_name} FOR ({label.lower()}:{label}) REQUIRE {label.lower()}.{property_name} IS UNIQUE")
             logger.info("Constraint created.")
 
 def is_graph_ready():
