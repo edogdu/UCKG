@@ -1,5 +1,5 @@
 # Create a Python environment
-FROM python:latest AS python-builder
+FROM python:3.11-slim-bookworm AS python-builder
 
 # Set the working directory
 WORKDIR /app
@@ -21,8 +21,12 @@ RUN pip install pandas
 RUN pip install numpy
 RUN pip install openpyxl
 RUN pip install prometheus_client
+
 # Copy your Python script and any other necessary files
 COPY . /app
+
+# Create logs directory for embedding process
+RUN mkdir -p /app/logs
 
 # Set permissions for the JAR and data directory
 RUN chmod 755 /app/mapping/mapper.jar

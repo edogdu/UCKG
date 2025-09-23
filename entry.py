@@ -8,6 +8,9 @@ from process import shared_functions as sf
 sys.path.append("./data_collection")
 from data_collection import cve_collection as cve, cwe_collection as cwe, d3fend_collection as d3fend, attack_collection as attack, capec_collection as capec
 
+# Add embedding processor import from new location
+from process.embedding_functions import run_embedding_processing
+
 uco_abs_path = os.environ['UCO_ONTO_PATH']
 root_folder_abs_path = os.environ['ROOT_FOLDER']
 
@@ -75,3 +78,13 @@ elif capec_data_status == 0:
 logger.info("###############################################")
 logger.info("All Data Sources Have Been Initialized!")
 logger.info("###############################################")
+
+# Run embedding processing if enabled
+logger.info("Checking embedding processing configuration...")
+try:
+    run_embedding_processing()
+except Exception as e:
+    logger.error(f"Error during embedding generation: {e}")
+    logger.info("System will continue without embeddings - they can be generated later")
+
+logger.info("Complete system initialization finished!")
