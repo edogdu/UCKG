@@ -27,6 +27,43 @@ $  docker-compose up --build
 $  docker-compose down
 ```
 
+## Configuration Options
+
+### GPU Acceleration (Optional)
+The embedding generation process can utilize NVIDIA GPUs for faster processing:
+
+* **To run with GPU** (default): The GPU configuration is enabled by default. Requires NVIDIA drivers and Docker GPU support.
+
+* **To disable GPU support**: Comment out the GPU-related lines in `docker-compose.yml` if you don't have an NVIDIA GPU:
+  ```yaml
+  # In the ollama service section, comment out these lines:
+  environment:
+    # - NVIDIA_VISIBLE_DEVICES=all
+    # - NVIDIA_DRIVER_CAPABILITIES=compute,utility
+  # deploy:
+  #   resources:
+  #     reservations:
+  #       devices:
+  #         - driver: nvidia
+  #           count: all
+  #           capabilities: [gpu]
+  ```
+
+### Embedding Process Control
+The system includes semantic embedding generation for enhanced search capabilities:
+
+* **To enable embeddings** (default): The embedding generation is enabled by default with `EMBED_ENV: "true"`.
+
+* **To disable embeddings**: Change `EMBED_ENV` to `"false"` in `docker-compose.yml` to skip embedding generation and save processing time:
+  ```yaml
+  # In uckg-scripts service environment section:
+  uckg-scripts:
+    environment:
+      EMBED_ENV: "false"  # Change from "true" to "false" to disable
+  ```
+
+Note: Disabling embeddings will skip the semantic search capabilities but the core knowledge graph functionality will still work.
+
 ## Resources
 * A copy of our paper outlining the project is available in the root directory as uckg_paper.pdf
 * A web-based visualization of the Unified Cybersecurity Ontology can be accessed at this url: https://service.tib.eu/webvowl/#iri=http://purl.org/cyber/uco
