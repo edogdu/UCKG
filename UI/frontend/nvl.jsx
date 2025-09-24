@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { InteractiveNvlWrapper } from '@neo4j-nvl/react';
-import { executeQuery } from './connection';
+import { executeQuery, getLabelCounts, getCoreLabelData, expandNode, getCoreLabels } from './connection';
 
 // Merges arrays of nodes/relationships by ID, avoiding duplicates.
 function mergeElements(oldArr, newArr, key = 'id') {
@@ -75,16 +75,6 @@ function formatValue(value) {
   return String(value);
 }
 
-// Core label configurations
-const coreLabels = [
-  { name: 'UcoCWE', query: 'MATCH (n:UcoCWE) RETURN n LIMIT 5', countQuery: 'MATCH (n:UcoCWE) RETURN count(n) as count', description: 'Common Weakness Enumeration' },
-  { name: 'UcoCVE', query: 'MATCH (n:UcoCVE) RETURN n LIMIT 5', countQuery: 'MATCH (n:UcoCVE) RETURN count(n) as count', description: 'Common Vulnerabilities and Exposures' },
-  { name: 'UcoexCPE', query: 'MATCH (n:UcoexCPE) RETURN n LIMIT 5', countQuery: 'MATCH (n:UcoexCPE) RETURN count(n) as count', description: 'Common Platform Enumeration' },
-  { name: 'UcoexCAPEC', query: 'MATCH (n:UcoexCAPEC) RETURN n LIMIT 5', countQuery: 'MATCH (n:UcoexCAPEC) RETURN count(n) as count', description: 'Common Attack Pattern Enumeration and Classification' },
-  { name: 'UcoexMITREATTACK', query: 'MATCH (n:UcoexMITREATTACK) RETURN n LIMIT 5', countQuery: 'MATCH (n:UcoexMITREATTACK) RETURN count(n) as count', description: 'MITRE ATT&CK' },
-  { name: 'UcoexMITRED3FEND', query: 'MATCH (n:UcoexMITRED3FEND) RETURN n LIMIT 5', countQuery: 'MATCH (n:UcoexMITRED3FEND) RETURN count(n) as count', description: 'D3FEND' }
-];
-
 export default function Nvl() {
   const [cypher, setCypher] = useState('MATCH (n) RETURN n LIMIT 5');
   const [nodes, setNodes] = useState([]);
@@ -95,6 +85,7 @@ export default function Nvl() {
   const [expandedNodes, setExpandedNodes] = useState(new Set()); // Track expanded nodes
   const [previousStates, setPreviousStates] = useState(new Map()); // Store previous states for each node
   const [labelCounts, setLabelCounts] = useState({});
+  const [coreLabels, setCoreLabels] = useState([]); // Store core labels from backend
   const [queryResult, setQueryResult] = useState(null); // Store non-graph query results
   const [resultType, setResultType] = useState('graph'); // 'graph' or 'data'
   const [viewMode, setViewMode] = useState('graph'); // 'graph' or 'data' - for toggling view
@@ -126,28 +117,36 @@ export default function Nvl() {
     };
     
     const fetchLabelCounts = async () => {
-      const counts = {};
-      for (const label of coreLabels) {
-        try {
-          const result = await executeQuery(label.countQuery);
-          if (result.type === 'data' && result.records && result.records.length > 0) {
-            const count = result.records[0].count;
-            counts[label.name] = count;
-          } else {
-            counts[label.name] = 0;
-          }
-        } catch (error) {
-          console.error(`Error fetching count for ${label.name}:`, error);
-          counts[label.name] = 0;
+      try {
+        const counts = await getLabelCounts();
+        if (!cancelled) {
+          setLabelCounts(counts);
+        }
+      } catch (error) {
+        console.error('Error fetching label counts:', error);
+        if (!cancelled) {
+          setLabelCounts({});
         }
       }
-      if (!cancelled) {
-        setLabelCounts(counts);
+    };
+    
+    const fetchCoreLabels = async () => {
+      try {
+        const labels = await getCoreLabels();
+        if (!cancelled) {
+          setCoreLabels(labels);
+        }
+      } catch (error) {
+        console.error('Error fetching core labels:', error);
+        if (!cancelled) {
+          setCoreLabels([]);
+        }
       }
     };
     
     fetchData();
     fetchLabelCounts();
+    fetchCoreLabels();
     return () => { cancelled = true; };
   }, []); // empty dependency array: only run once on mount
 
@@ -160,13 +159,13 @@ export default function Nvl() {
   
   // Handle core label button clicks
   const handleLabelClick = async (labelConfig) => {
-    const query = labelConfig.query;
+    const query = `MATCH (n:${labelConfig.name}) RETURN n LIMIT 5`;
     setCypher(query);
     
     // Generate a unique key for this query
     const queryKey = `search_${Date.now()}_${query.trim()}`;
     
-    const result = await executeQuery(query);
+    const result = await getCoreLabelData(labelConfig.name);
     
     if (result.type === 'graph') {
       setNodes(result.nodes);
@@ -207,9 +206,10 @@ export default function Nvl() {
   };
 
   const mouseEventCallbacks = {
-    onHover: (element, hitTargets, evt) => console.log('onHover', element, hitTargets, evt),
+    // onHover: (element, hitTargets, evt) => {
+    //   // Optional: Add hover functionality if needed
+    // },
     onNodeClick: (node, hitTargets, evt) => {
-      console.log('onNodeClick', node, hitTargets, evt);
       if (node?.properties) {
         setSidePanel(
           Object.entries(node.properties)
@@ -249,18 +249,15 @@ export default function Nvl() {
           return newMap;
         });
         
-        // Expand: show this node and its relationships
-        const query = `MATCH p = (a)-[r]-(b) WHERE id(a) = ${nodeId} RETURN p`;
-        const result = await executeQuery(query);
+        // Expand: show this node and its relationships via API
+        const result = await expandNode(nodeId);
         if (result.type === 'graph') {
           setNodes(prevNodes => {
             const mergedNodes = mergeElements(prevNodes, result.nodes);
-            setRels(prevRels =>
-              filterValidRelationships(
-                mergedNodes,
-                mergeElements(prevRels, result.relationships)
-              )
-            );
+            setRels(prevRels => {
+              const mergedRels = mergeElements(prevRels, result.relationships);
+              return filterValidRelationships(mergedNodes, mergedRels);
+            });
             return mergedNodes;
           });
         }
@@ -268,7 +265,6 @@ export default function Nvl() {
       }
     },
     onRelationshipClick: (rel, hitTargets, evt) => {
-      console.log('onRelationshipClick', rel, hitTargets, evt);
       if (rel?.properties) {
         setSidePanel(
           Object.entries(rel.properties)
@@ -280,14 +276,23 @@ export default function Nvl() {
       }
     },
     onCanvasClick: evt => {
-      console.log('onCanvasClick', evt);
       setSidePanel('');
     },
-    onCanvasDoubleClick: evt => console.log('onCanvasDoubleClick', evt),
-    onCanvasRightClick: evt => console.log('onCanvasRightClick', evt),
-    onDrag: nodes => console.log('onDrag', nodes),
-    onPan: evt => console.log('onPan', evt),
-    onZoom: zoomLevel => console.log('onZoom', zoomLevel)
+    // onCanvasDoubleClick: evt => {
+    //   // Optional: Add double-click canvas functionality if needed
+    // },
+    // onCanvasRightClick: evt => {
+    //   // Optional: Add right-click canvas functionality if needed
+    // },
+    onDrag: nodes => {
+      // Optional: Add drag functionality if needed
+    },
+    onPan: evt => {
+      // Optional: Add pan functionality if needed
+    },
+    onZoom: zoomLevel => {
+      // Optional: Add zoom functionality if needed
+    }
   };
 
   // Runs the current Cypher query and updates the graph/chat history.
@@ -297,7 +302,7 @@ export default function Nvl() {
     // Generate a unique key for this query
     const queryKey = `search_${Date.now()}_${cypher.trim()}`;
     
-    const result = await executeQuery(cypher);
+    const result = await executeQuery(cypher); 
     
     if (result.type === 'graph') {
       // Handle graph results
@@ -371,7 +376,7 @@ export default function Nvl() {
           setViewMode('data');
         }
         
-        console.log('Retrieved result from session storage');
+        // Retrieved result from session storage
       } catch (error) {
         console.error('Error parsing stored result:', error);
         // Fallback to fresh query if parsing fails
@@ -429,12 +434,9 @@ export default function Nvl() {
         setViewMode('graph');
         setQueryResult(null);
       }
-    } else if (resultType === 'data') {
-      if (viewMode === 'data') {
-        // For data queries, we can't switch to graph view, but we can show a message
-        // or keep the current data view
-        console.log('Data query results cannot be displayed as a graph');
-      }
+    // } else if (resultType === 'data') {
+    //   if (viewMode === 'data') {
+    //   }
     }
   };
 

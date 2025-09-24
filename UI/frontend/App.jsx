@@ -1,8 +1,7 @@
 import React from "react";
-import { BrowserRouter as Router, Routes, Route, NavLink, Link } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, NavLink } from "react-router-dom";
 import Home from "./Home.jsx";
-// import QnAPage from "./QnAPage.jsx";
-import Nvl from "./Nvl.jsx";
+import Nvl from "./nvl.jsx";
 
 export default function App() {
   return (
