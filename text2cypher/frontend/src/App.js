@@ -10,6 +10,8 @@ function App() {
   const [queryHistory, setQueryHistory] = useState([]);
   const [showHistory, setShowHistory] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [chatAnswer, setChatAnswer] = useState(null);
+  const [chatThread, setChatThread] = useState([]);
 
   // Working cybersecurity queries based on actual database structure
   const sampleQueries = [
@@ -69,6 +71,7 @@ function App() {
       };
       
       setQueryHistory(prev => [newHistoryItem, ...prev.slice(0, 9)]); // Keep last 10 queries
+      setChatAnswer(null);
     } catch (err) {
       setError(err.message || 'Failed to generate Cypher query');
     } finally {
@@ -102,6 +105,21 @@ function App() {
 
   const formatTimestamp = (timestamp) => {
     return new Date(timestamp).toLocaleString();
+  };
+
+  const askFromHistory = async () => {
+    if (!query.trim()) return;
+    try {
+      setLoading(true);
+      const { answer } = await text2CypherAPI.chatHistory('demo1', query);
+      setChatAnswer(answer);
+      setChatThread(prev => [...prev, { role: 'user', content: query }, { role: 'assistant', content: answer }]);
+      setResult(null);
+    } catch (err) {
+      setError(err.message || 'Chat history failed');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -140,6 +158,13 @@ function App() {
                 onClick={() => setShowHistory(!showHistory)}
               >
                 {showHistory ? 'Hide' : 'Show'} History
+              </button>
+              <button 
+                className="secondary-button"
+                onClick={askFromHistory}
+                disabled={loading || !query.trim()}
+              >
+                Ask from History
               </button>
               {queryHistory.length > 0 && (
                 <button 
@@ -306,6 +331,22 @@ function App() {
                     </button>
                   </div>
                 </div>
+              </div>
+            )}
+            {chatAnswer && (
+              <div className="chat-answer">
+                <h3>Answer from History:</h3>
+                <p>{chatAnswer}</p>
+              </div>
+            )}
+            {chatThread.length > 0 && (
+              <div className="chat-thread">
+                <h3>Chat History (demo1):</h3>
+                {chatThread.map((m, idx) => (
+                  <p key={idx} className={m.role === 'user' ? 'chat-user' : 'chat-assistant'}>
+                    <strong>{m.role === 'user' ? 'You' : 'Assistant'}:</strong> {m.content}
+                  </p>
+                ))}
               </div>
             )}
           </div>

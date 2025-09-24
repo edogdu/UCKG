@@ -475,6 +475,23 @@
   color: #495057;
 }
 
+.chat-thread {
+  background: #ffffff;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  padding: 20px;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.chat-user {
+  color: #2c3e50;
+}
+
+.chat-assistant {
+  color: #6f42c1;
+}
+
 @media (max-width: 768px) {
   .App-header {
     padding: 10px;

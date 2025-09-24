@@ -61,6 +61,24 @@ class Text2CypherAPI {
       throw error;
     }
   }
+
+  async chatHistory(sessionId, question) {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/chat_history`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ session_id: sessionId, question })
+      });
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.detail || `HTTP error! status: ${response.status}`);
+      }
+      return await response.json();
+    } catch (error) {
+      console.error('Chat history API error:', error);
+      throw error;
+    }
+  }
 }
 
 export const text2CypherAPI = new Text2CypherAPI();

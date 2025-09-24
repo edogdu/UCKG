@@ -44,6 +44,42 @@ t2c = Text2Cypher(NEO4J_URI, NEO4J_USER, NEO4J_PASSWORD, llm)
 class QueryRequest(BaseModel):
     question: str
 
+# -------- Chat-from-history support ---------
+class ChatRequest(QueryRequest):
+    session_id: str
+
+# prompt template
+HISTORY_EXAMPLE = (
+    "Chat history:\nUSER: Hi\nASSISTANT: Hello\n\n"
+    "User question: What did I just say?\n"
+    "Assistant: You said: \"Hi\".\n\n"
+)
+
+HISTORY_PROMPT = (
+    "You are an assistant that helps to form nice and human understandable answers.\n"
+    "The information part contains the current chat history that you must use to answer the user.\n"
+    "The provided information is authoritative, you must never doubt it or try to use your internal knowledge to correct it.\n"
+    "Make the answer sound as a response to the question. Do not mention that you based the result on the given information.\n"
+    "If the provided information is empty, say that you don't know the answer.\n\n"
+    "Information:\n{history}\n\n"
+    "Question: {question}\n\n"
+    "Helpful Answer:"
+)
+
+def answer_from_history(session_id: str, question: str) -> str:
+    from .chat_memory import get_memory
+    from .chat_types import ChatMessage, Role
+
+    mem = get_memory(session_id)
+    prompt = HISTORY_PROMPT.format(history=mem.formatted_history(), question=question)
+
+    raw_answer = llm.invoke(prompt).strip()
+
+    # store turns
+    mem.add(ChatMessage(role=Role.USER, content=question))
+    mem.add(ChatMessage(role=Role.ASSISTANT, content=raw_answer))
+    return raw_answer
+
 @app.get("/")
 def health_check():
     """Health check endpoint"""
@@ -71,4 +107,16 @@ def text2cypher_endpoint(req: QueryRequest):
         return {"cypher": cypher, "result": result}
     except Exception as e:
         logger.error(f"Error processing query: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+# ---------- new endpoint --------------------
+
+@app.post("/api/chat_history")
+def chat_history(req: ChatRequest):
+    try:
+        logger.info(f"Chat history Q: {req.question}")
+        answer = answer_from_history(req.session_id, req.question)
+        return {"answer": answer}
+    except Exception as e:
+        logger.error(f"Chat-history error: {e}")
         raise HTTPException(status_code=500, detail=str(e)) 
