@@ -1,6 +1,8 @@
 # Ignore Python cache files and folders
 __pycache__/
 *.pyc
+*.pyo
+*.egg-info/
 
 # Ignore downloaded files
 *.json
@@ -8,3 +10,31 @@ __pycache__/
 
 # Ignore VSCode folders
 .vscode/
+.idea/
+
+# Environment variables (IMPORTANT - contains sensitive info!)
+.env
+.env.local
+.env.*.local
+
+# Virtual environments
+venv/
+env/
+ENV/
+.venv/
+
+# Logs
+logs/
+*.log
+
+# OS files
+.DS_Store
+.DS_Store?
+._*
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.bak
+*.orig
+*plugins/*.jar
