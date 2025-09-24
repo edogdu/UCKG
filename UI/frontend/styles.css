@@ -1,0 +1,427 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto+Flex:opsz,wght@8..144,100..1000&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Barlow:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+
+/* Pre-setting for reused components */
+:root {
+   --color-primary-1: #012351;
+   --color-primary-2: #ffc52a;
+   --color-bg: #e2e6f1;
+   --color-border: #3b3b3b;
+
+   --font-family: 'Barlow', 'Roboto Flex', sans-serif;
+   --font-size-base: 16px;
+   --line-height: 1.5rem;
+
+   --radius-s: 4px;
+   --radius-m: 8px;
+}
+
+::-webkit-scrollbar {
+   display: none;
+}
+
+*, *::before, *::after {
+   box-sizing: border-box;
+}
+
+body {
+   margin: 0;
+   padding: 0;
+   font-family: var(--font-family);
+   font-size: var(--line-height);
+   line-height: var(--line-height);
+   font-weight: 500;
+   color: var(--color-text);
+   background-color: var(--color-bg);
+}
+
+#app {
+   display: flex;
+   flex-direction: column;
+   height: 100vh;
+}
+
+/* in App.jsx */
+nav {
+   display: flex;
+   flex-grow: 0;
+   background-color: var(--color-primary-1);
+   overflow: hidden;
+   align-items: center;
+}
+
+nav .logo img {
+   margin: 2px 4px;
+   height: 45px;
+}
+
+nav a {
+   float: left;
+   text-align: center;
+   padding: 14px 16px;
+   text-decoration: none;
+   font-size: var(--font-size-base);
+   color: #ffffff;
+}
+
+nav a:hover {
+  background-color: #0e3363;  
+}
+
+nav a.active {
+   color: #000000;
+   background-color: var(--color-primary-2);
+}
+
+.Home {
+   flex-grow: 1;
+   padding: 16px;
+}
+
+/* in Nvl.jsx */
+.Q-n-A {
+   display: flex;
+   flex-grow: 1;
+   overflow: hidden;
+   position: relative;
+}
+
+/* Left Panel Styles */
+.left-panel {
+   background-color: var(--color-primary-1);
+   color: white;
+   display: flex;
+   flex-direction: column;
+   transition: width 0.3s ease;
+   border-top: 1px solid var(--color-border);
+   min-width: 0;
+}
+
+.left-panel.open {
+   width: 250px;
+}
+
+.left-panel.closed {
+   max-height: fit-content;
+   position: absolute;
+   z-index: 2;
+}
+
+.left-panel-header {
+   display: flex;
+   justify-content: space-between;
+   align-items: center;
+   padding: 16px;
+   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+   background-color: rgba(0, 0, 0, 0.1);
+}
+
+.left-panel.closed .left-panel-header h3 {
+   display: none;
+}
+
+.left-panel-header h3 {
+   margin: 0;
+   font-size: 18px;
+   font-weight: 600;
+}
+
+.toggle-panel-btn {
+   background: none;
+   border: none;
+   color: white;
+   font-size: 16px;
+   cursor: pointer;
+   padding: 4px 8px;
+   border-radius: var(--radius-s);
+   transition: background-color 0.2s ease;
+}
+
+.toggle-panel-btn:hover {
+   background-color: rgba(255, 255, 255, 0.1);
+}
+
+.label-buttons {
+   flex: 1;
+   padding: 12px;
+   overflow-y: auto;
+   display: flex;
+   flex-direction: column;
+   gap: 8px;
+}
+
+.left-panel.closed .label-buttons {
+   display: none;
+}
+
+.label-btn {
+   background-color: rgba(255, 255, 255, 0.05);
+   border: 1px solid rgba(255, 255, 255, 0.1);
+   border-radius: var(--radius-m);
+   padding: 12px;
+   color: white;
+   cursor: pointer;
+   transition: all 0.2s ease;
+   text-align: left;
+   display: flex;
+   flex-direction: column;
+   gap: 4px;
+}
+
+.label-btn:hover {
+   background-color: rgba(255, 255, 255, 0.1);
+   border-color: var(--color-primary-2);
+   transform: translateY(-1px);
+}
+
+.label-btn:active {
+   transform: translateY(0);
+}
+
+.label-name {
+   font-weight: 600;
+   font-size: 14px;
+   color: var(--color-primary-2);
+}
+
+.label-desc {
+   font-size: 12px;
+   opacity: 0.8;
+   line-height: 1.3;
+}
+
+.graph {
+   flex: 1;
+   position: relative;
+   z-index: 1;
+   overflow: hidden;
+}
+
+#NVL_interactive-wrapper {
+   width: 100%;
+   height: 100%;
+   border-right: 1px solid var(--color-border);
+   background-color: #ffffff;
+}
+
+.graph .props {
+   position: absolute;
+   top: 20px;
+   right: 20px;
+   min-width: 220px;
+   max-width: 320px;
+   background-color: var(--color-bg);
+   border-radius: var(--radius-m);
+   box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+   padding: 16px;
+   z-index: 10;
+   color: #151515;
+   font-size: 14px;
+   max-height: 60vh;
+   overflow-y: scroll;
+   word-wrap: break-word;
+   
+}
+
+.Chat-bot {
+   position: relative;
+   width: 300px;
+   max-height: calc(100vh - 52px);
+   border-left: 1px solid var(--color-border);
+   display: flex;
+   flex-direction: column;
+}
+
+.Chat-bot-content {
+   flex: 1;
+   background: var(--color-bg);
+   padding: 12px;
+   padding-top: 0;
+   overflow-y: auto;
+}
+
+.Query-list {
+   display: flex;
+   flex-direction: column-reverse;
+   padding-left: 18px;
+   margin: 0;
+   height: 100%;
+   overflow-y: scroll;
+   font-size: var(--font-size-base);
+}
+
+.Query-list-content {
+   cursor: pointer;
+   margin-bottom: 2px;
+}
+
+.Input-box {
+   display: flex;
+   border-top: 1px solid var(--color-border);
+}
+
+.Input-content {
+   flex: 1;
+   padding: 8px;
+   border: none;
+   outline: none;
+   font-family: var(--font-family);
+   font-size: var(--font-size-base);
+}
+
+.Input-button {
+   width: 50px;
+   background: var(--color-primary-2);
+   border: none;
+   cursor: pointer;
+}
+
+/* Chatbot conversation styles */
+.Chat-list {
+  display: flex;
+  flex-direction: column;
+  padding-left: 0;
+  margin: 0;
+  list-style: none;
+  font-size: var(--font-size-base);
+}
+.Chat-list-user {
+  align-self: flex-end;
+  background: #f4f8ff;
+  color: #012351;
+  border-radius: 12px 12px 0 12px;
+  margin: 4px 0 4px 40px;
+  padding: 8px 12px;
+  max-width: 80%;
+  cursor: pointer;
+  word-break: break-word;
+}
+.Chat-list-answer {
+  align-self: flex-start;
+  background: #fffbe6;
+  color: #352700;
+  border-radius: 12px 12px 12px 0;
+  margin: 4px 40px 4px 0;
+  padding: 8px 12px;
+  max-width: 80%;
+  word-break: break-word;
+}
+
+/* Data result styles */
+.data-result {
+  padding: 20px;
+  background-color: #ffffff;
+  height: 100%;
+  width: 100%;
+  overflow-y: auto;
+  box-sizing: border-box;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+.data-result h3 {
+  margin: 60px 0 16px 0;
+  color: var(--color-primary-1);
+  font-size: 18px;
+  font-weight: 600;
+  border-bottom: 2px solid var(--color-primary-2);
+  padding-bottom: 8px;
+}
+
+.result-table {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.result-record {
+  background-color: #f8f9fa;
+  border: 1px solid #e9ecef;
+  border-radius: var(--radius-m);
+  padding: 16px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.result-field {
+  margin-bottom: 8px;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.result-field:last-child {
+  margin-bottom: 0;
+}
+
+.result-field strong {
+  color: var(--color-primary-1);
+  font-weight: 600;
+  margin-right: 8px;
+}
+
+.no-results {
+  text-align: center;
+  color: #6c757d;
+  font-style: italic;
+  padding: 40px 20px;
+  background-color: #f8f9fa;
+  border-radius: var(--radius-m);
+  border: 1px dashed #dee2e6;
+}
+
+/* View toggle button styles */
+.view-toggle-container {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  z-index: 20;
+}
+
+.view-toggle-btn {
+  background-color: var(--color-primary-1);
+  color: white;
+  border: none;
+  border-radius: var(--radius-m);
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.view-toggle-btn:hover {
+  background-color: #0e3363;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.view-toggle-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.view-toggle-btn.active {
+  background-color: var(--color-primary-2);
+  color: var(--color-primary-1);
+}
+
+.view-toggle-btn.active:hover {
+  background-color: #e6b800;
+}
+
+.view-toggle-btn:disabled {
+  background-color: #6c757d;
+  color: #ffffff;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.view-toggle-btn:disabled:hover {
+  background-color: #6c757d;
+  transform: none;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
