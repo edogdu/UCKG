@@ -68,15 +68,15 @@ def test_relationship_queries():
             # Validate the generated Cypher
             is_valid, error_msg = t2c.validate_cypher(cypher)
             if is_valid:
-                print(f"   ✅ Valid Cypher query")
+                print(f"   Valid Cypher query")
             else:
-                print(f"   ❌ Invalid: {error_msg}")
+                print(f"   Invalid: {error_msg}")
                 
         except Exception as e:
-            print(f"   ❌ Error: {str(e)}")
+            print(f"   Error: {str(e)}")
     
     print("\n" + "=" * 50)
-    print("✅ Relationship query testing completed!")
+    print("Relationship query testing completed!")
 
 def test_real_neo4j_connection():
     """Test with real Neo4j connection if available"""
@@ -103,7 +103,7 @@ def test_real_neo4j_connection():
             print("Sample result:", result[0])
         
     except Exception as e:
-        print(f"❌ Connection failed: {str(e)}")
+        print(f"Connection failed: {str(e)}")
         print("Make sure Neo4j is running and credentials are correct")
 
 if __name__ == "__main__":

@@ -23,10 +23,15 @@ module.exports = () => ({
       template: './index.html',
     }),
     new webpack.DefinePlugin({
-      'process.env.NODE_ENV': JSON.stringify()//process.env.NODE_ENV || 'development'
+      'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV || 'development')
     }),
   ],
   resolve: {
+    extensions: ['.js', '.jsx', '.json'],
+    alias: {
+      react: path.resolve('./node_modules/react'),
+      'react-dom': path.resolve('./node_modules/react-dom')
+    },
     fallback: {
       process: require.resolve('process/browser')
     }

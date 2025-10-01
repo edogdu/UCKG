@@ -1,0 +1,30 @@
+# FastAPI and server dependencies
+fastapi>=0.104.0
+uvicorn[standard]>=0.24.0
+pydantic>=2.0.0
+
+# Neo4j and graph dependencies
+neo4j>=5.0.0
+neo4j-graphrag>=0.1.0
+
+# LangChain dependencies
+langchain>=0.1.0
+langchain-core>=0.1.0
+langchain-ollama>=0.1.0
+langchain-text-splitters>=0.0.1
+
+# HTTP client
+httpx>=0.25.0
+
+# Scientific computing (for embeddings and ML operations)
+numpy>=1.24.0
+scipy>=1.10.0
+
+# Configuration and utilities
+pyyaml>=6.0
+requests>=2.31.0
+tenacity>=8.2.0
+
+# Optional: For better performance and debugging
+python-multipart>=0.0.6
+python-json-logger>=2.0.0

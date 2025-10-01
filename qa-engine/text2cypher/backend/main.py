@@ -1,9 +1,9 @@
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
-from .text2cypher import Text2Cypher
+from text2cypher import Text2Cypher
 # NOTE: Configuration is now environment-driven. See ``ollama_llm.OllamaLLM``.
-from .ollama_llm import OllamaLLM
+from ollama_llm import OllamaLLM
 import os
 import logging
 
@@ -67,8 +67,8 @@ HISTORY_PROMPT = (
 )
 
 def answer_from_history(session_id: str, question: str) -> str:
-    from .chat_memory import get_memory
-    from .chat_types import ChatMessage, Role
+    from chat_memory import get_memory
+    from chat_types import ChatMessage, Role
 
     mem = get_memory(session_id)
     prompt = HISTORY_PROMPT.format(history=mem.formatted_history(), question=question)
@@ -119,4 +119,8 @@ def chat_history(req: ChatRequest):
         return {"answer": answer}
     except Exception as e:
         logger.error(f"Chat-history error: {e}")
-        raise HTTPException(status_code=500, detail=str(e)) 
+        raise HTTPException(status_code=500, detail=str(e))
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=8000)
