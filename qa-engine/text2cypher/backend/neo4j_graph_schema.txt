@@ -1,0 +1,356 @@
+Neo4j Graph Schema
+
+====================
+
+This document describes the schema of a Neo4j graph database. It is intended to be used by a Large Language Model to generate accurate Cypher queries.
+
+
+1. Node Labels and Properties
+
+----------------------------
+
+* **Node Label:** `:Axiom`
+  - `annotatedTarget` (String)
+  - `comment` (String)
+  - `uri` (String)
+
+* **Node Label:** `:Class`
+  - `comment` (String)
+  - `seeAlso` (String)
+  - `uri` (String)
+
+* **Node Label:** `:DatatypeProperty`
+  - `uri` (String)
+  - `uri` (String)
+  - `uri` (String)
+
+* **Node Label:** `:FunctionalProperty`
+  - `uri` (String)
+
+* **Node Label:** `:IrreflexiveProperty`
+  - `uri` (String)
+  - `uri` (String)
+
+* **Node Label:** `:NamedIndividual`
+  - `uri` (String)
+
+* **Node Label:** `:ObjectProperty`
+  - `comment` (String)
+  - `seeAlso` (String)
+  - `uri` (String)
+
+* **Node Label:** `:Ontology`
+  - `uri` (String)
+
+* **Node Label:** `:Resource`
+  - `comment` (String)
+  - `cpeNameId` (String)
+  - `cpeName` (String)
+  - `dictionary_found` (Boolean)
+  - `label` (String)
+  - `label` (String)
+  - `lastModified` (LocalDateTime)
+  - `minQualifiedCardinality` (Long)
+  - `titles` (String)
+  - `ucoabstraction` (String)
+  - `ucoapplicablePlatform` (String)
+  - `ucobaseSeverity` (String)
+  - `ucocommonConsequences` (String)
+  - `ucocweExtendedSummary` (String)
+  - `ucocweID` (String)
+  - `ucocweName` (String)
+  - `ucocweSummary` (String)
+  - `ucodemonstrativeExamples` (String)
+  - `ucodescription` (String)
+  - `ucodetectionMethods` (String)
+  - `ucoevaluatorSolution` (String)
+  - `ucoexAbstraction` (String)
+  - `ucoexCAPEC_id` (String)
+  - `ucoexCAPEC_name` (String)
+  - `ucoexConsequences` (StringArray)
+  - `ucoexDESCRIPTION` (String)
+  - `ucoexDescription` (String)
+  - `ucoexExample` (StringArray)
+  - `ucoexExecutionFlowTechnique` (StringArray)
+  - `ucoexExtendedDescription` (StringArray)
+  - `ucoexLikelihood` (String)
+  - `ucoexMITRED3FEND_DEFINITION` (String)
+  - `ucoexMITRED3FEND_LABEL` (String)
+  - `ucoexMitigations` (StringArray)
+  - `ucoexPrerequisites` (StringArray)
+  - `ucoexRelatedAttPattern` (StringArray)
+  - `ucoexRelatedWeaknesses` (StringArray)
+  - `ucoexResources_Required` (StringArray)
+  - `ucoexSeverity` (String)
+  - `ucoexSkills_Required` (StringArray)
+  - `ucoexTaxonomyMappingATTACK` (StringArray)
+  - `ucoexploitabilityScore` (String)
+  - `ucoimpactScore` (String)
+  - `ucolastModifiedDateTime` (LocalDateTime)
+  - `ucolikelihoodOfExploit` (String)
+  - `ucomappingNotes` (String)
+  - `ucomodesOfIntroduction` (String)
+  - `ucoobtainAllPrivilege` (String)
+  - `ucopotentialMitigations` (String)
+  - `ucopublishedDateTime` (LocalDateTime)
+  - `ucoreferences` (String)
+  - `ucorelatedAttackPatterns` (String)
+  - `ucostatus` (String)
+  - `ucostructure` (String)
+  - `ucosummary` (String)
+  - `ucotimeOfIntroduction` (LocalDateTime)
+  - `ucouserInteractionRequired` (String)
+  - `ucovectorString` (String)
+  - `ucovulnStatus` (String)
+  - `uri` (String)
+  - `uri` (String)
+  - `uri` (String)
+  - `uri` (String)
+  - `uri` (String)
+  - `uri` (String)
+  - `uri` (String)
+  - `uri` (String)
+  - `uri` (String)
+  - `uri` (String)
+  - `uri` (String)
+
+* **Node Label:** `:_GraphConfig`
+  - `_applyNeo4jNaming` (Boolean)
+  - `_classLabel` (String)
+  - `_classNamePropName` (String)
+  - `_dataTypePropertyLabel` (String)
+  - `_domainRel` (String)
+  - `_handleMultival` (Integer)
+  - `_handleRDFTypes` (Integer)
+  - `_handleVocabUris` (Integer)
+  - `_keepCustomDataTypes` (Boolean)
+  - `_keepLangTag` (Boolean)
+  - `_multivalPropList` (StringArray)
+  - `_objectPropertyLabel` (String)
+  - `_rangeRel` (String)
+  - `_relNamePropName` (String)
+  - `_subClassOfRel` (String)
+  - `_subPropertyOfRel` (String)
+
+
+2. Relationship Types and Properties
+
+---------------------------------
+
+* **Relationship Type:** `[::`ANNOTATEDPROPERTY]`
+  - `None` (Unknown)
+
+* **Relationship Type:** `[::`ANNOTATEDSOURCE]`
+  - `None` (Unknown)
+
+* **Relationship Type:** `[::`DOMAIN]`
+  - `None` (Unknown)
+
+* **Relationship Type:** `[::`EQUIVALENTCLASS]`
+  - `None` (Unknown)
+
+* **Relationship Type:** `[::`EQUIVALENTPROPERTY]`
+  - `None` (Unknown)
+
+* **Relationship Type:** `[::`FIRST]`
+  - `None` (Unknown)
+
+* **Relationship Type:** `[::`INVERSEOF]`
+  - `None` (Unknown)
+
+* **Relationship Type:** `[::`ONCLASS]`
+  - `None` (Unknown)
+
+* **Relationship Type:** `[::`ONEOF]`
+  - `None` (Unknown)
+
+* **Relationship Type:** `[::`ONPROPERTY]`
+  - `None` (Unknown)
+
+* **Relationship Type:** `[::`RANGE]`
+  - `None` (Unknown)
+
+* **Relationship Type:** `[::`REST]`
+  - `None` (Unknown)
+
+* **Relationship Type:** `[::`SOMEVALUESFROM]`
+  - `None` (Unknown)
+
+* **Relationship Type:** `[::`SUBCLASSOF]`
+  - `None` (Unknown)
+
+* **Relationship Type:** `[::`SUBPROPERTYOF]`
+  - `None` (Unknown)
+
+* **Relationship Type:** `[::`UCOEXEXAMPLEOBSERVEDIN]`
+  - `None` (Unknown)
+
+* **Relationship Type:** `[::`UCOEXHASCPE]`
+  - `None` (Unknown)
+
+* **Relationship Type:** `[::`UCOEXHASMITREATTACK]`
+  - `None` (Unknown)
+
+* **Relationship Type:** `[::`UCOEXHASRELATEDWEAKNESS]`
+  - `None` (Unknown)
+
+* **Relationship Type:** `[::`UCOEXHASTAXONOMYMAPPING]`
+  - `None` (Unknown)
+
+* **Relationship Type:** `[::`UCOHASCVE_ID]`
+  - `None` (Unknown)
+
+* **Relationship Type:** `[::`UCOHASOBSERVEDEXAMPLE]`
+  - `None` (Unknown)
+
+* **Relationship Type:** `[::`UCOHASVULNERABILITY]`
+  - `None` (Unknown)
+
+* **Relationship Type:** `[::`UCOHASWEAKNESS]`
+  - `None` (Unknown)
+
+* **Relationship Type:** `[::`UNIONOF]`
+  - `None` (Unknown)
+
+* **Relationship Type:** `[::`VERSIONIRI]`
+  - `None` (Unknown)
+
+
+3. Relationship Schema (How Nodes are Connected)
+
+-----------------------------------------------
+The following patterns exist in the graph:
+- `(:Axiom)-[R:ANNOTATEDPROPERTY]->(:Resource)`
+- `(:Axiom)-[R:ANNOTATEDSOURCE]->(:Class)`
+- `(:Axiom)-[R:ANNOTATEDSOURCE]->(:Resource)`
+- `(:Class)-[R:EQUIVALENTCLASS]->(:Class)`
+- `(:Class)-[R:EQUIVALENTCLASS]->(:Resource)`
+- `(:Class)-[R:EQUIVALENTCLASS]->(:Restriction)`
+- `(:Class)-[R:ONEOF]->(:Resource)`
+- `(:Class)-[R:SUBCLASSOF]->(:Class)`
+- `(:Class)-[R:SUBCLASSOF]->(:Resource)`
+- `(:Class)-[R:SUBCLASSOF]->(:Restriction)`
+- `(:Class)-[R:UNIONOF]->(:Resource)`
+- `(:DatatypeProperty)-[R:DOMAIN]->(:Class)`
+- `(:DatatypeProperty)-[R:DOMAIN]->(:Resource)`
+- `(:DatatypeProperty)-[R:RANGE]->(:Class)`
+- `(:DatatypeProperty)-[R:RANGE]->(:Resource)`
+- `(:DatatypeProperty)-[R:SUBPROPERTYOF]->(:DatatypeProperty)`
+- `(:DatatypeProperty)-[R:SUBPROPERTYOF]->(:ObjectProperty)`
+- `(:DatatypeProperty)-[R:SUBPROPERTYOF]->(:Resource)`
+- `(:FunctionalProperty)-[R:DOMAIN]->(:Class)`
+- `(:FunctionalProperty)-[R:DOMAIN]->(:Resource)`
+- `(:FunctionalProperty)-[R:RANGE]->(:Class)`
+- `(:FunctionalProperty)-[R:RANGE]->(:Resource)`
+- `(:FunctionalProperty)-[R:SUBPROPERTYOF]->(:DatatypeProperty)`
+- `(:FunctionalProperty)-[R:SUBPROPERTYOF]->(:ObjectProperty)`
+- `(:FunctionalProperty)-[R:SUBPROPERTYOF]->(:Resource)`
+- `(:IrreflexiveProperty)-[R:DOMAIN]->(:Class)`
+- `(:IrreflexiveProperty)-[R:DOMAIN]->(:Resource)`
+- `(:IrreflexiveProperty)-[R:INVERSEOF]->(:IrreflexiveProperty)`
+- `(:IrreflexiveProperty)-[R:INVERSEOF]->(:ObjectProperty)`
+- `(:IrreflexiveProperty)-[R:INVERSEOF]->(:Resource)`
+- `(:IrreflexiveProperty)-[R:RANGE]->(:Class)`
+- `(:IrreflexiveProperty)-[R:RANGE]->(:Resource)`
+- `(:ObjectProperty)-[R:DOMAIN]->(:Class)`
+- `(:ObjectProperty)-[R:DOMAIN]->(:Resource)`
+- `(:ObjectProperty)-[R:EQUIVALENTPROPERTY]->(:ObjectProperty)`
+- `(:ObjectProperty)-[R:EQUIVALENTPROPERTY]->(:Resource)`
+- `(:ObjectProperty)-[R:INVERSEOF]->(:IrreflexiveProperty)`
+- `(:ObjectProperty)-[R:INVERSEOF]->(:ObjectProperty)`
+- `(:ObjectProperty)-[R:INVERSEOF]->(:Resource)`
+- `(:ObjectProperty)-[R:RANGE]->(:Class)`
+- `(:ObjectProperty)-[R:RANGE]->(:Resource)`
+- `(:ObjectProperty)-[R:SUBPROPERTYOF]->(:DatatypeProperty)`
+- `(:ObjectProperty)-[R:SUBPROPERTYOF]->(:ObjectProperty)`
+- `(:ObjectProperty)-[R:SUBPROPERTYOF]->(:Resource)`
+- `(:Ontology)-[R:VERSIONIRI]->(:Ontology)`
+- `(:Ontology)-[R:VERSIONIRI]->(:Resource)`
+- `(:Resource)-[R:ANNOTATEDPROPERTY]->(:Resource)`
+- `(:Resource)-[R:ANNOTATEDSOURCE]->(:Class)`
+- `(:Resource)-[R:ANNOTATEDSOURCE]->(:Resource)`
+- `(:Resource)-[R:DOMAIN]->(:Class)`
+- `(:Resource)-[R:DOMAIN]->(:Resource)`
+- `(:Resource)-[R:EQUIVALENTCLASS]->(:Class)`
+- `(:Resource)-[R:EQUIVALENTCLASS]->(:Resource)`
+- `(:Resource)-[R:EQUIVALENTCLASS]->(:Restriction)`
+- `(:Resource)-[R:EQUIVALENTPROPERTY]->(:ObjectProperty)`
+- `(:Resource)-[R:EQUIVALENTPROPERTY]->(:Resource)`
+- `(:Resource)-[R:FIRST]->(:Class)`
+- `(:Resource)-[R:FIRST]->(:NamedIndividual)`
+- `(:Resource)-[R:FIRST]->(:Resource)`
+- `(:Resource)-[R:INVERSEOF]->(:IrreflexiveProperty)`
+- `(:Resource)-[R:INVERSEOF]->(:ObjectProperty)`
+- `(:Resource)-[R:INVERSEOF]->(:Resource)`
+- `(:Resource)-[R:ONCLASS]->(:Class)`
+- `(:Resource)-[R:ONCLASS]->(:Resource)`
+- `(:Resource)-[R:ONEOF]->(:Resource)`
+- `(:Resource)-[R:ONPROPERTY]->(:IrreflexiveProperty)`
+- `(:Resource)-[R:ONPROPERTY]->(:ObjectProperty)`
+- `(:Resource)-[R:ONPROPERTY]->(:Resource)`
+- `(:Resource)-[R:RANGE]->(:Class)`
+- `(:Resource)-[R:RANGE]->(:Resource)`
+- `(:Resource)-[R:REST]->(:Resource)`
+- `(:Resource)-[R:SOMEVALUESFROM]->(:Class)`
+- `(:Resource)-[R:SOMEVALUESFROM]->(:Resource)`
+- `(:Resource)-[R:SUBCLASSOF]->(:Class)`
+- `(:Resource)-[R:SUBCLASSOF]->(:Resource)`
+- `(:Resource)-[R:SUBCLASSOF]->(:Restriction)`
+- `(:Resource)-[R:SUBPROPERTYOF]->(:DatatypeProperty)`
+- `(:Resource)-[R:SUBPROPERTYOF]->(:ObjectProperty)`
+- `(:Resource)-[R:SUBPROPERTYOF]->(:Resource)`
+- `(:Resource)-[R:UCOEXEXAMPLEOBSERVEDIN]->(:Resource)`
+- `(:Resource)-[R:UCOEXEXAMPLEOBSERVEDIN]->(:UcoCVE)`
+- `(:Resource)-[R:UCOEXHASCPE]->(:Resource)`
+- `(:Resource)-[R:UCOEXHASCPE]->(:UcoexCPE)`
+- `(:Resource)-[R:UCOEXHASMITREATTACK]->(:Resource)`
+- `(:Resource)-[R:UCOEXHASMITREATTACK]->(:UcoexMITREATTACK)`
+- `(:Resource)-[R:UCOEXHASRELATEDWEAKNESS]->(:Resource)`
+- `(:Resource)-[R:UCOEXHASRELATEDWEAKNESS]->(:UcoCWE)`
+- `(:Resource)-[R:UCOEXHASTAXONOMYMAPPING]->(:Resource)`
+- `(:Resource)-[R:UCOEXHASTAXONOMYMAPPING]->(:UcoexMITREATTACK)`
+- `(:Resource)-[R:UCOHASCVE_ID]->(:Resource)`
+- `(:Resource)-[R:UCOHASCVE_ID]->(:UcoCVE)`
+- `(:Resource)-[R:UCOHASOBSERVEDEXAMPLE]->(:Resource)`
+- `(:Resource)-[R:UCOHASOBSERVEDEXAMPLE]->(:UcoexObservedExample)`
+- `(:Resource)-[R:UCOHASVULNERABILITY]->(:Resource)`
+- `(:Resource)-[R:UCOHASVULNERABILITY]->(:UcoVulnerability)`
+- `(:Resource)-[R:UCOHASWEAKNESS]->(:Resource)`
+- `(:Resource)-[R:UCOHASWEAKNESS]->(:UcoCWE)`
+- `(:Resource)-[R:UNIONOF]->(:Resource)`
+- `(:Resource)-[R:VERSIONIRI]->(:Ontology)`
+- `(:Resource)-[R:VERSIONIRI]->(:Resource)`
+- `(:Restriction)-[R:ONCLASS]->(:Class)`
+- `(:Restriction)-[R:ONCLASS]->(:Resource)`
+- `(:Restriction)-[R:ONPROPERTY]->(:IrreflexiveProperty)`
+- `(:Restriction)-[R:ONPROPERTY]->(:ObjectProperty)`
+- `(:Restriction)-[R:ONPROPERTY]->(:Resource)`
+- `(:Restriction)-[R:SOMEVALUESFROM]->(:Class)`
+- `(:Restriction)-[R:SOMEVALUESFROM]->(:Resource)`
+- `(:SymmetricProperty)-[R:DOMAIN]->(:Class)`
+- `(:SymmetricProperty)-[R:DOMAIN]->(:Resource)`
+- `(:SymmetricProperty)-[R:RANGE]->(:Class)`
+- `(:SymmetricProperty)-[R:RANGE]->(:Resource)`
+- `(:UcoCVE)-[R:UCOEXHASCPE]->(:Resource)`
+- `(:UcoCVE)-[R:UCOEXHASCPE]->(:UcoexCPE)`
+- `(:UcoCWE)-[R:UCOHASOBSERVEDEXAMPLE]->(:Resource)`
+- `(:UcoCWE)-[R:UCOHASOBSERVEDEXAMPLE]->(:UcoexObservedExample)`
+- `(:UcoExploitTarget)-[R:UCOHASVULNERABILITY]->(:Resource)`
+- `(:UcoExploitTarget)-[R:UCOHASVULNERABILITY]->(:UcoVulnerability)`
+- `(:UcoExploitTarget)-[R:UCOHASWEAKNESS]->(:Resource)`
+- `(:UcoExploitTarget)-[R:UCOHASWEAKNESS]->(:UcoCWE)`
+- `(:UcoVulnerability)-[R:UCOHASCVE_ID]->(:Resource)`
+- `(:UcoVulnerability)-[R:UCOHASCVE_ID]->(:UcoCVE)`
+- `(:UcoexCAPEC)-[R:UCOEXHASRELATEDWEAKNESS]->(:Resource)`
+- `(:UcoexCAPEC)-[R:UCOEXHASRELATEDWEAKNESS]->(:UcoCWE)`
+- `(:UcoexCAPEC)-[R:UCOEXHASTAXONOMYMAPPING]->(:Resource)`
+- `(:UcoexCAPEC)-[R:UCOEXHASTAXONOMYMAPPING]->(:UcoexMITREATTACK)`
+- `(:UcoexMITRED3FEND)-[R:UCOEXHASMITREATTACK]->(:Resource)`
+- `(:UcoexMITRED3FEND)-[R:UCOEXHASMITREATTACK]->(:UcoexMITREATTACK)`
+- `(:UcoexObservedExample)-[R:UCOEXEXAMPLEOBSERVEDIN]->(:Resource)`
+- `(:UcoexObservedExample)-[R:UCOEXEXAMPLEOBSERVEDIN]->(:UcoCVE)`
+
+
+====================
+
+End of Schema Report.
