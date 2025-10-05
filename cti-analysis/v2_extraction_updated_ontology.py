@@ -13,6 +13,7 @@ from ontologies.validator import validate_triple_record, tally_validity
 from ontologies.malont_adapter import normalize_and_map_malont
 from ontologies.ontology_loader import get_ontology
 from ontologies.malont import get_config 
+from ontologies.validator import top_unknown_predicates
 # -------- spaCy setup --------
 try:
     nlp = spacy.load("en_core_web_sm")
@@ -29,6 +30,45 @@ matcher = PhraseMatcher(nlp.vocab, attr="LOWER")
 # -------- feature flags --------
 USE_CONTEXT_WINDOW = True
 CONTEXT_WINDOW_K = 1  # prev/next sentence window size
+
+
+
+from datetime import datetime
+from ontologies.validator import top_unknown_predicates
+
+def save_unknown_predicates_report(records, ontology, target_field="mapped", k=20, output_dir="reports"):
+    """
+    Collects the top unknown predicates (those not found in ontology.PREDICATES),
+    prints them to console, and saves to a timestamped JSON file.
+    """
+    unknowns = top_unknown_predicates(records, ontology, target_field=target_field, k=k)
+    if not unknowns:
+        print("[Validator] No unknown predicates found.")
+        return
+
+    # Show in console
+    print("\n[Validator] Top unknown predicates:")
+    for pred, count in unknowns:
+        print(f"  {pred}: {count}")
+
+    # Make sure output folder exists
+    os.makedirs(output_dir, exist_ok=True)
+
+    # File name with timestamp
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    filename = os.path.join(output_dir, f"unknown_predicates_{timestamp}.json")
+
+    # Save to JSON
+    data = {
+        "timestamp": timestamp,
+        "top_unknown_predicates": [{"predicate": p, "count": c} for p, c in unknowns],
+        "ontology_predicate_count": len(ontology.PREDICATES),
+    }
+    with open(filename, "w", encoding="utf-8") as f:
+        json.dump(data, f, indent=2)
+
+    print(f"[Validator] Unknown predicate report saved to: {filename}")
+
 
 def ensure_ollama_model(model_name="mistral", base_url="http://localhost:11434"):
     try:
@@ -238,23 +278,21 @@ OUTPUT (JSON array only):
 
                     self.raw_triples += len(triples)
 
-                    norm_pack = []          # keep accepted (strict or lenient) for this sentence
+                    norm_pack = []
                     for raw_t in (triples or []):
                         # 1) normalize (MALONT cleanup) + map (to connection ontology)
-                        clean_malont, mapped = normalize_and_map_malont(raw_t)
+                        record = normalize_and_map_malont(raw_t)  # <-- one dict, already has "mapped"
 
-                        # 2) create record with both views
-                        rec = dict(clean_malont)
-                        rec["mapped"] = mapped
-
-                        # 3) validate mapped view and tag
-                        outcome = validate_triple_record(rec, self.ontology, lenient_accept=self.lenient_accept, target_field="mapped")
+                        # 2) validate mapped view and tag
+                        outcome = validate_triple_record(record, self.ontology,
+                                                        lenient_accept=self.lenient_accept,
+                                                        target_field="mapped")
                         if outcome != "reject":
-                            print(f"{rec['subject']} —{rec['predicate']}→ {rec['object']}  [{outcome}]")
-                            norm_pack.append(rec)
-                            self.valid_triples.append(rec)
+                            print(f"{record['subject']} —{record['predicate']}→ {record['object']}  [{outcome}]")
+                            norm_pack.append(record)
+                            self.valid_triples.append(record)
                         else:
-                            print(f"Suspicious triple (rejected): {rec}")
+                            print(f"Suspicious triple (rejected): {record}")
                             self.suspicious_triples += 1
 
                     # store only accepted recs for this sentence
@@ -264,17 +302,17 @@ OUTPUT (JSON array only):
                     print(f"LLM error on page {page_no} sentence {i}: {e}")
 
         self.runtime_seconds = time.time() - start_time
+        extractor.save_to_json(out_path)
         return chunk_results
 
     def build_dict(self, chunk_results):
         self.chunk_data = []
         for sentence, page_no, i, triples, ctx_before, ctx_after in chunk_results:
-            valid_only = [t for t in triples if self._is_valid_triple(t)]
-            if not valid_only:
+            if not triples:
                 continue
             self.chunk_data.append({
                 "context": sentence,
-                "triple": valid_only,
+                "triple": triples,  # already vetted by validator
                 "metadata": {
                     "page_number": page_no,
                     "id": str(i).zfill(3),
@@ -285,6 +323,7 @@ OUTPUT (JSON array only):
                 }
             })
         return self.chunk_data
+
 
     def safe_filename(self, name: str) -> str:
         return re.sub(r'[<>:"/\\|?*]', '_', name)
@@ -356,3 +395,13 @@ if __name__ == "__main__":
         extractor.build_dict(raw_chunk_results)
         out_name = extractor.safe_filename(f"chunk_data_{model}.json")
         extractor.save_to_json(out_name)
+        # After extractor finishes
+    if hasattr(extractor, "chunk_data"):
+        save_unknown_predicates_report(
+        extractor.chunk_data,
+        extractor.ontology,
+        target_field="mapped",
+        k=20,
+        output_dir="reports"
+    )
+

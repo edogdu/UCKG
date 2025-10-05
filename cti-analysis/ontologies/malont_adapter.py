@@ -1,76 +1,98 @@
-# malont_adapter.py
-# One-stop adapter: take a raw MALONT-like triple from the LLM,
-# normalize types/predicates (regex + aliases), apply safe repairs,
-# and map to your connection.py ontology for validation/graph.
-
 from __future__ import annotations
+from typing import Dict, Any, Optional, Tuple
 import re
-from typing import Dict, Any, Tuple, Optional
-from .connection import get_config as get_connection_config, OntologyConfig
 
-# -------------------------
-# 1) Normalization helpers
-# -------------------------
+# -----------------------------------------------------------------------------
+# 0) Basic string normalizers
+# -----------------------------------------------------------------------------
 
-# Common free-text → MALONT surface predicates (keep MALONT wording)
-_PRED_CANON: Dict[str, str] = {
-    r"\buses?\b": "uses",
-    r"\btargets?\b": "targets",
-    r"\bexploit(?:s|ed|ing)?\b": "exploits",
-    r"\bcommunicates? with\b": "communicatesWith",
-    r"\bbelongs to\b": "belongsTo",
-    r"\bhas alias(?:es)?\b": "hasAlias",
-    r"\bhas\b": "has",
+def _norm_spaces_case(s: str) -> str:
+    return re.sub(r"\s+", " ", s.strip())
 
-    # incident/investigation language
-    r"\bwas contacted to look into\b": "investigates",
-    r"\binvestigat(?:e|ed|ing|ion)\b": "investigates",
-    r"\bfocused (?:initially )?on\b": "focusesOn",
-    r"\bexhibited\b": "exhibits",
-    r"\bcoincides? with\b": "coincidesWith",
-}
+def _norm_key(s: str) -> str:
+    # unify for dictionary keys: remove spaces/underscores/hyphens and lower
+    return (
+        s.strip().lower()
+         .replace(" ", "")
+         .replace("_", "")
+         .replace("-", "")
+    )
 
-# Lightweight type canonicalization:
-#  - fixes casing/spacing/hyphen/underscore variants
-#  - collapses long MALONT names to the canonical surface label
+# -----------------------------------------------------------------------------
+# 1) Canonicalization (LLM → canonical MALONT surface)
+#    Use these on the raw LLM outputs *before* mapping to the connection ontology.
+# -----------------------------------------------------------------------------
+
+# Soft alias table for types at the MALONT layer
 _TYPE_ALIASES: Dict[str, str] = {
-    # identities
     "threatactor": "ThreatActor",
-    "threat actor": "ThreatActor",
+    "actor": "ThreatActor",
+    "org": "Organization",
     "organisation": "Organization",
-
-    # actions
+    "company": "Organization",
+    "person": "Person",
+    "human": "Person",
+    "campaign": "Campaign",
     "attackpattern": "AttackPattern",
-    "attack-pattern": "AttackPattern",
-    "attackpattern_largedescription": "AttackPattern",
-    "attackpattern_smalldescription": "AttackPattern",
-
-    # observables
+    "tactic": "AttackPattern",
+    "technique": "AttackPattern",
+    "url": "URL",
+    "domain": "DomainName",
+    "domainname": "DomainName",
+    "ip": "IPAddress",
     "ipaddress": "IPAddress",
-    "ip address": "IPAddress",
-    "domain name": "DomainName",
-    "email address": "EmailAddress",
-    "file name": "Filename",
-    "file path": "Filepath",
+    "email": "EmailAddress",
+    "emailaddress": "EmailAddress",
+    "filepath": "Filepath",
+    "filename": "Filename",
+    "hash": "Hash",
+    "md5": "MD5",
+    "sha1": "SHA-1",
+    "sha256": "SHA-256",
+    "tool": "Tool",
+    "malware": "Malware",
+    "software": "Software",
+    "infrastructure": "Infrastructure",
+    "network": "Network",
+    "system": "System",
+    "vulnerability": "Vulnerability",
+    "location": "Location",
+    "country": "Country",
+    "region": "Region",
+    "datetime": "DateTime",
+    "string": "String",
+    "number": "Number",
 }
 
-def _normalize_spaces_case(s: str) -> str:
-    # normalize case and remove obvious separators to match _TYPE_ALIASES keys
-    s2 = s.strip()
-    s2 = re.sub(r"[_\-]+", " ", s2)
-    return s2
+# Regex-to-canonical MALONT predicate patterns (very permissive)
+_PRED_CANON: Dict[str, str] = {
+    r"^use[s]?$|leverag|drop|deliver|deploy|install|run|launch|execut": "usesTool",
+    r"target|against|aim|victim": "targetsAsset",
+    r"exploit": "exploits",
+    r"communicat|connect": "communicatesWith",
+    r"belong|affiliat|operate[s]? by|run[s]? by": "belongsTo",
+    r"alias|aka|also known as|handle": "hasAlias",
+    r"focus|objective|goal|intent|purpose|to\s+\w+": "focusesOn",
+    r"result|lead[s]? to|cause[s]?": "exhibits",
+    r"coincid|correlat|relat": "coincidesWith",
+    r"name|label|title": "has",  # often maps to core:name later
+    r"ref|reference|link": "has", # later → core:externalReference
+    r"time|date": "atTime",
+    r"locat|in\s+\w+": "inLocation",
+    r"investigat|analyz|research|track": "investigates",
+    r"perform|conduct|execute": "usesTool",  # often operationalized as instrument
+}
 
 def canonicalize_type(raw: Any) -> Optional[str]:
     if not isinstance(raw, str) or not raw.strip():
         return None
-    s = _normalize_spaces_case(raw).lower()
+    s = _norm_spaces_case(raw).lower()
     if s in _TYPE_ALIASES:
         return _TYPE_ALIASES[s]
-    # Title-case tokens like "attack pattern" → "Attack Pattern" then collapse known MALONT forms
-    title = " ".join(tok.capitalize() for tok in s.split())
-    # collapse known multi-word MALONT surface labels back to canonical token
+
+    title = " ".join(tok.capitalize() for tok in s.split())  # "attack pattern" → "Attack Pattern"
     join = title.replace(" ", "")
-    # prefer explicit alias mapping if we had it
+    # prefer explicit MALONT tokens if we recognize them
     if join in {"ThreatActor","Organization","Person","Campaign","AttackPattern","URL","DomainName","IPAddress",
                 "EmailAddress","Filepath","Filename","Hash","MD5","SHA-1","SHA-256","Software","Tool","Malware",
                 "Infrastructure","Network","System","Vulnerability","Location","Country","Region","DateTime",
@@ -85,124 +107,182 @@ def canonicalize_predicate(raw: Any) -> Optional[str]:
     for pat, canon in _PRED_CANON.items():
         if re.search(pat, s):
             return canon
-    return raw.strip()  # leave as-is if unknown; mapper may still handle it
+    return raw.strip()  # leave as-is; mapper may still handle it
 
-# ------------------------------------------------
-# 2) MALONT → connection ontology mapping tables
-# ------------------------------------------------
+# -----------------------------------------------------------------------------
+# 2) Mapping: canonical MALONT → connection ontology
+#    Fill these with your actual ontology terms.
+# -----------------------------------------------------------------------------
 
-_TYPE_MAP: Dict[str, str] = {
-    # Identities
-    "ThreatActor": "identity:Identity",        # refine later to Person vs Organization if you wish
+# Types: MALONT → connection
+TYPE_MAP: Dict[str, str] = {
+    # identities
+    "ThreatActor": "identity:Organization",
     "Organization": "identity:Organization",
     "Person": "identity:Person",
 
-    # Actions (higher-level activities)
+    # actions/attack concepts
     "Campaign": "action:Action",
-    "AttackPattern": "action:Action",
+    "AttackPattern": "tool:Tool",   # or a dedicated class if you have one
+    "Software": "tool:Tool",
+    "Tool": "tool:Tool",
+    "Malware": "tool:Tool",
 
-    # Observables
+    # observables
     "URL": "observable:URL",
     "DomainName": "observable:DomainName",
     "IPAddress": "observable:IPAddress",
     "EmailAddress": "observable:EmailAddress",
-    "Filename": "observable:File",
     "Filepath": "observable:File",
+    "Filename": "observable:File",
     "Hash": "observable:File",
     "MD5": "observable:File",
     "SHA-1": "observable:File",
     "SHA-256": "observable:File",
-    "Software": "observable:Tool",
-    "Tool": "observable:Tool",
-    "Malware": "observable:Tool",
-    "Infrastructure": "observable:ObservableObject",
-    "Network": "observable:ObservableObject",
-    "System": "observable:ObservableObject",
-    "Vulnerability": "observable:Vulnerability",
 
-    # Locations
+    # infra/locations
+    "Infrastructure": "location:Location",
+    "Network": "location:Location",
+    "System": "location:Location",
     "Location": "location:Location",
     "Country": "location:Location",
     "Region": "location:Location",
 
-    # Literals
+    # literals
     "DateTime": "core:DateTime",
-    "String": "core:Literal",
+    "String": "core:String",
     "Number": "core:Number",
+
+    "Application": "tool:Tool",                   # scripts/utilities are software
+    "Command": "action:Action",                   # “Delete command … deletes …” is an action
+    "AttackPattern_SmallDescription": "tool:Tool",# you can refine later if you add a dedicated class
+    "MalwareAnalysis": "core:Literal",            # treat analysis labels/snippets as literal text
+    "Filename": "observable:File",  
 }
 
-_PRED_MAP: Dict[str, str] = {
-    # canonical MALONT verbs
-    "uses": "action:instrument",
-    "targets": "action:object",
-    "exploits": "action:object",
-    "communicatesWith": "action:instrument",    # you can add a dedicated net:communicatesWith later
-    "belongsTo": "core:createdBy",
-    "hasAlias": "core:externalReference",
-    "has": "core:hasFacet",
+def map_malont_type(malont_type: Optional[str]) -> Optional[str]:
+    if not malont_type:
+        return None
+    return TYPE_MAP.get(malont_type, malont_type)
 
-    # normalized free-text
-    "investigates": "action:participant",       # Org investigates Action/Incident
-    "focusesOn": "action:objective",
-    "exhibits": "action:result",
-    "coincidesWith": "core:hasFacet",           # often better as Action.startTime
+# Predicates: MALONT → connection (semantic)
+def _pm(key: str) -> str:
+    return _norm_key(key)
+
+PRED_MAP: Dict[str, str] = {
+    # canonical MALONT-style keys (normalized with _norm_key)
+    _pm("usesTool"): "action:instrument",
+    _pm("targetsAsset"): "action:object",
+    _pm("exploits"): "action:object",
+    _pm("communicatesWith"): "action:instrument",
+    _pm("belongsTo"): "core:createdBy",
+    _pm("hasAlias"): "core:externalReference",
+    _pm("has"): "core:hasFacet",
+    _pm("investigates"): "action:participant",
+    _pm("focusesOn"): "action:objective",
+    _pm("exhibits"): "action:result",
+    _pm("coincidesWith"): "core:hasFacet",
+    _pm("atTime"): "action:startTime",
+    _pm("inLocation"): "action:location",
+
+    # common CTI verbs seen in the wild (fall through to the same mapping)
+    _pm("uses"): "action:instrument",
+    _pm("leverages"): "action:instrument",
+    _pm("delivers"): "action:instrument",
+    _pm("drops"): "action:instrument",
+    _pm("downloads"): "action:instrument",
+    _pm("installs"): "action:instrument",
+    _pm("runs"): "action:instrument",
+    _pm("launches"): "action:instrument",
+    _pm("deploys"): "action:instrument",
+    _pm("connects"): "action:instrument",
+    _pm("connectsTo"): "action:instrument",
+    _pm("communicates"): "action:instrument",
+    _pm("hosts"): "action:object",
+    _pm("hostsOn"): "action:location",
+    _pm("associatedWith"): "core:hasFacet",
+    _pm("relatedTo"): "core:hasFacet",
+    _pm("controls"): "action:object",
+    _pm("controlsServer"): "action:object",
+    _pm("observedIn"): "action:location",
+    _pm("performs"): "action:performer",
+
+    _pm("deletes"):    "action:object",   # deletes <files> → object is observable:File
+    _pm("contains"):   "core:hasFacet",
 }
 
-# --------------------------------------
-# 3) Adapter public API (one-call usage)
-# --------------------------------------
+def map_malont_predicate(pred: Optional[str]) -> Optional[str]:
+    if not pred:
+        return None
+    k = _norm_key(pred)
+    return PRED_MAP.get(k, pred)
 
-def get_connection_ontology() -> OntologyConfig:
-    return get_connection_config()
 
-def normalize_and_map_malont(triple: Dict[str, Any]) -> Tuple[Dict[str, Any], Dict[str, Any]]:
+def map_malont_predicate_with_context(pred: Optional[str],
+                                      mapped_subject_type: Optional[str],
+                                      mapped_object_type: Optional[str]) -> Optional[str]:
+    base = map_malont_predicate(pred)
+    if base is None:
+        return None
+
+    # If object is a literal, prefer attributes over relations where possible
+    if mapped_object_type and mapped_object_type.startswith("core:"):
+        if base in ("core:hasFacet", "core:description"):
+            return "core:description"   # attribute; allowed for any subject with core:Literal
+        if base.startswith("action:"):
+            # action:* with literal object will likely fail; fall back to description
+            return "core:description"
+
+    # If the verb is about targeting/connecting/deleting, it’s an action on an observable
+    if base == "action:object":
+        # ensure subject will be an action (validator expects that combo)
+        return "action:object"
+
+    return base
+
+
+def _force_action_subject_if_needed(subj_type: Optional[str], predicate: Optional[str]) -> Optional[str]:
+    if isinstance(predicate, str) and predicate.startswith("action:"):
+        if subj_type != "action:Action":
+            return "action:Action"
+    return subj_type
+
+
+# -----------------------------------------------------------------------------
+# 3) High-level adapter: normalize MALONT → map to connection
+#    Call this from your extractor to produce the "mapped" view.
+# -----------------------------------------------------------------------------
+
+def normalize_and_map_malont(triple: Dict[str, Any]) -> Dict[str, Any]:
     """
-    Input: raw MALONT-ish triple from LLM:
-      {"subject":{"name":..., "type":...}, "predicate":..., "object":{...}, "evidence":{...}}
-    Returns:
-      (clean_malont, mapped_connection)
+    Input triple is the raw LLM/MALONT-style triple:
+      { "subject": {"name":..., "type":...}, "predicate": "...", "object": {"name":..., "type": ...}, ... }
+
+    Returns a dict with both the original and a 'mapped' connection-ontology view.
     """
-    # --- normalize MALONT surface ---
-    subj = dict(triple.get("subject") or {})
-    obj  = dict(triple.get("object") or {})
-    pred = triple.get("predicate")
+    subj = triple.get("subject", {}) or {}
+    obj  = triple.get("object", {}) or {}
 
-    subj["type"] = canonicalize_type(subj.get("type", ""))
-    obj["type"]  = canonicalize_type(obj.get("type", ""))
-    pred_clean   = canonicalize_predicate(pred)
+    # 1) Canonicalize MALONT types and predicate
+    s_type_canon = canonicalize_type(subj.get("type"))
+    o_type_canon = canonicalize_type(obj.get("type"))
+    p_canon      = canonicalize_predicate(triple.get("predicate"))
 
-    clean_malont = dict(triple)
-    clean_malont["subject"] = subj
-    clean_malont["object"]  = obj
-    clean_malont["predicate"] = pred_clean
+    # 2) Map to connection ontology
+    s_type_conn = map_malont_type(s_type_canon)
+    o_type_conn = map_malont_type(o_type_canon)
+    # 3) Context-aware predicate mapping (uses mapped types)
+    p_conn = map_malont_predicate_with_context(p_canon, s_type_conn, o_type_conn)
+    # 4) Ensure subject is action for action:* predicates
+    s_type_conn = _force_action_subject_if_needed(s_type_conn, p_conn)
 
-    # --- map to connection ontology ---
-    s_out = {"name": subj.get("name"), "type": _TYPE_MAP.get(subj.get("type",""), subj.get("type",""))}
-    o_out = {"name": obj.get("name"),  "type": _TYPE_MAP.get(obj.get("type",""),  obj.get("type",""))}
-    p_out = _PRED_MAP.get(pred_clean or "", pred_clean or "")
+    mapped = {
+        "subject": {"name": subj.get("name"), "type": s_type_conn},
+        "predicate": p_conn,
+        "object": {"name": obj.get("name"), "type": o_type_conn},
+    }
 
-    # --- safe structural repairs ---
-    # 1) DateTime as subject & Action as object → flip to Action --action:startTime--> DateTime
-    if s_out.get("type") == "core:DateTime" and o_out.get("type") == "action:Action":
-        s_out, o_out = o_out, s_out
-        p_out = "action:startTime"
-
-    # 2) “security incident” often better as Action
-    if isinstance(o_out.get("name"), str) and o_out["name"].lower().strip() in {"security incident","incident"}:
-        o_out["type"] = "action:Action"
-
-    mapped = {"subject": s_out, "predicate": p_out, "object": o_out}
-    return clean_malont, mapped
-
-# --------------------------------------
-# 4) Optional: extend at runtime
-# --------------------------------------
-
-def add_type_alias(raw_variant: str, canonical_malont: str) -> None:
-    """Let you add a new normalization alias without editing code elsewhere."""
-    key = _normalize_spaces_case(raw_variant).lower()
-    _TYPE_ALIASES[key] = canonical_malont
-
-def add_predicate_rule(pattern: str, malont_predicate: str) -> None:
-    """Add a regex → MALONT predicate rule."""
-    _PRED_CANON[pattern] = malont_predicate
+    # Preserve originals and add mapped
+    out = dict(triple)
+    out["mapped"] = mapped
+    return out

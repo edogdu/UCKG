@@ -1,3 +1,4 @@
+
 import json
 import os
 import requests
@@ -8,13 +9,10 @@ import spacy
 import re
 from spacy.matcher import PhraseMatcher
 
-# Ontology plumbing
-from ontologies.base import validate_triple_semantics
-from ontologies import connection 
-from ontologies import malont 
+from ontologies.validator import validate_triple_record, tally_validity
 from ontologies.malont_adapter import normalize_and_map_malont
-from ontologies.validator import validate_mapped_triple
-
+from ontologies.ontology_loader import get_ontology
+from ontologies.malont import get_config 
 # -------- spaCy setup --------
 try:
     nlp = spacy.load("en_core_web_sm")
@@ -64,7 +62,10 @@ class CyberTripleExtractor:
             stop=["</think>", "<think>"],
         )
 
-        self.ontology = malont.get_config()
+        self.ontology = get_ontology("connection")
+        self.malont_onto = get_config()  # MALONT surface vocab for the prompt
+        self.MALONT_TYPES = sorted(self.malont_onto.OBJECT_TYPES | self.malont_onto.LITERAL_TYPES)
+        self.MALONT_PREDS = sorted(self.malont_onto.PREDICATES)
 
 
         self.SUBJECT_TYPES        = self.ontology.SUBJECT_TYPES
@@ -110,11 +111,13 @@ class CyberTripleExtractor:
         self.rejection_stats = {"bad_structure": 0, "invalid_class_or_predicate": 0}
         self.pages_parsed = 0
         self.runtime_seconds = 0
+        self.lenient_accept = True  # or False if you only want strict
+
 
     # ---------- prompt with optional context window ----------
     def generate_prompt(self, text, ctx_before="", ctx_after=""):
-        entity_types = ", ".join(sorted(self.SUBJECT_TYPES | self.OBJECT_TYPES))
-        predicates = ", ".join(sorted(self.PREDICATES))
+        entity_types = ", ".join(sorted(self.MALONT_TYPES))
+        predicates = ", ".join(sorted(self.MALONT_PREDS))
         return f"""
 You are a cybersecurity analyst extracting structured intelligence.
 
@@ -234,21 +237,28 @@ OUTPUT (JSON array only):
                         triples = []
 
                     self.raw_triples += len(triples)
-                    chunk_results.append((sentence, page_no, i, triples, ctx_before, ctx_after))
 
-                    for t in triples:
-                        if self._is_valid_triple(t):
-                            print(f"{t['subject']} —{t['predicate']}→ {t['object']}")
-                            self.valid_triples.append(t)
+                    norm_pack = []          # keep accepted (strict or lenient) for this sentence
+                    for raw_t in (triples or []):
+                        # 1) normalize (MALONT cleanup) + map (to connection ontology)
+                        clean_malont, mapped = normalize_and_map_malont(raw_t)
+
+                        # 2) create record with both views
+                        rec = dict(clean_malont)
+                        rec["mapped"] = mapped
+
+                        # 3) validate mapped view and tag
+                        outcome = validate_triple_record(rec, self.ontology, lenient_accept=self.lenient_accept, target_field="mapped")
+                        if outcome != "reject":
+                            print(f"{rec['subject']} —{rec['predicate']}→ {rec['object']}  [{outcome}]")
+                            norm_pack.append(rec)
+                            self.valid_triples.append(rec)
                         else:
-                            print(f"Suspicious triple: {t}")
+                            print(f"Suspicious triple (rejected): {rec}")
                             self.suspicious_triples += 1
-                            if not isinstance(t, dict):
-                                self.rejection_stats["bad_structure"] += 1
-                            elif not validate_triple_semantics(self.ontology, t):
-                                self.rejection_stats["invalid_class_or_predicate"] += 1
-                            else:
-                                self.rejection_stats["bad_structure"] += 1
+
+                    # store only accepted recs for this sentence
+                    chunk_results.append((sentence, page_no, i, norm_pack, ctx_before, ctx_after))
 
                 except Exception as e:
                     print(f"LLM error on page {page_no} sentence {i}: {e}")
@@ -294,19 +304,34 @@ OUTPUT (JSON array only):
                 os.makedirs(output_dir, exist_ok=True)
                 filename = self.safe_filename(output_filename)
                 output_path = os.path.join(output_dir, filename)
+            
+            
+            strict = lenient = reject = 0
+            for item in self.chunk_data:
+                for t in item.get("triple", []):
+                    v = t.get("_validity", "reject")
+                    if v == "strict":
+                        strict += 1
+                    elif isinstance(v, str) and v.startswith("lenient:"):
+                        lenient += 1
+                    else:
+                        reject += 1
 
             metrics = {
                 "file_name": os.path.basename(self.file_path),
-                "model_used": self.model_name,
-                "num_pages": self.pages_parsed,
-                "num_sentences_total": self.sentences_total,
-                "num_sentences_used": self.sentences_used,
-                "num_raw_triples": self.raw_triples,
-                "num_valid_triples": len(self.valid_triples),
-                "num_suspicious_triples": self.suspicious_triples,
-                "avg_triples_per_sentence": self.raw_triples / self.sentences_used if self.sentences_used else 0,
-                "rejection_stats": self.rejection_stats,
-                "runtime_seconds": self.runtime_seconds,
+                 "model_used": self.model_name,
+                 "num_pages": self.pages_parsed,
+                 "num_sentences_total": self.sentences_total,
+                 "num_sentences_used": self.sentences_used,
+                 "num_raw_triples": self.raw_triples,
+                 "num_valid_triples": len(self.valid_triples),
+                 "num_suspicious_triples": self.suspicious_triples,
+                 "avg_triples_per_sentence": self.raw_triples / self.sentences_used if self.sentences_used else 0,
+                 "rejection_stats": self.rejection_stats,
+                 "runtime_seconds": self.runtime_seconds,
+                 "num_valid_triples_strict": strict,
+                 "num_valid_triples_lenient": lenient,
+                 "num_rejected_triples": reject,
             }
 
             metadata = {"metrics": metrics, "data": self.chunk_data}
@@ -319,7 +344,9 @@ OUTPUT (JSON array only):
 
     # -------- single source of truth: ontology validator --------
     def _is_valid_triple(self, triple):
-        return validate_triple_semantics(self.ontology, triple)
+    # no longer used; kept for compatibility
+        return True
+
 
 if __name__ == "__main__":
     models = ["gemma2:9b"]
