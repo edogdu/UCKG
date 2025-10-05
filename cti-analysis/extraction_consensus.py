@@ -39,7 +39,7 @@ def ensure_ollama_model(model_name="mistral", base_url="http://localhost:11434")
         print("Error checking or downloading model:", e)
 
 class CyberTripleExtractor:
-    def __init__(self, file_path, model_name="mistral", ollama_base_url="http://localhost:11434"):
+    def __init__(self, file_path, model_name="mistral", ollama_base_url="http://localhost:11434", seed = 1):
         self.file_path = file_path
         self.ollama_base_url = ollama_base_url
         self.converter = DocumentConverter()
@@ -49,9 +49,18 @@ class CyberTripleExtractor:
         self.llm = Ollama(
             model=model_name,
             base_url=self.ollama_base_url,
-            num_ctx=2048,
             format="json",
-            stop=["</think>", "<think>"]
+            model_kwargs={
+            "options": {
+                "seed": seed,
+                "temperature": 0,
+                "num_ctx": 4096,            # match Modelfile
+                "num_predict": 512,         # keep bounded; raise later if needed
+                "top_p": 0.9,
+                "mirostat": 0,
+            # Add conservative stop tokens; keep your think stops too if you want
+                "stop": ["</s>", "###", "</think>", "<think>"],
+        }}
         )
         self.suspicious_triples = 0
         self.malont_classes = [

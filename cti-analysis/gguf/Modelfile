@@ -1,0 +1,6 @@
+FROM ./foundation-sec-8b-q4_k_m.gguf
+PARAMETER num_ctx 4096
+PARAMETER temperature 0
+PARAMETER seed 1
+
+TEMPLATE """{{ .Prompt }}"""

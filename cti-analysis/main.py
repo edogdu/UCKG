@@ -19,6 +19,7 @@ CTI_HAL_REPO_URL  = "https://github.com/dessertlab/CTI-HAL.git"
 CTI_HAL_LOCAL_DIR = BASE_DIR / "datasets" / "CTI-HAL"  # where to clone the repo
 PROGRESS_PATH     = WORKDIR / "CTI-HAL" / "progress.json"
 
+
 def _clean_state():
     # remove progress file
     try:
@@ -114,8 +115,8 @@ def enumerate_cti_hal(repo_root: Path):
         ann_S = data_dir / group / "annotator S"
         yield pdf, group, ann_L, ann_S
 
-def stage_extraction(input_path: Path, model: str, ollama_base_url: str, out_dir: Path) -> Path:
-    from extraction import CyberTripleExtractor  # local module
+def stage_extraction(input_path: Path, model: str, ollama_base_url: str, out_dir: Path,) -> Path:
+    from v2_extraction_updated_ontology import CyberTripleExtractor  # local module
 
     out_dir.mkdir(parents=True, exist_ok=True)
     stem = input_path.stem.replace(" ", "_")
