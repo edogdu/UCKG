@@ -289,8 +289,8 @@ class UCKGEmbedder:
                     # Track nodes with no extractable text
                     empty_text_nodes.append(node_id)
             
-            if not texts:
-                continue
+            # if not texts:
+            #     continue
             
             # Check if we need to limit batch size for large text content
             total_chars = sum(len(text) for text in texts)
