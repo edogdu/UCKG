@@ -1,0 +1,2 @@
+nl_question,cypher_query
+Show UcoexObservedExample and optionally connected UcoCWE,"MATCH (a:`UcoexObservedExample`) OPTIONAL MATCH (a)-->(b:`UcoCWE`) RETURN a, b LIMIT 10"

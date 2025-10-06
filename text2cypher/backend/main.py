@@ -17,13 +17,14 @@ app = FastAPI(
     version="1.0.0"
 )
 
-# Add CORS middleware
+# Add CORS middleware with more permissive settings
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000", "http://localhost:3001", "http://127.0.0.1:3000", "http://127.0.0.1:3001"],
-    allow_credentials=True,
-    allow_methods=["*"],
+    allow_origins=["*"],  # Allow all origins for development
+    allow_credentials=False,  # Set to False when using wildcard origins
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS", "HEAD"],
     allow_headers=["*"],
+    expose_headers=["*"],
 )
 
 # Configuration: prefer environment variables so that the same code works both
@@ -39,6 +40,8 @@ OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "llama3")
 
 # Instantiate LLM wrapper with resolved values.
 llm = OllamaLLM(base_url=OLLAMA_URL, model=OLLAMA_MODEL)
+
+# Instantiate Text2Cypher with V2 capabilities
 t2c = Text2Cypher(NEO4J_URI, NEO4J_USER, NEO4J_PASSWORD, llm)
 
 class QueryRequest(BaseModel):
@@ -84,6 +87,26 @@ def answer_from_history(session_id: str, question: str) -> str:
 def health_check():
     """Health check endpoint"""
     return {"status": "healthy", "message": "Text2Cypher API is running"}
+
+@app.options("/{path:path}")
+def options_handler(path: str):
+    """Handle CORS preflight for all endpoints"""
+    return {"status": "ok", "path": path}
+
+@app.options("/api/text2cypher")
+def options_text2cypher():
+    """Handle CORS preflight for text2cypher endpoint"""
+    return {"status": "ok"}
+
+@app.options("/api/schema")
+def options_schema():
+    """Handle CORS preflight for schema endpoint"""
+    return {"status": "ok"}
+
+@app.options("/api/chat_history")
+def options_chat_history():
+    """Handle CORS preflight for chat_history endpoint"""
+    return {"status": "ok"}
 
 @app.get("/api/schema")
 def get_schema():
