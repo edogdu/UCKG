@@ -1,251 +1,98 @@
 difficulty_level,intent,question,cypher_query
-1,get_property_by_id,Find the description of the weakness with ID 'CWE-79'.,MATCH (r:Resource {ucocweID: 'CWE-79'}) RETURN r.ucodescription
-1,get_property_by_uri,What is the CVSS vector string for the resource 'CVE-2025-1000'?,MATCH (r:Resource {uri: 'CVE-2025-1000'}) RETURN r.ucovectorString
-1,get_property_by_id,Show me the summary for the CAPEC pattern 'CAPEC-98'.,MATCH (r:Resource {ucoexCAPEC_id: 'CAPEC-98'}) RETURN r.ucosummary
-1,get_property_by_id,What are the common consequences listed for 'CWE-416'?,MATCH (r:Resource {ucocweID: 'CWE-416'}) RETURN r.ucocommonConsequences
-1,get_property_by_cpe,List the titles for the resource with the CPE name 'cpe:2.3:a:vendor:product:1.2.3:*:*:*:*:*:*:*'.,MATCH (r:Resource {cpeName: 'cpe:2.3:a:vendor:product:1.2.3:*:*:*:*:*:*:*'}) RETURN r.titles
-1,get_boolean_property,Was the 'dictionary_found' flag set for the resource with CPE Name ID 'cpe:2.3:id:12345'?,MATCH (r:Resource {cpeNameId: 'cpe:2.3:id:12345'}) RETURN r.dictionary_found
-1,get_numeric_property,What is the exploitability score for 'CVE-2025-2000'?,MATCH (r:Resource {uri: 'CVE-2025-2000'}) RETURN r.ucoexploitabilityScore
-1,get_property_by_id,Find the modes of introduction for weakness 'CWE-611'.,MATCH (r:Resource {ucocweID: 'CWE-611'}) RETURN r.ucomodesOfIntroduction
-1,get_property_by_uri,What platforms are applicable for the vulnerability 'CVE-2025-3000'?,MATCH (r:Resource {uri: 'CVE-2025-3000'}) RETURN r.ucoapplicablePlatform
-1,get_property_by_id,Show me the demonstrative examples for 'CWE-22'.,MATCH (r:Resource {ucocweID: 'CWE-22'}) RETURN r.ucodemonstrativeExamples
-1,get_property_by_id,What is the label for the D3FEND countermeasure 'D3-PSA'?,MATCH (r:Resource {ucoexMITRED3FEND_LABEL: 'D3-PSA'}) RETURN r.label
-1,get_array_property,Find the execution flow techniques for 'CAPEC-15'.,MATCH (r:Resource {ucoexCAPEC_id: 'CAPEC-15'}) RETURN r.ucoexExecutionFlowTechnique
-1,get_array_property,What resources are required for attack pattern 'CAPEC-148'?,MATCH (r:Resource {ucoexCAPEC_id: 'CAPEC-148'}) RETURN r.ucoexResources_Required
-1,get_array_property,List the skills required for 'CAPEC-113'.,MATCH (r:Resource {ucoexCAPEC_id: 'CAPEC-113'}) RETURN r.ucoexSkills_Required
-1,find_node_by_label,Find any NamedIndividual in the graph.,MATCH (ni:NamedIndividual) RETURN ni.uri
-1,get_node_property,Return the URI of any IrreflexiveProperty nodes.,MATCH (ip:IrreflexiveProperty) RETURN ip.uri
-1,get_node_properties,Find the label and comment for any FunctionalProperty nodes.,"MATCH (fp:FunctionalProperty) RETURN fp.label, fp.comment"
-1,get_node_property,Show me the comment for the ObjectProperty with URI '.../hasWeakness'.,MATCH (op:ObjectProperty {uri: '.../hasWeakness'}) RETURN op.comment
-1,get_array_property,List the ATT&CK taxonomy mappings for the resource with the URI 'urn:capec:123'.,MATCH (r:Resource {uri: 'urn:capec:123'}) RETURN r.ucoexTaxonomyMappingATTACK
-1,get_property_by_id,What is the structure of weakness CWE-1021?,MATCH (r:Resource {ucocweID: 'CWE-1021'}) RETURN r.ucostructure
-1,get_property_by_id,Does the resource 'CVE-2025-6000' allow for obtaining all privileges?,MATCH (r:Resource {uri: 'CVE-2025-6000'}) RETURN r.ucoobtainAllPrivilege
-1,get_property_by_id,Find the vulnerability status for CVE-2025-5000.,MATCH (r:Resource {uri: 'CVE-2025-5000'}) RETURN r.ucovulnStatus
-1,get_property_by_id,What are the related attack patterns for 'CWE-400'?,MATCH (r:Resource {ucocweID: 'CWE-400'}) RETURN r.ucorelatedAttackPatterns
-1,get_property_by_id,Show me any references for the weakness 'CWE-78'.,MATCH (r:Resource {ucocweID: 'CWE-78'}) RETURN r.ucoreferences
-1,get_property_by_id,Find the definition for the D3FEND countermeasure with label 'D3-AC'.,MATCH (r:Resource {ucoexMITRED3FEND_LABEL: 'D3-AC'}) RETURN r.ucoexMITRED3FEND_DEFINITION
-1,get_date_property,Find the last modified date for the resource with the CPE name 'cpe:2.3:o:linux:linux_kernel:5.10:*:*:*:*:*:*:*'.,MATCH (r:Resource {cpeName: 'cpe:2.3:o:linux:linux_kernel:5.10:*:*:*:*:*:*:*'}) RETURN r.lastModified
-1,get_numeric_property,What is the minimum qualified cardinality for the resource 'urn:some-restriction'?,MATCH (r:Resource {uri: 'urn:some-restriction'}) RETURN r.minQualifiedCardinality
-1,get_array_property,List the related weaknesses for the attack pattern 'CAPEC-12'.,MATCH (r:Resource {ucoexCAPEC_id: 'CAPEC-12'}) RETURN r.ucoexRelatedWeaknesses
-1,get_array_property,Show me examples for the attack pattern 'CAPEC-13'.,MATCH (r:Resource {ucoexCAPEC_id: 'CAPEC-13'}) RETURN r.ucoexExample
-1,get_config_property,Which relationship is used for domain as per the graph config?,MATCH (gc:_GraphConfig) RETURN gc._domainRel
-1,get_config_property,What is the `_subClassOfRel` value in the graph configuration?,MATCH (gc:_GraphConfig) RETURN gc._subClassOfRel
-1,find_config_node,Find the URI of the `_GraphConfig` node.,MATCH (gc:_GraphConfig) RETURN gc.uri
-1,get_property_by_id,Find the mapping notes for CWE-287.,MATCH (r:Resource {ucocweID: 'CWE-287'}) RETURN r.ucomappingNotes
-1,get_property_by_id,What is the abstraction level for CAPEC-47?,MATCH (r:Resource {ucoexCAPEC_id: 'CAPEC-47'}) RETURN r.ucoexAbstraction
-1,get_config_property,Which relationship is configured for 'range' in the graph config?,MATCH (gc:_GraphConfig) RETURN gc._rangeRel
-1,get_config_property,What is the `_classNamePropName` from the graph config?,MATCH (gc:_GraphConfig) RETURN gc._classNamePropName
-1,get_property_by_id,Show me the evaluator solution for the weakness 'CWE-502'.,MATCH (r:Resource {ucocweID: 'CWE-502'}) RETURN r.ucoevaluatorSolution
-1,get_array_property,What are the extended descriptions for CAPEC-310?,MATCH (r:Resource {ucoexCAPEC_id: 'CAPEC-310'}) RETURN r.ucoexExtendedDescription
-1,find_node_by_label,Find all `ObjectProperty` nodes.,MATCH (op:ObjectProperty) RETURN op.uri
-1,get_config_property,Does the graph config handle multivalue properties?,MATCH (gc:_GraphConfig) RETURN gc._handleMultival
-1,get_property_by_label,Get the comment for the ObjectProperty 'ucoHasVulnerability'.,MATCH (op:ObjectProperty {label: 'ucoHasVulnerability'}) RETURN op.comment
-1,get_property_by_label,What is the 'seeAlso' property for the class 'UcoVulnerability'?,MATCH (c:Class {label: 'UcoVulnerability'}) RETURN c.seeAlso
-1,get_array_property,Find the consequences listed for the attack pattern CAPEC-107.,MATCH (r:Resource {ucoexCAPEC_id: 'CAPEC-107'}) RETURN r.ucoexConsequences
-1,get_property_by_uri,What is the likelihood of exploit for CVE-2025-9000?,MATCH (r:Resource {uri: 'CVE-2025-9000'}) RETURN r.ucolikelihoodOfExploit
-1,get_property_by_id,Show me the summary of weakness 'CWE-312'.,MATCH (r:Resource {ucocweID: 'CWE-312'}) RETURN r.ucocweSummary
-1,get_property_by_id,What is the `ucoabstraction` for the weakness 'CWE-284'?,MATCH (r:Resource {ucocweID: 'CWE-284'}) RETURN r.ucoabstraction
-1,get_property_by_label,Find the `seeAlso` link for the ObjectProperty 'ucoHasPart'.,MATCH (op:ObjectProperty {label: 'ucoHasPart'}) RETURN op.seeAlso
-1,get_property_by_uri,What is the comment for the Class with URI '.../UcoObject'?,MATCH (c:Class {uri: '.../UcoObject'}) RETURN c.comment
-1,get_property_by_uri,What is the label of the resource with URI '.../uco-core'?,MATCH (r:Resource {uri: '.../uco-core'}) RETURN r.label
-1,get_property_by_property,Find the URI of the axiom with the annotated target 'Some Target String'.,MATCH (a:Axiom {annotatedTarget: 'Some Target String'}) RETURN a.uri
-1,get_config_property,What is the `_dataTypePropertyLabel` in the graph config?,MATCH (gc:_GraphConfig) RETURN gc._dataTypePropertyLabel
-1,get_config_property,What is the `_objectPropertyLabel` from the graph config?,MATCH (gc:_GraphConfig) RETURN gc._objectPropertyLabel
-1,find_node_by_label,Find the URI of any FunctionalProperty.,MATCH (fp:FunctionalProperty) RETURN fp.uri LIMIT 1
-1,get_property_by_label,List the labels of all properties that are Functional Properties.,MATCH (fp:FunctionalProperty) RETURN fp.label
-1,get_property_by_id,Find the `ucoAbstraction` for the resource with `ucocweID` 'CWE-125'.,MATCH (r:Resource {ucocweID: 'CWE-125'}) RETURN r.ucoabstraction
-1,get_config_property,What is the `_classLabel` value in the graph config?,MATCH (gc:_GraphConfig) RETURN gc._classLabel
-1,find_node_by_label,List all `DatatypeProperty` nodes.,MATCH (dp:DatatypeProperty) RETURN dp.uri
-1,get_uri_by_label,Find the URI for the class 'Ontology'.,MATCH (c:Class {label: 'Ontology'}) RETURN c.uri
-1,get_config_property,What is the configured name for the `subPropertyOf` relationship?,MATCH (gc:_GraphConfig) RETURN gc._subPropertyOfRel
-1,get_property_by_property,What is the `annotatedTarget` of an axiom where the comment is 'Reification of a statement'?,MATCH (a:Axiom {comment: 'Reification of a statement'}) RETURN a.annotatedTarget
-1,get_property_by_name,What is the `ucoexDescription` for the CAPEC pattern named 'Social Engineering'?,MATCH (r:Resource:UcoexCAPEC {ucoexCAPEC_name: 'Social Engineering'}) RETURN r.ucoexDescription
-1,get_array_property,List any related attack patterns for CAPEC with ID 'CAPEC-555'.,MATCH (r:Resource {ucoexCAPEC_id: 'CAPEC-555'}) RETURN r.ucoexRelatedAttPattern
-1,get_config_property_array,Get the list of multi-value properties from the graph config.,MATCH (gc:_GraphConfig) RETURN gc._multivalPropList
-1,get_config_property_boolean,Is the graph config set to keep language tags?,MATCH (gc:_GraphConfig) RETURN gc._keepLangTag
-1,get_config_property,What is the `_relNamePropName` according to the graph config?,MATCH (gc:_GraphConfig) RETURN gc._relNamePropName
-1,find_node_by_label,List the URIs of all ontologies in the graph.,MATCH (o:Ontology) RETURN o.uri
-1,get_date_property,Find the last modified date and time for CVE-2025-8000.,MATCH (r:Resource {uri: 'CVE-2025-8000'}) RETURN r.ucolastModifiedDateTime
-1,get_property_by_id,What is the `ucoexSeverity` of the attack pattern with ID 'CAPEC-1'?,MATCH (r:Resource {ucoexCAPEC_id: 'CAPEC-1'}) RETURN r.ucoexSeverity
-1,get_sample_nodes,List 10 resources of any type.,MATCH (r:Resource) RETURN r.uri LIMIT 10
-1,get_config_property,"What is the name of the property that holds the class name, according to the config?",MATCH (gc:_GraphConfig) RETURN gc._classNamePropName
-1,get_config_property_boolean,Does the graph config apply Neo4j naming conventions?,MATCH (gc:_GraphConfig) RETURN gc._applyNeo4jNaming
-1,get_date_property,Show me the last modified date and time for CAPEC-21.,MATCH (r:Resource {ucoexCAPEC_id: 'CAPEC-21'}) RETURN r.ucolastModifiedDateTime
-1,get_property_by_id,What is the name of the weakness with ID 'CWE-601'?,MATCH (r:Resource {ucocweID: 'CWE-601'}) RETURN r.ucocweName
-1,get_property_by_uri,What is the extended description for the resource 'urn:capec:111'?,MATCH (r:Resource {uri: 'urn:capec:111'}) RETURN r.ucoexDESCRIPTION
-1,get_config_property_boolean,Is the graph set to keep custom data types?,MATCH (gc:_GraphConfig) RETURN gc._keepCustomDataTypes
-1,get_config_property,Is the graph set to handle RDF types?,MATCH (gc:_GraphConfig) RETURN gc._handleRDFTypes
-2,find_related_node,What is the 'someValuesFrom' relationship for any Restriction?,MATCH (:Restriction)-[:SOMEVALUESFROM]->(r) RETURN r.uri
-2,find_equivalent_property,Collect the URIs of all properties that are equivalent to the property 'ucoExHasCPE'.,MATCH (:ObjectProperty {label: 'ucoExHasCPE'})-[:EQUIVALENTPROPERTY]->(p) RETURN collect(p.uri)
-2,find_related_node,Which CVE is observed in the example 'Arbitrary Code Execution Example'?,MATCH (:UcoexObservedExample {label: 'Arbitrary Code Execution Example'})-[:UCOEXEXAMPLEOBSERVEDIN]->(cve:UcoCVE) RETURN cve.uri
-2,count_by_property,How many resources have a 'High' likelihood of exploit?,MATCH (r:Resource) WHERE r.ucolikelihoodOfExploit = 'High' RETURN count(r)
-2,find_related_node,Find the CVEs where the observed example is 'SQL Injection Example'.,MATCH (:UcoexObservedExample {label: 'SQL Injection Example'})-[:UCOEXEXAMPLEOBSERVEDIN]->(cve:UcoCVE) RETURN cve.uri
-2,find_inverse_property,Find the inverse of any Irreflexive Property.,"MATCH (ip:IrreflexiveProperty)-[:INVERSEOF]->(p) RETURN ip.uri, p.uri"
-2,filter_by_string_prefix,Find all resources with a label starting with 'CVE-'.,MATCH (r:Resource) WHERE r.label STARTS WITH 'CVE-' RETURN r.label
-2,find_nodes_with_property,Find resources that have a `seeAlso` property defined.,MATCH (r) WHERE r.seeAlso IS NOT NULL RETURN r.uri
-2,find_restriction_by_class,Find resources that are a `Restriction` on the class `UcoAction`.,MATCH (r:Restriction)-[:ONCLASS]->(:Class {label: 'UcoAction'}) RETURN r.uri
-2,find_property_domain,What is the domain of a `SymmetricProperty`?,MATCH (sp:SymmetricProperty)-[:DOMAIN]->(d) RETURN DISTINCT d.uri
-2,count_by_property,How many CAPEC patterns have a 'High' likelihood of exploit?,MATCH (c:UcoexCAPEC {ucoexLikelihood: 'High'}) RETURN count(c)
-2,find_nodes_with_missing_property,List all weaknesses with no description provided.,MATCH (w:UcoCWE) WHERE w.ucodescription IS NULL RETURN w.ucocweID
-2,find_nodes_in_relationship,Find resources that are part of a `UNIONOF` relationship.,MATCH ()-[:UNIONOF]->(r:Resource) RETURN DISTINCT r.uri
-2,count_nodes_by_label,How many axioms are in the graph?,MATCH (a:Axiom) RETURN count(a)
-2,find_equivalent_classes,List all pairs of classes connected by an 'EQUIVALENTCLASS' relationship.,"MATCH (c1:Class)-[:EQUIVALENTCLASS]->(c2:Class) RETURN c1.label, c2.label"
-2,count_nodes_by_label,Count the number of `ObjectProperty` nodes.,MATCH (op:ObjectProperty) RETURN count(op)
-2,explore_node_relationships,Show all relationships originating from the Ontology node.,"MATCH (:Ontology)-[r]->(n) RETURN type(r), n.uri"
-2,filter_by_string_suffix,Find any resources with a URI ending in '.pdf'.,MATCH (r:Resource) WHERE r.uri ENDS WITH '.pdf' RETURN r.uri
-2,filter_by_property,List CAPEC patterns that have a 'Low' severity.,MATCH (c:UcoexCAPEC) WHERE c.ucoexSeverity = 'Low' RETURN c.ucoexCAPEC_id
-2,find_node_with_multiple_labels,Show me the labels and URIs of all resources that are IrreflexiveProperties.,"MATCH (r:Resource:IrreflexiveProperty) RETURN r.label, r.uri"
-2,graph_wide_aggregation,Find the total number of relationships in the graph.,MATCH ()-[r]->() RETURN count(r)
-2,db_schema_call,List all node labels present in the database.,CALL db.labels()
-2,graph_wide_aggregation,Find the total number of nodes in the graph.,MATCH (n) RETURN count(n)
-2,find_node_with_multiple_labels,Find all resources that are both a `UcoCWE` and a `Class`.,MATCH (r:UcoCWE:Class) RETURN r.uri
-2,find_related_node,Find the name of any resource that is the target of an 'ANNOTATEDSOURCE' relationship from an Axiom.,MATCH (:Axiom)-[:ANNOTATEDSOURCE]->(r:Resource) RETURN r.label
-2,find_nodes_with_property,List all resources that have a comment.,MATCH (r) WHERE r.comment IS NOT NULL RETURN r.uri
-2,find_subclasses,Show me all properties that are subclasses of 'Resource'.,MATCH (p)-[:SUBCLASSOF]->(:Class {label: 'Resource'}) RETURN p.label
-2,db_schema_call,List all relationship types in the database.,CALL db.relationshipTypes()
-2,count_related_nodes,How many CVEs are associated with the vulnerability 'Shellshock'?,MATCH (:UcoVulnerability {label: 'Shellshock'})-[:UCOHASCVE_ID]->(cve) RETURN count(cve)
-2,find_sub_properties,Find all properties that are sub-properties of a functional property.,MATCH (p)-[:SUBPROPERTYOF]->(fp:FunctionalProperty) RETURN p.uri
-2,find_node_with_multiple_labels,Find all weaknesses that are also functional properties.,MATCH (w:UcoCWE:FunctionalProperty) RETURN w.uri
-2,find_connected_nodes,List all resources that have at least one outgoing relationship.,MATCH (r:Resource)-->() RETURN DISTINCT r.uri
-2,find_node_with_multiple_labels,Find resources that are a type of 'Class' and also a 'Resource'.,MATCH (r:Resource:Class) RETURN r.uri
-2,count_nodes_by_label,How many distinct CAPEC patterns are in the database?,MATCH (c:UcoexCAPEC) RETURN count(DISTINCT c) AS capec_count
-2,find_distinct_property_values,List all distinct base severity levels for vulnerabilities.,MATCH (v:UcoVulnerability) WHERE v.ucobaseSeverity IS NOT NULL RETURN DISTINCT v.ucobaseSeverity
-2,filter_by_property,Find weaknesses introduced in the 'Architecture and Design' phase.,MATCH (w:UcoCWE) WHERE w.ucotimeOfIntroduction = 'Architecture and Design' RETURN w.ucocweID
-2,find_union_class,Find any resource that is the union of other resources.,"MATCH (c:Class)-[:UNIONOF]->(r:Resource) RETURN c.uri, collect(r.uri)"
-2,find_related_node,What is the 'onProperty' for any Restriction node?,MATCH (:Restriction)-[:ONPROPERTY]->(p) RETURN p.uri
-2,find_related_nodes,What CPEs are associated with the vulnerability 'CVE-2025-4000'?,MATCH (:UcoCVE {uri: 'CVE-2025-4000'})-[:UCOEXHASCPE]->(cpe:UcoexCPE) RETURN cpe.cpeName
-2,find_related_nodes,Find observed examples for the weakness 'CWE-306'.,MATCH (:UcoCWE {ucocweID: 'CWE-306'})-[:UCOHASOBSERVEDEXAMPLE]->(ex:UcoexObservedExample) RETURN ex.label
-2,find_related_nodes,Find the vulnerabilities associated with the exploit target 'Apache Struts2'.,MATCH (:UcoExploitTarget {label: 'Apache Struts2'})-[:UCOHASVULNERABILITY]->(v:UcoVulnerability) RETURN v.label
-2,find_related_nodes,Which MITRE ATT&CK patterns are mapped to the CAPEC pattern 'CAPEC-460'?,MATCH (:UcoexCAPEC {ucoexCAPEC_id: 'CAPEC-460'})-[:UCOEXHASTAXONOMYMAPPING]->(m:UcoexMITREATTACK) RETURN m.label
-2,find_property_range,What is the range of the 'ucoimpactScore' property?,MATCH (dp:DatatypeProperty {uri: '.../ucoimpactScore'})-[:RANGE]->(r) RETURN r.uri
-2,find_equivalent_class,Find any equivalent class for the class 'UcoExploitTarget'.,MATCH (c:Class {label: 'UcoExploitTarget'})-[:EQUIVALENTCLASS]->(e) RETURN e.label
-2,find_annotated_source,What is the annotated source of the axiom with target 'Authentication Bypass'?,MATCH (a:Axiom {annotatedTarget: 'Authentication Bypass'})-[:ANNOTATEDSOURCE]->(s) RETURN s.uri
-2,find_ontology_version,Which ontology version is this one?,MATCH (o:Ontology)-[:VERSIONIRI]->(v) RETURN v.uri
-2,find_related_by_type,Which classes are equivalent to a Restriction?,MATCH (c:Class)-[:EQUIVALENTCLASS]->(:Restriction) RETURN c.uri
-2,find_related_node,What is the annotated property for any Axiom node?,MATCH (:Axiom)-[:ANNOTATEDPROPERTY]->(r:Resource) RETURN r.uri
-2,find_parent_class,What is the parent class of the Class 'UcoVulnerability'?,MATCH (c:Class {label: 'UcoVulnerability'})-[:SUBCLASSOF]->(parent) RETURN parent.label
-2,find_property_domain,What is the domain of the 'ucoimpactScore' property?,MATCH (dp:DatatypeProperty {uri: '.../ucoimpactScore'})-[:DOMAIN]->(d) RETURN d.uri
-2,find_related_node,What is the CVE identifier for the vulnerability named 'Heartbleed'?,MATCH (v:UcoVulnerability {label: 'Heartbleed'})-[:UCOHASCVE_ID]->(c:UcoCVE) RETURN c.uri
-2,find_related_nodes,What weaknesses are related to the CAPEC attack 'CAPEC-18'?,MATCH (:UcoexCAPEC {ucoexCAPEC_id: 'CAPEC-18'})-[:UCOEXHASRELATEDWEAKNESS]->(w:UcoCWE) RETURN w.ucocweID
-2,count_distinct_property,How many distinct CWE names are there?,MATCH (w:UcoCWE) RETURN count(DISTINCT w.ucocweName)
-2,find_node_with_multiple_labels,Find all resources that are also axioms.,MATCH (r:Resource:Axiom) RETURN r.uri
-2,find_related_nodes,List the MITRE ATT&CK patterns related to the D3FEND countermeasure 'D3-DNA'.,MATCH (:UcoexMITRED3FEND {ucoexMITRED3END_LABEL: 'D3-DNA'})-[:UCOEXHASMITREATTACK]->(m:UcoexMITREATTACK) RETURN m.label
-2,count_nodes_by_label,How many CVEs are there?,MATCH (c:UcoCVE) RETURN count(c)
-2,find_equivalent_property,List the properties that are equivalent to 'ucoHasVulnerability'.,MATCH (:ObjectProperty {label: 'ucoHasVulnerability'})-[:EQUIVALENTPROPERTY]->(p) RETURN p.label
-2,find_node_by_label,Find the URI of any DatatypeProperty.,MATCH (dp:DatatypeProperty) RETURN dp.uri LIMIT 1
-2,find_inverse_property,What is the inverse of the property 'isWeaknessOf'?,MATCH (:ObjectProperty {label: 'isWeaknessOf'})-[:INVERSEOF]->(inv) RETURN inv.label
-2,find_sub_properties,Which properties are sub-properties of 'ucoLastModifiedDateTime'?,MATCH (p)-[:SUBPROPERTYOF]->(:DatatypeProperty {label: 'ucoLastModifiedDateTime'}) RETURN p.label
-2,find_property_domain,Find the domain of the `ucoexLikelihood` property.,MATCH (:DatatypeProperty {label: 'ucoexLikelihood'})-[:DOMAIN]->(d) RETURN d.label
-2,find_property_range,What is the range of the 'ucoexHasCPE' property?,MATCH (:ObjectProperty {label: 'ucoexHasCPE'})-[:RANGE]->(r) RETURN r.label
-2,find_nodes_with_relationship,Which vulnerabilities have the weakness 'CWE-125'?,MATCH (v:UcoVulnerability)-[:UCOHASWEAKNESS]->(:UcoCWE {ucocweID: 'CWE-125'}) RETURN v.label
-2,find_related_nodes_reversed,What CAPEC patterns are related to the weakness 'CWE-20'?,MATCH (c:UcoexCAPEC)-[:UCOEXHASRELATEDWEAKNESS]->(:UcoCWE {ucocweID: 'CWE-20'}) RETURN c.ucoexCAPEC_id
-2,find_related_nodes_reversed,Which exploit targets are associated with the vulnerability 'Dirty COW'?,MATCH (et:UcoExploitTarget)-[:UCOHASVULNERABILITY]->(:UcoVulnerability {label: 'Dirty COW'}) RETURN et.label
-2,find_node_by_label,Find the names of any `SymmetricProperty` nodes.,MATCH (sp:SymmetricProperty) RETURN sp.label
-2,find_nodes_with_relationship,What are the weaknesses for the exploit target 'Microsoft IIS Server'?,MATCH (:UcoExploitTarget {label: 'Microsoft IIS Server'})-[:UCOHASWEAKNESS]->(w:UcoCWE) RETURN w.ucocweID
-2,sort_query_results,"Return the names of all CAPEC patterns, sorted alphabetically.",MATCH (c:UcoexCAPEC) RETURN c.ucoexCAPEC_name ORDER BY c.ucoexCAPEC_name
-2,find_related_nodes_reversed,What CAPECs have 'CWE-119' as a related weakness?,MATCH (c:UcoexCAPEC)-[:UCOEXHASRELATEDWEAKNESS]->(:UcoCWE {ucocweID: 'CWE-119'}) RETURN c.ucoexCAPEC_id
-2,find_subclasses,Which classes are a subclass of 'UcoThing'?,MATCH (c:Class)-[:SUBCLASSOF]->(:Class {label: 'UcoThing'}) RETURN c.label
-2,find_related_node,Find a resource that is the `someValuesFrom` a Restriction.,MATCH (:Restriction)-[:SOMEVALUESFROM]->(r:Resource) RETURN r.label
-2,find_related_node,What is the annotated property of an axiom with comment 'Example reification'?,MATCH (:Axiom {comment: 'Example reification'})-[:ANNOTATEDPROPERTY]->(p) RETURN p.uri
-3,find_restriction_on_class,List any restrictions that are placed on a class.,MATCH (:Class)-[:SUBCLASSOF]->(r:Restriction) RETURN r.uri
-3,rank_by_degree,List the labels of the top 5 most connected resources.,"MATCH (r:Resource)-[rel]-() WITH r, count(rel) AS degree RETURN r.label, degree ORDER BY degree DESC LIMIT 5"
-3,sort_by_property_function,Return the labels of CAPEC nodes and sort them by the length of their name.,MATCH (c:UcoexCAPEC) RETURN c.ucoexCAPEC_name ORDER BY size(c.ucoexCAPEC_name) DESC
-3,get_property_of_related_nodes,What are the common consequences for weaknesses related to CAPEC-460?,"MATCH (:UcoexCAPEC {ucoexCAPEC_id: 'CAPEC-460'})-[:UCOEXHASRELATEDWEAKNESS]->(w:UcoCWE) RETURN w.ucocweID, w.ucocommonConsequences"
-3,group_by_and_count,Categorize CAPECs by likelihood and count them.,"MATCH (c:UcoexCAPEC) WHERE c.ucoexLikelihood IS NOT NULL RETURN c.ucoexLikelihood, count(c)"
-3,find_domain_of_subproperties,What are the domains for properties that are sub-properties of 'ucoTemporalProperty'?,"MATCH (p)-[:SUBPROPERTYOF]->(:DatatypeProperty {label: 'ucoTemporalProperty'}) MATCH (p)-[:DOMAIN]->(d) RETURN p.label, d.label"
-3,find_min_by_date,Find the vulnerability with the oldest publication date.,"MATCH (v:UcoVulnerability) WHERE v.ucopublishedDateTime IS NOT NULL RETURN v.uri, v.ucopublishedDateTime ORDER BY v.ucopublishedDateTime ASC LIMIT 1"
-3,find_related_nodes_by_date_filter,Find weaknesses that are related to vulnerabilities published before 2020.,MATCH (w:UcoCWE)<-[:UCOHASWEAKNESS]-(v:UcoVulnerability) WHERE v.ucopublishedDateTime < datetime('2020-01-01T00:00:00') RETURN DISTINCT w.ucocweID
-3,find_subclass_hierarchy_path,Show me the chain of `SUBCLASSOF` relationships starting from `UcoCVE`.,MATCH p = (:Class {label: 'UcoCVE'})-[:SUBCLASSOF*]->() RETURN p
-3,filter_by_property_comparison,Which weaknesses have a name that is identical to their description?,MATCH (w:UcoCWE) WHERE w.ucocweName = w.ucocweSummary RETURN w.ucocweID
-3,find_restriction_details,"Find the class a restriction is on, for any restriction related to the 'ucoHasPart' property.",MATCH (r:Restriction)-[:ONPROPERTY]->(:ObjectProperty {label: 'ucoHasPart'}) MATCH (r)-[:ONCLASS]->(c:Class) RETURN c.label
-3,find_nodes_with_multiple_relationship_types,Find all exploit targets that have at least one vulnerability and one weakness associated.,MATCH (et:UcoExploitTarget)-[:UCOHASVULNERABILITY]->() MATCH (et)-[:UCOHASWEAKNESS]->() RETURN DISTINCT et.label
-3,count_distinct_nodes,Count how many distinct CWEs are associated with vulnerabilities.,MATCH (:UcoVulnerability)-[:UCOHASWEAKNESS]->(w:UcoCWE) RETURN count(DISTINCT w) AS distinct_cwe_count
-3,aggregate_property_max,What is the maximum CVSS impact score among all CVEs?,MATCH (r:Resource:UcoCVE) WHERE r.ucoimpactScore IS NOT NULL RETURN max(toFloat(r.ucoimpactScore)) AS max_impact_score
-3,unwind_array_property,Unwind all mitigations for 'CAPEC-55'.,MATCH (c:UcoexCAPEC {ucoexCAPEC_id: 'CAPEC-55'}) UNWIND c.ucoexMitigations AS mitigation RETURN mitigation
-3,find_list_structure,Find the first item in any list defined by a 'oneOf' relationship.,MATCH (:Class)-[:ONEOF]->(res:Resource)-[:FIRST]->(item) RETURN item.uri
-3,filter_by_multiple_properties,List vulnerabilities where user interaction is required and the base severity is 'High'.,MATCH (v:UcoVulnerability) WHERE v.ucouserInteractionRequired = 'Required' AND v.ucobaseSeverity = 'High' RETURN v.label
-3,filter_by_date,List all vulnerabilities and their severities that were published today.,"MATCH (v:UcoVulnerability) WHERE v.ucopublishedDateTime.year = 2025 AND v.ucopublishedDateTime.month = 10 AND v.ucopublishedDateTime.day = 3 RETURN v.label, v.ucobaseSeverity"
-3,count_related_nodes,Count the number of weaknesses related to each CAPEC pattern.,"MATCH (c:UcoexCAPEC)-[:UCOEXHASRELATEDWEAKNESS]->(w) RETURN c.ucoexCAPEC_id, count(w) AS weakness_count ORDER BY weakness_count DESC"
-3,find_nodes_by_multi_hop,Find all CVEs for weaknesses related to the attack pattern 'CAPEC-94'.,MATCH (:UcoexCAPEC {ucoexCAPEC_id: 'CAPEC-94'})-[:UCOEXHASRELATEDWEAKNESS]->(:UcoCWE)<-[:UCOHASWEAKNESS]-(:UcoVulnerability)-[:UCOHASCVE_ID]->(cve:UcoCVE) RETURN DISTINCT cve.uri
-3,rank_and_limit,List the top 10 vulnerabilities with the highest impact scores.,"MATCH (v:UcoVulnerability) WHERE v.ucoimpactScore IS NOT NULL RETURN v.uri, v.ucoimpactScore ORDER BY toFloat(v.ucoimpactScore) DESC LIMIT 10"
-3,aggregate_property_by_date,What is the average exploitability score for all vulnerabilities published in 2025?,MATCH (v:UcoVulnerability) WHERE v.ucopublishedDateTime.year = 2025 AND v.ucoexploitabilityScore IS NOT NULL RETURN avg(toFloat(v.ucoexploitabilityScore)) AS average_score
-3,collect_related_nodes,Collect all MITRE ATT&CK mappings for 'CAPEC-242'.,"MATCH (c:UcoexCAPEC {ucoexCAPEC_id: 'CAPEC-242'})-[:UCOEXHASTAXONOMYMAPPING]->(m) RETURN c.ucoexCAPEC_name, collect(m.label) AS mitre_mappings"
-3,filter_by_string_contains,Find weaknesses that have 'SQL Injection' in their name.,"MATCH (w:UcoCWE) WHERE w.ucocweName CONTAINS 'SQL Injection' RETURN w.ucocweID, w.ucocweName"
-3,find_subclass_hierarchy,Find all subclasses of the Class 'UcoCyberThreat'.,MATCH (c:Class)-[:SUBCLASSOF*]->(:Class {label: 'UcoCyberThreat'}) RETURN c.label
-3,find_nodes_by_multi_hop,Which CVEs were observed in examples related to 'CWE-787'?,MATCH (:UcoCWE {ucocweID: 'CWE-787'})-[:UCOHASOBSERVEDEXAMPLE]->(:UcoexObservedExample)-[:UCOEXEXAMPLEOBSERVEDIN]->(cve:UcoCVE) RETURN cve.uri
-3,filter_by_array_contains,Show all CAPEC patterns that have 'Authentication' as a prerequisite.,MATCH (c:UcoexCAPEC) WHERE 'Authentication' IN c.ucoexPrerequisites RETURN c.ucoexCAPEC_id
-3,find_sub_properties,List all properties that are a sub-property of 'ucoIdentifier'.,MATCH (p)-[:SUBPROPERTYOF]->(:DatatypeProperty {label: 'ucoIdentifier'}) RETURN p.label
-3,rank_by_relationship_count,Show me the top 3 most common CWEs associated with vulnerabilities.,"MATCH (:UcoVulnerability)-[:UCOHASWEAKNESS]->(w:UcoCWE) RETURN w.ucocweID, count(w) AS frequency ORDER BY frequency DESC LIMIT 3"
-3,filter_by_degree,Find any resource with more than 5 outgoing relationships.,"MATCH (r:Resource)-[rel]->() WITH r, count(rel) AS rel_count WHERE rel_count > 5 RETURN r.uri"
-3,get_property_by_label,Find the names of all Irreflexive Properties.,MATCH (ip:IrreflexiveProperty) RETURN ip.label
-3,collect_nodes,Collect the URIs of all Named Individuals in the graph.,MATCH (ni:NamedIndividual) RETURN collect(ni.uri)
-3,rank_by_property_value,Find the top 3 most common `ucoapplicablePlatform` values.,"MATCH (r:Resource) WHERE r.ucoapplicablePlatform IS NOT NULL RETURN r.ucoapplicablePlatform, count(*) as freq ORDER BY freq DESC LIMIT 3"
-3,find_symmetric_property,Find any properties that are their own inverse.,MATCH (p)-[:INVERSEOF]->(p) RETURN p.uri
-3,filter_by_recent_date,Find vulnerabilities published in the last 30 days.,MATCH (v:UcoVulnerability) WHERE v.ucopublishedDateTime >= datetime() - duration({days: 30}) RETURN v.uri
-3,filter_by_date,Find all resources modified since the beginning of 2025.,MATCH (r:Resource) WHERE r.lastModified >= datetime('2025-01-01T00:00:00') RETURN r.uri
-3,rank_by_relationship_count,Show me the top 5 most common MITRE ATT&CK mappings across all CAPEC patterns.,"MATCH (:UcoexCAPEC)-[:UCOEXHASTAXONOMYMAPPING]->(m:UcoexMITREATTACK) RETURN m.label, count(m) AS mapping_count ORDER BY mapping_count DESC LIMIT 5"
-3,find_complex_structure,What is the 'onClass' for a Restriction node that is a subclass of another class?,MATCH (:Class)-[:SUBCLASSOF]->(res:Restriction)-[:ONCLASS]->(c) RETURN c.uri
-3,group_by_date_and_count,"For each year, count the number of CVEs published.","MATCH (c:UcoCVE) WHERE c.ucopublishedDateTime IS NOT NULL RETURN c.ucopublishedDateTime.year AS year, count(c) AS cve_count ORDER BY year"
-3,get_property_of_subclasses,What are the common consequences for weaknesses that are subclasses of 'Data Processing Errors'?,"MATCH (w:UcoCWE)-[:SUBCLASSOF]->(:Class {label: 'Data Processing Errors'}) RETURN w.ucocweID, w.ucocommonConsequences"
-3,traverse_linked_list,Find the second item in a list starting from a resource with URI 'urn:list:1'.,MATCH (:Resource {uri: 'urn:list:1'})-[:REST]->(second_item_list)-[:FIRST]->(item) RETURN item.uri
-3,rank_by_relationship_count,Rank weaknesses by the number of CAPEC patterns they are related to.,"MATCH (c:UcoexCAPEC)-[:UCOEXHASRELATEDWEAKNESS]->(w:UcoCWE) RETURN w.ucocweID, count(c) AS capec_count ORDER BY capec_count DESC"
-3,rank_by_date,Return the labels of the 10 most recently modified resources.,MATCH (r:Resource) WHERE r.lastModified IS NOT NULL RETURN r.label ORDER BY r.lastModified DESC LIMIT 10
-3,filter_by_property_comparison,Find resources where the label is the same as the URI.,MATCH (r:Resource) WHERE r.label = r.uri RETURN r.uri
-3,count_with_filter,Count how many vulnerabilities have an exploitability score greater than 8.0.,MATCH (v:UcoVulnerability) WHERE toFloat(v.ucoexploitabilityScore) > 8.0 RETURN count(v)
-3,aggregate_array_size,What is the average number of skills required per CAPEC?,MATCH (c:UcoexCAPEC) WHERE c.ucoexSkills_Required IS NOT NULL RETURN avg(size(c.ucoexSkills_Required))
-3,unwind_array_property,Unwind all the related attack patterns for 'CWE-77'.,MATCH (r:Resource {ucocweID: 'CWE-77'}) UNWIND r.ucorelatedAttackPatterns AS pattern RETURN pattern
-3,filter_by_string_contains,Find the names of CWEs that have 'cross-site' in their summary.,MATCH (w:UcoCWE) WHERE w.ucocweSummary CONTAINS 'cross-site' RETURN w.ucocweName
-3,get_array_size,What is the size of the `ucoexExample` array for CAPEC-116?,MATCH (c:UcoexCAPEC {ucoexCAPEC_id: 'CAPEC-116'}) RETURN size(c.ucoexExample) AS example_count
-3,unwind_array_property,List all `ucoexTaxonomyMappingATTACK` values for CAPEC-34.,MATCH (c:UcoexCAPEC {ucoexCAPEC_id: 'CAPEC-34'}) UNWIND c.ucoexTaxonomyMappingATTACK as mapping RETURN mapping
-3,aggregate_property_min,What is the minimum impact score for vulnerabilities published in 2024?,MATCH (v:UcoVulnerability) WHERE v.ucopublishedDateTime.year = 2024 AND v.ucoimpactScore IS NOT NULL RETURN min(toFloat(v.ucoimpactScore))
-3,collect_distinct_property,Collect all unique `ucoexSeverity` values for CAPEC patterns.,MATCH (c:UcoexCAPEC) RETURN collect(DISTINCT c.ucoexSeverity)
-3,count_related_nodes,"For each CPE, count the number of CVEs it is associated with.","MATCH (cpe:UcoexCPE)<-[:UCOEXHASCPE]-(cve:UcoCVE) RETURN cpe.cpeName, count(cve) as cve_count ORDER BY cve_count DESC"
-3,filter_by_date_range,Find vulnerabilities published in the first quarter of 2025.,MATCH (v:UcoVulnerability) WHERE v.ucopublishedDateTime >= datetime('2025-01-01T00:00:00') AND v.ucopublishedDateTime < datetime('2025-04-01T00:00:00') RETURN v.uri
-3,find_nodes_by_multi_hop,Which CAPEC patterns are related to weaknesses that are also related to 'CVE-2025-1234'?,MATCH (c:UcoexCAPEC)-[:UCOEXHASRELATEDWEAKNESS]->(w:UcoCWE)<-[:UCOHASWEAKNESS]-(:UcoVulnerability)-[:UCOHASCVE_ID]->(:UcoCVE {uri: 'CVE-2025-1234'}) RETURN DISTINCT c.ucoexCAPEC_id
-3,aggregate_property_sum,Sum the total number of `minQualifiedCardinality` for all resources where it is defined.,MATCH (r:Resource) WHERE r.minQualifiedCardinality IS NOT NULL RETURN sum(r.minQualifiedCardinality)
-3,find_explicit_path,Show the path from an exploit target to its related CVEs.,MATCH p = (et:UcoExploitTarget)-[:UCOHASVULNERABILITY]->(:UcoVulnerability)-[:UCOHASCVE_ID]->(:UcoCVE) RETURN p LIMIT 10
-4,find_shortest_path,Find the shortest path between 'CWE-89' and 'CVE-2025-7000'.,"MATCH (start:UcoCWE {ucocweID: 'CWE-89'}), (end:UcoCVE {uri: 'CVE-2025-7000'}), p = shortestPath((start)-[*]-(end)) RETURN p"
-4,calculate_percentage,What percentage of vulnerabilities have a 'High' base severity?,"MATCH (v:UcoVulnerability) WITH count(v) AS total MATCH (v_high:UcoVulnerability {ucobaseSeverity: 'High'}) WITH total, count(v_high) AS high_count RETURN (toFloat(high_count) / total) * 100 AS percentage"
-4,find_indirectly_related_nodes,Which D3FEND countermeasures are related to ATT&CK patterns that are also mapped from CAPEC-100?,MATCH (d:UcoexMITRED3FEND)-[:UCOEXHASMITREATTACK]->(m:UcoexMITREATTACK)<-[:UCOEXHASTAXONOMYMAPPING]-(:UcoexCAPEC {ucoexCAPEC_id: 'CAPEC-100'}) RETURN DISTINCT d.ucoexMITRED3FEND_LABEL
-4,multiple_optional_matches,"For each vulnerability, provide its CVE, its CWE, and a list of affected CPEs, if they exist.","MATCH (v:UcoVulnerability) OPTIONAL MATCH (v)-[:UCOHASCVE_ID]->(cve:UcoCVE) OPTIONAL MATCH (v)-[:UCOHASWEAKNESS]->(w:UcoCWE) OPTIONAL MATCH (cve)-[:UCOEXHASCPE]->(cpe:UcoexCPE) RETURN v.label, cve.uri, w.ucocweID, collect(cpe.cpeName) AS affected_cpes"
-4,filter_by_aggregation_with,"Find weaknesses that have more than 5 related vulnerabilities, and then list those vulnerabilities.","MATCH (w:UcoCWE)<-[:UCOHASWEAKNESS]-(v:UcoVulnerability) WITH w, count(v) AS vuln_count WHERE vuln_count > 5 MATCH (w)<-[:UCOHASWEAKNESS]-(v_new:UcoVulnerability) RETURN w.ucocweID, collect(v_new.label) AS vulnerabilities"
-4,find_shared_connections,Find pairs of CAPEC patterns that share at least one common weakness.,"MATCH (c1:UcoexCAPEC)-[:UCOEXHASRELATEDWEAKNESS]->(w)<-[:UCOEXHASRELATEDWEAKNESS]-(c2:UcoexCAPEC) WHERE id(c1) < id(c2) RETURN c1.ucoexCAPEC_id, c2.ucoexCAPEC_id, w.ucocweID"
-4,find_related_with_optional,"List all CAPEC patterns and their related weaknesses. If a weakness has a CVE, show that as well.","MATCH (c:UcoexCAPEC)-[:UCOEXHASRELATEDWEAKNESS]->(w:UcoCWE) OPTIONAL MATCH (w)<-[:UCOHASWEAKNESS]-(:UcoVulnerability)-[:UCOHASCVE_ID]->(cve:UcoCVE) RETURN c.ucoexCAPEC_id, w.ucocweID, collect(cve.uri) AS cves"
-4,classify_with_case,"Classify all vulnerabilities as 'Critical', 'High', 'Medium', or 'Low' based on their exploitability score and return the counts for each.","MATCH (v:UcoVulnerability) WHERE v.ucoexploitabilityScore IS NOT NULL WITH toFloat(v.ucoexploitabilityScore) AS score RETURN CASE WHEN score >= 9.0 THEN 'Critical' WHEN score >= 7.0 THEN 'High' WHEN score >= 4.0 THEN 'Medium' ELSE 'Low' END AS category, count(*) AS count"
-4,find_unrelated_nodes,Find any CAPEC pattern that is NOT related to 'CWE-79'.,MATCH (c:UcoexCAPEC) WHERE NOT (c)-[:UCOEXHASRELATEDWEAKNESS]->(:UcoCWE {ucocweID: 'CWE-79'}) RETURN c.ucoexCAPEC_id
-4,find_nodes_with_missing_relationship,List all weaknesses that have no observed examples.,MATCH (w:UcoCWE) WHERE NOT (w)-[:UCOHASOBSERVEDEXAMPLE]->() RETURN w.ucocweID
-4,search_within_array_property,Find any CAPEC patterns where the extended description contains the word 'network'.,MATCH (c:UcoexCAPEC) WHERE any(desc IN c.ucoexExtendedDescription WHERE desc CONTAINS 'network') RETURN c.ucoexCAPEC_id
-4,find_common_neighbor,Which weaknesses are related to both 'CAPEC-66' and 'CAPEC-113'?,MATCH (:UcoexCAPEC {ucoexCAPEC_id: 'CAPEC-66'})-[:UCOEXHASRELATEDWEAKNESS]->(w:UcoCWE)<-[:UCOEXHASRELATEDWEAKNESS]-(:UcoexCAPEC {ucoexCAPEC_id: 'CAPEC-113'}) RETURN w.ucocweID
-4,aggregate_property_stdev,What is the standard deviation of impact scores for vulnerabilities?,MATCH (v:UcoVulnerability) WHERE v.ucoimpactScore IS NOT NULL RETURN stdev(toFloat(v.ucoimpactScore)) AS impact_score_stdev
-4,find_nodes_with_missing_property,List all CAPEC patterns that have no documented mitigations.,MATCH (c:UcoexCAPEC) WHERE c.ucoexMitigations IS NULL OR size(c.ucoexMitigations) = 0 RETURN c.ucoexCAPEC_id
-4,find_explicit_path,Show me the full path from 'CAPEC-22' to any related CVEs.,MATCH p = (:UcoexCAPEC {ucoexCAPEC_id: 'CAPEC-22'})-[:UCOEXHASRELATEDWEAKNESS*]->(:UcoCWE)<-[:UCOHASWEAKNESS]-(:UcoVulnerability)-[:UCOHASCVE_ID]->(:UcoCVE) RETURN p LIMIT 5
-4,find_nodes_with_multiple_relationships,"Find vulnerabilities that have an associated CVE and at least one related weakness, returning all three entities.","MATCH (cve:UcoCVE)<-[:UCOHASCVE_ID]-(v:UcoVulnerability)-[:UCOHASWEAKNESS]->(w:UcoCWE) RETURN v.label, cve.uri, w.ucocweID"
-4,find_inverse_property,What is the inverse property of 'hasVulnerability'?,MATCH (:ObjectProperty {label: 'hasVulnerability'})-[:INVERSEOF]->(inv) RETURN inv.label
-4,advanced_structural_query,Find all properties that have ':Class' as their domain but not as their range.,MATCH (p)-[:DOMAIN]->(:Class) WHERE NOT (p)-[:RANGE]->(:Class) RETURN p.uri
-4,traverse_linked_list,Show the chain of items in a list using the REST relationship.,MATCH p = (start_node:Resource)-[:REST*]->(:Resource) WHERE NOT ()-[:REST]->(start_node) RETURN p
-4,find_nodes_with_missing_relationship,List all `DatatypeProperty` nodes that do not have a `DOMAIN` relationship.,MATCH (dp:DatatypeProperty) WHERE NOT (dp)-[:DOMAIN]->() RETURN dp.uri
-4,complex_filter_and,List all vulnerabilities that have a critical impact score (>= 9.0) but do not require user interaction.,MATCH (v:UcoVulnerability) WHERE toFloat(v.ucoimpactScore) >= 9.0 AND v.ucouserInteractionRequired = 'None' RETURN v.label
-4,calculate_graph_density,What is the average number of relationships per node?,"MATCH (n) WITH count(n) AS nodeCount MATCH ()-[r]->() WITH nodeCount, count(r) AS relCount RETURN toFloat(relCount) / nodeCount AS avgRelsPerNode"
-4,full_text_search_style_query,Show me all data related to the 'log4j' vulnerability.,MATCH (n) WHERE any(prop IN keys(n) WHERE n[prop] CONTAINS 'log4j') RETURN n
-4,find_nodes_with_missing_relationship,List all CVEs that are NOT associated with any CPE.,MATCH (c:UcoCVE) WHERE NOT (c)-[:UCOEXHASCPE]->() RETURN c.uri
-4,calculate_average_degree,What is the average number of weaknesses per CAPEC pattern?,"MATCH (c:UcoexCAPEC)-[:UCOEXHASRELATEDWEAKNESS]->(w) WITH c, count(w) AS weakness_count RETURN avg(weakness_count)"
-4,find_nodes_with_missing_relationship,Find vulnerabilities that have a CVE but no associated CWE.,MATCH (v:UcoVulnerability)-[:UCOHASCVE_ID]->() WHERE NOT (v)-[:UCOHASWEAKNESS]->() RETURN v.label
-4,find_complex_path_with_filter,"For vulnerabilities with high severity, find their CWEs and any CAPECs related to those CWEs.","MATCH (v:UcoVulnerability {ucobaseSeverity: 'High'})-[:UCOHASWEAKNESS]->(w:UcoCWE)<-[:UCOEXHASRELATEDWEAKNESS]-(c:UcoexCAPEC) RETURN v.label, w.ucocweID, c.ucoexCAPEC_id"
-4,multiple_optional_matches,"For each CWE, provide its name, the number of CAPECs it's related to, and optionally, a list of its subclasses.","MATCH (w:UcoCWE) OPTIONAL MATCH (w)<-[:UCOEXHASRELATEDWEAKNESS]-(c:UcoexCAPEC) OPTIONAL MATCH (sub:Class)-[:SUBCLASSOF]->(w) RETURN w.ucocweName, count(DISTINCT c) AS capec_count, collect(DISTINCT sub.label) AS subclasses"
-4,filter_with_list_predicate,Find CAPECs where all of their related weaknesses have a 'High' severity.,"MATCH (c:UcoexCAPEC)-[:UCOEXHASRELATEDWEAKNESS]->(w:UcoCWE) WITH c, collect(w) AS weaknesses WHERE all(w_node IN weaknesses WHERE w_node.ucobaseSeverity = 'High') RETURN c.ucoexCAPEC_id"
-4,classify_with_case,Classify resources as 'Old' (before 2020) or 'New' (2020 or later) based on their published date and count them.,"MATCH (r:Resource) WHERE r.ucopublishedDateTime IS NOT NULL RETURN CASE WHEN r.ucopublishedDateTime.year < 2020 THEN 'Old' ELSE 'New' END AS era, count(r) AS count"
-4,filter_by_global_aggregate,"Find the average impact score for all CVEs, then return only the CVEs that are below that average.","MATCH (c:UcoCVE) WHERE c.ucoimpactScore IS NOT NULL WITH avg(toFloat(c.ucoimpactScore)) AS avg_score MATCH (c2:UcoCVE) WHERE toFloat(c2.ucoimpactScore) < avg_score RETURN c2.uri, c2.ucoimpactScore"
-4,filter_with_list_predicate,Find any CAPEC where none of its prerequisites mention 'user'.,MATCH (c:UcoexCAPEC) WHERE c.ucoexPrerequisites IS NOT NULL AND none(p IN c.ucoexPrerequisites WHERE p CONTAINS 'user') RETURN c.ucoexCAPEC_id
-4,find_related_with_optional,"List all properties and their domains, and optionally, their inverse property if it exists.","MATCH (p:ObjectProperty)-[:DOMAIN]->(d) OPTIONAL MATCH (p)-[:INVERSEOF]->(inv) RETURN p.label, d.label, inv.label AS inverse"
-4,find_shortest_path,Find the shortest path from an exploit target 'Linux Kernel' to any related MITRE ATT&CK pattern.,"MATCH (start:UcoExploitTarget {label: 'Linux Kernel'}), (end:UcoexMITREATTACK), p = shortestPath((start)-[*..5]-(end)) RETURN p"
-4,find_shared_connections_ranked,Show me the top 3 CWEs that share the most CAPEC patterns with 'CWE-89'.,"MATCH (:UcoCWE {ucocweID: 'CWE-89'})<-[:UCOEXHASRELATEDWEAKNESS]-(c:UcoexCAPEC)-[:UCOEXHASRELATEDWEAKNESS]->(w:UcoCWE) WHERE w.ucocweID <> 'CWE-89' RETURN w.ucocweID, count(c) AS shared_capecs ORDER BY shared_capecs DESC LIMIT 3"
-4,find_nodes_with_mixed_relationships,Find vulnerabilities that have a related CWE but no associated CVE.,MATCH (v:UcoVulnerability)-[:UCOHASWEAKNESS]->() WHERE NOT (v)-[:UCOHASCVE_ID]->() RETURN v.label
-4,calculate_ratio,What is the ratio of Functional Properties to Irreflexive Properties?,"MATCH (fp:FunctionalProperty) WITH count(fp) AS fp_count MATCH (ip:IrreflexiveProperty) WITH fp_count, count(ip) AS ip_count RETURN toFloat(fp_count) / ip_count AS ratio"
-4,group_by_label_and_aggregate,"For each resource type (CVE, CWE, CAPEC), find its average impact score, if applicable.","MATCH (r:Resource) WHERE r.ucoimpactScore IS NOT NULL AND (r:UcoCVE OR r:UcoCWE OR r:UcoexCAPEC) WITH labels(r) as labels, toFloat(r.ucoimpactScore) as score WITH [lbl IN labels WHERE lbl IN ['UcoCVE', 'UcoCWE', 'UcoexCAPEC'] | lbl][0] AS type, score RETURN type, avg(score) AS average_score"
-4,filter_with_list_predicate,Find any CAPEC where at least one of its examples contains the word 'exploit'.,MATCH (c:UcoexCAPEC) WHERE c.ucoexExample IS NOT NULL AND any(ex IN c.ucoexExample WHERE ex CONTAINS 'exploit') RETURN c.ucoexCAPEC_id
-4,count_subclasses,List all ontology classes and the count of their direct subclasses.,"MATCH (parent:Class)<-[:SUBCLASSOF]-(child:Class) RETURN parent.label, count(child) AS direct_subclasses"
-4,find_nodes_with_same_property,Find vulnerabilities that share the same CVSS vector string but are not the same node.,"MATCH (v1:UcoVulnerability), (v2:UcoVulnerability) WHERE v1.ucovectorString = v2.ucovectorString AND id(v1) < id(v2) RETURN v1.label, v2.label, v1.ucovectorString"
-4,find_superclass_hierarchy,Find the entire chain of superclasses for the class 'UcoCVE'.,MATCH p = (:Class {label: 'UcoCVE'})-[:SUBCLASSOF*]->(superclass:Class) RETURN [n IN nodes(p) | n.label]
-4,find_shared_connections,Find pairs of CVEs that are linked to the same CWE.,"MATCH (cve1:UcoCVE)<-[:UCOHASCVE_ID]-(:UcoVulnerability)-[:UCOHASWEAKNESS]->(w:UcoCWE)<-[:UCOHASWEAKNESS]-(:UcoVulnerability)-[:UCOHASCVE_ID]->(cve2:UcoCVE) WHERE id(cve1) < id(cve2) RETURN cve1.uri, cve2.uri, w.ucocweID"
-4,classify_with_case,"Generate a report of CAPEC ID, its severity, and a classification of its exploitability score.","MATCH (c:UcoexCAPEC) WHERE c.ucoexploitabilityScore IS NOT NULL RETURN c.ucoexCAPEC_id, c.ucoexSeverity, CASE WHEN toFloat(c.ucoexploitabilityScore) > 7.0 THEN 'High' ELSE 'Moderate' END AS exploit_class"
-4,find_isolated_nodes,Find all resources that are not connected to any other resource.,MATCH (r:Resource) WHERE NOT (r)--() RETURN r.uri
+1,get_property_by_id,What is the base severity for CVE-2002-1777?,MATCH (c:UcoCVE {label: 'CVE-2002-1777'}) RETURN c.ucobaseSeverity
+1,get_property_by_id,Find the abstraction level for the weakness with CWE ID 'CWE-24'.,MATCH (c:UcoCWE {ucocweID: 'CWE-24'}) RETURN c.ucoabstraction
+1,get_property_by_id,What is the name of the CAPEC entry with ID '519'?,MATCH (c:UcoexCAPEC {ucoexCAPEC_id: '519'}) RETURN c.ucoexCAPEC_name
+1,get_property_by_id,Retrieve the exploitability score for 'CVE-2002-1777'.,MATCH (c:UcoCVE {label: 'CVE-2002-1777'}) RETURN c.ucoexploitabilityScore
+1,get_property_by_id,What is the summary for the vulnerability with URI 'http://purl.org/cyber/uco#VULN-CVE-2000-0363'?,MATCH (v:UcoVulnerability {uri: 'http://purl.org/cyber/uco#VULN-CVE-2000-0363'}) RETURN v.ucosummary
+1,get_property_by_id,Show the description of CAPEC pattern '519'.,MATCH (c:UcoexCAPEC {ucoexCAPEC_id: '519'}) RETURN c.ucoexDescription
+1,get_property_by_label,What is the likelihood of exploit for the CAPEC pattern 'Documentation Alteration to Cause Errors in System Design'?,MATCH (c:UcoexCAPEC {ucoexCAPEC_name: 'Documentation Alteration to Cause Errors in System Design'}) RETURN c.ucoexLikelihood
+1,get_property_by_id,What is the structure of CWE-24?,MATCH (c:UcoCWE {ucocweID: 'CWE-24'}) RETURN c.ucostructure
+1,get_property_by_id,When was the vulnerability 'http://purl.org/cyber/uco#VULN-CVE-2000-0363' published?,MATCH (v:UcoVulnerability {uri: 'http://purl.org/cyber/uco#VULN-CVE-2000-0363'}) RETURN v.ucopublishedDateTime
+1,get_property_by_id,Does CVE-2002-1777 require user interaction?,MATCH (c:UcoCVE {label: 'CVE-2002-1777'}) RETURN c.ucouserInteractionRequired
+1,get_property_by_id,What is the full CPE name for the URI 'http://example.com/ucoex#cpe%3A2.3%3Aa%3Aberoftpd%3Aberoftpd%3A1.3.2%3A%2A%3A%2A%3A%2A%3A%2A%3A%2A%3A%2A%3A%2A'?,MATCH (c:UcoexCPE {uri: 'http://example.com/ucoex#cpe%3A2.3%3Aa%3Aberoftpd%3Aberoftpd%3A1.3.2%3A%2A%3A%2A%3A%2A%3A%2A%3A%2A%3A%2A%3A%2A'}) RETURN c.cpeName
+1,get_property_by_id,Show me the potential mitigations for CWE-24.,MATCH (c:UcoCWE {ucocweID: 'CWE-24'}) RETURN c.ucopotentialMitigations
+1,get_property_by_id,List the prerequisites for CAPEC-519.,MATCH (c:UcoexCAPEC {ucoexCAPEC_id: '519'}) RETURN c.ucoexPrerequisites
+1,get_property_by_id,What is the vulnerability status of CVE-2002-1777?,MATCH (c:UcoCVE {label: 'CVE-2002-1777'}) RETURN c.ucovulnStatus
+1,get_property_by_id,What is the impact score for CVE-2002-1777?,MATCH (c:UcoCVE {label: 'CVE-2002-1777'}) RETURN c.ucoimpactScore
+1,count_nodes,How many UcoCVE nodes exist in the graph?,MATCH (n:UcoCVE) RETURN count(n)
+1,count_nodes,Count all UcoexCAPEC entries.,MATCH (n:UcoexCAPEC) RETURN count(n)
+1,count_nodes,How many weaknesses (UcoCWE) are recorded?,MATCH (n:UcoCWE) RETURN count(n)
+1,get_property_by_id,Show all skills required for CAPEC-519.,MATCH (c:UcoexCAPEC {ucoexCAPEC_id: '519'}) RETURN c.ucoexSkills_Required
+1,get_property_by_id,What is the extended summary for CWE-24?,MATCH (c:UcoCWE {ucocweID: 'CWE-24'}) RETURN c.ucocweExtendedSummary
+1,get_property_by_id,List the examples for CAPEC-519.,MATCH (c:UcoexCAPEC {ucoexCAPEC_id: '519'}) RETURN c.ucoexExample
+1,get_property_by_id,What is the vector string for CVE-2002-1777?,MATCH (c:UcoCVE {label: 'CVE-2002-1777'}) RETURN c.ucovectorString
+1,get_property_by_id,Show the common consequences of CWE-24.,MATCH (c:UcoCWE {ucocweID: 'CWE-24'}) RETURN c.ucocommonConsequences
+1,get_property_by_id,What is the URI for the MITRE ATT&CK node with elementId '4:979f3676-8b6b-4ea8-9892-52543dc744ff:782312'?,MATCH (m:UcoexMITREATTACK) WHERE elementId(m) = '4:979f3676-8b6b-4ea8-9892-52543dc744ff:782312' RETURN m.uri
+1,get_property_by_id,Find the label for the UcoCVE node with URI 'http://purl.org/cyber/uco#CVE-2002-1777'.,MATCH (c:UcoCVE {uri: 'http://purl.org/cyber/uco#CVE-2002-1777'}) RETURN c.label
+2,find_neighbors_property,Find the summary of the vulnerability associated with CVE 'CVE-2002-1777'.,MATCH (v:UcoVulnerability)-[:UCOHASCVE_ID]->(:UcoCVE {label: 'CVE-2002-1777'}) RETURN v.ucosummary
+2,find_neighbors_property,What are the names of weaknesses related to CAPEC-519?,MATCH (:UcoexCAPEC {ucoexCAPEC_id: '519'})-[:UCOEXHASRELATEDWEAKNESS]->(w:UcoCWE) RETURN w.ucocweName
+2,find_neighbors_property,List all CPE names that are linked to the CVE with the label 'CVE-2002-1777'.,MATCH (:UcoCVE {label: 'CVE-2002-1777'})-[:UCOEXHASCPE]->(cpe:UcoexCPE) RETURN cpe.cpeName
+2,find_neighbors_property,What vulnerabilities are associated with the exploit target 'http://purl.org/cyber/uco#ExploitTarget-CWE-1431'?,MATCH (:UcoExploitTarget {uri: 'http://purl.org/cyber/uco#ExploitTarget-CWE-1431'})-[:UCOHASVULNERABILITY]->(v:UcoVulnerability) RETURN v.ucosummary
+2,count_neighbors,How many weaknesses are related to the CAPEC pattern with ID '519'?,MATCH (:UcoexCAPEC {ucoexCAPEC_id: '519'})-[:UCOEXHASRELATEDWEAKNESS]->(w:UcoCWE) RETURN count(w)
+2,find_neighbors_property,What is the publication date of the vulnerability identified by 'CVE-2002-1777'?,MATCH (v:UcoVulnerability)-[:UCOHASCVE_ID]->(:UcoCVE {label: 'CVE-2002-1777'}) RETURN v.ucopublishedDateTime
+2,find_neighbors_property,Find the CVE labels for vulnerabilities published on '1999-10-22T04:00:00'.,MATCH (:UcoVulnerability {ucopublishedDateTime: localdatetime('1999-10-22T04:00:00')})-[:UCOHASCVE_ID]->(c:UcoCVE) RETURN c.label
+2,find_neighbors_property,Which CVEs are associated with the CPE name 'cpe:2.3:a:beroftpd:beroftpd:1.3.2:*:*:*:*:*:*:*'?,MATCH (c:UcoCVE)-[:UCOEXHASCPE]->(:UcoexCPE {cpeName: 'cpe:2.3:a:beroftpd:beroftpd:1.3.2:*:*:*:*:*:*:*'}) RETURN c.label
+2,get_list_property_size,Count the number of mitigations listed for CAPEC-519.,MATCH (c:UcoexCAPEC {ucoexCAPEC_id: '519'}) RETURN size(c.ucoexMitigations)
+2,find_neighbors_property,What is the description of an observed example for CWE-24?,MATCH (:UcoCWE {ucocweID: 'CWE-24'})-[:UCOHASOBSERVEDEXAMPLE]->(o:UcoexObservedExample) RETURN o.ucoexDESCRIPTION
+2,find_neighbors_property,List the MITRE ATT&CK URIs that are mapped from CAPEC-519.,MATCH (:UcoexCAPEC {ucoexCAPEC_id: '519'})-[:UCOEXHASTAXONOMYMAPPING]->(m:UcoexMITREATTACK) RETURN m.uri
+2,find_neighbors_property,Which weaknesses are tied to the exploit target with URI 'http://purl.org/cyber/uco#ExploitTarget-CWE-1431'?,MATCH (:UcoExploitTarget {uri: 'http://purl.org/cyber/uco#ExploitTarget-CWE-1431'})-[:UCOHASWEAKNESS]->(w:UcoCWE) RETURN w.ucocweID
+2,count_neighbors,How many CPEs are associated with CVEs that have a 'HIGH' base severity?,MATCH (:UcoCVE {ucobaseSeverity: 'HIGH'})-[:UCOEXHASCPE]->(cpe:UcoexCPE) RETURN count(cpe)
+2,find_neighbors_property,What is the CVE label for an observed example with description containing 'travers'?,MATCH (o:UcoexObservedExample)-[:UCOEXEXAMPLEOBSERVEDIN]->(c:UcoCVE) WHERE o.ucoexDESCRIPTION CONTAINS 'travers' RETURN c.label
+2,filter_by_list_property,Find CAPEC patterns that list 'Access to the manufacturer\'s documentation.' as a prerequisite.,MATCH (c:UcoexCAPEC) WHERE 'Access to the manufacturer\'s documentation.' IN c.ucoexPrerequisites RETURN c.ucoexCAPEC_id
+2,count_neighbors,How many observed examples are there for the weakness 'Path Traversal: `../filedir`'?,MATCH (:UcoCWE {ucocweName: 'Path Traversal: `../filedir`'})-[:UCOHASOBSERVEDEXAMPLE]->(o:UcoexObservedExample) RETURN count(o)
+2,get_node_by_property,List vulnerabilities that were last modified on '2025-04-03T01:03:51'.,MATCH (v:UcoVulnerability {ucolastModifiedDateTime: localdatetime('2025-04-03T01:03:51')}) RETURN v.uri
+2,find_neighbors_property,Which CAPEC patterns are related to the weakness 'CWE-24'?,MATCH (c:UcoexCAPEC)-[:UCOEXHASRELATEDWEAKNESS]->(:UcoCWE {ucocweID: 'CWE-24'}) RETURN c.ucoexCAPEC_name
+2,find_neighbors_property,Find the definitions of D3FEND techniques that counter the MITRE ATT&CK technique with URI 'http://example.com/ucoex#T1040'.,MATCH (d:UcoexMITRED3FEND)-[:UCOEXHASMITREATTACK]->(:UcoexMITREATTACK {uri: 'http://example.com/ucoex#T1040'}) RETURN d.ucoexMITRED3FEND_DEFINITION
+2,find_neighbors_property,What is the status of weaknesses related to CAPEC-519?,MATCH (:UcoexCAPEC {ucoexCAPEC_id: '519'})-[:UCOEXHASRELATEDWEAKNESS]->(w:UcoCWE) RETURN w.ucostatus
+2,find_neighbors_property,List the URIs of exploit targets that have the weakness 'CWE-24'.,MATCH (et:UcoExploitTarget)-[:UCOHASWEAKNESS]->(:UcoCWE {ucocweID: 'CWE-24'}) RETURN et.uri
+2,count_nodes_by_property,How many high severity CAPEC patterns are in the database?,MATCH (c:UcoexCAPEC {ucoexSeverity: 'High'}) RETURN count(c)
+2,find_neighbors_property,Show the summary for vulnerabilities linked to CVEs that do not require user interaction.,MATCH (v:UcoVulnerability)-[:UCOHASCVE_ID]->(:UcoCVE {ucouserInteractionRequired: 'false'}) RETURN v.ucosummary
+2,find_neighbors_property,Find the URI of the vulnerability associated with CVE-2002-1777.,MATCH (v:UcoVulnerability)-[:UCOHASCVE_ID]->(:UcoCVE {label: 'CVE-2002-1777'}) RETURN v.uri
+3,traverse_and_return,What are the labels of CVEs associated with the exploit target 'http://purl.org/cyber/uco#ExploitTarget-CWE-1431'?,MATCH (:UcoExploitTarget {uri: 'http://purl.org/cyber/uco#ExploitTarget-CWE-1431'})-[:UCOHASVULNERABILITY]->(:UcoVulnerability)-[:UCOHASCVE_ID]->(c:UcoCVE) RETURN c.label
+3,filter_with_conversion,List all CVEs with an exploitability score of 10.0.,MATCH (c:UcoCVE) WHERE toFloat(c.ucoexploitabilityScore) = 10.0 RETURN c.label
+3,traverse_and_return,Find the names of CAPEC patterns related to weaknesses found in any exploit target.,MATCH (:UcoExploitTarget)-[:UCOHASWEAKNESS]->(w:UcoCWE)<-[:UCOEXHASRELATEDWEAKNESS]-(ca:UcoexCAPEC) RETURN DISTINCT ca.ucoexCAPEC_name
+3,traverse_and_filter,Which CAPEC patterns are related to CWEs with 'Path Traversal' in their name?,MATCH (ca:UcoexCAPEC)-[:UCOEXHASRELATEDWEAKNESS]->(w:UcoCWE) WHERE w.ucocweName CONTAINS 'Path Traversal' RETURN ca.ucoexCAPEC_id
+3,filter_by_date,List the summaries of vulnerabilities published before the year 2000.,MATCH (v:UcoVulnerability) WHERE v.ucopublishedDateTime.year < 2000 RETURN v.ucosummary
+3,multi_hop_traversal,What are the MITRE ATT&CK URIs for CAPEC patterns related to 'CWE-24'?,MATCH (:UcoexCAPEC)-[:UCOEXHASRELATEDWEAKNESS]->(:UcoCWE {ucocweID: 'CWE-24'}) MATCH (ca)-[:UCOEXHASTAXONOMYMAPPING]->(m:UcoexMITREATTACK) RETURN m.uri
+3,aggregate_by_property,"For each base severity level, count the number of CVEs.","MATCH (c:UcoCVE) RETURN c.ucobaseSeverity, count(c) AS count"
+3,filter_by_list_property,Show the name and mitigations for CAPEC patterns that require a 'High' skill level.,"MATCH (c:UcoexCAPEC) WHERE any(skill IN c.ucoexSkills_Required WHERE skill STARTS WITH 'Level:High') RETURN c.ucoexCAPEC_name, c.ucoexMitigations"
+3,aggregate_and_sort,Find the top 5 CWEs by the number of associated CAPEC patterns.,"MATCH (ca:UcoexCAPEC)-[:UCOEXHASRELATEDWEAKNESS]->(w:UcoCWE) WITH w, count(ca) as capecCount RETURN w.ucocweID ORDER BY capecCount DESC LIMIT 5"
+3,aggregate_neighbors,Collect all weaknesses associated with the exploit target 'http://purl.org/cyber/uco#ExploitTarget-CWE-1431'.,MATCH (:UcoExploitTarget {uri: 'http://purl.org/cyber/uco#ExploitTarget-CWE-1431'})-[:UCOHASWEAKNESS]->(w:UcoCWE) RETURN collect(w.ucocweID) as weaknesses
+3,multi_path_existence_check,List the labels of CVEs that have CPEs and are also observed as examples for any weakness.,MATCH (c:UcoCVE)-[:UCOEXHASCPE]->() MATCH (c)<-[:UCOEXEXAMPLEOBSERVEDIN]-(:UcoexObservedExample) RETURN DISTINCT c.label
+3,multi_filter_with_conversion,Find CVEs with an impact score below 7.0 and an exploitability score above 9.0.,MATCH (c:UcoCVE) WHERE toFloat(c.ucoimpactScore) < 7.0 AND toFloat(c.ucoexploitabilityScore) > 9.0 RETURN c.label
+3,multi_hop_traversal,What D3FEND techniques are proposed for attacks mapped from CAPEC-519?,MATCH (:UcoexCAPEC {ucoexCAPEC_id: '519'})-[:UCOEXHASTAXONOMYMAPPING]->(m:UcoexMITREATTACK)<-[:UCOEXHASMITREATTACK]-(d:UcoexMITRED3FEND) RETURN d.ucoexMITRED3FEND_LABEL
+3,negative_existence_check,Find the names of CWEs that are associated with an exploit target but have no observed examples.,MATCH (:UcoExploitTarget)-[:UCOHASWEAKNESS]->(w:UcoCWE) WHERE NOT (w)-[:UCOHASOBSERVEDEXAMPLE]->() RETURN w.ucocweName
+3,traverse_and_filter,Show the CVE label and the vendor/product from the CPE name for all CVEs related to 'beroftpd'.,"MATCH (c:UcoCVE)-[:UCOEXHASCPE]->(cpe:UcoexCPE) WHERE cpe.cpeName CONTAINS 'beroftpd' RETURN c.label, cpe.cpeName"
+3,aggregate_all,What is the average impact score for all CVEs in the database?,MATCH (c:UcoCVE) RETURN avg(toFloat(c.ucoimpactScore))
+3,aggregate_by_node,"For each exploit target, count its number of associated vulnerabilities.","MATCH (et:UcoExploitTarget)-[:UCOHASVULNERABILITY]->(v:UcoVulnerability) RETURN et.uri, count(v) as vulnerability_count"
+3,filter_by_string_encoded_json,List CWEs that have 'Implementation' as a mode of introduction.,"MATCH (c:UcoCWE) WHERE c.ucomodesOfIntroduction CONTAINS '""Phase"":""Implementation""' RETURN c.ucocweID"
+3,filter_by_list_content,Retrieve all CAPEC mitigations that suggest to 'cryptographically sign' documents.,MATCH (c:UcoexCAPEC) WHERE any(mitigation IN c.ucoexMitigations WHERE mitigation CONTAINS 'cryptographically sign') RETURN c.ucoexMitigations
+3,count_distinct_neighbors,How many distinct MITRE ATT&CK techniques are mapped from CAPEC patterns?,MATCH (:UcoexCAPEC)-[:UCOEXHASTAXONOMYMAPPING]->(m:UcoexMITREATTACK) RETURN count(DISTINCT m)
+3,filter_by_date_parts,Find CVEs associated with vulnerabilities published in the same year they were last modified.,MATCH (v:UcoVulnerability)-[:UCOHASCVE_ID]->(c:UcoCVE) WHERE v.ucopublishedDateTime.year = v.ucolastModifiedDateTime.year RETURN c.label
+3,filter_by_list_size,List CAPEC patterns that have more than 3 listed mitigations.,MATCH (c:UcoexCAPEC) WHERE size(c.ucoexMitigations) > 3 RETURN c.ucoexCAPEC_id
+3,filter_by_string_encoded_json,Find the CWE name for a weakness that has a common consequence with 'Confidentiality' scope.,"MATCH (c:UcoCWE) WHERE c.ucocommonConsequences CONTAINS '""Scope"":[""Confidentiality""' RETURN c.ucocweName"
+3,traverse_and_filter,What are the CVE labels for vulnerabilities targeting 'beroftpd' that have a 'HIGH' severity?,MATCH (c:UcoCVE {ucobaseSeverity: 'HIGH'})-[:UCOEXHASCPE]->(cpe:UcoexCPE) WHERE cpe.cpeName CONTAINS 'beroftpd' RETURN c.label
+4,path_finding,Find the shortest path between 'CVE-2002-1777' and 'CAPEC-519'.,"MATCH (start:UcoCVE {label: 'CVE-2002-1777'}), (end:UcoexCAPEC {ucoexCAPEC_id: '519'}) MATCH p = shortestPath((start)-[*]-(end)) RETURN p"
+4,optional_match_aggregation,"For each UcoCWE, list its name and any associated CAPEC patterns. If there are none, show null.","MATCH (w:UcoCWE) OPTIONAL MATCH (ca:UcoexCAPEC)-[:UCOEXHASRELATEDWEAKNESS]->(w) RETURN w.ucocweName, collect(ca.ucoexCAPEC_name) AS capecs"
+4,self_join_pattern,Identify pairs of CVEs that share the same exploitability and impact scores.,"MATCH (c1:UcoCVE), (c2:UcoCVE) WHERE id(c1) < id(c2) AND c1.ucoexploitabilityScore = c2.ucoexploitabilityScore AND c1.ucoimpactScore = c2.ucoimpactScore RETURN c1.label, c2.label"
+4,complex_aggregation,"Calculate a risk score for each exploit target, defined as the sum of impact scores of its vulnerabilities.","MATCH (et:UcoExploitTarget)-[:UCOHASVULNERABILITY]->(:UcoVulnerability)-[:UCOHASCVE_ID]->(c:UcoCVE) RETURN et.uri, sum(toFloat(c.ucoimpactScore)) AS riskScore ORDER BY riskScore DESC"
+4,negative_path_check,"Find exploit targets affected by vulnerabilities with a CVE, but for which the CVE has no associated CPE information.",MATCH (et:UcoExploitTarget)-[:UCOHASVULNERABILITY]->(:UcoVulnerability)-[:UCOHASCVE_ID]->(c:UcoCVE) WHERE NOT (c)-[:UCOEXHASCPE]->() RETURN et.uri
+4,multi_path_traversal,Which CAPEC patterns are mitigated by D3FEND techniques that also counter MITRE ATT&CK 'T1040'?,MATCH (d:UcoexMITRED3FEND)-[:UCOEXHASMITREATTACK]->(:UcoexMITREATTACK {uri: 'http://example.com/ucoex#T1040'}) MATCH (d)-[:UCOEXHASMITREATTACK]->(m)<-[:UCOEXHASTAXONOMYMAPPING]-(ca:UcoexCAPEC) RETURN DISTINCT ca.ucoexCAPEC_name
+4,pattern_comprehension,"List all weaknesses and, using pattern comprehension, list the labels of CVEs observed as their examples.","MATCH (w:UcoCWE) RETURN w.ucocweID, [ (w)-[:UCOHASOBSERVEDEXAMPLE]->(:UcoexObservedExample)-[:UCOEXEXAMPLEOBSERVEDIN]->(c:UcoCVE) | c.label ] AS observed_cves"
+4,list_predicate_filter,Find CVEs where all associated CPEs are for the vendor 'beroftpd'.,"MATCH (c:UcoCVE)-[:UCOEXHASCPE]->(cpe:UcoexCPE) WITH c, collect(cpe.cpeName) as cpes WHERE all(x IN cpes WHERE x CONTAINS ':a:beroftpd:') RETURN c.label"
+4,complex_traversal_aggregation,"For each CVE with a 'HIGH' severity, find all CAPEC patterns related to its underlying weaknesses.","MATCH (:UcoCVE {ucobaseSeverity: 'HIGH'})<-[:UCOHASCVE_ID]-(:UcoVulnerability)<-[:UCOHASVULNERABILITY]-(:UcoExploitTarget)-[:UCOHASWEAKNESS]->(w:UcoCWE)<-[:UCOEXHASRELATEDWEAKNESS]-(ca:UcoexCAPEC) RETURN cve.label, collect(DISTINCT ca.ucoexCAPEC_name) AS related_capecs"
+4,subquery_aggregation,"Using a subquery, find the average number of CPEs per CVE.","CALL { MATCH (c:UcoCVE)-[:UCOEXHASCPE]->(cpe:UcoexCPE) RETURN c, count(cpe) AS cpeCount } RETURN avg(cpeCount)"
+4,multi_property_filter_list,"Identify 'high impact, low prerequisite' CAPEC patterns (Severity 'High', with 2 or fewer prerequisites).",MATCH (c:UcoexCAPEC) WHERE c.ucoexSeverity = 'High' AND size(c.ucoexPrerequisites) <= 2 RETURN c.ucoexCAPEC_id
+4,positive_and_negative_check,Find exploit targets that have weaknesses with 'Variant' abstraction but no weaknesses with 'Simple' structure.,MATCH (et:UcoExploitTarget)-[:UCOHASWEAKNESS]->(w1:UcoCWE) WHERE w1.ucoabstraction = 'Variant' AND NOT EXISTS { MATCH (et)-[:UCOHASWEAKNESS]->(:UcoCWE {ucostructure: 'Simple'}) } RETURN DISTINCT et.uri
+4,aggregate_and_sort,What is the most common CWE abstraction level for weaknesses that have observed examples?,"MATCH (w:UcoCWE)-[:UCOHASOBSERVEDEXAMPLE]->() RETURN w.ucoabstraction, count(w) AS frequency ORDER BY frequency DESC LIMIT 1"
+4,negative_path_check,List all UcoexMITREATTACK nodes that are not connected to any UcoexMITRED3FEND technique.,MATCH (m:UcoexMITREATTACK) WHERE NOT (m)<-[:UCOEXHASMITREATTACK]-(:UcoexMITRED3FEND) RETURN m.uri
+4,traverse_and_aggregate,"For each CWE, find the latest publication date of a vulnerability on an exploit target affected by that CWE.","MATCH (w:UcoCWE)<-[:UCOHASWEAKNESS]-(:UcoExploitTarget)-[:UCOHASVULNERABILITY]->(v:UcoVulnerability) RETURN w.ucocweID, max(v.ucopublishedDateTime) AS latest_vuln"
+4,complex_conditional_traversal,Find CVEs associated with 'Path Traversal' weaknesses that have at least one 'High' severity CAPEC pattern.,"MATCH (c:UcoCVE)<-[:UCOHASCVE_ID]-(:UcoVulnerability)<-[:UCOHASVULNERABILITY]-(:UcoExploitTarget)-[:UCOHASWEAKNESS]->(w:UcoCWE) WHERE w.ucocweName CONTAINS 'Path Traversal' WITH c, w MATCH (w)<-[:UCOEXHASRELATEDWEAKNESS]-(ca:UcoexCAPEC {ucoexSeverity: 'High'}) RETURN DISTINCT c.label"
+4,string_parsing_aggregation,"For each vendor found in CPE names, count the number of associated CVEs.","MATCH (c:UcoCVE)-[:UCOEXHASCPE]->(cpe:UcoexCPE) WITH c, split(cpe.cpeName, ':')[3] as vendor RETURN vendor, count(DISTINCT c) as cve_count ORDER BY cve_count DESC"
+4,path_finding,"Show the full attack chain: A CVE, its target's weakness, that weakness's CAPEC pattern, and that pattern's MITRE ATT&CK ID.",MATCH p = (:UcoCVE)<-[:UCOHASCVE_ID]-(:UcoVulnerability)<-[:UCOHASVULNERABILITY]-(:UcoExploitTarget)-[:UCOHASWEAKNESS]->(:UcoCWE)<-[:UCOEXHASRELATEDWEAKNESS]-(:UcoexCAPEC)-[:UCOEXHASTAXONOMYMAPPING]->(:UcoexMITREATTACK) RETURN p LIMIT 5
+4,existence_check_list,Do any CAPEC patterns exist that have mitigations but no listed prerequisites?,MATCH (c:UcoexCAPEC) WHERE size(c.ucoexMitigations) > 0 AND size(c.ucoexPrerequisites) = 0 RETURN count(c) > 0 AS result
+4,multi_path_existence_check,List exploit targets vulnerable to CVE-2002-1777 and also having the weakness CWE-24.,MATCH (et:UcoExploitTarget)-[:UCOHASVULNERABILITY]->(:UcoVulnerability)-[:UCOHASCVE_ID]->(:UcoCVE {label: 'CVE-2002-1777'}) MATCH (et)-[:UCOHASWEAKNESS]->(:UcoCWE {ucocweID: 'CWE-24'}) RETURN et.uri
+4,complex_aggregation,What is the average number of weaknesses per exploit target?,"MATCH (et:UcoExploitTarget)-[:UCOHASWEAKNESS]->(w:UcoCWE) WITH et, count(w) AS weakness_count RETURN avg(weakness_count)"
+4,pattern_matching,Find pairs of CAPEC patterns that share at least one MITRE ATT&CK mapping.,"MATCH (ca1:UcoexCAPEC)-[:UCOEXHASTAXONOMYMAPPING]->(m:UcoexMITREATTACK)<-[:UCOEXHASTAXONOMYMAPPING]-(ca2:UcoexCAPEC) WHERE id(ca1) < id(ca2) RETURN ca1.ucoexCAPEC_id, ca2.ucoexCAPEC_id, m.uri"
+4,subgraph_retrieval,"Return the subgraph related to 'CVE-2002-1777', showing connected vulnerabilities, targets, and weaknesses.",MATCH p = (c:UcoCVE {label: 'CVE-2002-1777'})-[*1..3]-() RETURN p
+4,complex_aggregation_and_sort,Find the D3FEND technique that covers the most CAPEC patterns via MITRE ATT&CK mappings.,"MATCH (d:UcoexMITRED3FEND)-[:UCOEXHASMITREATTACK]->(m:UcoexMITREATTACK)<-[:UCOEXHASTAXONOMYMAPPING]-(ca:UcoexCAPEC) WITH d, count(DISTINCT ca) as capec_count RETURN d.ucoexMITRED3FEND_LABEL ORDER BY capec_count DESC LIMIT 1"

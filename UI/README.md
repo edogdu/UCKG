@@ -27,7 +27,21 @@ UI/
 - Neo4j database running
 - Docker (for Neo4j)
 
-### 1. Install Dependencies
+### 1. Setup Package Files
+
+**IMPORTANT**: Due to .gitignore settings, package.json files are not tracked. You need to rename the provided .txt files:
+
+```bash
+# In UI directory
+mv package.json.txt package.json
+
+# In UI/backend directory  
+cd backend
+mv package.json.txt package.json
+cd ..
+```
+
+### 2. Install Dependencies
 
 **Frontend:**
 ```bash
@@ -40,7 +54,7 @@ cd backend
 npm install
 ```
 
-### 2. Configure Environment Variables
+### 3. Configure Environment Variables
 
 Create a `.env` file in the `backend/` directory:
 ```bash
@@ -52,14 +66,14 @@ NEO4J_PASSWORD=abcd90909090
 FRONTEND_URL=http://localhost:8080
 ```
 
-### 3. Start Neo4j Database
+### 4. Start Neo4j Database
 
 Run Neo4j using Docker Compose (from project root):
 ```bash
 docker-compose up
 ```
 
-### 4. Run the Application
+### 5. Run the Application
 
 **Option 1: Run both frontend and backend together**
 ```bash

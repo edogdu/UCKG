@@ -1,29 +1,43 @@
 import os
+import re
 import traceback
 from neo4j import GraphDatabase
 
 # --- Configuration ---
-# TODO: Update these with your Neo4j instance details
 NEO4J_URI = "bolt://localhost:7687"
 NEO4J_USER = "neo4j"
 NEO4J_PASSWORD = "abcd90909090" # Replace with your actual password
-OUTPUT_FILE_NAME = "neo4j_graph_schema.txt"
+FULL_SCHEMA_FILE_NAME = "neo4j_graph_schema.txt"
+FILTERED_SCHEMA_FILE_NAME = "filtered_neo4j_schema.txt"
 
 class Neo4jSchemaExtractor:
     """
-    Connects to a Neo4j database to extract and format its schema.
-    The output is designed to be used as context for a Large Language Model (LLM)
-    to help it generate accurate Cypher queries.
+    Connects to a Neo4j database to extract its schema.
+    It produces two files: a complete schema dump and a filtered version
+    containing only domain-specific "useful" information for an LLM.
     """
 
     def __init__(self, uri, user, password):
         """
-        Initializes the extractor and connects to the database.
+        Initializes the extractor and defines the filters for the "useful" schema.
         """
         self.uri = uri
         self.user = user
         self.password = password
         self.driver = None
+
+        # Define the cybersecurity-specific labels and relationships for filtering
+        self.useful_labels = {
+            "UcoCVE", "UcoCWE", "UcoVulnerability", "UcoExploitTarget", "UcoexCAPEC", 
+            "UcoexCPE", "UcoexMITREATTACK", "UcoexMITRED3FEND", "UcoexObservedExample", 
+            "SymmetricProperty"
+        }
+        self.useful_relationships = {
+            "UCOEXEXAMPLEOBSERVEDIN", "UCOEXHASCPE", "UCOEXHASMITREATTACK", 
+            "UCOEXHASRELATEDWEAKNESS", "UCOEXHASTAXONOMYMAPPING", "UCOHASCVE_ID", 
+            "UCOHASOBSERVEDEXAMPLE", "UCOHASVULNERABILITY", "UCOHASWEAKNESS", "DOMAIN"
+        }
+        
         try:
             self.driver = GraphDatabase.driver(self.uri, auth=(self.user, self.password))
             self.driver.verify_connectivity()
@@ -34,17 +48,15 @@ class Neo4jSchemaExtractor:
             raise
 
     def close(self):
-        """
-        Closes the database connection.
-        """
+        """ Closes the database connection. """
         if self.driver:
             self.driver.close()
             print("Neo4j connection closed.")
 
     def get_schema(self):
-        """
-        Fetches the complete schema from the database using built-in procedures.
-        This includes node labels, properties, relationship types, and their connections.
+        """ 
+        Fetches the complete schema from the database using a more robust direct
+        query method instead of relying on potentially misleading built-in procedures.
         """
         print("Extracting schema from the database...")
         schema_info = {
@@ -54,173 +66,133 @@ class Neo4jSchemaExtractor:
         }
         try:
             with self.driver.session() as session:
-                # Get node labels and their properties
-                node_props_query = "CALL db.schema.nodeTypeProperties()"
-                schema_info["node_properties"] = session.run(node_props_query).data()
-
-                # Get relationship types and their properties
-                rel_props_query = "CALL db.schema.relTypeProperties()"
-                schema_info["rel_properties"] = session.run(rel_props_query).data()
-
-                # Get the relationship schema (how nodes are connected)
-                relationships_query = "CALL db.schema.visualization()"
-                result = session.run(relationships_query).data()
-
-                if not result:
-                    print("Warning: `CALL db.schema.visualization()` returned no data. Could not determine relationship schema.")
-                    return schema_info
-
-                vis_data = result[0]
-                nodes = vis_data.get('nodes', [])
-                rels = vis_data.get('relationships', [])
+                # 1. Get node labels and their properties (this part is usually reliable)
+                schema_info["node_properties"] = session.run("CALL db.schema.nodeTypeProperties()").data()
                 
-                # 1. Build a map of node IDs to their labels for quick lookup.
-                node_map = {}
-                for node in nodes:
-                    node_id = node.get('<id>')
-                    node_label = node.get('name')
-                    if node_id is not None and node_label:
-                        node_map[node_id] = [node_label]
+                # 2. Get relationship properties (if any)
+                schema_info["rel_properties"] = session.run("CALL db.schema.relTypeProperties()").data()
+                
+                # 3. Robustly get relationship schema by directly querying the graph
+                rel_query = """
+                MATCH (start_node)-[rel]->(end_node)
+                RETURN DISTINCT labels(start_node) AS start_labels, 
+                                type(rel) AS rel_type, 
+                                labels(end_node) AS end_labels
+                LIMIT 500 
+                """
+                results = session.run(rel_query).data()
+                
+                for record in results:
+                    start_labels = record['start_labels']
+                    end_labels = record['end_labels']
+                    rel_type = record['rel_type']
 
-                # 2. Process relationships with robust logic to handle multiple data formats.
-                for rel_tuple in rels:
-                    if len(rel_tuple) < 3:
-                        print(f"Warning: Skipping malformed relationship tuple: {rel_tuple}")
-                        continue
+                    # Prefer the more specific label over generic ones like 'Resource'
+                    start_label = next((l for l in start_labels if l != 'Resource'), start_labels[0])
+                    end_label = next((l for l in end_labels if l != 'Resource'), end_labels[0])
 
-                    # Correctly unpack the tuple: (start_node, relationship, end_node)
-                    start_node_ref, rel_info, end_node_ref = rel_tuple[0], rel_tuple[1], rel_tuple[2]
-
-                    start_label = None
-                    end_label = None
-                    
-                    # Determine start node label
-                    if isinstance(start_node_ref, dict) and 'name' in start_node_ref:
-                        start_label = start_node_ref.get('name') # Label is in the dict directly
-                    else:
-                        start_node_id = start_node_ref.get('<id>') if isinstance(start_node_ref, dict) else start_node_ref
-                        labels_list = node_map.get(start_node_id)
-                        if labels_list:
-                            start_label = labels_list[0] # Looked up the label via ID
-
-                    # Determine end node label
-                    if isinstance(end_node_ref, dict) and 'name' in end_node_ref:
-                        end_label = end_node_ref.get('name') # Label is in the dict directly
-                    else:
-                        end_node_id = end_node_ref.get('<id>') if isinstance(end_node_ref, dict) else end_node_ref
-                        labels_list = node_map.get(end_node_id)
-                        if labels_list:
-                            end_label = labels_list[0] # Looked up the label via ID
-
-                    if not start_label or not end_label:
-                        print(f"Warning: Could not determine start or end node label from relationship tuple: {rel_tuple}")
-                        continue
-
-                    # Extract relationship type
-                    rel_type = rel_info.get('name') if isinstance(rel_info, dict) else rel_info
-                    if not rel_type:
-                        continue
-
-                    # Construct and store the relationship string
-                    rel_str = f"(:{start_label})-[R:{rel_type}]->(:{end_label})"
-                    if rel_str not in schema_info["relationships"]:
-                         schema_info["relationships"].append(rel_str)
-
+                    if start_label and end_label and rel_type:
+                        rel_str = f"(:{start_label})-[R:{rel_type}]->(:{end_label})"
+                        if rel_str not in schema_info["relationships"]:
+                            schema_info["relationships"].append(rel_str)
+                            
             print("Schema extraction successful.")
             return schema_info
         except Exception as e:
             print(f"An error occurred while fetching the schema: {e}")
-            print("--- Full Traceback (from get_schema) ---")
             traceback.print_exc()
-            print("----------------------------------------")
             return None
 
-    def format_schema_for_llm(self, schema_info):
+    def format_schema_for_llm(self, schema_info, filter_useful=False):
         """
-        Formats the extracted schema into a human-readable and LLM-friendly string.
+        Formats the schema into a readable string, optionally filtering for useful items.
         """
-        try:
-            if not schema_info:
-                return "Could not generate schema report due to an error."
+        if not schema_info:
+            return "Could not generate schema report due to an error."
 
-            report = []
-            report.append("Neo4j Graph Schema\n")
-            report.append("=" * 20)
-            report.append("\nThis document describes the schema of a Neo4j graph database. It is intended to be used by a Large Language Model to generate accurate Cypher queries.\n")
+        report_title = "Filtered Neo4j Graph Schema" if filter_useful else "Neo4j Graph Schema"
+        report = [report_title + "\n" + "=" * len(report_title)]
+        report.append("\nThis document describes the schema of a Neo4j graph database. It is intended to be used by a Large Language Model to generate accurate Cypher queries.\n")
 
-            # 1. Node Labels and Properties
-            report.append("\n1. Node Labels and Properties\n")
-            report.append("-" * 28)
-            if schema_info.get("node_properties"):
-                nodes_by_label = {}
-                for item in schema_info["node_properties"]:
-                    node_labels = item.get('nodeLabels')
-                    if not node_labels:
-                        continue
-                    label = node_labels[0]
-                    
-                    if label not in nodes_by_label:
-                        nodes_by_label[label] = []
-                    
-                    # FIX: Safely get property type, handling if it is None
-                    property_types = item.get('propertyTypes')
-                    prop_type_str = property_types[0] if property_types else 'Unknown'
-                    prop_info = f"  - `{item.get('propertyName', 'N/A')}` ({prop_type_str})"
+        # 1. Node Labels and Properties
+        report.append("\n1. Node Labels and Properties\n" + "-" * 28)
+        nodes_by_label = {}
+        for item in schema_info.get("node_properties", []):
+            for label in item.get('nodeLabels', []):
+                if filter_useful and label not in self.useful_labels:
+                    continue
+                if label not in nodes_by_label:
+                    nodes_by_label[label] = []
+                
+                # --- FIX IS HERE ---
+                # Robustly handle cases where propertyTypes might be None
+                property_types = item.get('propertyTypes')
+                prop_type = property_types[0] if property_types else 'Unknown'
+                # --- END OF FIX ---
+
+                prop_info = f"  - `{item.get('propertyName', 'N/A')}` ({prop_type})"
+                if prop_info not in nodes_by_label[label]:
                     nodes_by_label[label].append(prop_info)
+        for label, props in sorted(nodes_by_label.items()):
+            report.append(f"\n* **Node Label:** `:{label}`")
+            report.extend(sorted(props))
 
-                for label, props in sorted(nodes_by_label.items()):
-                    report.append(f"\n* **Node Label:** `:{label}`")
-                    report.extend(sorted(props))
+        # 2. Relationship Types and Properties
+        report.append("\n\n2. Relationship Types and Properties\n" + "-" * 33)
+        rels_by_type = {}
+        for item in schema_info.get("rel_properties", []):
+            rel_type = item.get('relType', '').strip("`")
+            if not rel_type or (filter_useful and rel_type not in self.useful_relationships):
+                continue
+            
+            if rel_type not in rels_by_type:
+                rels_by_type[rel_type] = []
+            
+            # --- FIX IS HERE ---
+            # Applied the same robust handling here
+            property_types = item.get('propertyTypes')
+            prop_type = property_types[0] if property_types else 'Unknown'
+            # --- END OF FIX ---
+            
+            prop_info = f"  - `{item.get('propertyName', 'N/A')}` ({prop_type})"
+            if prop_info not in rels_by_type[rel_type]:
+                rels_by_type[rel_type].append(prop_info)
+
+        if not rels_by_type:
+            report.append("No relationship properties found.")
+        else:
+            for rel_type, props in sorted(rels_by_type.items()):
+                report.append(f"\n* **Relationship Type:** `[:{rel_type}]`")
+                report.extend(sorted(props))
+
+
+        # 3. Relationship Schema (Connectivity)
+        report.append("\n\n3. Relationship Schema (How Nodes are Connected)\n" + "-" * 47)
+        report.append("The following patterns exist in the graph:")
+        found_rels = False
+        rel_pattern = re.compile(r"\(:(\w+)\)-\[R:(\w+)\]->\(:(\w+)\)")
+        for rel_str in sorted(schema_info.get("relationships", [])):
+            match = rel_pattern.match(rel_str)
+            if not match: continue
+            start_label, rel_type, end_label = match.groups()
+            if filter_useful:
+                if (start_label in self.useful_labels and 
+                    end_label in self.useful_labels and 
+                    rel_type in self.useful_relationships):
+                    report.append(f"- `{rel_str}`")
+                    found_rels = True
             else:
-                report.append("No node properties found.")
+                report.append(f"- `{rel_str}`")
+                found_rels = True
+        if not found_rels:
+            report.append("No matching relationships found.")
 
-            # 2. Relationship Types and Properties
-            report.append("\n\n2. Relationship Types and Properties\n")
-            report.append("-" * 33)
-            if schema_info.get("rel_properties"):
-                rels_by_type = {}
-                for item in schema_info["rel_properties"]:
-                    rel_type = item.get('relType', '').strip("`")
-                    if not rel_type: continue
-                    if rel_type not in rels_by_type:
-                        rels_by_type[rel_type] = []
-
-                    # FIX: Safely get property type, handling if it is None
-                    property_types = item.get('propertyTypes')
-                    prop_type_str = property_types[0] if property_types else 'Unknown'
-                    prop_info = f"  - `{item.get('propertyName', 'N/A')}` ({prop_type_str})"
-                    rels_by_type[rel_type].append(prop_info)
-                
-                for rel_type, props in sorted(rels_by_type.items()):
-                    report.append(f"\n* **Relationship Type:** `[:{rel_type}]`")
-                    report.extend(sorted(props))
-            else:
-                report.append("No relationship properties found.")
-
-            # 3. Graph Schema (Connectivity)
-            report.append("\n\n3. Relationship Schema (How Nodes are Connected)\n")
-            report.append("-" * 47)
-            if schema_info.get("relationships"):
-                report.append("The following patterns exist in the graph:")
-                for rel in sorted(schema_info["relationships"]):
-                    report.append(f"- `{rel}`")
-            else:
-                report.append("No relationships found.")
-                
-            report.append("\n\n" + "="*20)
-            report.append("\nEnd of Schema Report.")
-
-            return "\n".join(report)
-        except Exception as e:
-            print(f"An error occurred while formatting the schema: {e}")
-            print("--- Full Traceback (from format_schema_for_llm) ---")
-            traceback.print_exc()
-            print("--------------------------------------------------")
-            return None
+        report.append("\n\n" + "=" * 20 + "\nEnd of Schema Report.")
+        return "\n".join(report)
 
 def main():
     """
-    Main function to run the schema extraction process.
+    Main function to run the schema extraction and file writing process.
     """
     extractor = None
     try:
@@ -228,26 +200,26 @@ def main():
         schema_data = extractor.get_schema()
         
         if schema_data:
-            formatted_schema = extractor.format_schema_for_llm(schema_data)
+            # --- 1. Generate and save the FULL schema report ---
+            full_schema_report = extractor.format_schema_for_llm(schema_data, filter_useful=False)
+            if full_schema_report:
+                with open(FULL_SCHEMA_FILE_NAME, "w", encoding="utf-8") as f:
+                    f.write(full_schema_report)
+                print(f"\n✅ Full schema has been written to '{os.path.abspath(FULL_SCHEMA_FILE_NAME)}'")
             
-            # Check if formatting failed
-            if formatted_schema is None:
-                 print("Stopping process because schema formatting failed.")
-                 return
-
-            with open(OUTPUT_FILE_NAME, "w", encoding="utf-8") as f:
-                f.write(formatted_schema)
-            print(f"\nSchema has been successfully written to '{os.path.abspath(OUTPUT_FILE_NAME)}'")
+            # --- 2. Generate and save the FILTERED schema report ---
+            filtered_schema_report = extractor.format_schema_for_llm(schema_data, filter_useful=True)
+            if filtered_schema_report:
+                with open(FILTERED_SCHEMA_FILE_NAME, "w", encoding="utf-8") as f:
+                    f.write(filtered_schema_report)
+                print(f"✅ Filtered (useful) schema has been written to '{os.path.abspath(FILTERED_SCHEMA_FILE_NAME)}'")
 
     except Exception as e:
-        print(f"A critical error occurred in the main process: {e}")
-        print("--- Full Traceback (from main) ---")
+        print(f"\nA critical error occurred: {e}")
         traceback.print_exc()
-        print("----------------------------------")
     finally:
         if extractor:
             extractor.close()
-
 
 if __name__ == "__main__":
     main()

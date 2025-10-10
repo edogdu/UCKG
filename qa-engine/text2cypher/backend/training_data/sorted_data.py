@@ -36,7 +36,7 @@ def sort_jsonl_to_csv(input_json_path, output_csv_path):
 
 # --- How to Use ---
 # Define the names of your input and output files
-input_file = r'C:\Users\User\Downloads\UCKG\qa-engine\text2cypher\backend\training_data\traning_data.json'
+input_file = r'C:\Users\User\Downloads\UCKG\qa-engine\text2cypher\backend\training_data\training_data.json'
 output_file = r'C:\Users\User\Downloads\UCKG\qa-engine\text2cypher\backend\training_data\sorted_training_data.csv'
 
 # Call the function to perform the conversion and sorting

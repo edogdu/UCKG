@@ -12,42 +12,126 @@ class Text2Cypher:
         self.driver = GraphDatabase.driver(neo4j_uri, auth=(neo4j_user, neo4j_password))
         self.llm = llm
         
-        # Resolve schema path relative to this file's directory
-        base_dir = os.path.dirname(__file__)
-        self.schema_full_path = schema_path if os.path.isabs(schema_path) else os.path.join(base_dir, schema_path)
+        # Define ontology metadata and generic labels to EXCLUDE (not cybersecurity domain)
+        self.excluded_labels = {
+            # Generic UCO ontology labels
+            "Resource", "Entity", "UcoObject", "UcoThing", "UcoCore", "UcoIdentity",
+            "UcoLocation", "UcoTime", "UcoObservable", "UcoAction", "UcoFacet",
+            "UcoRole", "UcoCo", "UcoItem", "UcoItemList", "UcoMarkingDefinition",
+            "UcoRelationship", "UcoAssertion", "UcoAttributedName", "UcoBundle",
+            "UcoContent", "UcoHash", "UcoMessageThread", "UcoThread",
+            "UcoAccount", "UcoApplication", "UcoBrowser", "UcoCalendarEntry",
+            "UcoComputerSpecification", "UcoContact", "UcoDevice", "UcoDigitalAccount",
+            "UcoEmailAccount", "UcoEmailAddress", "UcoEmailMessage", "UcoFile",
+            "UcoForum", "UcoGeoLocationEntry", "UcoIPAddress", "UcoLatLongCoordinates",
+            "UcoMessage", "UcoMobileAccount", "UcoNetworkConnection", "UcoNetworkInterface",
+            "UcoNetworkRoute", "UcoOnlineService", "UcoOperatingSystem", "UcoPathRelation",
+            "UcoPhoneAccount", "UcoProfile", "UcoRasterPicture", "UcoSIMCard",
+            "UcoSMSMessage", "UcoTablet", "UcoURL", "UcoUserAccount", "UcoUserSession",
+            "UcoVector", "UcoWifiAddress", "UcoWindowsRegistryKey", "UcoWindowsRegistryValue",
+            "UcoX509Certificate", "UcoX509V3Certificate", "UcoYaraRule",
+            # Ontology metadata labels (OWL/RDF)
+            "Ontology", "Class", "Property", "DatatypeProperty", "ObjectProperty",
+            "AnnotationProperty", "NamedIndividual", "Restriction", "Union", "Intersection",
+            "Complement", "OneOf", "AllValuesFrom", "SomeValuesFrom", "HasValue",
+            "MinCardinality", "MaxCardinality", "ExactCardinality", "HasSelf",
+            "DataRange", "DataOneOf", "DataComplementOf", "DataIntersectionOf",
+            "DataUnionOf", "DatatypeRestriction", "FacetRestriction", "DataHasValue",
+            "DataMinCardinality", "DataMaxCardinality", "DataExactCardinality",
+            "DataAllValuesFrom", "DataSomeValuesFrom", "DataMinLength", "DataMaxLength",
+            "DataExactLength", "DataMinInclusive", "DataMaxInclusive", "DataMinExclusive",
+            "DataMaxExclusive", "DataPattern", "DataLanguage", "DataLength",
+            # Additional ontology metadata
+            "Axiom", "FunctionalProperty", "IrreflexiveProperty", "SymmetricProperty",
+            "TransitiveProperty", "InverseFunctionalProperty", "ReflexiveProperty",
+            "AsymmetricProperty", "DisjointWith", "EquivalentClass", "EquivalentProperty",
+            "InverseOf", "SubClassOf", "SubPropertyOf", "Domain", "Range",
+            "Annotation", "AnnotationProperty", "OntologyProperty", "DeprecatedClass",
+            "DeprecatedProperty", "Nothing", "Thing", "TopObjectProperty", "TopDataProperty",
+            "BottomObjectProperty", "BottomDataProperty", "OWLClass", "OWLObjectProperty",
+            "OWLDatatypeProperty", "OWLAnnotationProperty", "OWLNamedIndividual",
+            "OWLOntology", "OWLAxiom", "OWLDeclaration", "OWLImports", "OWLVersionInfo",
+            "OWLVersionIRI", "OWLPriorVersion", "OWLBackwardCompatibleWith", "OWLIncompatibleWith",
+            "RDFProperty", "RDFClass", "RDFResource", "RDFList", "RDFAlt", "RDFBag", "RDFSeq",
+            "RDFStatement", "RDFSubject", "RDFPredicate", "RDFObject", "RDFType", "RDFValue",
+            "RDFFirst", "RDFRest", "RDFNil", "RDFXMLLiteral", "RDFPlainLiteral", "RDFLangString",
+            # Graph configuration and metadata
+            "_GraphConfig", "_GraphMeta", "_GraphSchema", "_GraphIndex", "_GraphConstraint"
+        }
         
-        self.schema = ""
-        self.cybersecurity_labels = set()
-        self.cybersecurity_relationships = set()
+        # Define generic ontology relationships to EXCLUDE (not cybersecurity domain)
+        self.excluded_relationships = {
+            # Generic UCO ontology relationships
+            "UCOHASPROPERTY", "UCOHASFACET", "UCOHASROLE", "UCOHASIDENTITY",
+            "UCOHASLOCATION", "UCOHASOBSERVABLE", "UCOHASACTION", "UCOHASRELATIONSHIP",
+            "UCOHASASSERTION", "UCOHASATTRIBUTEDNAME", "UCOHASBUNDLE", "UCOHASCONTENT",
+            "UCOHASHASH", "UCOHASMESSAGETHREAD", "UCOHASTHREAD", "UCOHASACCOUNT",
+            "UCOHASAPPLICATION", "UCOHASBROWSER", "UCOHASCALENDARENTRY", "UCOHASCOMPUTERSPECIFICATION",
+            "UCOHASCONTACT", "UCOHASDEVICE", "UCOHASDIGITALACCOUNT", "UCOHASEMAILACCOUNT",
+            "UCOHASEMAILADDRESS", "UCOHASEMAILMESSAGE", "UCOHASFILE", "UCOHASFORUM",
+            "UCOHASGEOLOCATIONENTRY", "UCOHASIPADDRESS", "UCOHASLATLONGCOORDINATES",
+            "UCOHASMESSAGE", "UCOHASMOBILEACCOUNT", "UCOHASNETWORKCONNECTION",
+            "UCOHASNETWORKINTERFACE", "UCOHASNETWORKROUTE", "UCOHASONLINESERVICE",
+            "UCOHASOPERATINGSYSTEM", "UCOHASPATHRELATION", "UCOHASPHONEACCOUNT",
+            "UCOHASPROFILE", "UCOHASRASTERPICTURE", "UCOHASSIMCARD", "UCOHASSMSMESSAGE",
+            "UCOHASTABLET", "UCOHASURL", "UCOHASUSERACCOUNT", "UCOHASUSERSESSION",
+            "UCOHASVECTOR", "UCOHASWIFIADDRESS", "UCOHASWINDOWSREGISTRYKEY",
+            "UCOHASWINDOWSREGISTRYVALUE", "UCOHASX509CERTIFICATE", "UCOHASX509V3CERTIFICATE",
+            "UCOHASYARARULE", "UCOHASCO", "UCOHASITEM", "UCOHASITEMLIST",
+            "UCOHASMARKINGDEFINITION",
+            # Generic ontology relationships (OWL/RDF)
+            "RDFTYPE", "RDFSUBCLASSOF", "RDFSUBPROPERTYOF", "RDFDOMAIN", "RDFRANGE",
+            "RDFEQUIVALENTCLASS", "RDFEQUIVALENTPROPERTY", "RDFINVERSEOF", "RDFDISJOINTWITH",
+            "RDFUNIONOF", "RDFINTERSECTIONOF", "RDFCOMPLEMENTOF", "RDFONEOF",
+            "RDFALLVALUESFROM", "RDFSOMEVALUESFROM", "RDFHASVALUE", "RDFMINCARDINALITY",
+            "RDFMAXCARDINALITY", "RDFEXACTCARDINALITY", "RDFHASSELF", "RDFDATARANGE",
+            "RDFDATAONEOF", "RDFDATACOMPLEMENTOF", "RDFDATAINTERSECTIONOF", "RDFDATAUNIONOF",
+            "RDFDATATYPERESTRICTION", "RDFFACETRESTRICTION", "RDFDATAHASVALUE",
+            "RDFDATAMINCARDINALITY", "RDFDATAMAXCARDINALITY", "RDFDATAEXACTCARDINALITY",
+            "RDFDATAALLVALUESFROM", "RDFDATASOMEVALUESFROM", "RDFDATAMINLENGTH",
+            "RDFDATAMAXLENGTH", "RDFDATAEXACTLENGTH", "RDFDATAMININCLUSIVE",
+            "RDFDATAMAXINCLUSIVE", "RDFDATAMINEXCLUSIVE", "RDFDATAMAXEXCLUSIVE",
+            "RDFDATAPATTERN", "RDFDATALANGUAGE", "RDFDATALENGTH",
+            # Additional ontology relationships
+            "ANNOTATEDPROPERTY", "ANNOTATEDSOURCE", "ANNOTATEDTARGET", "EQUIVALENTCLASS",
+            "EQUIVALENTPROPERTY", "FIRST", "INVERSEOF", "ONCLASS", "ONEOF", "ONPROPERTY",
+            "REST", "SOMEVALUESFROM", "SUBCLASSOF", "SUBPROPERTYOF", "UNIONOF",
+            "VERSIONIRI", "IMPORTS", "PRIORVERSION", "BACKWARDCOMPATIBLEWITH", "INCOMPATIBLEWITH",
+            "DECLARATION", "ANNOTATION", "ANNOTATIONPROPERTY", "ONTOLOGYPROPERTY",
+            "DEPRECATEDCLASS", "DEPRECATEDPROPERTY", "NOTHING", "THING", "TOPOBJECTPROPERTY",
+            "TOPDATAPROPERTY", "BOTTOMOBJECTPROPERTY", "BOTTOMDATAPROPERTY", "OWLCLASS",
+            "OWLOBJECTPROPERTY", "OWLDATATYPEPROPERTY", "OWLANNOTATIONPROPERTY",
+            "OWLNAMEDINDIVIDUAL", "OWLONTOLOGY", "OWLAXIOM", "OWLDECLARATION",
+            "OWLIMPORTS", "OWLVERSIONINFO", "OWLVERSIONIRI", "OWLPRIORVERSION",
+            "OWLBACKWARDCOMPATIBLEWITH", "OWLINCOMPATIBLEWITH", "RDFPROPERTY", "RDFCLASS",
+            "RDFRESOURCE", "RDFLIST", "RDFALT", "RDFBAG", "RDFSEQ", "RDFSTATEMENT",
+            "RDFSUBJECT", "RDFPREDICATE", "RDFOBJECT", "RDFTYPE", "RDFVALUE", "RDFFIRST",
+            "RDFREST", "RDFNIL", "RDFXMLLITERAL", "RDFPLAINLITERAL", "RDFLANGSTRING"
+        }
 
-        self._load_schema()
+    def get_cybersecurity_schema(self) -> str:
+        """Get rich schema information with properties + valid edge signatures (V2 approach)"""
+        node_props = self._fetch_node_properties()
+        rel_props = self._fetch_relationship_properties()
+        rel_signatures = self._fetch_relationship_signatures()
 
-    def _load_schema(self):
-        """Loads the graph schema from the specified text file."""
-        try:
-            with open(self.schema_full_path, "r", encoding="utf-8") as f:
-                self.schema = f.read()
-            logger.info(f"Successfully loaded schema from '{self.schema_full_path}'")
-            
-            # Dynamically extract labels and relationships for validation
-            self.cybersecurity_labels = set(re.findall(r"Node Label:`:(\w+)`", self.schema))
-            self.cybersecurity_relationships = set(re.findall(r"Relationship Type:`:\[(\w+)\]`", self.schema))
-            
-            if not self.cybersecurity_labels and not self.cybersecurity_relationships:
-                 logger.warning("Schema file was loaded, but no node labels or relationship types were extracted. Validation may be affected.")
-            else:
-                logger.info(f"Extracted {len(self.cybersecurity_labels)} labels and {len(self.cybersecurity_relationships)} relationships for validation.")
+        # --- format for prompt -------------------------------------------------------
+        label_lines = "".join(
+            f"- {lbl}: [{', '.join(props) if props else 'no properties'}]\n"
+            for lbl, props in sorted(node_props.items())
+        )
 
-        except FileNotFoundError:
-            logger.error(f"CRITICAL: Schema file not found at '{self.schema_full_path}'. The application will not function correctly without it.")
-            self.schema = "Error: Schema file not found. Please run neo4j_schema_extractor.py."
-        except Exception as e:
-            logger.error(f"Failed to load or parse schema file: {e}")
-            self.schema = f"Error: Could not load schema from file due to: {e}"
+        rel_lines = "".join(
+            f"- {rel}: [{', '.join(props) if props else 'no properties'}] paths: "
+            f"{', '.join(sorted(rel_signatures[rel])) if rel_signatures[rel] else 'unknown'}\n"
+            for rel, props in sorted(rel_props.items())
+        )
 
-    def get_schema(self) -> str:
-        """Returns the pre-loaded schema content."""
-        return self.schema
+        return (
+            "CYBERSECURITY KNOWLEDGE GRAPH SCHEMA (v2):\n\n"
+            "Node Labels and Properties:\n" + label_lines +
+            "\nRelationship Types, Properties, and Signatures:\n" + rel_lines
+        )
 
     def get_schema_info(self) -> dict:
         """Get detailed schema information for debugging."""
@@ -71,35 +155,57 @@ class Text2Cypher:
         if not any(cypher.upper().startswith(starter) for starter in valid_starters):
             return False, f"Query must start with a valid Cypher keyword. Got: {cypher[:50]}"
         
-        # 3. Check for placeholder or instruction text
-        if "{" in cypher or "}" in cypher:
-            return False, "Query contains invalid placeholder characters '{' or '}'."
-
-        # 4. Check against loaded schema (if available)
-        if self.cybersecurity_labels or self.cybersecurity_relationships:
-            found_labels = set(re.findall(r":(\w+)", cypher))
-            found_rels = set(re.findall(r":\[(\w+)\]", cypher))
-
-            if not found_labels.intersection(self.cybersecurity_labels) and not found_rels.intersection(self.cybersecurity_relationships):
-                return False, "Query does not use any of the node labels or relationship types defined in the schema."
-
-        # 5. Check for common syntax errors
-        if cypher.count('(') != cypher.count(')'):
-            return False, "Query has unbalanced parentheses '(' and ')'."
-        if cypher.count('[') != cypher.count(']'):
-            return False, "Query has unbalanced square brackets '[' and ']'."
+        # 3. Check for excluded ontology metadata (warn if found)
+        has_excluded_labels = any(f":{label}" in cypher for label in self.excluded_labels)
+        has_excluded_relationships = any(f":{rel}" in cypher for rel in self.excluded_relationships)
         
-        return True, "Valid Cypher query."
+        if has_excluded_labels or has_excluded_relationships:
+            errors.append("Warning: Query contains ontology metadata labels/relationships that should be excluded")
+        
+        # 4. Check for common syntax errors
+        if '{{' in cypher or '}}' in cypher:
+            return False, "Invalid syntax: Found {{ or }} - use proper node syntax (n:Label)"
+        
+        # 5. Check for balanced parentheses and brackets
+        if cypher.count('(') != cypher.count(')') or cypher.count('[') != cypher.count(']'):
+            return False, "Unbalanced parentheses or brackets"
+        
+        # 6. Check for proper node syntax (should have :Label)
+        node_pattern = r'\([^:]+\)'
+        if re.search(node_pattern, cypher):
+            return False, "Nodes should have labels: (n:Label) not (n)"
+        
+        # 7. Check for proper relationship syntax
+        rel_pattern = r'\[[^:]+[^]]*\]'
+        if re.search(rel_pattern, cypher):
+            return False, "Relationships should have types: [:TYPE] not []"
+        
+        # 8. Check for common LLM mistakes
+        if 'year:{year:' in cypher or 'year:{"year":' in cypher:
+            return False, "Invalid node syntax: Use WHERE clause for filtering, not property nodes"
+        
+        # 9. Check for invalid relationship usage (semantic validation)
+        # UCOHASWEAKNESS connects UcoExploitTarget->UcoCWE, not UcoCVE->UcoCWE
+        if 'UcoCVE)-[:UCOHASWEAKNESS]->(cwe:UcoCWE' in cypher:
+            return False, "Invalid relationship: UCOHASWEAKNESS connects UcoExploitTarget->UcoCWE, not UcoCVE->UcoCWE"
+        
+        return True, "Valid Cypher query"
 
-    def text_to_cypher(self, question: str) -> str:
-        if "Error:" in self.schema:
-            raise ValueError("Cannot generate Cypher query because the schema could not be loaded.")
-
+    def text_to_cypher(self, question: str, schema: str = None) -> str:
+        schema_block = schema or self.get_cybersecurity_schema()
+        
+        # Print schema block for debugging
+        print("=" * 80)
+        print("SCHEMA BLOCK SENT TO LLM:")
+        print("=" * 80)
+        print(schema_block)
+        print("=" * 80)
+        
         prompt = (
             f"{PROMPT_TEMPLATE}\n\n"
+            
             f"{FEW_SHOT_EXAMPLES}\n\n"
-            f"Here is the exact schema of the cybersecurity graph. Use it to construct the query.\n"
-            f"SCHEMA:\n---\n{self.schema}\n---\n\n"
+            f"CYBERSECURITY SCHEMA:\n{schema_block}\n\n"
             f"Question: {question}\n"
             "Cypher:"
         )
@@ -127,28 +233,131 @@ class Text2Cypher:
 
     def run_cypher(self, cypher_query: str):
         with self.driver.session() as session:
-            try:
-                result = session.run(cypher_query)
-                return [record.data() for record in result]
-            except Exception as e:
-                logger.error(f"Error running Cypher query: {e}")
-                raise
+            result = session.run(cypher_query)
+            return result
+
+    # ---- V2 helper methods for rich schema extraction ----
+    
+    def _fetch_node_properties(self) -> dict:
+        """Return mapping label -> sorted list of property names (excluding ontology metadata)."""
+        node_props = {}
+        with self.driver.session() as session:
+            # Get all node labels from database
+            result = session.run("CALL db.labels()")
+            all_labels = [record['label'] for record in result]
+            
+            # Filter out excluded labels (ontology metadata)
+            cybersecurity_labels = [label for label in all_labels if label not in self.excluded_labels]
+            
+            for lbl in cybersecurity_labels:
+                try:
+                    # Get all distinct property keys for this label
+                    res = session.run(
+                        f"MATCH (n:{lbl}) RETURN DISTINCT keys(n) AS props LIMIT 10"
+                    )
+                    all_props = set()
+                    for record in res:
+                        if record["props"]:
+                            all_props.update(record["props"])
+                    node_props[lbl] = sorted(all_props) if all_props else []
+                except Exception as e:
+                    print(f"Warning: Could not get properties for {lbl}: {e}")
+                    node_props[lbl] = []
+        return node_props
+
+    def _fetch_relationship_properties(self) -> dict:
+        """Return mapping rel-type -> sorted list of property names (excluding ontology metadata)."""
+        rel_props = {}
+        with self.driver.session() as session:
+            # Get all relationship types from database
+            result = session.run("CALL db.relationshipTypes()")
+            all_relationships = [record['relationshipType'] for record in result]
+            
+            # Filter out excluded relationships (ontology metadata)
+            cybersecurity_relationships = [rel for rel in all_relationships if rel not in self.excluded_relationships]
+            
+            for rel in cybersecurity_relationships:
+                try:
+                    # Get all distinct property keys for this relationship type
+                    res = session.run(
+                        f"MATCH ()-[r:{rel}]->() RETURN DISTINCT keys(r) AS props LIMIT 10"
+                    )
+                    all_props = set()
+                    for record in res:
+                        if record["props"]:
+                            all_props.update(record["props"])
+                    rel_props[rel] = sorted(all_props) if all_props else []
+                except Exception as e:
+                    print(f"Warning: Could not get properties for {rel}: {e}")
+                    rel_props[rel] = []
+        return rel_props
+
+    def _fetch_relationship_signatures(self) -> dict:
+        """Return mapping rel-type -> set of "startLabel->endLabel" signatures."""
+        from collections import defaultdict
+        sigs = defaultdict(set)
+        with self.driver.session() as session:
+            record = session.run("CALL db.schema.visualization()").single()
+            if record is None:
+                return sigs
+            nodes = record.get("nodes")
+            rels = record.get("relationships")
+            if not isinstance(nodes, list) or not isinstance(rels, list):
+                return sigs
+
+        # Map node element_id to the first non-excluded label it carries
+        id_to_label = {}
+        for n in nodes:
+            # Extract element_id from Neo4j Node object
+            node_id = n.element_id if hasattr(n, 'element_id') else str(n)
+            # Extract labels from Neo4j Node object
+            labels = list(n.labels) if hasattr(n, 'labels') else []
+            # Find first label that's not in excluded_labels
+            label_match = next((l for l in labels if l not in self.excluded_labels), None)
+            if label_match is not None:
+                id_to_label[node_id] = label_match
+
+        for r in rels:
+            # Extract relationship type from Neo4j Relationship object
+            rel_type = r.type if hasattr(r, 'type') else str(r)
+            # Skip excluded relationships (ontology metadata)
+            if rel_type in self.excluded_relationships:
+                continue
+            
+            # Extract start and end nodes from Neo4j Relationship object
+            start_node = r.start_node if hasattr(r, 'start_node') else None
+            end_node = r.end_node if hasattr(r, 'end_node') else None
+            
+            if start_node and end_node:
+                start_id = start_node.element_id if hasattr(start_node, 'element_id') else str(start_node)
+                end_id = end_node.element_id if hasattr(end_node, 'element_id') else str(end_node)
+                
+                start_label = id_to_label.get(start_id)
+                end_label = id_to_label.get(end_id)
+                if start_label and end_label:
+                    sigs[rel_type].add(f"{start_label}->{end_label}")
+
+        return sigs
 
 def extract_cypher(text: str) -> str:
-    """Extracts a Cypher query from a string, removing markdown code blocks."""
-    text = text.strip()
-    # Remove markdown ```cypher ... ``` or ``` ... ```
-    pattern = r"```(?:cypher)?\s*\n?(.*?)\n?```"
-    matches = re.findall(pattern, text, re.DOTALL | re.IGNORECASE)
+    text = re.sub(r'(?i)^\s*cypher\s*', '', text).strip()
     
+    # Try to extract from code blocks first
+    pattern = r"```(?:cypher)?\n?(.*?)```"
+    matches = re.findall(pattern, text, re.DOTALL)
     if matches:
-        query = matches[0]
-    else:
-        # If no markdown, assume the whole text is the query
-        query = text
-
-    # Clean up any residual keywords or explanations
-    if query.lower().startswith("cypher:"):
-        query = query[7:].strip()
-        
-    return query.strip()
+        return matches[0].strip()
+    
+    # If no code blocks, look for lines that start with MATCH, RETURN, etc.
+    lines = text.split('\n')
+    cypher_lines = []
+    for line in lines:
+        line = line.strip()
+        if line and (line.upper().startswith(('MATCH', 'RETURN', 'WITH', 'UNWIND', 'CALL', 'CREATE', 'DELETE', 'SET', 'REMOVE', 'MERGE'))):
+            cypher_lines.append(line)
+    
+    if cypher_lines:
+        return '\n'.join(cypher_lines)
+    
+    # Fallback to original text
+    return text.strip()

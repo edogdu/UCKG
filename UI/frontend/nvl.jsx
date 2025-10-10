@@ -75,10 +75,10 @@ function formatValue(value) {
   return String(value);
 }
 
-export default function Nvl() {
+export default function Nvl({ initialNodes = [], initialRels = [], minimal = false }) {
   const [cypher, setCypher] = useState('MATCH (n) RETURN n LIMIT 5');
-  const [nodes, setNodes] = useState([]);
-  const [rels, setRels] = useState([]);
+  const [nodes, setNodes] = useState(initialNodes);
+  const [rels, setRels] = useState(initialRels);
   const [sidePanel, setSidePanel] = useState('');
   const [chatHistory, setChatHistory] = useState([]);
   const [leftPanelOpen, setLeftPanelOpen] = useState(true);
@@ -93,8 +93,18 @@ export default function Nvl() {
   const chatContainerRef = useRef();
   const wrapperRef = useRef();
 
+  // Update nodes and relationships when props change
+  useEffect(() => {
+    if (minimal) {
+      setNodes(initialNodes);
+      setRels(filterValidRelationships(initialNodes, initialRels));
+      return;
+    }
+  }, [initialNodes, initialRels, minimal]);
+
   // Fetch initial data and label counts
   useEffect(() => {
+    if (minimal) return; // Skip initial data fetch in minimal mode
     let cancelled = false;
     const fetchData = async () => {
       const result = await executeQuery(cypher);
@@ -442,35 +452,37 @@ export default function Nvl() {
 
   return (
     <div className='Q-n-A'>
-      {/* Left Side Panel */}
-      <div className={`left-panel ${leftPanelOpen ? 'open' : 'closed'}`}>
-        <div className="left-panel-header">
-          <h3>Labels</h3>
-          <button 
-            className="toggle-panel-btn"
-            onClick={() => setLeftPanelOpen(!leftPanelOpen)}
-          >
-            {leftPanelOpen ? '◀' : '▶'}
-          </button>
-        </div>
-        <div className="label-buttons">
-          {coreLabels.map((label) => (
-            <button
-              key={label.name}
-              className="label-btn"
-              onClick={() => handleLabelClick(label)}
-              title={label.description}
+      {/* Left Side Panel - Only show in non-minimal mode */}
+      {!minimal && (
+        <div className={`left-panel ${leftPanelOpen ? 'open' : 'closed'}`}>
+          <div className="left-panel-header">
+            <h3>Labels</h3>
+            <button 
+              className="toggle-panel-btn"
+              onClick={() => setLeftPanelOpen(!leftPanelOpen)}
             >
-              <span className="label-name">{label.name} ({labelCounts[label.name] || 0})</span>
-              <span className="label-desc">{label.description}</span>
+              {leftPanelOpen ? '◀' : '▶'}
             </button>
-          ))}
+          </div>
+          <div className="label-buttons">
+            {coreLabels.map((label) => (
+              <button
+                key={label.name}
+                className="label-btn"
+                onClick={() => handleLabelClick(label)}
+                title={label.description}
+              >
+                <span className="label-name">{label.name} ({labelCounts[label.name] || 0})</span>
+                <span className="label-desc">{label.description}</span>
+              </button>
+            ))}
+          </div>
         </div>
-      </div>
+      )}
 
       <div className='graph'>
-        {/* View mode toggle button - show for both graph and data results */}
-        {(resultType === 'graph' || resultType === 'data') && (
+        {/* View mode toggle button - show for both graph and data results, but not in minimal mode */}
+        {!minimal && (resultType === 'graph' || resultType === 'data') && (
           <div className='view-toggle-container'>
             <button 
               className={`view-toggle-btn ${viewMode === 'graph' ? 'active' : ''}`}
@@ -533,37 +545,40 @@ export default function Nvl() {
           <div className='props' dangerouslySetInnerHTML={{ __html: sidePanel }} />
         )}
       </div>
-      <div className='Chat-bot'>
-        <div className='Chat-bot-content' ref={chatContainerRef}>
-          <ul className='Chat-list'>
-            {chatHistory.map((msg, i) => (
-              <li
-                key={i}
-                className={msg.type === 'user' ? 'Chat-list-user' : 'Chat-list-answer'}
-                onClick={msg.type === 'user' ? () => handleHistorySearch(msg.text, msg.queryKey) : undefined}
-              >
-                {msg.text}
-              </li>
-            ))}
-          </ul>
+      {/* Chat section - Only show in non-minimal mode */}
+      {!minimal && (
+        <div className='Chat-bot'>
+          <div className='Chat-bot-content' ref={chatContainerRef}>
+            <ul className='Chat-list'>
+              {chatHistory.map((msg, i) => (
+                <li
+                  key={i}
+                  className={msg.type === 'user' ? 'Chat-list-user' : 'Chat-list-answer'}
+                  onClick={msg.type === 'user' ? () => handleHistorySearch(msg.text, msg.queryKey) : undefined}
+                >
+                  {msg.text}
+                </li>
+              ))}
+            </ul>
+          </div>
+          <div className='Input-box'>
+            <input
+              className='Input-content'
+              type='text'
+              value={cypher}
+              onChange={e => setCypher(e.target.value)}
+              onKeyDown={e => e.key === 'Enter' && handleSearch()}
+              placeholder='Enter Cypher query'
+            />
+            <button
+              className='Input-button'
+              onClick={handleSearch}
+            >
+              Enter
+            </button>
+          </div>
         </div>
-        <div className='Input-box'>
-          <input
-            className='Input-content'
-            type='text'
-            value={cypher}
-            onChange={e => setCypher(e.target.value)}
-            onKeyDown={e => e.key === 'Enter' && handleSearch()}
-            placeholder='Enter Cypher query'
-          />
-          <button
-            className='Input-button'
-            onClick={handleSearch}
-          >
-            Enter
-          </button>
-        </div>
-      </div>
+      )}
     </div>
   );
 }

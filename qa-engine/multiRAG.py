@@ -342,16 +342,52 @@ FINAL ANSWER:""",
         """Get semantic search results"""
         try:
             results = self.semantic_retriever.search(query_text=query, top_k=top_k)
-            return list(results.results) if hasattr(results, 'results') else []
-        except:
+            
+            if hasattr(results, 'items'):
+                result_list = []
+                for item in results.items:
+                    # Convert RetrieverResultItem to dictionary format expected by wrapper
+                    result_dict = {
+                        'content': item.content,
+                        'metadata': item.metadata,
+                        'score': getattr(item, 'score', 0.0)  # Add score if available
+                    }
+                    result_list.append(result_dict)
+                
+                return result_list
+            elif hasattr(results, 'results'):
+                return list(results.results)
+            else:
+                return []
+        except Exception as e:
+            # Log error but don't print to stdout (interferes with JSON output)
+            import traceback
+            import sys
+            print(f"ERROR in _get_semantic_results: {str(e)}", file=sys.stderr)
+            traceback.print_exc(file=sys.stderr)
             return []
     
     def _get_graph_results(self, query: str, top_k: int) -> List[Dict]:
         """Get graph traversal results"""
         try:
             results = self.graph_retriever.search(query_text=query, top_k=top_k)
-            return list(results.results) if hasattr(results, 'results') else []
-        except:
+            if hasattr(results, 'items'):
+                result_list = []
+                for item in results.items:
+                    result_dict = {
+                        'content': item.content,
+                        'metadata': item.metadata,
+                        'score': getattr(item, 'score', 0.0)
+                    }
+                    result_list.append(result_dict)
+                return result_list
+            elif hasattr(results, 'results'):
+                return list(results.results)
+            else:
+                return []
+        except Exception as e:
+            import sys
+            print(f"ERROR in _get_graph_results: {str(e)}", file=sys.stderr)
             return []
     
     def _get_hybrid_results(self, query: str, top_k: int) -> List[Dict]:
@@ -741,16 +777,16 @@ if __name__ == "__main__":
         ]
         
         for query in test_queries:
-            print(f"\n🔍 Query: {query}")
+            print(f"\nQuery: {query}")
             print("-" * 50)
             
             result = rag.run(query)
-            print(f"📊 Mode: {result['mode']}")
-            print(f"💡 Answer: {result['answer']}...")
+            print(f"Mode: {result['mode']}")
+            print(f"Answer: {result['answer']}...")
             print("-" * 50)
             #print(f"📚 Sources: {len(result['sources'])} items")
             #print(f"🤖 Context: {result['context']}...")
-            #print(f"🌐 Context/wMetaData: {len(result['context_metadata'])} items")
+            #print(f"Context/wMetaData: {len(result['context_metadata'])} items")
             #print(f"👾 Metadata: {result['enhanced_metadata']}...")
     finally:
         rag.close()

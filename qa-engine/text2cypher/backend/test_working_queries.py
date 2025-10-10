@@ -59,21 +59,21 @@ def test_working_queries():
                 # Try to run the query
                 result = t2c.run_cypher(cypher)
                 result_count = len(result) if isinstance(result, list) else 1
-                print(f"    ✅ Valid Cypher query - {result_count} results")
+                print(f"    Valid Cypher query - {result_count} results")
                 results['success'].append({
                     'question': question,
                     'cypher': cypher,
                     'result_count': result_count
                 })
             else:
-                print(f"    ❌ Invalid: {error_msg}")
+                print(f"    Invalid: {error_msg}")
                 results['failed'].append({
                     'question': question,
                     'error': error_msg
                 })
                 
         except Exception as e:
-            print(f"    ❌ Error: {str(e)}")
+            print(f"    Error: {str(e)}")
             results['failed'].append({
                 'question': question,
                 'error': str(e)
@@ -81,21 +81,21 @@ def test_working_queries():
     
     # Summary
     print("\n" + "=" * 60)
-    print("📊 TEST SUMMARY")
+    print("TEST SUMMARY")
     print("=" * 60)
-    print(f"✅ Successful queries: {len(results['success'])}")
-    print(f"❌ Failed queries: {len(results['failed'])}")
+    print(f"Successful queries: {len(results['success'])}")
+    print(f"Failed queries: {len(results['failed'])}")
     total_queries = len(results['success']) + len(results['failed'])
     success_rate = (len(results['success']) / total_queries * 100) if total_queries > 0 else 0
     print(f"📈 Success rate: {success_rate:.1f}%")
     
     if results['failed']:
-        print("\n❌ FAILED QUERIES:")
+        print("\nFAILED QUERIES:")
         for failed in results['failed']:
             print(f"  - {failed['question']}")
             print(f"    Error: {failed['error']}")
     
-    print("\n✅ SUCCESSFUL QUERIES:")
+    print("\nSUCCESSFUL QUERIES:")
     for success in results['success']:
         print(f"  - {success['question']}")
         print(f"    Results: {success['result_count']}")
@@ -129,7 +129,7 @@ def test_specific_relationship_queries():
                     print(f"  {i}. CAPEC-{capec.get('ucoexCAPEC_id', 'N/A')}: {capec.get('ucoexCAPEC_name', 'N/A')}")
         
     except Exception as e:
-        print(f"❌ Error: {str(e)}")
+        print(f"Error: {str(e)}")
 
 if __name__ == "__main__":
     test_working_queries()

@@ -84,7 +84,7 @@ def test_cypher_queries(json_file_path):
 
 # --- How to Use ---
 # Set the name of your training data file
-input_file = r'C:\Users\User\Downloads\UCKG\qa-engine\text2cypher\backend\training_data\traning_data.json'
+input_file = r'C:\Users\User\Downloads\UCKG\qa-engine\text2cypher\backend\training_data\training_data.json'
 
 # Run the test function
 if __name__ == "__main__":

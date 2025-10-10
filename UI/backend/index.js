@@ -5,7 +5,7 @@ const dbConnection = require('./utils/database');
 
 // Import routers
 const graphRouter = require('./routers/graphRouter');
-// const Q&ARouter = require('./routers/Q&ARouter');
+const Q_ARouter = require('./routers/Q&ARouter');
 
 const app = express();
 
@@ -18,7 +18,7 @@ app.use(express.json());
 
 // Routes
 app.use('/api/graph', graphRouter);
-// app.use('/api/qna', Q&ARouter);
+app.use('/api/qna', Q_ARouter);
 
 
 // Initialize database connection and start server

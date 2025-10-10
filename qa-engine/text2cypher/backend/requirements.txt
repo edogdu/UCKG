@@ -1,5 +1,14 @@
-fastapi
-uvicorn
-neo4j
-httpx
-pydantic 
+# Core ML stack for Gemma on Mac (MPS)
+torch==2.2.2           # universal2 wheel, includes MPS backend
+transformers>=4.41.0
+accelerate>=0.27.2
+sentencepiece>=0.1.99
+peft>=0.10.0
+tqdm>=4.66
+
+# Database & evaluation
+neo4j>=5.14
+pandas>=2.2
+
+# Optional: Ollama integration (if using Text2Cypher with Ollama)
+ollama>=0.1.2    

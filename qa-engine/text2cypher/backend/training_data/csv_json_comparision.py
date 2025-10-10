@@ -58,4 +58,4 @@ def compare_question_differences(csv_file_path, json_file_path):
 # --- Example Usage ---
 # Replace with the actual paths to your files.
 compare_question_differences(r'C:\Users\User\Downloads\UCKG\qa-engine\text2cypher\backend\training_data\sorted_training_data.csv',
-                             r'C:\Users\User\Downloads\UCKG\qa-engine\text2cypher\backend\training_data\traning_data.json')
+                             r'C:\Users\User\Downloads\UCKG\qa-engine\text2cypher\backend\training_data\training_data.json')
