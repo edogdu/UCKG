@@ -1,10 +1,15 @@
-# V2/V3 Documentation (keep local, don't push to GitHub)
+# V2/V3/V4 Documentation (keep local, don't push to GitHub)
 V2_UPDATE_REPORT.md
 V3_OUTGOING_CONNECTIONS_UPDATE.md
 V4_BIDIRECTIONAL_ADVANCED_UPDATE.md
 V4_CYPHER_GUARD_INTEGRATION.md
 V4_ERROR_HANDLING_UPDATE.md
 V4_QUICK_SUMMARY.md
+WEEKLY_REPORT_V4_ACHIEVEMENTS.md
+
+# Non-essential Python files (keep local, don't push to GitHub)
+logger.py
+cypher_validation.py
 
 # Log files
 *.log
