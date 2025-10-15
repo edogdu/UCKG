@@ -49,13 +49,11 @@ function App() {
     "Show threat groups and their attack techniques",
     "Find CVEs affecting the same platform",
     
-    // V4 Multi-hop Template Queries
+    // V4 Advanced Queries
     "Find groups and software using the same technique",
     "Show campaign attribution to attack techniques",
     "Find CVEs affecting same platform with weaknesses",
     "Show mitigations for group techniques",
-    
-    // V4 Property Filtering Queries
     "Show CVEs with HIGH severity",
     "Find CWE weaknesses with Draft status",
     "Show CAPEC patterns with High severity",
@@ -201,12 +199,11 @@ function App() {
       <header className="App-header">
         <div className="header-content">
           <h1>Cybersecurity Text2Cypher V4 Assistant</h1>
-          <p>Enterprise-grade natural language to Cypher conversion with bidirectional paths, intelligent error handling, and advanced validation</p>
+          <p>Enterprise-grade natural language to Cypher conversion with intelligent error handling and advanced validation</p>
           
           {/* V4 Feature Badges */}
           <div className="v4-features">
-            <span className="feature-badge">✅ Bidirectional Paths</span>
-            <span className="feature-badge">✅ Multi-hop Templates</span>
+            <span className="feature-badge">✅ Advanced Queries</span>
             <span className="feature-badge">✅ Smart Error Handling</span>
             <span className="feature-badge">✅ Cypher Guard Validation</span>
           </div>
@@ -331,28 +328,12 @@ function App() {
                       </div>
                       
                       <div className="category">
-                        <h5>🔗 Multi-hop Templates</h5>
+                        <h5>🚀 Advanced Queries</h5>
                         <div className="sample-grid">
-                          {sampleQueries.slice(4, 8).map((sample, index) => (
+                          {sampleQueries.slice(4, 12).map((sample, index) => (
                             <button
                               key={index + 4}
-                              className="sample-button multihop"
-                              onClick={() => handleSampleQuery(sample)}
-                              disabled={loading}
-                            >
-                              {sample}
-                            </button>
-                          ))}
-                        </div>
-                      </div>
-                      
-                      <div className="category">
-                        <h5>🎯 Property Filtering</h5>
-                        <div className="sample-grid">
-                          {sampleQueries.slice(8, 12).map((sample, index) => (
-                            <button
-                              key={index + 8}
-                              className="sample-button filtering"
+                              className="sample-button advanced"
                               onClick={() => handleSampleQuery(sample)}
                               disabled={loading}
                             >
@@ -542,28 +523,12 @@ function App() {
                 </div>
                 
                 <div className="category">
-                  <h4>🔗 Multi-hop Templates</h4>
+                  <h4>🚀 Advanced Queries</h4>
                   <div className="sample-grid">
-                    {sampleQueries.slice(4, 8).map((sample, index) => (
+                    {sampleQueries.slice(4, 12).map((sample, index) => (
                       <button
                         key={index + 4}
-                        className="sample-button multihop"
-                        onClick={() => handleSampleQuery(sample)}
-                        disabled={loading}
-                      >
-                        {sample}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-                
-                <div className="category">
-                  <h4>🎯 Property Filtering</h4>
-                  <div className="sample-grid">
-                    {sampleQueries.slice(8, 12).map((sample, index) => (
-                      <button
-                        key={index + 8}
-                        className="sample-button filtering"
+                        className="sample-button advanced"
                         onClick={() => handleSampleQuery(sample)}
                         disabled={loading}
                       >
