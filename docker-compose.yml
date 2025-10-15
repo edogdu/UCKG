@@ -81,7 +81,7 @@ services:
       VOL_PATH: /vol/data
       OLLAMA_URL: http://host.docker.internal:11434
       EMBEDDING_MODEL: nomic-embed-text:latest
-      EMBED_ENV: "true"
+      EMBED_ENV: "false"
       LOG_LEVEL: "INFO"
       EMBEDDING_BATCH_SIZE: "1500"
     volumes:

@@ -1,5 +1,5 @@
-import re
 import os
+import re
 import sys
 from typing import List
 from neo4j import GraphDatabase
@@ -23,7 +23,7 @@ from config import (
 )
 
 class Text2Cypher:
-    def __init__(self, neo4j_uri: str, neo4j_user: str, neo4j_password: str, llm):
+    def __init__(self, neo4j_uri: str, neo4j_user: str, neo4j_password: str, llm, schema_path: str = "neo4j_graph_schema.txt"):
         self.driver = GraphDatabase.driver(neo4j_uri, auth=(neo4j_user, neo4j_password))
         self.llm = llm
         
@@ -139,28 +139,22 @@ class Text2Cypher:
     def get_schema_info(self) -> dict:
         """Get detailed schema information for frontend display"""
         try:
-            # Get node properties
-            node_props = self._fetch_node_properties()
-            rel_props = self._fetch_relationship_properties()
-            outgoing_connections = self._fetch_outgoing_connections()
-            incoming_connections = self._fetch_incoming_connections()
-            
-            # Get validation info
-            validation_info = self.cypher_validator.get_validation_info()
-            
-            return {
-                "node_types": list(node_props.keys()),
-                "relationship_types": list(rel_props.keys()),
-                "node_properties": node_props,
-                "relationship_properties": rel_props,
-                "bidirectional_connections": {
-                    "outgoing": outgoing_connections,
-                    "incoming": incoming_connections
-                },
-                "validation_info": validation_info,
-                "schema_status": "✅ Loaded",
-                "timestamp": "Current cybersecurity schema information with Cypher Guard validation"
-            }
+        # Get node properties
+        node_props = self._fetch_node_properties()
+        rel_props = self._fetch_relationship_properties()
+        
+        # Get validation info
+        validation_info = self.cypher_validator.get_validation_info()
+        
+        return {
+            "node_types": list(node_props.keys()),
+            "relationship_types": list(rel_props.keys()),
+            "node_properties": node_props,
+            "relationship_properties": rel_props,
+            "validation_info": validation_info,
+            "schema_status": "✅ Loaded",
+            "timestamp": "Current cybersecurity schema information with Cypher Guard validation"
+        }
         except Exception as e:
             print(f"Error getting schema info: {e}")
             return {
@@ -168,7 +162,6 @@ class Text2Cypher:
                 "relationship_types": [],
                 "node_properties": {},
                 "relationship_properties": {},
-                "bidirectional_connections": {"outgoing": {}, "incoming": {}},
                 "validation_info": {},
                 "schema_status": "❌ Error loading schema",
                 "error": str(e),
@@ -302,27 +295,26 @@ class Text2Cypher:
         
         prompt = self._build_prompt(question=question, schema_block=schema_block, examples=few_shot_examples)
         
-        # Retry mechanism for better reliability
         max_retries = 3
         for attempt in range(max_retries):
             try:
                 llm_output = self.llm.invoke(prompt)
                 cypher = extract_cypher(llm_output)
                 
-                # Comprehensive validation
-                is_valid, error_msg = self.validate_cypher(cypher, schema_block)
+                is_valid, error_msg = self.validate_cypher(cypher)
                 if not is_valid:
+                    logger.warning(f"Attempt {attempt + 1}: Validation failed for generated query '{cypher}'. Reason: {error_msg}")
+                    # Re-raise to trigger retry
                     raise ValueError(f"Validation failed: {error_msg}")
                 
+                logger.info(f"Successfully generated and validated Cypher: {cypher}")
                 return cypher
                 
             except Exception as e:
-                if attempt == max_retries - 1:  # Last attempt
-                    raise e
-                # Add a small delay before retry
-                import time
+                logger.error(f"Error in text_to_cypher (attempt {attempt + 1}/{max_retries}): {e}")
+                if attempt == max_retries - 1:
+                    raise Exception("Failed to generate a valid Cypher query after multiple attempts.") from e
                 time.sleep(0.5)
-                continue
 
     def text_to_cypher_with_fallback(self, question: str, schema: str = None) -> dict:
         """
@@ -529,115 +521,6 @@ class Text2Cypher:
 
     
 
-    def _fetch_outgoing_connections(self) -> dict:
-        """Return mapping of node label -> list of (relationship_type, target_label) tuples for outgoing connections."""
-        from collections import defaultdict
-        outgoing = defaultdict(set)
-        
-        record = self._get_schema_visualization()
-        if record is None:
-            return outgoing
-        nodes = record.get("nodes")
-        rels = record.get("relationships")
-        if not isinstance(nodes, list) or not isinstance(rels, list):
-            return outgoing
-
-        # Map node element_id to all non-excluded labels it carries
-        id_to_labels = {}
-        for n in nodes:
-            # Extract element_id from Neo4j Node object
-            node_id = n.element_id if hasattr(n, 'element_id') else str(n)
-            # Extract labels from Neo4j Node object
-            labels = list(n.labels) if hasattr(n, 'labels') else []
-            # Filter out excluded labels
-            valid_labels = [l for l in labels if l not in self.excluded_labels]
-            if valid_labels:
-                id_to_labels[node_id] = valid_labels
-
-        # Build outgoing connections for each node type
-        for r in rels:
-            # Extract relationship type from Neo4j Relationship object
-            rel_type = r.type if hasattr(r, 'type') else str(r)
-            # Skip excluded relationships (ontology metadata)
-            if rel_type in self.excluded_relationships:
-                continue
-            
-            # Extract start and end nodes from Neo4j Relationship object
-            start_node = r.start_node if hasattr(r, 'start_node') else None
-            end_node = r.end_node if hasattr(r, 'end_node') else None
-            
-            if start_node and end_node:
-                start_id = start_node.element_id if hasattr(start_node, 'element_id') else str(start_node)
-                end_id = end_node.element_id if hasattr(end_node, 'element_id') else str(end_node)
-                
-                start_labels = id_to_labels.get(start_id, [])
-                end_labels = id_to_labels.get(end_id, [])
-                
-                # For each start label, add all end labels as targets
-                for start_label in start_labels:
-                    for end_label in end_labels:
-                        outgoing[start_label].add((rel_type, end_label))
-
-        # Convert sets to sorted lists for consistent output
-        return {label: sorted(list(connections)) for label, connections in outgoing.items()}
-
-    def _fetch_incoming_connections(self) -> dict:
-        """Return mapping of node label -> list of (source_label, relationship_type) tuples for incoming connections."""
-        from collections import defaultdict
-        incoming = defaultdict(set)
-        
-        record = self._get_schema_visualization()
-        if record is None:
-            return incoming
-        nodes = record.get("nodes")
-        rels = record.get("relationships")
-        if not isinstance(nodes, list) or not isinstance(rels, list):
-            return incoming
-
-        # Map node element_id to all non-excluded labels it carries
-        id_to_labels = {}
-        for n in nodes:
-            # Extract element_id from Neo4j Node object
-            node_id = n.element_id if hasattr(n, 'element_id') else str(n)
-            # Extract labels from Neo4j Node object
-            labels = list(n.labels) if hasattr(n, 'labels') else []
-            # Filter out excluded labels
-            valid_labels = [l for l in labels if l not in self.excluded_labels]
-            if valid_labels:
-                id_to_labels[node_id] = valid_labels
-
-        # Build incoming connections for each node type
-        for r in rels:
-            # Extract relationship type from Neo4j Relationship object
-            rel_type = r.type if hasattr(r, 'type') else str(r)
-            # Skip excluded relationships (ontology metadata)
-            if rel_type in self.excluded_relationships:
-                continue
-            
-            # Extract start and end nodes from Neo4j Relationship object
-            start_node = r.start_node if hasattr(r, 'start_node') else None
-            end_node = r.end_node if hasattr(r, 'end_node') else None
-            
-            if start_node and end_node:
-                start_id = start_node.element_id if hasattr(start_node, 'element_id') else str(start_node)
-                end_id = end_node.element_id if hasattr(end_node, 'element_id') else str(end_node)
-                
-                start_labels = id_to_labels.get(start_id, [])
-                end_labels = id_to_labels.get(end_id, [])
-                
-                # For each end label, add all start labels as sources
-                for end_label in end_labels:
-                    for start_label in start_labels:
-                        incoming[end_label].add((start_label, rel_type))
-
-        # Convert sets to sorted lists for consistent output
-        return {label: sorted(list(connections)) for label, connections in incoming.items()}
-
-    
-
-    
-
-    
 
 def fix_common_label_mistakes(cypher: str) -> str:
     """Fix common LLM mistakes with node labels."""

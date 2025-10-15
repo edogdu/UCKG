@@ -1,0 +1,118 @@
+Filtered Neo4j Graph Schema
+===========================
+
+This document describes the schema of a Neo4j graph database. It is intended to be used by a Large Language Model to generate accurate Cypher queries.
+
+
+1. Node Labels and Properties
+----------------------------
+
+* **Node Label:** `:SymmetricProperty`
+  - `uri` (String)
+
+* **Node Label:** `:UcoCVE`
+  - `label` (String)
+  - `ucobaseSeverity` (String)
+  - `ucoevaluatorSolution` (String)
+  - `ucoexploitabilityScore` (String)
+  - `ucoimpactScore` (String)
+  - `ucoobtainAllPrivilege` (String)
+  - `ucouserInteractionRequired` (String)
+  - `ucovectorString` (String)
+  - `ucovulnStatus` (String)
+  - `uri` (String)
+
+* **Node Label:** `:UcoCWE`
+  - `ucoabstraction` (String)
+  - `ucoapplicablePlatform` (String)
+  - `ucocommonConsequences` (String)
+  - `ucocweExtendedSummary` (String)
+  - `ucocweID` (String)
+  - `ucocweName` (String)
+  - `ucocweSummary` (String)
+  - `ucodemonstrativeExamples` (String)
+  - `ucodescription` (String)
+  - `ucodetectionMethods` (String)
+  - `ucolikelihoodOfExploit` (String)
+  - `ucomappingNotes` (String)
+  - `ucomodesOfIntroduction` (String)
+  - `ucopotentialMitigations` (String)
+  - `ucoreferences` (String)
+  - `ucorelatedAttackPatterns` (String)
+  - `ucostatus` (String)
+  - `ucostructure` (String)
+  - `ucotimeOfIntroduction` (LocalDateTime)
+  - `uri` (String)
+
+* **Node Label:** `:UcoExploitTarget`
+  - `uri` (String)
+
+* **Node Label:** `:UcoVulnerability`
+  - `ucolastModifiedDateTime` (LocalDateTime)
+  - `ucopublishedDateTime` (LocalDateTime)
+  - `ucosummary` (String)
+  - `uri` (String)
+
+* **Node Label:** `:UcoexCAPEC`
+  - `label` (String)
+  - `ucoexAbstraction` (String)
+  - `ucoexCAPEC_id` (String)
+  - `ucoexCAPEC_name` (String)
+  - `ucoexConsequences` (StringArray)
+  - `ucoexDescription` (String)
+  - `ucoexExample` (StringArray)
+  - `ucoexExecutionFlowTechnique` (StringArray)
+  - `ucoexExtendedDescription` (StringArray)
+  - `ucoexLikelihood` (String)
+  - `ucoexMitigations` (StringArray)
+  - `ucoexPrerequisites` (StringArray)
+  - `ucoexRelatedAttPattern` (StringArray)
+  - `ucoexRelatedWeaknesses` (StringArray)
+  - `ucoexResources_Required` (StringArray)
+  - `ucoexSeverity` (String)
+  - `ucoexSkills_Required` (StringArray)
+  - `ucoexTaxonomyMappingATTACK` (StringArray)
+  - `uri` (String)
+
+* **Node Label:** `:UcoexCPE`
+  - `cpeNameId` (String)
+  - `cpeName` (String)
+  - `dictionary_found` (Boolean)
+  - `lastModified` (LocalDateTime)
+  - `titles` (String)
+  - `uri` (String)
+
+* **Node Label:** `:UcoexMITREATTACK`
+  - `uri` (String)
+
+* **Node Label:** `:UcoexMITRED3FEND`
+  - `ucoexMITRED3FEND_DEFINITION` (String)
+  - `ucoexMITRED3FEND_LABEL` (String)
+  - `uri` (String)
+
+* **Node Label:** `:UcoexObservedExample`
+  - `ucoexDESCRIPTION` (String)
+  - `uri` (String)
+
+
+2. Relationship Types and Properties
+---------------------------------
+No relationship properties found.
+
+
+3. Relationship Schema (How Nodes are Connected)
+-----------------------------------------------
+The following patterns exist in the graph:
+- `(:UcoCVE)-[R:UCOEXHASCPE]->(:UcoexCPE)`
+- `(:UcoCWE)-[R:UCOHASOBSERVEDEXAMPLE]->(:UcoexObservedExample)`
+- `(:UcoExploitTarget)-[R:UCOHASVULNERABILITY]->(:UcoVulnerability)`
+- `(:UcoExploitTarget)-[R:UCOHASWEAKNESS]->(:UcoCWE)`
+- `(:UcoVulnerability)-[R:UCOHASCVE_ID]->(:UcoCVE)`
+- `(:UcoexCAPEC)-[R:UCOEXHASRELATEDWEAKNESS]->(:UcoCWE)`
+- `(:UcoexCAPEC)-[R:UCOEXHASTAXONOMYMAPPING]->(:UcoexMITREATTACK)`
+- `(:UcoexMITRED3FEND)-[R:UCOEXHASMITREATTACK]->(:UcoexMITREATTACK)`
+- `(:UcoexObservedExample)-[R:UCOEXEXAMPLEOBSERVEDIN]->(:UcoCVE)`
+
+
+====================
+End of Schema Report.
