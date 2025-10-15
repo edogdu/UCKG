@@ -5,7 +5,7 @@ from tqdm import tqdm
 from neo4j import GraphDatabase
 
 import sys, pathlib
-BACKEND_DIR = pathlib.Path(__file__).resolve().parent
+BACKEND_DIR = pathlib.Path(__file__).resolve().parent.parent
 if str(BACKEND_DIR) not in sys.path:
     sys.path.insert(0, str(BACKEND_DIR))
 

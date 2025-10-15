@@ -10,5 +10,8 @@ tqdm>=4.66
 neo4j>=5.14
 pandas>=2.2
 
+# Cypher validation
+cypher-guard>=0.1.0
+
 # Optional: Ollama integration (if using Text2Cypher with Ollama)
 ollama>=0.1.2    

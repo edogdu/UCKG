@@ -19,8 +19,9 @@ class Text2CypherAPI {
 
       const data = await response.json();
       
-      // Ensure we have the expected structure
-      if (!data.cypher) {
+      // V4 Response Format: cypher can be null for error cases
+      // Only throw error if we don't have a valid V4 response structure
+      if (!data.status && !data.cypher) {
         throw new Error('Invalid response format: missing Cypher query');
       }
 
@@ -58,6 +59,21 @@ class Text2CypherAPI {
       return await response.json();
     } catch (error) {
       console.error('Schema fetch error:', error);
+      throw error;
+    }
+  }
+
+  async getValidationInfo() {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/validation`);
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      return await response.json();
+    } catch (error) {
+      console.error('Validation info fetch error:', error);
       throw error;
     }
   }

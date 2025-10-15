@@ -42,7 +42,11 @@ OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "llama3")
 llm = OllamaLLM(base_url=OLLAMA_URL, model=OLLAMA_MODEL)
 
 # Instantiate Text2Cypher with V2 capabilities
-t2c = Text2Cypher(NEO4J_URI, NEO4J_USER, NEO4J_PASSWORD, llm)
+# Force reload of the module to ensure latest code is used
+import importlib
+import text2cypher
+importlib.reload(text2cypher)
+t2c = text2cypher.Text2Cypher(NEO4J_URI, NEO4J_USER, NEO4J_PASSWORD, llm)
 
 class QueryRequest(BaseModel):
     question: str
@@ -70,8 +74,8 @@ HISTORY_PROMPT = (
 )
 
 def answer_from_history(session_id: str, question: str) -> str:
-    from chat_memory import get_memory
-    from chat_types import ChatMessage, Role
+    from memory import get_memory
+    from memory import ChatMessage, Role
 
     mem = get_memory(session_id)
     prompt = HISTORY_PROMPT.format(history=mem.formatted_history(), question=question)
@@ -112,24 +116,92 @@ def options_chat_history():
 def get_schema():
     """Get detailed schema information"""
     try:
+        logger.info("Calling t2c.get_schema_info()")
         schema_info = t2c.get_schema_info()
+        logger.info(f"Schema info keys: {list(schema_info.keys())}")
+        logger.info(f"Has node_types: {'node_types' in schema_info}")
+        logger.info(f"Has schema_status: {'schema_status' in schema_info}")
         return schema_info
     except Exception as e:
         logger.error(f"Error getting schema: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 
+@app.get("/api/validation")
+def get_validation_info():
+    """Get Cypher Guard validation information"""
+    try:
+        validation_info = t2c.cypher_validator.get_validation_info()
+        return {
+            "cypher_guard_status": "active",
+            "validation_info": validation_info,
+            "features": [
+                "Syntax validation",
+                "Schema validation", 
+                "Read-only query enforcement",
+                "Security checks"
+            ]
+        }
+    except Exception as e:
+        logger.error(f"Error getting validation info: {str(e)}")
+        return {
+            "cypher_guard_status": "error",
+            "error": str(e),
+            "fallback_validation": "active"
+        }
+
 @app.post("/api/text2cypher")
 def text2cypher_endpoint(req: QueryRequest):
+    """Enhanced text2cypher endpoint with comprehensive error handling and fallback responses."""
     try:
         logger.info(f"Processing query: {req.question}")
+        schema = t2c.get_schema()
+        
+        # Use enhanced method with fallback handling
+        response = t2c.text_to_cypher_with_fallback(req.question, schema)
+        
+        # Add relationship information if query was successful
+        if response.get('cypher') and response.get('status') == 'success':
+            relationship_info = t2c.extract_query_relationships(response['cypher'])
+            response['relationship_info'] = relationship_info
+        
+        logger.info(f"Query status: {response['status']}")
+        if response['cypher']:
+            logger.info(f"Generated Cypher: {response['cypher']}")
+        logger.info(f"Response message: {response['message']}")
+        
+        return response
+        
+    except Exception as e:
+        logger.error(f"Error processing query: {str(e)}")
+        # Return a structured error response instead of raising HTTPException
+        return {
+            "cypher": None,
+            "result": [],
+            "status": "error",
+            "message": f"I encountered an unexpected error processing your question: '{req.question}'. Please try again or contact support if the issue persists.",
+            "count": 0,
+            "error": str(e),
+            "suggestions": [
+                "Try rephrasing your question",
+                "Check if the question is about cybersecurity entities (CVEs, CWEs, CAPEC, etc.)",
+                "Try asking about specific node types or relationships"
+            ]
+        }
+
+@app.post("/api/text2cypher/simple")
+def text2cypher_simple_endpoint(req: QueryRequest):
+    """Simple text2cypher endpoint for backward compatibility (original behavior)."""
+    try:
+        logger.info(f"Processing simple query: {req.question}")
         schema = t2c.get_schema()
         cypher = t2c.text_to_cypher(req.question, schema)
         logger.info(f"Generated Cypher: {cypher}")
         result = t2c.run_cypher(cypher)
-        logger.info(f"Query returned {len(result)} results")
-        return {"cypher": cypher, "result": result}
+        result_list = list(result)
+        logger.info(f"Query returned {len(result_list)} results")
+        return {"cypher": cypher, "result": result_list}
     except Exception as e:
-        logger.error(f"Error processing query: {str(e)}")
+        logger.error(f"Error processing simple query: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 
 # ---------- new endpoint --------------------
@@ -146,4 +218,4 @@ def chat_history(req: ChatRequest):
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    uvicorn.run(app, host="0.0.0.0", port=8001)
