@@ -8,8 +8,8 @@ V4_QUICK_SUMMARY.md
 WEEKLY_REPORT_V4_ACHIEVEMENTS.md
 
 # Non-essential Python files (keep local, don't push to GitHub)
-logger.py
-cypher_validation.py
+# logger.py - NEEDED for main.py logging
+# cypher_validation.py - NEEDED for text2cypher.py validation
 
 # Log files
 *.log
