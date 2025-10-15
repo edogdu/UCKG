@@ -14,8 +14,16 @@ qa-engine/
 │   └── schema_cache.txt      # Performance optimization
 ├── text2cypher/
 │   ├── backend/              # FastAPI backend
+│   │   ├── llm/             # LLM implementations
+│   │   │   ├── ollama_llm.py    # Ollama integration
+│   │   │   ├── gemma_llm.py     # Gemma integration
+│   │   │   └── gemma_mps.py     # Gemma MPS support
 │   │   ├── memory/          # Chat memory management
 │   │   ├── evaluation/      # Model evaluation tools
+│   │   ├── testing/         # Test suites and validation
+│   │   │   ├── test_*.py        # Unit and integration tests
+│   │   │   ├── *.cypher         # Cypher query examples
+│   │   │   └── check_*.py       # Validation scripts
 │   │   └── config.py        # Centralized configuration
 │   └── frontend/            # React frontend demo
 ```
@@ -39,7 +47,20 @@ qa-engine/
 - **Session Management**: Multi-user conversation support
 - **Context Preservation**: Maintains conversation context
 
-#### **4. Model Evaluation (`backend/evaluation/`)**
+#### **4. LLM Module (`backend/llm/`)**
+- **OllamaLLM**: Primary LLM interface for Ollama
+- **GemmaLLM**: Alternative LLM implementation
+- **GemmaMPS**: Metal Performance Shaders support for Apple Silicon
+- **Unified Interface**: Consistent API across all LLM providers
+
+#### **5. Testing Module (`backend/testing/`)**
+- **Unit Tests**: Individual component testing
+- **Integration Tests**: End-to-end workflow testing
+- **Cypher Query Tests**: Query validation and performance
+- **Relationship Tests**: Graph relationship validation
+- **Cypher Guard Tests**: Security validation testing
+
+#### **6. Model Evaluation (`backend/evaluation/`)**
 - **Performance Testing**: Compare different LLM models
 - **Dataset Generation**: Create evaluation datasets
 - **Metrics Collection**: Track accuracy and performance
@@ -102,6 +123,17 @@ python main.py
 cd qa-engine/text2cypher/frontend
 npm install
 npm start
+```
+
+### **Testing Setup**
+```bash
+# Run all tests
+python -m pytest testing/
+
+# Run specific test categories
+python testing/test_cybersecurity_queries.py
+python testing/test_cypher_guard.py
+python testing/test_working_queries.py
 ```
 
 ### **Environment Variables**

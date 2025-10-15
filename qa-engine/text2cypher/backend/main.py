@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from text2cypher import Text2Cypher
 # NOTE: Configuration is now environment-driven. See ``ollama_llm.OllamaLLM``.
-from ollama_llm import OllamaLLM
+from llm import OllamaLLM
 import os
 from logger import get_logger
 
@@ -13,7 +13,7 @@ logger = get_logger()
 # --- Early import and instantiation to catch startup errors ---
 try:
     from text2cypher import Text2Cypher
-    from ollama_llm import OllamaLLM
+    from llm import OllamaLLM
 except ImportError as e:
     logger.critical(f"Failed to import necessary modules: {e}")
     # Exit if core modules are missing

@@ -9,7 +9,7 @@ import os
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 from text2cypher import Text2Cypher
-from ollama_llm import OllamaLLM
+from llm import OllamaLLM
 
 def test_working_queries():
     """Test all working queries that are included in the frontend"""

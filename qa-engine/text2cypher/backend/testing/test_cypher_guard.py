@@ -8,7 +8,7 @@ import os
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 from text2cypher import Text2Cypher
-from ollama_llm import OllamaLLM
+from llm import OllamaLLM
 
 def test_cypher_guard_integration():
     """Test the Cypher Guard integration with various query types."""

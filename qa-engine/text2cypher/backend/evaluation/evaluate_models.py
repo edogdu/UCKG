@@ -10,8 +10,7 @@ if str(BACKEND_DIR) not in sys.path:
     sys.path.insert(0, str(BACKEND_DIR))
 
 from text2cypher import Text2Cypher
-from gemma_llm import GemmaLLM
-from ollama_llm import OllamaLLM
+from llm import GemmaLLM, OllamaLLM
 
 CSV_PATH = Path("evaluation/eval_dataset_template.csv")
 REPORT_MD = Path("evaluation/report.md")

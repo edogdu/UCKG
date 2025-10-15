@@ -9,7 +9,7 @@ import os
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 from text2cypher import Text2Cypher
-from ollama_llm import OllamaLLM
+from llm import OllamaLLM
 
 class MockLLM:
     """Mock LLM for testing relationship queries"""
