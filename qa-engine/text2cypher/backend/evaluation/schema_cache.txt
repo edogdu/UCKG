@@ -1,0 +1,33 @@
+NODES:
+UcoCVE { label: string, ucobaseSeverity: string, ucoevaluatorSolution: string, ucoexploitabilityScore: string, ucoimpactScore: string, ucoobtainAllPrivilege: string, ucouserInteractionRequired: string, ucovectorString: string, ucovulnStatus: string, uri: string }
+UcoCWE { ucoabstraction: string, ucoapplicablePlatform: string, ucocommonConsequences: string, ucocweExtendedSummary: string, ucocweID: string, ucocweName: string, ucocweSummary: string, ucodemonstrativeExamples: string, ucodescription: string, ucodetectionMethods: string, ucolikelihoodOfExploit: string, ucomappingNotes: string, ucomodesOfIntroduction: string, ucopotentialMitigations: string, ucoreferences: string, ucorelatedAttackPatterns: string, ucostatus: string, ucostructure: string, ucotimeOfIntroduction: unknown, uri: string }
+UcoExploitTarget { uri: string }
+UcoVulnerability { ucolastModifiedDateTime: unknown, ucopublishedDateTime: unknown, ucosummary: string, uri: string }
+UcoexCAMPAIGNS { ucoexDESCRIPTION: string, ucoexDOMAIN: string, ucoexNAME: string, ucoexURL: string, uri: string }
+UcoexCAPEC { label: string, ucoexAbstraction: string, ucoexCAPEC_id: string, ucoexCAPEC_name: string, ucoexConsequences: list<string>, ucoexDescription: string, ucoexExample: list<string>, ucoexExecutionFlowTechnique: list<string>, ucoexExtendedDescription: list<string>, ucoexLikelihood: string, ucoexMitigations: list<string>, ucoexPrerequisites: list<string>, ucoexRelatedAttPattern: list<string>, ucoexRelatedWeaknesses: list<string>, ucoexResources_Required: list<string>, ucoexSeverity: string, ucoexSkills_Required: list<string>, ucoexTaxonomyMappingATTACK: list<string>, uri: string }
+UcoexCPE { cpeName: string, cpeNameId: string, dictionary_found: boolean, lastModified: unknown, titles: string, uri: string }
+UcoexGROUPS { ucoexDESCRIPTION: string, ucoexDOMAIN: string, ucoexNAME: string, ucoexURL: string, uri: string }
+UcoexMITIGATIONS { ucoexDESCRIPTION: string, ucoexDOMAIN: string, ucoexNAME: string, ucoexURL: string, uri: string }
+UcoexMITREATTACK { ucoexDESCRIPTION: string, ucoexDOMAIN: string, ucoexNAME: string, ucoexURL: string, uri: string }
+UcoexMITRED3FEND { ucoexMITRED3FEND_DEFINITION: string, ucoexMITRED3FEND_LABEL: string, uri: string }
+UcoexObservedExample { ucoexDESCRIPTION: string, uri: string }
+UcoexSOFTWARE { ucoexDESCRIPTION: string, ucoexDOMAIN: string, ucoexNAME: string, ucoexURL: string, uri: string }
+UcoexTACTICS { ucoexDESCRIPTION: string, ucoexDOMAIN: string, ucoexNAME: string, ucoexURL: string, uri: string }
+
+RELATIONSHIPS:
+(:UcoCVE) -[:UCOEXHASCPE]-> (:UcoexCPE)
+(:UcoCWE) -[:UCOHASOBSERVEDEXAMPLE]-> (:UcoexObservedExample)
+(:UcoExploitTarget) -[:UCOHASVULNERABILITY]-> (:UcoVulnerability)
+(:UcoExploitTarget) -[:UCOHASWEAKNESS]-> (:UcoCWE)
+(:UcoVulnerability) -[:UCOHASCVE_ID]-> (:UcoCVE)
+(:UcoexCAMPAIGNS) -[:UCOEXATTRIBUTEDTO]-> (:UcoexGROUPS)
+(:UcoexCAMPAIGNS) -[:UCOEXCAMPAIGNUSESSOFTWARE]-> (:UcoexSOFTWARE)
+(:UcoexCAMPAIGNS) -[:UCOEXCAMPAIGNUSESTECHNIQUE]-> (:UcoexMITREATTACK)
+(:UcoexCAPEC) -[:UCOEXHASRELATEDWEAKNESS]-> (:UcoCWE)
+(:UcoexCAPEC) -[:UCOEXHASTAXONOMYMAPPING]-> (:UcoexMITREATTACK)
+(:UcoexGROUPS) -[:UCOEXGROUPUSESSOFTWARE]-> (:UcoexSOFTWARE)
+(:UcoexGROUPS) -[:UCOEXGROUPUSESTECHNIQUE]-> (:UcoexMITREATTACK)
+(:UcoexMITIGATIONS) -[:UCOEXMITIGATES]-> (:UcoexMITREATTACK)
+(:UcoexMITRED3FEND) -[:UCOEXHASMITREATTACK]-> (:UcoexMITREATTACK)
+(:UcoexObservedExample) -[:UCOEXEXAMPLEOBSERVEDIN]-> (:UcoCVE)
+(:UcoexSOFTWARE) -[:UCOEXSOFTWAREUSESTECHNIQUE]-> (:UcoexMITREATTACK)

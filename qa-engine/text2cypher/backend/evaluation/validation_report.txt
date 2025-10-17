@@ -1,0 +1,632 @@
+
+----- Validating Entry #1 -----
+Question: Find a specific CVE by its label, for example, 'CVE-2021-44228'.
+Query: MATCH (c:UcoCVE {label: 'CVE-2021-44228'}) RETURN c
+1. Grammar Check: PASS - Valid Cypher grammar.
+2. NER Check: PASS - All entities from question found in Cypher. Entities: set()
+3. Schema Check: PASS - Schema compliance check passed.
+
+----- Validating Entry #2 -----
+Question: Retrieve the details of the CWE with the ID 'CWE-89'.
+Query: MATCH (c:UcoCWE {ucocweID: 'CWE-89'}) RETURN c.ucocweName, c.ucodescription
+1. Grammar Check: PASS - Valid Cypher grammar.
+2. NER Check: FAIL - Entities missing from Cypher: {'CWE', 'ID'}
+3. Schema Check: PASS - Schema compliance check passed.
+
+----- Validating Entry #3 -----
+Question: Find information about the attack campaign named 'SolarWinds Orion'.
+Query: MATCH (c:UcoexCAMPAIGNS {ucoexNAME: 'SolarWinds Orion'}) RETURN c
+1. Grammar Check: PASS - Valid Cypher grammar.
+2. NER Check: PASS - All entities from question found in Cypher. Entities: {'SolarWinds Orion'}
+3. Schema Check: PASS - Schema compliance check passed.
+
+----- Validating Entry #4 -----
+Question: Get the details for the MITRE ATT&CK technique named 'Phishing'.
+Query: MATCH (t:UcoexMITREATTACK {ucoexNAME: 'Phishing'}) RETURN t.ucoexDESCRIPTION, t.ucoexDOMAIN
+1. Grammar Check: PASS - Valid Cypher grammar.
+2. NER Check: PASS - All entities from question found in Cypher. Entities: {'Phishing'}
+3. Schema Check: PASS - Schema compliance check passed.
+
+----- Validating Entry #5 -----
+Question: Find the software known as 'Mimikatz'.
+Query: MATCH (s:UcoexSOFTWARE {ucoexNAME: 'Mimikatz'}) RETURN s
+1. Grammar Check: PASS - Valid Cypher grammar.
+2. NER Check: PASS - All entities from question found in Cypher. Entities: {'Mimikatz'}
+3. Schema Check: PASS - Schema compliance check passed.
+
+----- Validating Entry #6 -----
+Question: Retrieve all campaigns associated with the 'FIN7' group.
+Query: MATCH (g:UcoexGROUPS {ucoexNAME: 'FIN7'}) RETURN g
+1. Grammar Check: PASS - Valid Cypher grammar.
+2. NER Check: PASS - All entities from question found in Cypher. Entities: set()
+3. Schema Check: PASS - Schema compliance check passed.
+
+----- Validating Entry #7 -----
+Question: Find the CAPEC pattern with the ID 'CAPEC-540'.
+Query: MATCH (c:UcoexCAPEC {ucoexCAPEC_id: 'CAPEC-540'}) RETURN c.ucoexCAPEC_name, c.ucoexDescription
+1. Grammar Check: PASS - Valid Cypher grammar.
+2. NER Check: FAIL - Entities missing from Cypher: {'CAPEC', 'ID'}
+3. Schema Check: PASS - Schema compliance check passed.
+
+----- Validating Entry #8 -----
+Question: List all tactics from the 'mitre-attack' domain.
+Query: MATCH (t:UcoexTACTICS {ucoexDOMAIN: 'mitre-attack'}) RETURN t.ucoexNAME
+1. Grammar Check: PASS - Valid Cypher grammar.
+2. NER Check: PASS - All entities from question found in Cypher. Entities: set()
+3. Schema Check: PASS - Schema compliance check passed.
+
+----- Validating Entry #9 -----
+Question: Find a mitigation by its name, for example 'Access Token Manipulation'.
+Query: MATCH (m:UcoexMITIGATIONS {ucoexNAME: 'Access Token Manipulation'}) RETURN m.ucoexDESCRIPTION
+1. Grammar Check: PASS - Valid Cypher grammar.
+2. NER Check: PASS - All entities from question found in Cypher. Entities: set()
+3. Schema Check: PASS - Schema compliance check passed.
+
+----- Validating Entry #10 -----
+Question: Get the definition for the MITRE D3FEND technique labeled 'T1566'.
+Query: MATCH (d:UcoexMITRED3FEND {ucoexMITRED3FEND_LABEL: 'T1566'}) RETURN d.ucoexMITRED3FEND_DEFINITION
+1. Grammar Check: PASS - Valid Cypher grammar.
+2. NER Check: PASS - All entities from question found in Cypher. Entities: set()
+3. Schema Check: PASS - Schema compliance check passed.
+
+----- Validating Entry #11 -----
+Question: What software is used by the group 'APT28'?
+Query: MATCH (g:UcoexGROUPS {ucoexNAME: 'APT28'})-[:UCOEXGROUPUSESSOFTWARE]->(s:UcoexSOFTWARE) RETURN s.ucoexNAME
+1. Grammar Check: PASS - Valid Cypher grammar.
+2. NER Check: PASS - All entities from question found in Cypher. Entities: set()
+3. Schema Check: FAIL - Node label ':UCOEXGROUPUSESSOFTWARE' not found in schema.
+
+----- Validating Entry #12 -----
+Question: Which MITRE ATT&CK techniques are mitigated by 'User Account Control'?
+Query: MATCH (m:UcoexMITIGATIONS {ucoexNAME: 'User Account Control'})-[:UCOEXMITIGATES]->(t:UcoexMITREATTACK) RETURN t.ucoexNAME
+1. Grammar Check: PASS - Valid Cypher grammar.
+2. NER Check: FAIL - Entities missing from Cypher: {'ATT&CK'}
+3. Schema Check: FAIL - Node label ':UCOEXMITIGATES' not found in schema.
+
+----- Validating Entry #13 -----
+Question: Which weaknesses are related to the CAPEC pattern 'CAPEC-115'?
+Query: MATCH (c:UcoexCAPEC {ucoexCAPEC_id: 'CAPEC-115'})-[:UCOEXHASRELATEDWEAKNESS]->(w:UcoCWE) RETURN w.ucocweID, w.ucocweName
+1. Grammar Check: PASS - Valid Cypher grammar.
+2. NER Check: FAIL - Entities missing from Cypher: {'CAPEC'}
+3. Schema Check: FAIL - Node label ':UCOEXHASRELATEDWEAKNESS' not found in schema.
+
+----- Validating Entry #14 -----
+Question: What vulnerabilities are associated with the CVE ID 'CVE-2017-0144'?
+Query: MATCH (v:UcoVulnerability)-[:UCOHASCVE_ID]->(c:UcoCVE {label: 'CVE-2017-0144'}) RETURN v.ucosummy
+1. Grammar Check: PASS - Valid Cypher grammar.
+2. NER Check: PASS - All entities from question found in Cypher. Entities: set()
+3. Schema Check: FAIL - Node label ':UCOHASCVE_ID' not found in schema.
+
+----- Validating Entry #15 -----
+Question: List the techniques used in the 'Operation ShadowHammer' campaign.
+Query: MATCH (c:UcoexCAMPAIGNS {ucoexNAME: 'Operation ShadowHammer'})-[:UCOEXCAMPAIGNUSESTECHNIQUE]->(t:UcoexMITREATTACK) RETURN t.ucoexNAME
+1. Grammar Check: PASS - Valid Cypher grammar.
+2. NER Check: PASS - All entities from question found in Cypher. Entities: set()
+3. Schema Check: FAIL - Node label ':UCOEXCAMPAIGNUSESTECHNIQUE' not found in schema.
+
+----- Validating Entry #16 -----
+Question: To which groups is the 'Stuxnet' campaign attributed?
+Query: MATCH (c:UcoexCAMPAIGNS {ucoexNAME: 'Stuxnet'})-[:UCOEXATTRIBUTEDTO]->(g:UcoexGROUPS) RETURN g.ucoexNAME
+1. Grammar Check: PASS - Valid Cypher grammar.
+2. NER Check: PASS - All entities from question found in Cypher. Entities: set()
+3. Schema Check: FAIL - Node label ':UCOEXATTRIBUTEDTO' not found in schema.
+
+----- Validating Entry #17 -----
+Question: What are the observed examples for the weakness 'CWE-787'?
+Query: MATCH (w:UcoCWE {ucocweID: 'CWE-787'})-[:UCOHASOBSERVEDEXAMPLE]->(e:UcoexObservedExample) RETURN e.ucoexDESCRIPTION
+1. Grammar Check: PASS - Valid Cypher grammar.
+2. NER Check: PASS - All entities from question found in Cypher. Entities: set()
+3. Schema Check: FAIL - Node label ':UCOHASOBSERVEDEXAMPLE' not found in schema.
+
+----- Validating Entry #18 -----
+Question: Find all CPEs associated with 'CVE-2021-26855'.
+Query: MATCH (c:UcoCVE {label: 'CVE-2021-26855'})-[:UCOEXHASCPE]->(p:UcoexCPE) RETURN p.cpeName
+1. Grammar Check: PASS - Valid Cypher grammar.
+2. NER Check: PASS - All entities from question found in Cypher. Entities: set()
+3. Schema Check: FAIL - Node label ':UCOEXHASCPE' not found in schema.
+
+----- Validating Entry #19 -----
+Question: What software does the 'Lazarus Group' use?
+Query: MATCH (g:UcoexGROUPS {ucoexNAME: 'Lazarus Group'})-[:UCOEXGROUPUSESSOFTWARE]->(s:UcoexSOFTWARE) RETURN s.ucoexNAME
+1. Grammar Check: PASS - Valid Cypher grammar.
+2. NER Check: FAIL - Entities missing from Cypher: {"the 'Lazarus Group"}
+3. Schema Check: FAIL - Node label ':UCOEXGROUPUSESSOFTWARE' not found in schema.
+
+----- Validating Entry #20 -----
+Question: Which MITRE ATT&CK techniques are associated with the software 'Cobalt Strike'?
+Query: MATCH (s:UcoexSOFTWARE {ucoexNAME: 'Cobalt Strike'})-[:UCOEXSOFTWAREUSESTECHNIQUE]->(t:UcoexMITREATTACK) RETURN t.ucoexNAME
+1. Grammar Check: PASS - Valid Cypher grammar.
+2. NER Check: PASS - All entities from question found in Cypher. Entities: {'Cobalt Strike'}
+3. Schema Check: FAIL - Node label ':UCOEXSOFTWAREUSESTECHNIQUE' not found in schema.
+
+----- Validating Entry #21 -----
+Question: What are the names of groups that use software which in turn uses the 'T1566' technique?
+Query: MATCH (g:UcoexGROUPS)-[:UCOEXGROUPUSESSOFTWARE]->(s:UcoexSOFTWARE)-[:UCOEXSOFTWAREUSESTECHNIQUE]->(t:UcoexMITREATTACK {ucoexNAME: 'T1566'}) RETURN g.ucoexNAME
+1. Grammar Check: PASS - Valid Cypher grammar.
+2. NER Check: PASS - All entities from question found in Cypher. Entities: set()
+3. Schema Check: FAIL - Node label ':UCOEXSOFTWAREUSESTECHNIQUE' not found in schema.
+
+----- Validating Entry #22 -----
+Question: Find the names of campaigns that use techniques related to the 'CWE-79' weakness.
+Query: MATCH (campaign:UcoexCAMPAIGNS)-[:UCOEXCAMPAIGNUSESTECHNIQUE]->(technique:UcoexMITREATTACK)<-[:UCOEXHASTAXONOMYMAPPING]-(capec:UcoexCAPEC)-[:UCOEXHASRELATEDWEAKNESS]->(cwe:UcoCWE {ucocweID: 'CWE-79'}) RETURN DISTINCT campaign.ucoexNAME
+1. Grammar Check: PASS - Valid Cypher grammar.
+2. NER Check: PASS - All entities from question found in Cypher. Entities: set()
+3. Schema Check: FAIL - Node label ':UCOEXHASRELATEDWEAKNESS' not found in schema.
+
+----- Validating Entry #23 -----
+Question: What are the common consequences of weaknesses found in exploit targets that have the vulnerability 'CVE-2021-44228'?
+Query: MATCH (cve:UcoCVE {label: 'CVE-2021-44228'})<-[:UCOHASCVE_ID]-(vuln:UcoVulnerability)<-[:UCOHASVULNERABILITY]-(target:UcoExploitTarget)-[:UCOHASWEAKNESS]->(cwe:UcoCWE) RETURN cwe.ucocommonConsequences
+1. Grammar Check: PASS - Valid Cypher grammar.
+2. NER Check: PASS - All entities from question found in Cypher. Entities: set()
+3. Schema Check: FAIL - Node label ':UCOHASWEAKNESS' not found in schema.
+
+----- Validating Entry #24 -----
+Question: List all techniques used by campaigns attributed to the 'Lazarus Group'.
+Query: MATCH (g:UcoexGROUPS {ucoexNAME: 'Lazarus Group'})<-[:UCOEXATTRIBUTEDTO]-(c:UcoexCAMPAIGNS)-[:UCOEXCAMPAIGNUSESTECHNIQUE]->(t:UcoexMITREATTACK) RETURN DISTINCT t.ucoexNAME
+1. Grammar Check: PASS - Valid Cypher grammar.
+2. NER Check: FAIL - Entities missing from Cypher: {"the 'Lazarus Group"}
+3. Schema Check: FAIL - Node label ':UCOEXCAMPAIGNUSESTECHNIQUE' not found in schema.
+
+----- Validating Entry #25 -----
+Question: Which groups use techniques that are mitigated by 'Multi-Factor Authentication'?
+Query: MATCH (g:UcoexGROUPS)-[:UCOEXGROUPUSESTECHNIQUE]->(t:UcoexMITREATTACK)<-[:UCOEXMITIGATES]-(m:UcoexMITIGATIONS {ucoexNAME: 'Multi-Factor Authentication'}) RETURN g.ucoexNAME
+1. Grammar Check: PASS - Valid Cypher grammar.
+2. NER Check: PASS - All entities from question found in Cypher. Entities: {'Multi-Factor Authentication'}
+3. Schema Check: FAIL - Node label ':UCOEXMITIGATES' not found in schema.
+
+----- Validating Entry #26 -----
+Question: Find weaknesses related to CAPEC patterns that map to the 'TA0002' tactic.
+Query: MATCH (tactic:UcoexTACTICS {ucoexNAME: 'TA0002'})<-[:UCOEXHASTAXONOMYMAPPING]-(capec:UcoexCAPEC)-[:UCOEXHASRELATEDWEAKNESS]->(cwe:UcoCWE) RETURN cwe.ucocweID, cwe.ucocweName
+1. Grammar Check: PASS - Valid Cypher grammar.
+2. NER Check: FAIL - Entities missing from Cypher: {'CAPEC'}
+3. Schema Check: FAIL - Node label ':UCOEXHASRELATEDWEAKNESS' not found in schema.
+
+----- Validating Entry #27 -----
+Question: What software is used by campaigns that are attributed to groups using the 'T1059' technique?
+Query: MATCH (group:UcoexGROUPS)-[:UCOEXGROUPUSESTECHNIQUE]->(technique:UcoexMITREATTACK {ucoexNAME: 'T1059'}), (group)<-[:UCOEXATTRIBUTEDTO]-(campaign:UcoexCAMPAIGNS)-[:UCOEXCAMPAIGNUSESSOFTWARE]->(software:UcoexSOFTWARE) RETURN DISTINCT software.ucoexNAME
+1. Grammar Check: PASS - Valid Cypher grammar.
+2. NER Check: PASS - All entities from question found in Cypher. Entities: set()
+3. Schema Check: FAIL - Node label ':UCOEXCAMPAIGNUSESSOFTWARE' not found in schema.
+
+----- Validating Entry #28 -----
+Question: Retrieve the descriptions of mitigations for techniques used by the 'Sandworm Team' group.
+Query: MATCH (g:UcoexGROUPS {ucoexNAME: 'Sandworm Team'})-[:UCOEXGROUPUSESTECHNIQUE]->(t:UcoexMITREATTACK)<-[:UCOEXMITIGATES]-(m:UcoexMITIGATIONS) RETURN m.ucoexDESCRIPTION
+1. Grammar Check: PASS - Valid Cypher grammar.
+2. NER Check: FAIL - Entities missing from Cypher: {"the 'Sandworm Team"}
+3. Schema Check: FAIL - Node label ':UCOEXMITIGATES' not found in schema.
+
+----- Validating Entry #29 -----
+Question: What are the D3FEND definitions for techniques used by software associated with 'CVE-2020-0601'?
+Query: MATCH (c:UcoCVE {label: 'CVE-2020-0601'})-[:UCOEXHASCPE]->(cpe:UcoexCPE)<-[:UCOEXHASCPE]-(s:UcoexSOFTWARE)-[:UCOEXSOFTWAREUSESTECHNIQUE]->(t:UcoexMITREATTACK)<-[:UCOEXHASMITREATTACK]-(d:UcoexMITRED3FEND) RETURN d.ucoexMITRED3FEND_DEFINITION
+1. Grammar Check: PASS - Valid Cypher grammar.
+2. NER Check: FAIL - Entities missing from Cypher: {'D3FEND'}
+3. Schema Check: FAIL - Node label ':UCOEXHASMITREATTACK' not found in schema.
+
+----- Validating Entry #30 -----
+Question: Find all techniques and the software that uses them, for campaigns attributed to 'APT38'.
+Query: MATCH (g:UcoexGROUPS {ucoexNAME: 'APT38'})<-[:UCOEXATTRIBUTEDTO]-(c:UcoexCAMPAIGNS)-[:UCOEXCAMPAIGNUSESSOFTWARE]->(s:UcoexSOFTWARE), (c)-[:UCOEXCAMPAIGNUSESTECHNIQUE]->(t:UcoexMITREATTACK) RETURN s.ucoexNAME, t.ucoexNAME
+1. Grammar Check: PASS - Valid Cypher grammar.
+2. NER Check: PASS - All entities from question found in Cypher. Entities: set()
+3. Schema Check: FAIL - Node label ':UCOEXCAMPAIGNUSESSOFTWARE' not found in schema.
+
+----- Validating Entry #31 -----
+Question: How many techniques are associated with each MITRE ATT&CK tactic?
+Query: MATCH (tactic:UcoexTACTICS)<-[:UCOEXHASTAXONOMYMAPPING]-(technique:UcoexMITREATTACK) RETURN tactic.ucoexNAME, count(technique) AS numberOfTechniques
+1. Grammar Check: PASS - Valid Cypher grammar.
+2. NER Check: FAIL - Entities missing from Cypher: {'ATT&CK'}
+3. Schema Check: FAIL - Node label ':UCOEXHASTAXONOMYMAPPING' not found in schema.
+
+----- Validating Entry #32 -----
+Question: Count the total number of vulnerabilities in the database.
+Query: MATCH (v:UcoVulnerability) RETURN count(v) AS totalVulnerabilities
+1. Grammar Check: PASS - Valid Cypher grammar.
+2. NER Check: PASS - All entities from question found in Cypher. Entities: set()
+3. Schema Check: PASS - Schema compliance check passed.
+
+----- Validating Entry #33 -----
+Question: What is the average exploitability score for CVEs with a 'HIGH' base severity?
+Query: MATCH (c:UcoCVE {ucobaseSeverity: 'HIGH'}) RETURN avg(toInteger(c.ucoexploitabilityScore)) AS averageExploitabilityScore
+1. Grammar Check: PASS - Valid Cypher grammar.
+2. NER Check: PASS - All entities from question found in Cypher. Entities: set()
+3. Schema Check: PASS - Schema compliance check passed.
+
+----- Validating Entry #34 -----
+Question: How many distinct groups use the 'T1059' (Command-Line Interface) technique?
+Query: MATCH (g:UcoexGROUPS)-[:UCOEXGROUPUSESTECHNIQUE]->(t:UcoexMITREATTACK {ucoexNAME: 'T1059'}) RETURN count(DISTINCT g) AS numberOfGroups
+1. Grammar Check: PASS - Valid Cypher grammar.
+2. NER Check: FAIL - Entities missing from Cypher: {'Command-Line Interface'}
+3. Schema Check: FAIL - Node label ':UCOEXGROUPUSESTECHNIQUE' not found in schema.
+
+----- Validating Entry #35 -----
+Question: Find the total number of CAPEC patterns.
+Query: MATCH (c:UcoexCAPEC) RETURN count(c) AS totalCAPECPatterns
+1. Grammar Check: PASS - Valid Cypher grammar.
+2. NER Check: FAIL - Entities missing from Cypher: {'CAPEC'}
+3. Schema Check: PASS - Schema compliance check passed.
+
+----- Validating Entry #36 -----
+Question: Count the number of campaigns attributed to each group.
+Query: MATCH (g:UcoexGROUPS)<-[:UCOEXATTRIBUTEDTO]-(c:UcoexCAMPAIGNS) RETURN g.ucoexNAME, count(c) AS campaignCount
+1. Grammar Check: PASS - Valid Cypher grammar.
+2. NER Check: PASS - All entities from question found in Cypher. Entities: set()
+3. Schema Check: FAIL - Node label ':UCOEXATTRIBUTEDTO' not found in schema.
+
+----- Validating Entry #37 -----
+Question: What is the maximum impact score among all CVEs?
+Query: MATCH (c:UcoCVE) WHERE c.ucoimpactScore IS NOT NULL RETURN max(toInteger(c.ucoimpactScore)) AS maxImpactScore
+1. Grammar Check: PASS - Valid Cypher grammar.
+2. NER Check: PASS - All entities from question found in Cypher. Entities: set()
+3. Schema Check: PASS - Schema compliance check passed.
+
+----- Validating Entry #38 -----
+Question: How many related weaknesses does each CAPEC pattern have?
+Query: MATCH (capec:UcoexCAPEC)-[:UCOEXHASRELATEDWEAKNESS]->(cwe:UcoCWE) RETURN capec.ucoexCAPEC_id, count(cwe) AS weaknessCount ORDER BY weaknessCount DESC
+1. Grammar Check: PASS - Valid Cypher grammar.
+2. NER Check: FAIL - Entities missing from Cypher: {'CAPEC'}
+3. Schema Check: FAIL - Node label ':UCOEXHASRELATEDWEAKNESS' not found in schema.
+
+----- Validating Entry #39 -----
+Question: Count the number of software entries per domain.
+Query: MATCH (s:UcoexSOFTWARE) RETURN s.ucoexDOMAIN, count(s) AS softwareCount
+1. Grammar Check: PASS - Valid Cypher grammar.
+2. NER Check: PASS - All entities from question found in Cypher. Entities: set()
+3. Schema Check: PASS - Schema compliance check passed.
+
+----- Validating Entry #40 -----
+Question: What is the total number of mitigations available?
+Query: MATCH (m:UcoexMITIGATIONS) RETURN count(m) AS totalMitigations
+1. Grammar Check: PASS - Valid Cypher grammar.
+2. NER Check: PASS - All entities from question found in Cypher. Entities: set()
+3. Schema Check: PASS - Schema compliance check passed.
+
+----- Validating Entry #41 -----
+Question: Find all CVEs with 'HIGH' severity AND where user interaction is required.
+Query: MATCH (c:UcoCVE) WHERE c.ucobaseSeverity = 'HIGH' AND c.ucouserInteractionRequired = 'true' RETURN c.label
+1. Grammar Check: PASS - Valid Cypher grammar.
+2. NER Check: PASS - All entities from question found in Cypher. Entities: set()
+3. Schema Check: PASS - Schema compliance check passed.
+
+----- Validating Entry #42 -----
+Question: List all software that is either used by the 'APT29' group OR is associated with the 'T1548' technique.
+Query: MATCH (s:UcoexSOFTWARE) WHERE (:UcoexGROUPS {ucoexNAME: 'APT29'})-[:UCOEXGROUPUSESSOFTWARE]->(s) OR (s)-[:UCOEXSOFTWAREUSESTECHNIQUE]->(:UcoexMITREATTACK {ucoexNAME: 'T1548'}) RETURN s.ucoexNAME
+1. Grammar Check: PASS - Valid Cypher grammar.
+2. NER Check: PASS - All entities from question found in Cypher. Entities: set()
+3. Schema Check: FAIL - Node label ':UCOEXSOFTWAREUSESTECHNIQUE' not found in schema.
+
+----- Validating Entry #43 -----
+Question: Find all CWEs that are of 'Class' structure and NOT 'Deprecated' status.
+Query: MATCH (c:UcoCWE) WHERE c.ucostructure = 'Class' AND NOT c.ucostatus = 'Deprecated' RETURN c.ucocweID, c.ucocweName
+1. Grammar Check: PASS - Valid Cypher grammar.
+2. NER Check: PASS - All entities from question found in Cypher. Entities: set()
+3. Schema Check: PASS - Schema compliance check passed.
+
+----- Validating Entry #44 -----
+Question: List campaigns that are not attributed to any known group.
+Query: MATCH (c:UcoexCAMPAIGNS) WHERE NOT (c)-[:UCOEXATTRIBUTEDTO]->() RETURN c.ucoexNAME
+1. Grammar Check: PASS - Valid Cypher grammar.
+2. NER Check: PASS - All entities from question found in Cypher. Entities: set()
+3. Schema Check: FAIL - Node label ':UCOEXATTRIBUTEDTO' not found in schema.
+
+----- Validating Entry #45 -----
+Question: Find techniques that have a 'High' likelihood of exploit AND a 'High' severity.
+Query: MATCH (c:UcoexCAPEC) WHERE c.ucoexLikelihood = 'High' AND c.ucoexSeverity = 'High' MATCH (c)-[:UCOEXHASTAXONOMYMAPPING]->(t:UcoexMITREATTACK) RETURN DISTINCT t.ucoexNAME
+1. Grammar Check: PASS - Valid Cypher grammar.
+2. NER Check: PASS - All entities from question found in Cypher. Entities: set()
+3. Schema Check: FAIL - Node label ':UCOEXHASTAXONOMYMAPPING' not found in schema.
+
+----- Validating Entry #46 -----
+Question: Retrieve vulnerabilities published after '2022-01-01' but before '2023-01-01'.
+Query: MATCH (v:UcoVulnerability) WHERE v.ucopublishedDateTime > datetime('2022-01-01') AND v.ucopublishedDateTime < datetime('2023-01-01') RETURN v.uri, v.ucosummy
+1. Grammar Check: PASS - Valid Cypher grammar.
+2. NER Check: PASS - All entities from question found in Cypher. Entities: {'2022-01-01', '2023-01-01'}
+3. Schema Check: PASS - Schema compliance check passed.
+
+----- Validating Entry #47 -----
+Question: Find all CVEs where 'obtainAllPrivilege' is true AND 'userInteractionRequired' is false.
+Query: MATCH (c:UcoCVE) WHERE c.ucoobtainAllPrivilege = 'true' AND c.ucouserInteractionRequired = 'false' RETURN c.label
+1. Grammar Check: PASS - Valid Cypher grammar.
+2. NER Check: PASS - All entities from question found in Cypher. Entities: set()
+3. Schema Check: PASS - Schema compliance check passed.
+
+----- Validating Entry #48 -----
+Question: List groups that use either 'PowerShell' or 'Cobalt Strike' software.
+Query: MATCH (g:UcoexGROUPS)-[:UCOEXGROUPUSESSOFTWARE]->(s:UcoexSOFTWARE) WHERE s.ucoexNAME = 'PowerShell' OR s.ucoexNAME = 'Cobalt Strike' RETURN DISTINCT g.ucoexNAME
+1. Grammar Check: PASS - Valid Cypher grammar.
+2. NER Check: PASS - All entities from question found in Cypher. Entities: {'PowerShell'}
+3. Schema Check: FAIL - Node label ':UCOEXGROUPUSESSOFTWARE' not found in schema.
+
+----- Validating Entry #49 -----
+Question: Find CAPEC patterns that are not abstract and have consequences listed.
+Query: MATCH (c:UcoexCAPEC) WHERE c.ucoexAbstraction <> 'Abstract' AND size(c.ucoexConsequences) > 0 RETURN c.ucoexCAPEC_id
+1. Grammar Check: PASS - Valid Cypher grammar.
+2. NER Check: FAIL - Entities missing from Cypher: {'CAPEC'}
+3. Schema Check: PASS - Schema compliance check passed.
+
+----- Validating Entry #50 -----
+Question: Retrieve techniques that are not mitigated by any recorded mitigation strategy.
+Query: MATCH (t:UcoexMITREATTACK) WHERE NOT (t)<-[:UCOEXMITIGATES]-() RETURN t.ucoexNAME
+1. Grammar Check: PASS - Valid Cypher grammar.
+2. NER Check: PASS - All entities from question found in Cypher. Entities: set()
+3. Schema Check: FAIL - Node label ':UCOEXMITIGATES' not found in schema.
+
+----- Validating Entry #51 -----
+Question: Is there any connection, up to 5 hops, between the 'APT1' group and the 'T1059' technique?
+Query: MATCH p = (g:UcoexGROUPS {ucoexNAME: 'APT1'})-[*1..5]-(t:UcoexMITREATTACK {ucoexNAME: 'T1059'}) RETURN p LIMIT 1
+1. Grammar Check: PASS - Valid Cypher grammar.
+2. NER Check: FAIL - Entities missing from Cypher: {'5'}
+3. Schema Check: PASS - Schema compliance check passed.
+
+----- Validating Entry #52 -----
+Question: Find all paths between CAPEC 'CAPEC-66' and MITRE ATT&CK 'T1595'.
+Query: MATCH p = (c:UcoexCAPEC {ucoexCAPEC_id: 'CAPEC-66'})-[*]-(t:UcoexMITREATTACK {ucoexNAME: 'T1595'}) RETURN p
+1. Grammar Check: PASS - Valid Cypher grammar.
+2. NER Check: FAIL - Entities missing from Cypher: {'CAPEC', 'ATT&CK'}
+3. Schema Check: PASS - Schema compliance check passed.
+
+----- Validating Entry #53 -----
+Question: What are all the entities connected to 'CVE-2017-0144' within 3 steps?
+Query: MATCH (c:UcoCVE {label: 'CVE-2017-0144'})-[*1..3]-(relatedNode) RETURN DISTINCT relatedNode
+1. Grammar Check: PASS - Valid Cypher grammar.
+2. NER Check: FAIL - Entities missing from Cypher: {'3'}
+3. Schema Check: PASS - Schema compliance check passed.
+
+----- Validating Entry #54 -----
+Question: Find the shortest path between the 'Emotet' software and the 'CWE-20' weakness.
+Query: MATCH p = shortestPath((s:UcoexSOFTWARE {ucoexNAME: 'Emotet'})-[*]-(w:UcoCWE {ucocweID: 'CWE-20'})) RETURN p
+1. Grammar Check: PASS - Valid Cypher grammar.
+2. NER Check: FAIL - Entities missing from Cypher: {"the 'Emotet"}
+3. Schema Check: PASS - Schema compliance check passed.
+
+----- Validating Entry #55 -----
+Question: Find if a campaign is connected to a specific CVE through any path.
+Query: MATCH p = (c:UcoexCAMPAIGNS {ucoexNAME: 'WannaCry'})-[*]-(cve:UcoCVE {label: 'CVE-2017-0144'}) RETURN CASE WHEN p IS NOT NULL THEN true ELSE false END AS isConnected
+1. Grammar Check: PASS - Valid Cypher grammar.
+2. NER Check: PASS - All entities from question found in Cypher. Entities: set()
+3. Schema Check: PASS - Schema compliance check passed.
+
+----- Validating Entry #56 -----
+Question: List all nodes that are reachable from the 'TrickBot' software in 2 to 4 hops.
+Query: MATCH (s:UcoexSOFTWARE {ucoexNAME: 'TrickBot'})-[*2..4]-(n) RETURN DISTINCT n
+1. Grammar Check: PASS - Valid Cypher grammar.
+2. NER Check: FAIL - Entities missing from Cypher: {'2', '4'}
+3. Schema Check: PASS - Schema compliance check passed.
+
+----- Validating Entry #57 -----
+Question: Find all relationships and intermediate nodes between the 'FIN6' group and the 'Valid Accounts' technique.
+Query: MATCH p = (g:UcoexGROUPS {ucoexNAME: 'FIN6'})-[*]-(t:UcoexMITREATTACK {ucoexNAME: 'Valid Accounts'}) RETURN nodes(p), relationships(p)
+1. Grammar Check: PASS - Valid Cypher grammar.
+2. NER Check: PASS - All entities from question found in Cypher. Entities: set()
+3. Schema Check: PASS - Schema compliance check passed.
+
+----- Validating Entry #58 -----
+Question: Does the 'APT29' group have a path to any vulnerabilities with 'CRITICAL' severity?
+Query: MATCH p = (g:UcoexGROUPS {ucoexNAME: 'APT29'})-[*]-(c:UcoCVE {ucobaseSeverity: 'CRITICAL'}) RETURN EXISTS(p)
+1. Grammar Check: FAIL - {code: Neo.ClientError.Statement.SyntaxError} {message: Argument to EXISTS(...) is not a pattern (line 1, column 115 (offset: 114))
+"EXPLAIN MATCH p = (g:UcoexGROUPS {ucoexNAME: 'APT29'})-[*]-(c:UcoCVE {ucobaseSeverity: 'CRITICAL'}) RETURN EXISTS(p)"
+                                                                                                                   ^}
+2. NER Check: PASS - All entities from question found in Cypher. Entities: {'CRITICAL'}
+3. Schema Check: PASS - Schema compliance check passed.
+
+----- Validating Entry #59 -----
+Question: Explore the neighborhood of the 'Zeus' software up to 2 hops.
+Query: MATCH (s:UcoexSOFTWARE {ucoexNAME: 'Zeus'})-[*1..2]-(neighbor) RETURN s, neighbor
+1. Grammar Check: PASS - Valid Cypher grammar.
+2. NER Check: FAIL - Entities missing from Cypher: {'2'}
+3. Schema Check: PASS - Schema compliance check passed.
+
+----- Validating Entry #60 -----
+Question: Find the shortest connection between two campaigns, 'Maze' and 'Ryuk'.
+Query: MATCH p = shortestPath((c1:UcoexCAMPAIGNS {ucoexNAME: 'Maze'})-[*]-(c2:UcoexCAMPAIGNS {ucoexNAME: 'Ryuk'})) RETURN p
+1. Grammar Check: PASS - Valid Cypher grammar.
+2. NER Check: FAIL - Entities missing from Cypher: {'two'}
+3. Schema Check: PASS - Schema compliance check passed.
+
+----- Validating Entry #61 -----
+Question: Find groups that use the same two techniques.
+Query: MATCH (g:UcoexGROUPS)-[:UCOEXGROUPUSESTECHNIQUE]->(t1:UcoexMITREATTACK), (g)-[:UCOEXGROUPUSESTECHNIQUE]->(t2:UcoexMITREATTACK) WHERE id(t1) < id(t2) RETURN g.ucoexNAME, t1.ucoexNAME, t2.ucoexNAME
+1. Grammar Check: PASS - Valid Cypher grammar.
+2. NER Check: FAIL - Entities missing from Cypher: {'two'}
+3. Schema Check: FAIL - Node label ':UCOEXGROUPUSESTECHNIQUE' not found in schema.
+
+----- Validating Entry #62 -----
+Question: Identify software used by a campaign which also uses a technique that is mitigated by 'Network Segmentation'.
+Query: MATCH (s:UcoexSOFTWARE)<-[:UCOEXCAMPAIGNUSESSOFTWARE]-(c:UcoexCAMPAIGNS)-[:UCOEXCAMPAIGNUSESTECHNIQUE]->(t:UcoexMITREATTACK)<-[:UCOEXMITIGATES]-(m:UcoexMITIGATIONS {ucoexNAME: 'Network Segmentation'}) RETURN s.ucoexNAME
+1. Grammar Check: PASS - Valid Cypher grammar.
+2. NER Check: PASS - All entities from question found in Cypher. Entities: set()
+3. Schema Check: FAIL - Node label ':UCOEXCAMPAIGNUSESSOFTWARE' not found in schema.
+
+----- Validating Entry #63 -----
+Question: Find a "triangle" where a Group uses a Technique, and that Technique is used in a Campaign attributed to the same Group.
+Query: MATCH (g:UcoexGROUPS)-[:UCOEXGROUPUSESTECHNIQUE]->(t:UcoexMITREATTACK), (g)<-[:UCOEXATTRIBUTEDTO]-(c:UcoexCAMPAIGNS)-[:UCOEXCAMPAIGNUSESTECHNIQUE]->(t) RETURN g.ucoexNAME, t.ucoexNAME, c.ucoexNAME
+1. Grammar Check: PASS - Valid Cypher grammar.
+2. NER Check: FAIL - Entities missing from Cypher: {'Group', 'Technique'}
+3. Schema Check: FAIL - Node label ':UCOEXGROUPUSESTECHNIQUE' not found in schema.
+
+----- Validating Entry #64 -----
+Question: Find two distinct campaigns that use the same piece of software.
+Query: MATCH (c1:UcoexCAMPAIGNS)-[:UCOEXCAMPAIGNUSESSOFTWARE]->(s:UcoexSOFTWARE)<-[:UCOEXCAMPAIGNUSESSOFTWARE]-(c2:UcoexCAMPAIGNS) WHERE id(c1) < id(c2) RETURN s.ucoexNAME, c1.ucoexNAME, c2.ucoexNAME
+1. Grammar Check: PASS - Valid Cypher grammar.
+2. NER Check: FAIL - Entities missing from Cypher: {'two'}
+3. Schema Check: FAIL - Node label ':UCOEXCAMPAIGNUSESSOFTWARE' not found in schema.
+
+----- Validating Entry #65 -----
+Question: Find groups that target the same software.
+Query: MATCH (g1:UcoexGROUPS)-[:UCOEXGROUPUSESSOFTWARE]->(s:UcoexSOFTWARE)<-[:UCOEXGROUPUSESSOFTWARE]-(g2:UcoexGROUPS) WHERE id(g1) < id(g2) RETURN s.ucoexNAME, g1.ucoexNAME, g2.ucoexNAME
+1. Grammar Check: PASS - Valid Cypher grammar.
+2. NER Check: PASS - All entities from question found in Cypher. Entities: set()
+3. Schema Check: FAIL - Node label ':UCOEXGROUPUSESSOFTWARE' not found in schema.
+
+----- Validating Entry #66 -----
+Question: Identify a pattern where a CVE has a CPE, and that CPE is associated with software used by a known group.
+Query: MATCH (cve:UcoCVE)-[:UCOEXHASCPE]->(cpe:UcoexCPE)<-[:UCOEXHASCPE]-(sw:UcoexSOFTWARE)<-[:UCOEXGROUPUSESSOFTWARE]-(g:UcoexGROUPS) RETURN cve.label, sw.ucoexNAME, g.ucoexNAME
+1. Grammar Check: PASS - Valid Cypher grammar.
+2. NER Check: FAIL - Entities missing from Cypher: {'CPE', 'CVE'}
+3. Schema Check: FAIL - Node label ':UCOEXHASCPE' not found in schema.
+
+----- Validating Entry #67 -----
+Question: Find a CAPEC that has a related CWE, and that CWE has an observed example in a CVE.
+Query: MATCH (capec:UcoexCAPEC)-[:UCOEXHASRELATEDWEAKNESS]->(cwe:UcoCWE)-[:UCOHASOBSERVEDEXAMPLE]->(obs:UcoexObservedExample)-[:UCOEXEXAMPLEOBSERVEDIN]->(cve:UcoCVE) RETURN capec.ucoexCAPEC_id, cwe.ucocweID, cve.label
+1. Grammar Check: PASS - Valid Cypher grammar.
+2. NER Check: FAIL - Entities missing from Cypher: {'CAPEC', 'CWE'}
+3. Schema Check: FAIL - Node label ':UCOHASOBSERVEDEXAMPLE' not found in schema.
+
+----- Validating Entry #68 -----
+Question: Find groups that use software which has a known vulnerability.
+Query: MATCH (g:UcoexGROUPS)-[:UCOEXGROUPUSESSOFTWARE]->(s:UcoexSOFTWARE)-[:UCOHASVULNERABILITY]->(v:UcoVulnerability) RETURN DISTINCT g.ucoexNAME, s.ucoexNAME
+1. Grammar Check: PASS - Valid Cypher grammar.
+2. NER Check: PASS - All entities from question found in Cypher. Entities: set()
+3. Schema Check: FAIL - Node label ':UCOEXGROUPUSESSOFTWARE' not found in schema.
+
+----- Validating Entry #69 -----
+Question: Find techniques that are part of the same tactic and are used by the same group.
+Query: MATCH (tactic:UcoexTACTICS)<-[:UCOEXHASTAXONOMYMAPPING]-(tech1:UcoexMITREATTACK)<-[:UCOEXGROUPUSESTECHNIQUE]-(group:UcoexGROUPS), (tactic)<-[:UCOEXHASTAXONOMYMAPPING]-(tech2:UcoexMITREATTACK)<-[:UCOEXGROUPUSESTECHNIQUE]-(group) WHERE id(tech1) < id(tech2) RETURN group.ucoexNAME, tactic.ucoexNAME, tech1.ucoexNAME, tech2.ucoexNAME
+1. Grammar Check: PASS - Valid Cypher grammar.
+2. NER Check: PASS - All entities from question found in Cypher. Entities: set()
+3. Schema Check: FAIL - Node label ':UCOEXGROUPUSESTECHNIQUE' not found in schema.
+
+----- Validating Entry #70 -----
+Question: Find campaigns that use software that mitigations exist for.
+Query: MATCH (c:UcoexCAMPAIGNS)-[:UCOEXCAMPAIGNUSESSOFTWARE]->(s:UcoexSOFTWARE)-[:UCOEXSOFTWAREUSESTECHNIQUE]->(t:UcoexMITREATTACK)<-[:UCOEXMITIGATES]-(m:UcoexMITIGATIONS) RETURN DISTINCT c.ucoexNAME
+1. Grammar Check: PASS - Valid Cypher grammar.
+2. NER Check: PASS - All entities from question found in Cypher. Entities: set()
+3. Schema Check: FAIL - Node label ':UCOEXCAMPAIGNUSESSOFTWARE' not found in schema.
+
+----- Validating Entry #71 -----
+Question: Which 10 CVEs have the highest exploitability scores?
+Query: MATCH (c:UcoCVE) WHERE c.ucoexploitabilityScore IS NOT NULL RETURN c.label, c.ucoexploitabilityScore ORDER BY toInteger(c.ucoexploitabilityScore) DESC LIMIT 10
+1. Grammar Check: PASS - Valid Cypher grammar.
+2. NER Check: FAIL - Entities missing from Cypher: {'10'}
+3. Schema Check: PASS - Schema compliance check passed.
+
+----- Validating Entry #72 -----
+Question: List the top 5 groups that use the most techniques.
+Query: MATCH (g:UcoexGROUPS)-[:UCOEXGROUPUSESTECHNIQUE]->(t:UcoexMITREATTACK) RETURN g.ucoexNAME, count(t) AS techniqueCount ORDER BY techniqueCount DESC LIMIT 5
+1. Grammar Check: PASS - Valid Cypher grammar.
+2. NER Check: FAIL - Entities missing from Cypher: {'5'}
+3. Schema Check: FAIL - Node label ':UCOEXGROUPUSESTECHNIQUE' not found in schema.
+
+----- Validating Entry #73 -----
+Question: Which vulnerabilities have a higher exploitability score than impact score?
+Query: MATCH (c:UcoCVE) WHERE toInteger(c.ucoexploitabilityScore) > toInteger(c.ucoimpactScore) RETURN c.label, c.ucoexploitabilityScore, c.ucoimpactScore
+1. Grammar Check: PASS - Valid Cypher grammar.
+2. NER Check: PASS - All entities from question found in Cypher. Entities: set()
+3. Schema Check: PASS - Schema compliance check passed.
+
+----- Validating Entry #74 -----
+Question: Find techniques that are associated with more than 5 CAPEC patterns.
+Query: MATCH (t:UcoexMITREATTACK)<-[:UCOEXHASTAXONOMYMAPPING]-(c:UcoexCAPEC) WITH t, count(c) AS capecCount WHERE capecCount > 5 RETURN t.ucoexNAME, capecCount
+1. Grammar Check: PASS - Valid Cypher grammar.
+2. NER Check: FAIL - Entities missing from Cypher: {'CAPEC', 'more than 5'}
+3. Schema Check: FAIL - Node label ':UCOEXHASTAXONOMYMAPPING' not found in schema.
+
+----- Validating Entry #75 -----
+Question: Rank software by the number of campaigns that use it, from most to least.
+Query: MATCH (s:UcoexSOFTWARE)<-[:UCOEXCAMPAIGNUSESSOFTWARE]-(c:UcoexCAMPAIGNS) RETURN s.ucoexNAME, count(c) AS campaignUsage ORDER BY campaignUsage DESC
+1. Grammar Check: PASS - Valid Cypher grammar.
+2. NER Check: FAIL - Entities missing from Cypher: {'Rank'}
+3. Schema Check: FAIL - Node label ':UCOEXCAMPAIGNUSESSOFTWARE' not found in schema.
+
+----- Validating Entry #76 -----
+Question: List the 10 oldest vulnerabilities in the database.
+Query: MATCH (v:UcoVulnerability) WHERE v.ucopublishedDateTime IS NOT NULL RETURN v.uri, v.ucopublishedDateTime ORDER BY v.ucopublishedDateTime ASC LIMIT 10
+1. Grammar Check: PASS - Valid Cypher grammar.
+2. NER Check: FAIL - Entities missing from Cypher: {'10'}
+3. Schema Check: PASS - Schema compliance check passed.
+
+----- Validating Entry #77 -----
+Question: Which CWEs are related to the most CAPEC patterns?
+Query: MATCH (w:UcoCWE)<-[:UCOEXHASRELATEDWEAKNESS]-(c:UcoexCAPEC) RETURN w.ucocweID, w.ucocweName, count(c) as capec_count ORDER BY capec_count DESC LIMIT 10
+1. Grammar Check: PASS - Valid Cypher grammar.
+2. NER Check: FAIL - Entities missing from Cypher: {'CAPEC'}
+3. Schema Check: FAIL - Node label ':UCOEXHASRELATEDWEAKNESS' not found in schema.
+
+----- Validating Entry #78 -----
+Question: Find all campaigns using more than 3 distinct pieces of software.
+Query: MATCH (c:UcoexCAMPAIGNS)-[:UCOEXCAMPAIGNUSESSOFTWARE]->(s:UcoexSOFTWARE) WITH c, count(DISTINCT s) AS softwareCount WHERE softwareCount > 3 RETURN c.ucoexNAME, softwareCount
+1. Grammar Check: PASS - Valid Cypher grammar.
+2. NER Check: FAIL - Entities missing from Cypher: {'more than 3'}
+3. Schema Check: FAIL - Node label ':UCOEXCAMPAIGNUSESSOFTWARE' not found in schema.
+
+----- Validating Entry #79 -----
+Question: Which mitigations cover the highest number of techniques?
+Query: MATCH (m:UcoexMITIGATIONS)-[:UCOEXMITIGATES]->(t:UcoexMITREATTACK) RETURN m.ucoexNAME, count(t) AS techniquesMitigated ORDER BY techniquesMitigated DESC LIMIT 5
+1. Grammar Check: PASS - Valid Cypher grammar.
+2. NER Check: PASS - All entities from question found in Cypher. Entities: set()
+3. Schema Check: FAIL - Node label ':UCOEXMITIGATES' not found in schema.
+
+----- Validating Entry #80 -----
+Question: List CVEs with an impact score less than 5 but an exploitability score greater than 8.
+Query: MATCH (c:UcoCVE) WHERE toInteger(c.ucoimpactScore) < 5 AND toInteger(c.ucoexploitabilityScore) > 8 RETURN c.label
+1. Grammar Check: PASS - Valid Cypher grammar.
+2. NER Check: FAIL - Entities missing from Cypher: {'less than 5', '8'}
+3. Schema Check: PASS - Schema compliance check passed.
+
+----- Validating Entry #81 -----
+Question: Find all groups that are known to use at least one technique.
+Query: MATCH (g:UcoexGROUPS) WHERE EXISTS((g)-[:UCOEXGROUPUSESTECHNIQUE]->()) RETURN g.ucoexNAME
+1. Grammar Check: PASS - Valid Cypher grammar.
+2. NER Check: FAIL - Entities missing from Cypher: {'at least one'}
+3. Schema Check: FAIL - Node label ':UCOEXGROUPUSESTECHNIQUE' not found in schema.
+
+----- Validating Entry #82 -----
+Question: List all CAPEC patterns that have a related weakness in the set ['CWE-89', 'CWE-79', 'CWE-78'].
+Query: MATCH (c:UcoexCAPEC)-[:UCOEXHASRELATEDWEAKNESS]->(w:UcoCWE) WHERE w.ucocweID IN ['CWE-89', 'CWE-79', 'CWE-78'] RETURN DISTINCT c.ucoexCAPEC_id
+1. Grammar Check: PASS - Valid Cypher grammar.
+2. NER Check: FAIL - Entities missing from Cypher: {'CAPEC'}
+3. Schema Check: FAIL - Node label ':UCOEXHASRELATEDWEAKNESS' not found in schema.
+
+----- Validating Entry #83 -----
+Question: Show all techniques that are either used by 'APT28' or 'APT29'.
+Query: MATCH (g:UcoexGROUPS)-[:UCOEXGROUPUSESTECHNIQUE]->(t:UcoexMITREATTACK) WHERE g.ucoexNAME = 'APT28' RETURN t.ucoexNAME AS Technique UNION MATCH (g2:UcoexGROUPS)-[:UCOEXGROUPUSESTECHNIQUE]->(t2:UcoexMITREATTACK) WHERE g2.ucoexNAME = 'APT29' RETURN t2.ucoexNAME AS Technique
+1. Grammar Check: PASS - Valid Cypher grammar.
+2. NER Check: PASS - All entities from question found in Cypher. Entities: set()
+3. Schema Check: FAIL - Node label ':UCOEXGROUPUSESTECHNIQUE' not found in schema.
+
+----- Validating Entry #84 -----
+Question: Find all CVEs for which a CPE exists.
+Query: MATCH (c:UcoCVE) WHERE EXISTS((c)-[:UCOEXHASCPE]->()) RETURN c.label
+1. Grammar Check: PASS - Valid Cypher grammar.
+2. NER Check: FAIL - Entities missing from Cypher: {'CPE'}
+3. Schema Check: FAIL - Node label ':UCOEXHASCPE' not found in schema.
+
+----- Validating Entry #85 -----
+Question: List all software for which there is no associated campaign.
+Query: MATCH (s:UcoexSOFTWARE) WHERE NOT EXISTS(()-[:UCOEXCAMPAIGNUSESSOFTWARE]->(s)) RETURN s.ucoexNAME
+1. Grammar Check: PASS - Valid Cypher grammar.
+2. NER Check: PASS - All entities from question found in Cypher. Entities: set()
+3. Schema Check: FAIL - Node label ':UCOEXCAMPAIGNUSESSOFTWARE' not found in schema.
+
+----- Validating Entry #86 -----
+Question: Find campaigns that use any of the techniques used by the 'Turla' group.
+Query: MATCH (g:UcoexGROUPS {ucoexNAME: 'Turla'})-[:UCOEXGROUPUSESTECHNIQUE]->(t:UcoexMITREATTACK) WITH collect(t) as turlaTechniques MATCH (c:UcoexCAMPAIGNS)-[:UCOEXCAMPAIGNUSESTECHNIQUE]->(t2) WHERE t2 in turlaTechniques RETURN DISTINCT c.ucoexNAME
+1. Grammar Check: PASS - Valid Cypher grammar.
+2. NER Check: PASS - All entities from question found in Cypher. Entities: {'Turla'}
+3. Schema Check: FAIL - Node label ':UCOEXGROUPUSESTECHNIQUE' not found in schema.
+
+----- Validating Entry #87 -----
+Question: Check if any campaign uses both 'Cobalt Strike' and 'Mimikatz' software.
+Query: MATCH (c:UcoexCAMPAIGNS)-[:UCOEXCAMPAIGNUSESSOFTWARE]->(:UcoexSOFTWARE {ucoexNAME: 'Cobalt Strike'}), (c)-[:UCOEXCAMPAIGNUSESSOFTWARE]->(:UcoexSOFTWARE {ucoexNAME: 'Mimikatz'}) RETURN c.ucoexNAME
+1. Grammar Check: PASS - Valid Cypher grammar.
+2. NER Check: PASS - All entities from question found in Cypher. Entities: {'Mimikatz'}
+3. Schema Check: FAIL - Node label ':UCOEXCAMPAIGNUSESSOFTWARE' not found in schema.
+
+----- Validating Entry #88 -----
+Question: List all techniques that are not associated with any CAPEC patterns.
+Query: MATCH (t:UcoexMITREATTACK) WHERE NOT EXISTS((t)<-[:UCOEXHASTAXONOMYMAPPING]-()) RETURN t.ucoexNAME
+1. Grammar Check: PASS - Valid Cypher grammar.
+2. NER Check: FAIL - Entities missing from Cypher: {'CAPEC'}
+3. Schema Check: FAIL - Node label ':UCOEXHASTAXONOMYMAPPING' not found in schema.
+
+----- Validating Entry #89 -----
+Question: Find all groups that use any software.
+Query: MATCH (g:UcoexGROUPS) WHERE (g)-[:UCOEXGROUPUSESSOFTWARE]->() RETURN g.ucoexNAME
+1. Grammar Check: PASS - Valid Cypher grammar.
+2. NER Check: PASS - All entities from question found in Cypher. Entities: set()
+3. Schema Check: FAIL - Node label ':UCOEXGROUPUSESSOFTWARE' not found in schema.
+
+----- Validating Entry #90 -----
+Question: Retrieve all vulnerabilities that do not have a CVE ID assigned.
+Query: MATCH (v:UcoVulnerability) WHERE NOT (v)-[:UCOHASCVE_ID]->() RETURN v.uri
+1. Grammar Check: PASS - Valid Cypher grammar.
+2. NER Check: PASS - All entities from question found in Cypher. Entities: set()
+3. Schema Check: FAIL - Node label ':UCOHASCVE_ID' not found in schema.
