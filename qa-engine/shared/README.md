@@ -1,0 +1,246 @@
+# UCKG Schema Extraction Module
+
+## Overview
+
+This module extracts the UCKG (Unified Cybersecurity Knowledge Graph) schema from Neo4j and saves it in a structured text format for use by Text2Cypher and other QA engine components.
+
+## Files
+
+- **`schema_extract.py`** - Core extraction logic with three main classes:
+  - `SchemaExtractor`: Connects to Neo4j and extracts node labels, relationship types, and properties
+  - `SchemaFormatter`: Formats schema data into human-readable and LLM-friendly text
+  - `SchemaValidator`: Validates extracted schema for completeness and correctness
+
+- **`run_schema_extraction.py`** - Simple runner script to execute schema extraction
+- **`extract_schema_example.py`** - Example usage with Neo4j connection check and fallback
+- **`test_schema_extraction_standalone.py`** - Standalone tests (no Neo4j required)
+- **`schema_cache.txt`** - Output file containing the extracted schema (generated)
+
+## How Schema Extraction Works
+
+### 1. Connection to Neo4j
+The `SchemaExtractor` connects to your Neo4j database using provided credentials:
+```python
+extractor = SchemaExtractor(
+    uri="bolt://localhost:7687",
+    user="neo4j",
+    password="your_password"
+)
+```
+
+### 2. Schema Extraction Process
+
+The extraction happens in three steps:
+
+#### Step A: Extract Node Labels and Properties
+- Queries Neo4j for all node labels in the database
+- For each label, samples nodes to infer property types
+- Filters out excluded labels (configured in `config.py`)
+- Result: Dictionary mapping `{NodeLabel: [property1, property2, ...]}`
+
+#### Step B: Extract Relationships
+- Queries Neo4j's schema visualization: `CALL db.schema.visualization()`
+- Extracts relationship types and their source/target nodes
+- Filters out excluded relationships (configured in `config.py`)
+- Result: List of relationship patterns: `(SourceLabel)-[RELATIONSHIP_TYPE]->(TargetLabel)`
+
+#### Step C: Property Type Inference
+- Samples up to 50 nodes per label
+- Infers data types for each property (string, integer, boolean, etc.)
+- Handles missing or null properties gracefully
+
+### 3. Schema Formatting
+
+The `SchemaFormatter` converts raw schema data into two formats:
+
+#### Text Format (for LLMs and humans):
+```
+NODES:
+UcoCVE {id: string, ucovectorString: string, ucobaseSeverity: string, ...}
+UcoCWE {ucocweID: string, ucocweName: string, ucodescription: string, ...}
+...
+
+RELATIONSHIPS:
+(:UcoCVE) -[:UCOEXHASCPE]-> (:UcoexCPE)
+(:UcoExploitTarget) -[:UCOHASWEAKNESS]-> (:UcoCWE)
+...
+```
+
+#### JSON Format (for programmatic use):
+```json
+{
+  "nodes": {
+    "UcoCVE": ["id", "ucovectorString", ...],
+    "UcoCWE": ["ucocweID", "ucocweName", ...]
+  },
+  "relationships": [
+    {"source": "UcoCVE", "type": "UCOEXHASCPE", "target": "UcoexCPE"},
+    ...
+  ]
+}
+```
+
+### 4. Schema Validation
+
+The `SchemaValidator` checks:
+- ✅ All node labels have at least one property
+- ✅ All relationships have valid source and target labels
+- ✅ No duplicate labels or relationships
+- ✅ Schema is non-empty
+
+### 5. Caching
+
+The extracted schema is saved to `qa-engine/shared/schema_cache.txt` by default (configurable via `config.py`).
+
+Text2Cypher reads this cached file to avoid repeatedly querying Neo4j for schema information.
+
+## Running Schema Extraction
+
+### Option 1: Using the Runner Script
+```bash
+cd /Users/kbahlibi/my_project/UCKG/qa-engine/shared
+python3 run_schema_extraction.py
+```
+
+You'll be prompted for Neo4j credentials, and the schema will be saved to `schema_cache.txt`.
+
+### Option 2: Using the Example Script
+```bash
+cd /Users/kbahlibi/my_project/UCKG/qa-engine/shared
+python3 extract_schema_example.py
+```
+
+This includes a Neo4j connection check and demonstrates both text and JSON output formats.
+
+### Option 3: Programmatic Usage
+```python
+from schema_extract import SchemaExtractor, SchemaFormatter
+
+# Extract
+extractor = SchemaExtractor("bolt://localhost:7687", "neo4j", "password")
+schema_data = extractor.extract_full_schema()
+
+# Format
+formatter = SchemaFormatter()
+text_output = formatter.format_text(schema_data)
+json_output = formatter.format_json(schema_data)
+
+# Save
+with open("schema_cache.txt", "w") as f:
+    f.write(text_output)
+```
+
+## Configuration
+
+All configuration is in `qa-engine/text2cypher/backend/config.py`:
+
+```python
+SCHEMA_EXTRACTION_CONFIG = {
+    "default_output_file": "schema.txt",
+    "default_format": "text",  # "text", "json", or "both"
+    "property_sample_size": 50,  # Nodes sampled for type inference
+    "max_properties_per_label": 10,  # Max properties per label
+    "include_metadata": True,
+    "validate_schema": True
+}
+
+EXCLUDED_LABELS = ["OldLabel", "DeprecatedNode"]
+EXCLUDED_RELATIONSHIPS = ["OLD_RELATIONSHIP"]
+EXCLUDED_PROPERTIES = ["embedding", "embedding_processed"]
+```
+
+## Integration with Text2Cypher
+
+Text2Cypher (`qa-engine/text2cypher/backend/text2cypher.py`) reads the cached schema:
+
+```python
+def get_cybersecurity_schema(self) -> str:
+    """Read schema from cache file (generated by shared/schema_extract.py)"""
+    shared_dir = os.path.join(os.path.dirname(__file__), '..', '..', 'shared')
+    cache_path = os.path.join(shared_dir, SCHEMA_CACHE_FILENAME)
+    
+    if os.path.exists(cache_path):
+        with open(cache_path, "r") as f:
+            return f.read()
+    else:
+        print("WARNING: Schema cache not found. Run schema extraction.")
+        return self._generate_fallback_schema()
+```
+
+## Troubleshooting
+
+### Neo4j Connection Failed
+- Ensure Neo4j is running: `docker ps` or check Neo4j Desktop
+- Verify credentials in `.env` or connection string
+- Check firewall/port settings (default: 7687)
+
+### Schema Cache Not Found
+Run schema extraction manually:
+```bash
+python3 qa-engine/shared/run_schema_extraction.py
+```
+
+### Missing Properties
+Adjust `property_sample_size` in `config.py` to sample more nodes for type inference.
+
+### Excluded Labels/Relationships
+Update `EXCLUDED_LABELS` and `EXCLUDED_RELATIONSHIPS` in `config.py`.
+
+## Architecture Diagram
+
+```
+┌─────────────────┐
+│   Neo4j DB      │
+│  (UCKG Graph)   │
+└────────┬────────┘
+         │
+         │ Cypher Queries
+         ▼
+┌─────────────────────┐
+│ SchemaExtractor     │
+│ - extract_nodes()   │
+│ - extract_rels()    │
+│ - infer_types()     │
+└────────┬────────────┘
+         │
+         │ Raw Schema Data
+         ▼
+┌─────────────────────┐
+│ SchemaFormatter     │
+│ - format_text()     │
+│ - format_json()     │
+└────────┬────────────┘
+         │
+         │ Formatted Schema
+         ▼
+┌─────────────────────┐
+│ SchemaValidator     │
+│ - validate()        │
+└────────┬────────────┘
+         │
+         │ Validated Schema
+         ▼
+┌─────────────────────┐
+│ schema_cache.txt    │ ◄─── Text2Cypher reads this
+└─────────────────────┘
+```
+
+## Output Example
+
+See `schema_cache.txt` for the full output. Here's a sample:
+
+```
+NODES:
+UcoCVE {id: string, ucobaseSeverity: string, ucovectorString: string}
+UcoCWE {ucocweID: string, ucocweName: string, ucodescription: string}
+UcoexCPE {cpeName: string, cpeNameId: string, titles: string}
+
+RELATIONSHIPS:
+(:UcoCVE) -[:UCOEXHASCPE]-> (:UcoexCPE)
+(:UcoExploitTarget) -[:UCOHASWEAKNESS]-> (:UcoCWE)
+(:UcoVulnerability) -[:UCOHASCVE_ID]-> (:UcoCVE)
+```
+
+## Contact
+
+For questions or issues, please open a GitHub issue or contact the team.
