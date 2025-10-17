@@ -4,6 +4,7 @@ from pydantic import BaseModel
 from text2cypher import Text2Cypher
 # NOTE: Configuration is now environment-driven. See ``ollama_llm.OllamaLLM``.
 from llm import OllamaLLM
+from t2css_integration import create_enhanced_text2cypher
 import os
 from logger import get_logger
 
@@ -47,12 +48,20 @@ OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "llama3")
 # Instantiate LLM wrapper with resolved values.
 llm = OllamaLLM(base_url=OLLAMA_URL, model=OLLAMA_MODEL)
 
-# Instantiate Text2Cypher with V2 capabilities
-# Force reload of the module to ensure latest code is used
-import importlib
-import text2cypher
-importlib.reload(text2cypher)
-t2c = text2cypher.Text2Cypher(NEO4J_URI, NEO4J_USER, NEO4J_PASSWORD, llm)
+# Instantiate Text2Cypher with optional T2CSS based on env toggle
+USE_T2CSS = os.getenv("USE_T2CSS", "false").lower() in ("1", "true", "yes", "on")
+T2CSS_TOP_K = int(os.getenv("T2CSS_TOP_K", "10"))
+
+if USE_T2CSS:
+    logger.info(f"Initializing Text2Cypher with T2CSS (top_k={T2CSS_TOP_K})")
+    t2c = create_enhanced_text2cypher(NEO4J_URI, NEO4J_USER, NEO4J_PASSWORD, llm, use_t2css=True, top_k_schema=T2CSS_TOP_K)
+else:
+    logger.info("Initializing Text2Cypher with FULL schema (no T2CSS)")
+    # Force reload of the module to ensure latest code is used
+    import importlib
+    import text2cypher
+    importlib.reload(text2cypher)
+    t2c = text2cypher.Text2Cypher(NEO4J_URI, NEO4J_USER, NEO4J_PASSWORD, llm)
 
 # --- API Models ---
 class QueryRequest(BaseModel):

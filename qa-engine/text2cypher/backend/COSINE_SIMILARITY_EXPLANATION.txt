@@ -1,0 +1,175 @@
+================================================================================
+COSINE SIMILARITY IN T2CSS PIPELINE - DETAILED EXPLANATION
+================================================================================
+
+OVERVIEW:
+The T2CSS pipeline uses cosine similarity to find the most relevant schema 
+elements (nodes and relationships) based on the user's natural language query.
+
+================================================================================
+STEP-BY-STEP PROCESS:
+================================================================================
+
+STEP 1: GENERATE SEMANTIC TEXTS
+--------------------------------
+Each schema element is converted to a semantic text:
+
+Example Node:
+  "UcoCVE is a Common Vulnerabilities and Exposures - security vulnerabilities 
+   with unique identifiers (e.g., CVE-2023-1234) with properties: label: string, 
+   ucobaseSeverity: string, ..."
+
+Example Relationship:
+  "(:UcoCVE) -[:UCOEXHASCPE]-> (:UcoexCPE) connects vulnerabilities to affected 
+   software/hardware products"
+
+STEP 2: EMBED SCHEMA TRIPLES (lines 169-211)
+---------------------------------------------
+Each semantic text is converted to a numerical vector using Ollama's 
+'nomic-embed-text' model:
+
+  Text → Ollama API → Embedding Vector (768 dimensions)
+
+Example:
+  Input:  "UcoCVE is a Common Vulnerabilities..."
+  Output: [0.123, -0.456, 0.789, ... ] (768 numbers)
+
+Result: A matrix of embeddings
+  Schema Embeddings: [N x 768] where N = number of schema triples
+
+STEP 3: EMBED USER QUERY (lines 234-249)
+-----------------------------------------
+The user's natural language query is also embedded:
+
+  User Query: "Find all CVEs related to Microsoft"
+  → Ollama API → Query Embedding [768 dimensions]
+
+STEP 4: CALCULATE COSINE SIMILARITY (lines 270-287)
+----------------------------------------------------
+Cosine similarity measures the angle between two vectors. 
+The smaller the angle, the more similar the vectors.
+
+Mathematical Formula:
+  cosine_similarity(A, B) = (A · B) / (||A|| × ||B||)
+
+Where:
+  • A · B = dot product (sum of element-wise multiplication)
+  • ||A|| = magnitude/norm of vector A
+  • ||B|| = magnitude/norm of vector B
+
+Implementation (lines 281-286):
+  1. Normalize query vector:
+     query_norm = query_vec / (||query_vec|| + 1e-8)
+     
+  2. Normalize all schema vectors:
+     schema_norms = schema_vecs / (||schema_vecs|| + 1e-8)
+     
+  3. Calculate dot product (cosine similarity):
+     similarities = dot(schema_norms, query_norm)
+
+Result: An array of similarity scores [0, 1] for each schema triple
+  Higher score = More relevant to the query
+
+STEP 5: SELECT TOP-K ELEMENTS (lines 258-268)
+----------------------------------------------
+Sort schema triples by similarity score and select the top-k most relevant:
+
+  1. Sort similarities in descending order
+  2. Get indices of top-k highest scores
+  3. Return corresponding schema triples
+
+Example Output:
+  1. [similarity=0.856] UcoCVE is a Common Vulnerabilities...
+  2. [similarity=0.742] (:UcoCVE) -[:UCOEXHASCPE]-> (:UcoexCPE)...
+  3. [similarity=0.689] UcoexCPE is a Common Platform Enumeration...
+  ...
+
+================================================================================
+VISUAL EXAMPLE:
+================================================================================
+
+User Query: "Find CVEs affecting Microsoft products"
+↓
+Query Embedding: [0.2, 0.5, -0.3, ..., 0.1] (768-dim)
+
+Schema Triples:
+  Triple 1: "UcoCVE is a Common Vulnerabilities..."
+    Embedding: [0.3, 0.6, -0.2, ..., 0.2]
+    Cosine Similarity = 0.856 ← HIGH (very relevant!)
+    
+  Triple 2: "UcoexCPE is a Common Platform Enumeration..."
+    Embedding: [0.1, 0.4, -0.1, ..., 0.15]
+    Cosine Similarity = 0.689 ← MEDIUM (somewhat relevant)
+    
+  Triple 3: "UcoexTACTICS is a MITRE ATT&CK tactics..."
+    Embedding: [-0.5, 0.1, 0.8, ..., -0.3]
+    Cosine Similarity = 0.123 ← LOW (not relevant)
+
+Top-K Selection (K=10):
+  → Select triples 1, 2, ... (highest 10 similarity scores)
+  → Return these to build the filtered schema for the LLM prompt
+
+================================================================================
+WHY COSINE SIMILARITY?
+================================================================================
+
+1. SEMANTIC UNDERSTANDING:
+   Embeddings capture meaning, not just keywords. 
+   "CVE" and "vulnerability" have similar embeddings even though they're 
+   different words.
+
+2. SCALE INVARIANT:
+   Cosine similarity measures direction, not magnitude. Two vectors pointing 
+   in the same direction have high similarity regardless of their length.
+
+3. EFFICIENT:
+   Can be computed quickly using matrix operations (numpy.dot).
+
+4. INTERPRETABLE:
+   Scores range from 0 (orthogonal/unrelated) to 1 (identical direction).
+
+================================================================================
+TOKEN REDUCTION BENEFIT:
+================================================================================
+
+Without T2CSS:
+  Full Schema → 5000+ tokens in LLM prompt
+
+With T2CSS (top-k=10):
+  Filtered Schema → ~500 tokens in LLM prompt
+  
+  ✅ 90% token reduction!
+  ✅ Faster LLM response
+  ✅ Lower API costs
+  ✅ More focused context
+
+================================================================================
+KEY PARAMETERS:
+================================================================================
+
+top_k = 10 (default)
+  → Number of schema elements to return
+  → Higher = more context, more tokens
+  → Lower = less context, fewer tokens
+
+embedding_model = 'nomic-embed-text'
+  → Ollama model for generating embeddings
+  → 768-dimensional embeddings
+  → Fast and accurate for semantic search
+
+similarity_threshold (optional)
+  → Could filter out low-similarity elements
+  → Currently not implemented (uses top-k only)
+
+================================================================================
+CACHING:
+================================================================================
+
+Schema embeddings are cached to 'schema_embeddings.json':
+  • Computed once when pipeline initializes
+  • Reused for all subsequent queries
+  • Only query embedding needs to be computed per request
+  
+This makes filtering very fast: ~10-50ms per query!
+
+================================================================================

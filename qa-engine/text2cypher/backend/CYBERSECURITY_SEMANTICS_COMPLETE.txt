@@ -1,0 +1,247 @@
+================================================================================
+COMPLETE CYBERSECURITY SEMANTIC SCHEMA
+================================================================================
+
+================================================================================
+NODE TYPES WITH PROPERTIES AND SEMANTIC DESCRIPTIONS
+================================================================================
+
+1. UcoCVE
+   Semantic: Common Vulnerabilities and Exposures - security vulnerabilities with unique identifiers (e.g., CVE-2023-1234)
+   Properties (10):
+      - label: string
+      - ucobaseSeverity: string
+      - ucoevaluatorSolution: string
+      - ucoexploitabilityScore: string
+      - ucoimpactScore: string
+      - ucoobtainAllPrivilege: string
+      - ucouserInteractionRequired: string
+      - ucovectorString: string
+      - ucovulnStatus: string
+      - uri: string
+
+2. UcoCWE
+   Semantic: Common Weakness Enumeration - software weakness types and categories (e.g., CWE-79 for XSS)
+   Properties (20):
+      - ucoabstraction: string
+      - ucoapplicablePlatform: string
+      - ucocommonConsequences: string
+      - ucocweExtendedSummary: string
+      - ucocweID: string
+      - ucocweName: string
+      - ucocweSummary: string
+      - ucodemonstrativeExamples: string
+      - ucodescription: string
+      - ucodetectionMethods: string
+      - ucolikelihoodOfExploit: string
+      - ucomappingNotes: string
+      - ucomodesOfIntroduction: string
+      - ucopotentialMitigations: string
+      - ucoreferences: string
+      - ucorelatedAttackPatterns: string
+      - ucostatus: string
+      - ucostructure: string
+      - ucotimeOfIntroduction: unknown
+      - uri: string
+
+3. UcoExploitTarget
+   Semantic: Target systems or applications that can be exploited by vulnerabilities
+   Properties (1):
+      - uri: string
+
+4. UcoVulnerability
+   Semantic: Generic vulnerability information with publication and modification dates
+   Properties (4):
+      - ucolastModifiedDateTime: unknown
+      - ucopublishedDateTime: unknown
+      - ucosummary: string
+      - uri: string
+
+5. UcoexCAMPAIGNS
+   Semantic: Cybersecurity campaigns - coordinated attack activities by threat groups
+   Properties (5):
+      - ucoexDESCRIPTION: string
+      - ucoexDOMAIN: string
+      - ucoexNAME: string
+      - ucoexURL: string
+      - uri: string
+
+6. UcoexCAPEC
+   Semantic: Common Attack Pattern Enumeration and Classification - attack patterns and techniques used by adversaries
+   Properties (19):
+      - label: string
+      - ucoexAbstraction: string
+      - ucoexCAPEC_id: string
+      - ucoexCAPEC_name: string
+      - ucoexConsequences: list<string>
+      - ucoexDescription: string
+      - ucoexExample: list<string>
+      - ucoexExecutionFlowTechnique: list<string>
+      - ucoexExtendedDescription: list<string>
+      - ucoexLikelihood: string
+      - ucoexMitigations: list<string>
+      - ucoexPrerequisites: list<string>
+      - ucoexRelatedAttPattern: list<string>
+      - ucoexRelatedWeaknesses: list<string>
+      - ucoexResources_Required: list<string>
+      - ucoexSeverity: string
+      - ucoexSkills_Required: list<string>
+      - ucoexTaxonomyMappingATTACK: list<string>
+      - uri: string
+
+7. UcoexCPE
+   Semantic: Common Platform Enumeration - software and hardware products with standardized names (e.g., microsoft:windows)
+   Properties (6):
+      - cpeName: string
+      - cpeNameId: string
+      - dictionary_found: boolean
+      - lastModified: unknown
+      - titles: string
+      - uri: string
+
+8. UcoexGROUPS
+   Semantic: Threat actor groups and organizations conducting cyber attacks
+   Properties (5):
+      - ucoexDESCRIPTION: string
+      - ucoexDOMAIN: string
+      - ucoexNAME: string
+      - ucoexURL: string
+      - uri: string
+
+9. UcoexMITIGATIONS
+   Semantic: Defensive techniques and countermeasures against attacks
+   Properties (5):
+      - ucoexDESCRIPTION: string
+      - ucoexDOMAIN: string
+      - ucoexNAME: string
+      - ucoexURL: string
+      - uri: string
+
+10. UcoexMITREATTACK
+   Semantic: MITRE ATT&CK framework techniques, tactics, and procedures used by adversaries
+   Properties (5):
+      - ucoexDESCRIPTION: string
+      - ucoexDOMAIN: string
+      - ucoexNAME: string
+      - ucoexURL: string
+      - uri: string
+
+11. UcoexMITRED3FEND
+   Semantic: MITRE D3FEND framework defensive techniques and countermeasures
+   Properties (3):
+      - ucoexMITRED3FEND_DEFINITION: string
+      - ucoexMITRED3FEND_LABEL: string
+      - uri: string
+
+12. UcoexObservedExample
+   Semantic: Real-world examples of vulnerabilities and attacks being observed
+   Properties (2):
+      - ucoexDESCRIPTION: string
+      - uri: string
+
+13. UcoexSOFTWARE
+   Semantic: Software applications and tools used in cybersecurity contexts
+   Properties (5):
+      - ucoexDESCRIPTION: string
+      - ucoexDOMAIN: string
+      - ucoexNAME: string
+      - ucoexURL: string
+      - uri: string
+
+14. UcoexTACTICS
+   Semantic: MITRE ATT&CK tactics - high-level adversary goals and objectives
+   Properties (5):
+      - ucoexDESCRIPTION: string
+      - ucoexDOMAIN: string
+      - ucoexNAME: string
+      - ucoexURL: string
+      - uri: string
+
+
+================================================================================
+RELATIONSHIP TYPES WITH SEMANTIC DESCRIPTIONS
+================================================================================
+
+1. (:UcoCVE) -[:UCOEXHASCPE]-> (:UcoexCPE)
+   Type: UCOEXHASCPE
+   Semantic: Vulnerability affects specific software/hardware products - connects CVEs to CPEs
+   Pattern: (UcoCVE) --[UCOEXHASCPE]--> (UcoexCPE)
+
+2. (:UcoCWE) -[:UCOHASOBSERVEDEXAMPLE]-> (:UcoexObservedExample)
+   Type: UCOHASOBSERVEDEXAMPLE
+   Semantic: Weakness has real-world observed examples - connects CWEs to observed examples
+   Pattern: (UcoCWE) --[UCOHASOBSERVEDEXAMPLE]--> (UcoexObservedExample)
+
+3. (:UcoExploitTarget) -[:UCOHASVULNERABILITY]-> (:UcoVulnerability)
+   Type: UCOHASVULNERABILITY
+   Semantic: Exploit target has specific vulnerability - connects targets to vulnerabilities
+   Pattern: (UcoExploitTarget) --[UCOHASVULNERABILITY]--> (UcoVulnerability)
+
+4. (:UcoExploitTarget) -[:UCOHASWEAKNESS]-> (:UcoCWE)
+   Type: UCOHASWEAKNESS
+   Semantic: Exploit target has specific weakness - connects targets to CWEs
+   Pattern: (UcoExploitTarget) --[UCOHASWEAKNESS]--> (UcoCWE)
+
+5. (:UcoVulnerability) -[:UCOHASCVE_ID]-> (:UcoCVE)
+   Type: UCOHASCVE_ID
+   Semantic: Vulnerability has specific CVE identifier - connects vulnerabilities to CVEs
+   Pattern: (UcoVulnerability) --[UCOHASCVE_ID]--> (UcoCVE)
+
+6. (:UcoexCAMPAIGNS) -[:UCOEXATTRIBUTEDTO]-> (:UcoexGROUPS)
+   Type: UCOEXATTRIBUTEDTO
+   Semantic: Campaign is attributed to specific threat group - connects campaigns to groups
+   Pattern: (UcoexCAMPAIGNS) --[UCOEXATTRIBUTEDTO]--> (UcoexGROUPS)
+
+7. (:UcoexCAMPAIGNS) -[:UCOEXCAMPAIGNUSESSOFTWARE]-> (:UcoexSOFTWARE)
+   Type: UCOEXCAMPAIGNUSESSOFTWARE
+   Semantic: Campaign uses specific software/tools - connects campaigns to software
+   Pattern: (UcoexCAMPAIGNS) --[UCOEXCAMPAIGNUSESSOFTWARE]--> (UcoexSOFTWARE)
+
+8. (:UcoexCAMPAIGNS) -[:UCOEXCAMPAIGNUSESTECHNIQUE]-> (:UcoexMITREATTACK)
+   Type: UCOEXCAMPAIGNUSESTECHNIQUE
+   Semantic: Campaign employs specific attack technique - connects campaigns to techniques
+   Pattern: (UcoexCAMPAIGNS) --[UCOEXCAMPAIGNUSESTECHNIQUE]--> (UcoexMITREATTACK)
+
+9. (:UcoexCAPEC) -[:UCOEXHASRELATEDWEAKNESS]-> (:UcoCWE)
+   Type: UCOEXHASRELATEDWEAKNESS
+   Semantic: Attack pattern exploits specific weakness - connects CAPECs to CWEs
+   Pattern: (UcoexCAPEC) --[UCOEXHASRELATEDWEAKNESS]--> (UcoCWE)
+
+10. (:UcoexCAPEC) -[:UCOEXHASTAXONOMYMAPPING]-> (:UcoexMITREATTACK)
+   Type: UCOEXHASTAXONOMYMAPPING
+   Semantic: Attack pattern maps to specific MITRE technique - connects CAPECs to techniques
+   Pattern: (UcoexCAPEC) --[UCOEXHASTAXONOMYMAPPING]--> (UcoexMITREATTACK)
+
+11. (:UcoexGROUPS) -[:UCOEXGROUPUSESSOFTWARE]-> (:UcoexSOFTWARE)
+   Type: UCOEXGROUPUSESSOFTWARE
+   Semantic: Threat group uses specific software/tools - connects groups to software
+   Pattern: (UcoexGROUPS) --[UCOEXGROUPUSESSOFTWARE]--> (UcoexSOFTWARE)
+
+12. (:UcoexGROUPS) -[:UCOEXGROUPUSESTECHNIQUE]-> (:UcoexMITREATTACK)
+   Type: UCOEXGROUPUSESTECHNIQUE
+   Semantic: Threat group employs specific attack technique - connects groups to techniques
+   Pattern: (UcoexGROUPS) --[UCOEXGROUPUSESTECHNIQUE]--> (UcoexMITREATTACK)
+
+13. (:UcoexMITIGATIONS) -[:UCOEXMITIGATES]-> (:UcoexMITREATTACK)
+   Type: UCOEXMITIGATES
+   Semantic: Mitigation technique counters specific attack - connects mitigations to techniques
+   Pattern: (UcoexMITIGATIONS) --[UCOEXMITIGATES]--> (UcoexMITREATTACK)
+
+14. (:UcoexMITRED3FEND) -[:UCOEXHASMITREATTACK]-> (:UcoexMITREATTACK)
+   Type: UCOEXHASMITREATTACK
+   Semantic: D3FEND technique relates to specific MITRE technique - connects D3FEND to techniques
+   Pattern: (UcoexMITRED3FEND) --[UCOEXHASMITREATTACK]--> (UcoexMITREATTACK)
+
+15. (:UcoexObservedExample) -[:UCOEXEXAMPLEOBSERVEDIN]-> (:UcoCVE)
+   Type: UCOEXEXAMPLEOBSERVEDIN
+   Semantic: Observed example is found in specific CVE - connects examples to CVEs
+   Pattern: (UcoexObservedExample) --[UCOEXEXAMPLEOBSERVEDIN]--> (UcoCVE)
+
+16. (:UcoexSOFTWARE) -[:UCOEXSOFTWAREUSESTECHNIQUE]-> (:UcoexMITREATTACK)
+   Type: UCOEXSOFTWAREUSESTECHNIQUE
+   Semantic: Software uses specific attack technique - connects software to techniques
+   Pattern: (UcoexSOFTWARE) --[UCOEXSOFTWAREUSESTECHNIQUE]--> (UcoexMITREATTACK)
+
+================================================================================
+SUMMARY: 14 Node Types, 16 Relationship Types
+================================================================================

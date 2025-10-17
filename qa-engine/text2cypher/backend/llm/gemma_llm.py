@@ -1,6 +1,9 @@
 from __future__ import annotations
 
-from gemma_mps import load_model, generate
+try:
+    from gemma_mps import load_model, generate  # type: ignore
+except Exception as e:  # pragma: no cover - optional dependency
+    raise ImportError("Gemma dependencies are not installed. Use OllamaLLM or install Gemma support.") from e
 
 class GemmaLLM:
     """Light wrapper so Text2Cypher can call .invoke(prompt)."""

@@ -15,13 +15,13 @@ dist/
 .env.test.local
 .env.production.local
 
-# IDE files
+# IDE
 .vscode/
 .idea/
 *.swp
 *.swo
 
-# OS files
+# OS
 .DS_Store
 Thumbs.db
 

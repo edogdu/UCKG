@@ -157,6 +157,43 @@ SCHEMA_EXTRACTION_CONFIG = {
     "validate_schema": True,  # Run schema validation after extraction
 }
 
+# Semantic mapping for cybersecurity domain elements (only nodes/relationships that exist in schema)
+CYBERSECURITY_SEMANTICS = {
+    # Node Labels with semantic descriptions (from actual schema)
+    "UcoCVE": "Common Vulnerabilities and Exposures - security vulnerabilities with unique identifiers (e.g., CVE-2023-1234)",
+    "UcoCWE": "Common Weakness Enumeration - software weakness types and categories (e.g., CWE-79 for XSS)",
+    "UcoExploitTarget": "Target systems or applications that can be exploited by vulnerabilities",
+    "UcoVulnerability": "Generic vulnerability information with publication and modification dates",
+    "UcoexCAMPAIGNS": "Cybersecurity campaigns - coordinated attack activities by threat groups",
+    "UcoexCAPEC": "Common Attack Pattern Enumeration and Classification - attack patterns and techniques used by adversaries",
+    "UcoexCPE": "Common Platform Enumeration - software and hardware products with standardized names (e.g., microsoft:windows)",
+    "UcoexGROUPS": "Threat actor groups and organizations conducting cyber attacks",
+    "UcoexMITIGATIONS": "Defensive techniques and countermeasures against attacks",
+    "UcoexMITREATTACK": "MITRE ATT&CK framework techniques, tactics, and procedures used by adversaries",
+    "UcoexMITRED3FEND": "MITRE D3FEND framework defensive techniques and countermeasures",
+    "UcoexObservedExample": "Real-world examples of vulnerabilities and attacks being observed",
+    "UcoexSOFTWARE": "Software applications and tools used in cybersecurity contexts",
+    "UcoexTACTICS": "MITRE ATT&CK tactics - high-level adversary goals and objectives",
+    
+    # Relationship Types with semantic descriptions (from actual schema)
+    "UCOEXHASCPE": "Vulnerability affects specific software/hardware products - connects CVEs to CPEs",
+    "UCOHASOBSERVEDEXAMPLE": "Weakness has real-world observed examples - connects CWEs to observed examples",
+    "UCOHASVULNERABILITY": "Exploit target has specific vulnerability - connects targets to vulnerabilities",
+    "UCOHASWEAKNESS": "Exploit target has specific weakness - connects targets to CWEs",
+    "UCOHASCVE_ID": "Vulnerability has specific CVE identifier - connects vulnerabilities to CVEs",
+    "UCOEXATTRIBUTEDTO": "Campaign is attributed to specific threat group - connects campaigns to groups",
+    "UCOEXCAMPAIGNUSESSOFTWARE": "Campaign uses specific software/tools - connects campaigns to software",
+    "UCOEXCAMPAIGNUSESTECHNIQUE": "Campaign employs specific attack technique - connects campaigns to techniques",
+    "UCOEXHASRELATEDWEAKNESS": "Attack pattern exploits specific weakness - connects CAPECs to CWEs",
+    "UCOEXHASTAXONOMYMAPPING": "Attack pattern maps to specific MITRE technique - connects CAPECs to techniques",
+    "UCOEXGROUPUSESSOFTWARE": "Threat group uses specific software/tools - connects groups to software",
+    "UCOEXGROUPUSESTECHNIQUE": "Threat group employs specific attack technique - connects groups to techniques",
+    "UCOEXMITIGATES": "Mitigation technique counters specific attack - connects mitigations to techniques",
+    "UCOEXHASMITREATTACK": "D3FEND technique relates to specific MITRE technique - connects D3FEND to techniques",
+    "UCOEXEXAMPLEOBSERVEDIN": "Observed example is found in specific CVE - connects examples to CVEs",
+    "UCOEXSOFTWAREUSESTECHNIQUE": "Software uses specific attack technique - connects software to techniques"
+}
+
 # Prompt templates and examples
 FEW_SHOT_EXAMPLES = """
 EXAMPLES FOR CYBERSECURITY KNOWLEDGE GRAPH (PROPERTY AND RELATIONSHIP QUERIES):

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import './App.css';
 import text2CypherAPI from './api';
+import sampleQueriesData from './sampleQueries.json';
 
 function App() {
   const [query, setQuery] = useState('');
@@ -41,39 +42,8 @@ function App() {
     setCurrentPage(page);
   };
 
-  // V4 Enhanced Sample Queries showcasing all features
-  const sampleQueries = [
-    // V4 Bidirectional Path Queries
-    "Show CVEs with their related CPE entries",
-    "Find CAPEC patterns related to CWE weaknesses",
-    "Show threat groups and their attack techniques",
-    "Find CVEs affecting the same platform",
-    
-    // V4 Advanced Queries
-    "Find groups and software using the same technique",
-    "Show campaign attribution to attack techniques",
-    "Find CVEs affecting same platform with weaknesses",
-    "Show mitigations for group techniques",
-    "Show CVEs with HIGH severity",
-    "Find CWE weaknesses with Draft status",
-    "Show CAPEC patterns with High severity",
-    "Find threat groups in enterprise-attack domain",
-    
-    // V4 Error Handling Examples
-    "Find non-existent data",
-    "Show invalid query example",
-    "Find CVEs from future year 2030",
-    
-    // V4 Advanced Queries
-    "Find CVEs with exploitability score greater than 8",
-    "Show CVEs that require user interaction",
-    "Find CWE weakness with ID CWE-1004",
-    "Find CAPEC pattern with ID 1",
-    "Find CPE entries for Microsoft products",
-    "Find CVEs that can obtain all privileges",
-    "Find groups using specific MITRE techniques",
-    "Show software used by specific threat groups"
-  ];
+  // Categorized sample queries aligned with the current schema
+  const categorizedSamples = sampleQueriesData;
 
   // Load query history from localStorage on component mount
   useEffect(() => {
@@ -309,55 +279,25 @@ function App() {
 
                 {activeTab === 'query' && (
                   <div className="v4-content">
-                    <h4>V4 Enhanced Query Categories</h4>
+                    <h4>Schema-valid Query Categories</h4>
                     <div className="query-categories">
-                      <div className="category">
-                        <h5>🔄 Bidirectional Paths</h5>
-                        <div className="sample-grid">
-                          {sampleQueries.slice(0, 4).map((sample, index) => (
-                            <button
-                              key={index}
-                              className="sample-button bidirectional"
-                              onClick={() => handleSampleQuery(sample)}
-                              disabled={loading}
-                            >
-                              {sample}
-                            </button>
-                          ))}
+                      {Object.entries(categorizedSamples).map(([category, queries]) => (
+                        <div className="category" key={category}>
+                          <h5>{category}</h5>
+                          <div className="sample-grid">
+                            {queries.map((sample, index) => (
+                              <button
+                                key={category + index}
+                                className="sample-button"
+                                onClick={() => handleSampleQuery(sample)}
+                                disabled={loading}
+                              >
+                                {sample}
+                              </button>
+                            ))}
+                          </div>
                         </div>
-                      </div>
-                      
-                      <div className="category">
-                        <h5>🚀 Advanced Queries</h5>
-                        <div className="sample-grid">
-                          {sampleQueries.slice(4, 12).map((sample, index) => (
-                            <button
-                              key={index + 4}
-                              className="sample-button advanced"
-                              onClick={() => handleSampleQuery(sample)}
-                              disabled={loading}
-                            >
-                              {sample}
-                            </button>
-                          ))}
-                        </div>
-                      </div>
-                      
-                      <div className="category">
-                        <h5>⚠️ Error Handling Examples</h5>
-                        <div className="sample-grid">
-                          {sampleQueries.slice(12, 15).map((sample, index) => (
-                            <button
-                              key={index + 12}
-                              className="sample-button error-demo"
-                              onClick={() => handleSampleQuery(sample)}
-                              disabled={loading}
-                            >
-                              {sample}
-                            </button>
-                          ))}
-                        </div>
-                      </div>
+                      ))}
                     </div>
                   </div>
                 )}
@@ -502,57 +442,27 @@ function App() {
               </div>
             )}
 
-            {/* Sample Queries Section */}
+            {/* Sample Queries Section (categorized) */}
             <div className="sample-queries">
-              <h3>Try these V4 enhanced cybersecurity queries:</h3>
+              <h3>Try schema-valid query examples by category:</h3>
               <div className="query-categories">
-                <div className="category">
-                  <h4>🔄 Bidirectional Paths</h4>
-                  <div className="sample-grid">
-                    {sampleQueries.slice(0, 4).map((sample, index) => (
-                      <button
-                        key={index}
-                        className="sample-button bidirectional"
-                        onClick={() => handleSampleQuery(sample)}
-                        disabled={loading}
-                      >
-                        {sample}
-                      </button>
-                    ))}
+                {Object.entries(categorizedSamples).map(([category, queries]) => (
+                  <div className="category" key={category}>
+                    <h4>{category}</h4>
+                    <div className="sample-grid">
+                      {queries.map((sample, index) => (
+                        <button
+                          key={category + index}
+                          className="sample-button"
+                          onClick={() => handleSampleQuery(sample)}
+                          disabled={loading}
+                        >
+                          {sample}
+                        </button>
+                      ))}
+                    </div>
                   </div>
-                </div>
-                
-                <div className="category">
-                  <h4>🚀 Advanced Queries</h4>
-                  <div className="sample-grid">
-                    {sampleQueries.slice(4, 12).map((sample, index) => (
-                      <button
-                        key={index + 4}
-                        className="sample-button advanced"
-                        onClick={() => handleSampleQuery(sample)}
-                        disabled={loading}
-                      >
-                        {sample}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-                
-                <div className="category">
-                  <h4>⚠️ Error Handling</h4>
-                  <div className="sample-grid">
-                    {sampleQueries.slice(12, 15).map((sample, index) => (
-                      <button
-                        key={index + 12}
-                        className="sample-button error-demo"
-                        onClick={() => handleSampleQuery(sample)}
-                        disabled={loading}
-                      >
-                        {sample}
-                      </button>
-                    ))}
-                  </div>
-                </div>
+                ))}
               </div>
             </div>
 
