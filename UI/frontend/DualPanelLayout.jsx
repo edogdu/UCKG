@@ -41,7 +41,12 @@ export default function DualPanelLayout() {
             properties: {
               ...node.properties,
               isRAGResult: true,
-              score: node.score
+              score: node.score,
+              nodeId: node.id, // Add node ID for easy reference
+              nodeType: node.type || node.nodeType || 'Unknown',
+              mode: 'graphrag',
+              // Add content if available
+              ...(node.content && { content: node.content })
             },
             // Use Context7 NVL color mapping based on score
             color: node.color || getRAGScoreColor(node.score),
@@ -118,8 +123,8 @@ export default function DualPanelLayout() {
   };
 
   const getRAGScoreSize = (score) => {
-    const baseSize = 60;
-    const maxSize = 140;
+    const baseSize = 20;
+    const maxSize = 40;
     return baseSize + ((score || 0) * (maxSize - baseSize));
   };
 

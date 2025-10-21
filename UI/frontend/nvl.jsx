@@ -17,10 +17,15 @@ function mergeElements(oldArr, newArr, key = 'id') {
   return Array.from(map.values());
 }
 
-// Filters relationships to only those with valid node IDs.
+// Filters relationships to only those with valid node IDs and adds caption styling
 function filterValidRelationships(nodes, relationships) {
   const nodeIds = new Set(nodes.map(n => String(n.id)));
-  return relationships.filter(r => nodeIds.has(String(r.from)) && nodeIds.has(String(r.to)));
+  return relationships
+    .filter(r => nodeIds.has(String(r.from)) && nodeIds.has(String(r.to)))
+    .map(r => ({
+      ...r,
+      captionSize: 2  // Smaller text size for relationships
+    }));
 }
 
 // Converts graph data to table format for data view
@@ -53,11 +58,15 @@ function convertGraphToTableData(nodes, relationships) {
 }
 
 // Formats values for display in a more readable way
-function formatValue(value) {
+function formatValue(value, key) {
   if (value === null || value === undefined) {
     return 'null';
   }
   if (typeof value === 'string') {
+    // Only make URIs clickable if the property key is 'uri' or 'URI'
+    if (key && key.toLowerCase() === 'uri' && isURL(value)) {
+      return `<a href="${value}" target="_blank" rel="noopener noreferrer" style="color: #3b82f6; text-decoration: underline; word-break: break-all;">${value}</a>`;
+    }
     return value;
   }
   if (typeof value === 'number') {
@@ -73,6 +82,92 @@ function formatValue(value) {
     return JSON.stringify(value, null, 2);
   }
   return String(value);
+}
+
+// Check if a string is a valid URL
+function isURL(str) {
+  if (!str || typeof str !== 'string') return false;
+
+  // Check for common URL patterns
+  const urlPattern = /^(https?:\/\/|http:\/\/|ftp:\/\/)/i;
+
+  // Also check for URIs like "urn:", "uco:", etc.
+  const uriPattern = /^[a-z][a-z0-9+.-]*:/i;
+
+  return urlPattern.test(str) || uriPattern.test(str);
+}
+
+// Clean property names by removing technical prefixes
+function cleanPropertyName(prop) {
+  // Remove common prefixes (order matters - longer prefixes first)
+  const prefixesToRemove = [
+    'ucoexMITRED3FEND_',
+    'ucocweExtended',
+    'ucocwe',
+    'ucoex',
+    'ucobase',  // For ucobaseSeverity
+    'uco',
+    'cpe'
+  ];
+
+  let cleanName = prop;
+  for (const prefix of prefixesToRemove) {
+    if (cleanName.toLowerCase().startsWith(prefix.toLowerCase())) {
+      cleanName = cleanName.substring(prefix.length);
+      break;
+    }
+  }
+
+  // Handle special cases and capitalize
+  const upperClean = cleanName.toUpperCase();
+  if (['DESCRIPTION', 'DOMAIN', 'NAME'].includes(upperClean)) {
+    return cleanName.charAt(0).toUpperCase() + cleanName.slice(1).toLowerCase();
+  } else if (['summary', 'Summary'].includes(cleanName)) {
+    return 'Summary';
+  } else if (['DEFINITION', 'LABEL'].includes(cleanName)) {
+    return cleanName.charAt(0).toUpperCase() + cleanName.slice(1).toLowerCase();
+  } else if (cleanName === 'Name') {  // for cpeName
+    return 'Name';
+  }
+
+  // Default: capitalize first letter
+  return cleanName ? cleanName.charAt(0).toUpperCase() + cleanName.slice(1) : prop;
+}
+
+// Property filtering function - removes embedding-related properties for display
+function filterProperties(properties) {
+  if (!properties || typeof properties !== 'object') {
+    return properties;
+  }
+  
+  const filtered = {};
+  
+  // Define embedding-related property patterns
+  const embeddingKeyPatterns = [
+    'embedding', 'embeddings', 'vector', 'vectors', 
+    'embedding_vector', 'text_embedding', 'node_embedding', 
+    'content_embedding', 'semantic_embedding'
+  ];
+  
+  Object.entries(properties).forEach(([key, value]) => {
+    const keyLower = key.toLowerCase();
+    
+    // Skip if key contains embedding-related terms
+    const isEmbeddingKey = embeddingKeyPatterns.some(pattern => 
+      keyLower.includes(pattern.toLowerCase())
+    );
+    
+    // Skip if value is an array of numbers (likely an embedding vector)
+    const isEmbeddingArray = Array.isArray(value) && 
+      value.length > 10 && // Embeddings are typically long arrays
+      value.every(v => typeof v === 'number');
+    
+    if (!isEmbeddingKey && !isEmbeddingArray) {
+      filtered[key] = value;
+    }
+  });
+  
+  return filtered;
 }
 
 export default function Nvl({ initialNodes = [], initialRels = [], minimal = false }) {
@@ -221,11 +316,30 @@ export default function Nvl({ initialNodes = [], initialRels = [], minimal = fal
     // },
     onNodeClick: (node, hitTargets, evt) => {
       if (node?.properties) {
-        setSidePanel(
-          Object.entries(node.properties)
-            .map(([k, v]) => '<b>' + k + '</b>: ' + v)
-            .join('<br>')
-        );
+        // Filter out unwanted properties before displaying
+        const filteredProperties = filterProperties(node.properties);
+
+        // Generate structured HTML
+        const propsHTML = `
+          <div class="props-header">
+            <h4 class="props-title">Node Properties</h4>
+          </div>
+          <div class="props-content">
+            ${Object.entries(filteredProperties).map(([key, value]) => {
+              const cleanKey = cleanPropertyName(key);
+              const formattedValue = formatValue(value, key);
+
+              return `
+                <div class="prop-item">
+                  <span class="prop-key">${cleanKey}</span>
+                  <div class="prop-value">${formattedValue}</div>
+                </div>
+              `;
+            }).join('')}
+          </div>
+        `;
+
+        setSidePanel(propsHTML);
       } else {
         setSidePanel('');
       }
@@ -262,8 +376,14 @@ export default function Nvl({ initialNodes = [], initialRels = [], minimal = fal
         // Expand: show this node and its relationships via API
         const result = await expandNode(nodeId);
         if (result.type === 'graph') {
+          // Add default size to expanded nodes if they don't have one
+          const normalizedNodes = result.nodes.map(n => ({
+            ...n,
+            size: n.size || 30 // Set default size for expanded nodes
+          }));
+
           setNodes(prevNodes => {
-            const mergedNodes = mergeElements(prevNodes, result.nodes);
+            const mergedNodes = mergeElements(prevNodes, normalizedNodes);
             setRels(prevRels => {
               const mergedRels = mergeElements(prevRels, result.relationships);
               return filterValidRelationships(mergedNodes, mergedRels);
@@ -276,11 +396,30 @@ export default function Nvl({ initialNodes = [], initialRels = [], minimal = fal
     },
     onRelationshipClick: (rel, hitTargets, evt) => {
       if (rel?.properties) {
-        setSidePanel(
-          Object.entries(rel.properties)
-            .map(([k, v]) => '<b>' + k + '</b>: ' + v)
-            .join('<br>')
-        );
+        // Filter out unwanted properties before displaying
+        const filteredProperties = filterProperties(rel.properties);
+
+        // Generate structured HTML
+        const propsHTML = `
+          <div class="props-header">
+            <h4 class="props-title">Relationship Properties</h4>
+          </div>
+          <div class="props-content">
+            ${Object.entries(filteredProperties).map(([key, value]) => {
+              const cleanKey = cleanPropertyName(key);
+              const formattedValue = formatValue(value, key);
+
+              return `
+                <div class="prop-item">
+                  <span class="prop-key">${cleanKey}</span>
+                  <div class="prop-value">${formattedValue}</div>
+                </div>
+              `;
+            }).join('')}
+          </div>
+        `;
+
+        setSidePanel(propsHTML);
       } else {
         setSidePanel('');
       }
@@ -503,9 +642,13 @@ export default function Nvl({ initialNodes = [], initialRels = [], minimal = fal
             mouseEventCallbacks={mouseEventCallbacks}
             nvlOptions={{
               layout: { name: 'forceDirected' },
-              relationship: { showArrows: true, arrowColor: 'black', arrowSize: 12 },
+              relationship: {
+                showArrows: true,
+                arrowColor: 'black',
+                arrowSize: 12
+              },
               interaction: { dragBackground: true, zoom: true, dragNodes: true },
-              node: { 
+              node: {
                 preserveColors: true,
                 color: 'auto',
                 hoverColor: 'auto',
@@ -527,7 +670,7 @@ export default function Nvl({ initialNodes = [], initialRels = [], minimal = fal
               <div className='result-table'>
                 {queryResult.map((record, index) => (
                   <div key={index} className='result-record'>
-                    {Object.entries(record).map(([key, value]) => (
+                    {Object.entries(filterProperties(record)).map(([key, value]) => (
                       <div key={key} className='result-field'>
                         <strong>{key}:</strong> {formatValue(value)}
                       </div>

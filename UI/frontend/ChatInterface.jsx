@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { executeRAGQuery, executeText2Cypher } from './connection';
+import Markdown from 'react-markdown';
 
 export default function ChatInterface({ onGraphUpdate, onModeChange }) {
   const [messages, setMessages] = useState([
@@ -60,23 +61,38 @@ export default function ChatInterface({ onGraphUpdate, onModeChange }) {
         setMessages(prev => [...prev, assistantMessage]);
 
       } else if (queryMode === 'text2cypher') {
-        // Use Text2Cypher query
+        // Use Text2Cypher query (LangChain pattern)
         result = await executeText2Cypher(inputValue);
 
-        // Update graph with Cypher results
-        if (result.execution_result && onGraphUpdate) {
-          onGraphUpdate(result.execution_result, 'cypher');
+        console.log('Text2Cypher result:', result);
+        console.log('Graph data:', result.graph_data);
+        console.log('Nodes:', result.graph_data?.nodes?.length || 0);
+        console.log('Relationships:', result.graph_data?.relationships?.length || 0);
+
+        // Update graph with visualization data from Python backend
+        if (result.graph_data && result.graph_data.nodes && result.graph_data.nodes.length > 0 && onGraphUpdate) {
+          console.log('✓ Calling onGraphUpdate with:', result.graph_data);
+          console.log('  - Nodes:', result.graph_data.nodes.length);
+          console.log('  - Relationships:', result.graph_data.relationships.length);
+          onGraphUpdate(result.graph_data, 'cypher');
+        } else {
+          if (!result.graph_data) {
+            console.warn('⚠ No graph_data in result');
+          } else if (!result.graph_data.nodes || result.graph_data.nodes.length === 0) {
+            console.warn('⚠ No nodes in graph_data - query returned non-graph results');
+          } else if (!onGraphUpdate) {
+            console.warn('⚠ No onGraphUpdate callback');
+          }
         }
 
-        // Create assistant response
+        // Create assistant response with LLM-generated answer
         const assistantMessage = {
           type: 'assistant',
-          text: `I converted your question to this Cypher query:\n\n\`\`\`cypher\n${result.cypher_query}\n\`\`\`\n\n${result.explanation}`,
-          cypherQuery: result.cypher_query,
-          explanation: result.explanation,
+          text: result.answer,  // LLM-generated natural language response
+          cypherQuery: result.cypher_query,  // Available for debugging
           confidence: result.confidence || 0,
-          executionResult: result.execution_result,
-          timestamp: Date.now()
+          timestamp: Date.now(),
+          hasGraphData: result.graph_data && result.graph_data.nodes && result.graph_data.nodes.length > 0
         };
 
         setMessages(prev => [...prev, assistantMessage]);
@@ -119,21 +135,15 @@ export default function ChatInterface({ onGraphUpdate, onModeChange }) {
 
     return (
       <div className="message-sources">
-        <h5>Sources:</h5>
-        {sources.map((source, index) => (
-          <div key={index} className="source-item">
-            <strong>{source.node_label}</strong>
-            {source.score && (
-              <span className="source-score">
-                (Score: {source.score.toFixed(3)})
-              </span>
-            )}
-            <div className="source-content">
-              {source.content.substring(0, 150)}
-              {source.content.length > 150 && '...'}
+        <div className="sources-header">Sources</div>
+        <div className="sources-list">
+          {sources.map((source, index) => (
+            <div key={index} className="source-chip">
+              <span className="source-label">{source.label}</span>
+              <span className="source-score">{source.score}</span>
             </div>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
     );
   };
@@ -157,9 +167,9 @@ export default function ChatInterface({ onGraphUpdate, onModeChange }) {
           <button
             className={`mode-btn ${queryMode === 'rag' ? 'active' : ''}`}
             onClick={() => handleModeChange('rag')}
-            title="Use RAG (Retrieval Augmented Generation) for contextual answers"
+            title="Use GraphRAG (Graph Retrieval Augmented Generation) for contextual answers"
           >
-            RAG Mode
+            GraphRAG Mode
           </button>
           <button
             className={`mode-btn ${queryMode === 'text2cypher' ? 'active' : ''}`}
@@ -189,7 +199,7 @@ export default function ChatInterface({ onGraphUpdate, onModeChange }) {
         {messages.map((message, index) => (
           <div key={index} className={`message ${message.type}`}>
             <div className="message-content">
-              {message.text}
+              <Markdown>{message.text}</Markdown>
 
               {/* Show confidence if available */}
               {message.confidence && (
@@ -253,7 +263,7 @@ export default function ChatInterface({ onGraphUpdate, onModeChange }) {
               : "Ask a question to convert to Cypher query..."
           }
           disabled={isLoading}
-          rows={2}
+          rows={1}
         />
         <button
           onClick={handleSendMessage}
