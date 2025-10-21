@@ -1,7 +1,8 @@
 import csv
 import json
 import re
-from typing import Any, Dict, List, Tuple
+import sys
+from typing import Any, Dict, List
 
 # Make sure to run: pip install neo4j pandas openpyxl
 try:
@@ -59,13 +60,14 @@ class DatasetValidator:
 
     # Add this inside the DatasetValidator class, maybe after __init__
     def _setup_loggers(self, log_directory: str):
-        """Sets up file handlers for different validation checks."""
+        """Sets up file handlers for all validation checks."""
         self.log_files = {
+            'duplication': open(f"{log_directory}/duplication_check.txt", 'w', encoding='utf-8'),
             'schema': open(f"{log_directory}/schema_check.txt", 'w', encoding='utf-8'),
             'execution': open(f"{log_directory}/cypher_check.txt", 'w', encoding='utf-8'),
             'entity': open(f"{log_directory}/entity_check.txt", 'w', encoding='utf-8'),
             'relevance': open(f"{log_directory}/question_cypher_relevance.txt", 'w', encoding='utf-8'),
-            'duplication': open(f"{log_directory}/duplication_check.txt", 'w', encoding='utf-8'),
+            'value': open(f"{log_directory}/value_check.txt", 'w', encoding='utf-8'), # <-- This is the new line
         }
 
     def _log(self, check_type: str, message: str):
@@ -75,10 +77,11 @@ class DatasetValidator:
 
     # Also add this to the DatasetValidator class
     def close_loggers(self):
-        """Closes all open log files."""
-        for f in self.log_files.values():
-            f.close()
-        print(f"\nAll validation logs have been saved.")
+        """Closes all open log files if they were created."""
+        if hasattr(self, 'log_files'):
+            for f in self.log_files.values():
+                f.close()
+            print(f"\nAll validation logs have been saved.")
 
     def _load_schema(self, schema_file: str) -> Dict[str, Any]:
         """
@@ -117,35 +120,154 @@ class DatasetValidator:
         else:
             raise ValueError("Unsupported file format. Please use csv, json, or xlsx.")
 
-    # *** NEW FUNCTION TO CHECK FOR DUPLICATES ***
-    def check_for_duplicates(self, dataset: List[Dict[str, str]]) -> bool:
+    # Helper function to count hops
+    def _count_hops(self, cypher_query: str) -> int:
+        """Counts the number of relationship traversals '-->' or '<--' in a query."""
+        return len(re.findall(r'-->|<--', cypher_query))
+
+    # Helper function to extract literal values
+    def _extract_literal_values_from_query(self, cypher_query: str) -> list:
         """
-        Checks for duplicate NaturalLanguageQuestion entries in the dataset.
-        Logs any duplicates found and returns True if duplicates exist, otherwise False.
+        Extracts string, numeric, and boolean data literals from a Cypher query,
+        while attempting to ignore literals used for query syntax (e.g., LIMIT, 
+        SKIP, path lengths).
         """
-        print("\nChecking for duplicate questions...")
-        seen_questions = {}
+        
+        # 1. Create a copy of the query to "clean"
+        cleaned_query = cypher_query
+        
+        # 2. Remove literals associated with LIMIT and SKIP clauses
+        # This replaces "LIMIT 10" with "LIMIT "
+        cleaned_query = re.sub(r'\b(LIMIT|SKIP)\s+\d+\b', r'\1 ', cleaned_query, flags=re.IGNORECASE)
+        
+        # 3. NEW: Remove literals from variable-length path definitions
+        # This replaces "[*2]", "[*3..5]", or "[*..2]" with "[]"
+        cleaned_query = re.sub(r'\[\*.+?\]', '[]', cleaned_query)
+        
+        # 4. Original regex to find remaining "data" literals
+        # This regex finds:
+        # 1. Strings in single or double quotes
+        # 2. Standalone numbers (integers or floats)
+        # 3. The boolean values true/false
+        pattern = re.compile(r"""
+            (["'])(.*?)\1 |       # Group 1 & 2: Quoted strings
+            \b(\d+(?:\.\d+)?)\b |  # Group 3: Numbers (integer or float)
+            \b(true|false)\b      # Group 4: Booleans
+        """, re.VERBOSE | re.IGNORECASE)
+
+        matches = pattern.findall(cleaned_query)
+        
+        # The findall returns tuples like ('"', 'value', '', ''). We need to flatten them.
+        literals = [group[1] or group[2] or group[3] for group in matches]
+        
+        # Return unique, sorted literals, filtering out potential empty strings
+        return sorted(list(set(l for l in literals if l)))
+
+    # --- UPDATED ENRICHMENT FUNCTION ---
+    def enrich_dataset(self, dataset: List[Dict[str, str]]) -> List[Dict[str, str]]:
+        """
+        Parses Cypher queries to populate all helper columns for the dataset.
+        """
+        print("\nEnriching dataset...")
+        for row in dataset:
+            cypher_query = str(row.get('CypherQuery', ''))
+            found_labels = set(re.findall(r'\(\w*:(\w+)', cypher_query))
+            found_rels = set(re.findall(r'\[\w*:(\w+)', cypher_query))
+            props_dot = set(re.findall(r'\w+\.(\w+)', cypher_query))
+            props_map = set(re.findall(r'{\s*(\w+)\s*:', cypher_query))
+            found_props = props_dot.union(props_map)
+
+            row['ExpectedNodeLabels'] = json.dumps(sorted(list(found_labels)))
+            row['ExpectedRelationshipTypes'] = json.dumps(sorted(list(found_rels)))
+            row['ExpectedProperties'] = json.dumps(sorted(list(found_props)))
+            row['Hops'] = self._count_hops(cypher_query)
+            row['ExtractedPropertyValues'] = json.dumps(self._extract_literal_values_from_query(cypher_query))
+        print("Dataset enrichment complete.")
+        return dataset
+    
+
+    # --- VALIDATION FUNCTIONS ---
+
+    def check_for_initial_duplicates(self, dataset: List[Dict[str, str]]) -> bool:
+        """
+        Strictly checks for duplicate (Question, Cypher) pairs in the raw dataset.
+        """
+        print("\nRunning initial check for duplicate Question/Cypher pairs...")
+        seen_pairs = {}
         for i, row in enumerate(dataset):
-            # Normalize whitespace and make case-insensitive for better matching
-            question = row.get('NaturalLanguageQuestion', '').strip().lower()
-            if question:
-                if question not in seen_questions:
-                    seen_questions[question] = []
-                seen_questions[question].append(i + 1) # Use 1-based indexing for entry ID
+            question = str(row.get('NaturalLanguageQuestion', '')).strip().lower()
+            query = str(row.get('CypherQuery', '')).strip()
+            pair = (question, query)
+            if pair not in seen_pairs: seen_pairs[pair] = []
+            seen_pairs[pair].append(i + 1)
 
-        # Filter out questions that are not duplicates
-        duplicates = {q: locs for q, locs in seen_questions.items() if len(locs) > 1}
-
+        duplicates = {p: locs for p, locs in seen_pairs.items() if len(locs) > 1}
         if not duplicates:
-            self._log('duplication', "PASS - No duplicate questions found in the dataset.")
-            print("PASS - No duplicate questions found.")
+            self._log('duplication', "INITIAL CHECK: PASS - No duplicate Question/Cypher pairs found.")
+            print("PASS - No duplicate Question/Cypher pairs found.")
             return False
         else:
-            self._log('duplication', f"FAIL - Found {len(duplicates)} duplicate questions.")
-            print(f"FAIL - Found {len(duplicates)} duplicate questions. See duplication_check.txt for details.")
-            for question, entry_ids in duplicates.items():
-                self._log('duplication', f"  - Question: '{question}' | Found at entries: {entry_ids}")
+            self._log('duplication', f"INITIAL CHECK: FAIL - Found {len(duplicates)} duplicate Question/Cypher pairs.")
+            print(f"FAIL - Found {len(duplicates)} duplicate pairs. See duplication_check.txt for details.")
+            for (q, c), entry_ids in duplicates.items():
+                self._log('duplication', f"  - Question: '{q}' | Cypher: '{c}' | Found at entries: {entry_ids}")
             return True
+
+    def validate_extracted_values_in_question(self, question: str, row: dict, entry_id: int) -> bool:
+        """
+        Checks if literal values from the Cypher query are present in the question.
+        This version is more robust, ignoring common non-data literals and values
+        found in LIMIT/SKIP clauses, and using flexible word matching.
+        """
+        # A set of common, non-data literals to ignore during validation.
+        # These are often programming constructs, not factual data from the question.
+        IGNORE_LIST = {'true', 'false', '1', '0'}
+
+        try:
+            extracted_values = json.loads(row.get('ExtractedPropertyValues', '[]'))
+        except (json.JSONDecodeError, KeyError):
+            self._log('value', f"Entry #{entry_id}: FAIL - Could not parse ExtractedPropertyValues column.")
+            return False
+        
+        # Get the Cypher query to check against for LIMIT/SKIP clauses
+        cypher_query = row.get('CypherQuery', '').lower()
+
+        # If there are no values to check, it's an automatic pass.
+        if not extracted_values:
+            self._log('value', f"Entry #{entry_id}: PASS - No literal values to check.")
+            return True
+
+        mismatched_values = []
+        # Prepare the question by making it lowercase and splitting it into a set of unique words.
+        question_words = set(re.split(r'\s|\W', question.lower()))
+
+        for value in extracted_values:
+            value_str = str(value).lower()
+
+            # 1. Skip this value if it's in our ignore list.
+            if value_str in IGNORE_LIST:
+                continue
+
+            # 2. NEW CHECK: Skip if the value is part of a LIMIT or SKIP clause
+            # This prevents flagging syntax numbers (like 'LIMIT 10') as data.
+            # We use word boundaries (\b) to ensure we match '10' and not '100'.
+            if re.search(r'\b(limit|skip)\s+' + re.escape(value_str) + r'\b', cypher_query):
+                continue
+
+            # 3. Use flexible word matching (Original step 2).
+            # Split the value into words and check for any intersection with question words.
+            value_words = set(re.split(r'\s|\W', value_str))
+            
+            # The intersection finds any common words between the two sets.
+            if not value_words.intersection(question_words):
+                mismatched_values.append(str(value))
+
+        if not mismatched_values:
+            self._log('value', f"Entry #{entry_id}: PASS")
+            return True
+        else:
+            self._log('value', f"Entry #{entry_id}: FAIL - Values {mismatched_values} from Cypher not in Question: '{question}'")
+            return False
 
     # Add this method to the DatasetValidator class
     def validate_schema_elements(self, cypher_query: str, entry_id: int) -> bool:
@@ -219,6 +341,7 @@ class DatasetValidator:
             error_msg = str(e).replace('\n', ' ')
             self._log('execution', f"Entry #{entry_id}: FAIL - Query: {cypher_query} | Error: {error_msg}")
             return False
+        
 
     # RENAME the existing `validate_schema_compliance` function to this:
     def validate_expected_entities_match_query(
@@ -295,36 +418,22 @@ class DatasetValidator:
 
     # REPLACE the old `run_all_validators` with this one.
     def run_all_validators(self, dataset: List[Dict[str, str]]) -> None:
-        """
-        Runs all validation stages on the entire dataset and saves reports to separate files.
-        """
+        """Runs the complete validation suite on the enriched dataset."""
         total_entries = len(dataset)
-        pass_counts = {'schema': 0, 'execution': 0, 'entity': 0, 'relevance': 0}
+        pass_counts = {'schema': 0, 'execution': 0, 'entity': 0, 'relevance': 0, 'value': 0}
 
-        print("\nStarting validation process...")
-
+        print("\nStarting full validation process...")
         for i, row in enumerate(dataset):
             entry_id = i + 1
-            question = row['NaturalLanguageQuestion']
-            query = row['CypherQuery']
+            question = str(row['NaturalLanguageQuestion'])
+            query = str(row['CypherQuery'])
             
             print(f"Processing Entry {entry_id}/{total_entries}...")
-
-            # 1. Schema Check
-            if self.validate_schema_elements(query, entry_id):
-                pass_counts['schema'] += 1
-                
-            # 2. Cypher Executability Check
-            if self.validate_query_executability(query, entry_id):
-                pass_counts['execution'] += 1
-
-            # 3. Entity Extraction Check
-            if self.validate_expected_entities_match_query(query, row, entry_id):
-                pass_counts['entity'] += 1
-            
-            # 4. Question-Cypher Relevance Check
-            if self.validate_semantic_relevance(question, query, entry_id):
-                pass_counts['relevance'] += 1
+            if self.validate_schema_elements(query, entry_id): pass_counts['schema'] += 1
+            if self.validate_query_executability(query, entry_id): pass_counts['execution'] += 1
+            if self.validate_expected_entities_match_query(query, row, entry_id): pass_counts['entity'] += 1
+            if self.validate_semantic_relevance(question, query, entry_id): pass_counts['relevance'] += 1
+            if self.validate_extracted_values_in_question(question, row, entry_id): pass_counts['value'] += 1
 
         print("\n----- Validation Summary -----")
         for check_type, count in pass_counts.items():
@@ -345,8 +454,9 @@ if __name__ == '__main__':
     NEO4J_USER = "neo4j"
     NEO4J_PASSWORD = "abcd90909090"
     SCHEMA_FILE = 'schema_cache.txt'
-    DATASET_FILE = r'C:\Users\User\Downloads\UCKG\qa-engine\text2cypher\backend\dataset\neo4j_evaluation_dataset.csv'
-    # Define the directory for logs
+    # Use a different name for the raw input file
+    RAW_DATASET_FILE = r'C:\Users\User\Downloads\UCKG\qa-engine\text2cypher\backend\dataset\neo4j_evaluation_dataset.csv'
+    ENRICHED_DATASET_FILE = r'C:\Users\User\Downloads\UCKG\qa-engine\text2cypher\backend\dataset\neo4j_evaluation_dataset_ENRICHED.csv'
     LOG_DIRECTORY = r'C:\Users\User\Downloads\UCKG\qa-engine\text2cypher\backend\validation_log'
 
     # --- Execution ---
@@ -354,26 +464,35 @@ if __name__ == '__main__':
 
     if validator.driver:
         try:
-            dataset = validator.load_dataset(DATASET_FILE)
-            print(f"Successfully loaded {len(dataset)} entries.")
+            # 1. Load the raw dataset
+            dataset = validator.load_dataset(RAW_DATASET_FILE)
+            print(f"Successfully loaded {len(dataset)} raw entries.")
             
-            # Set up the log files
+            # 2. Setup loggers for the entire process
             validator._setup_loggers(LOG_DIRECTORY)
             print(f"Validation reports will be saved to {LOG_DIRECTORY}")
+
+            # 3. Perform initial duplicate check as a gatekeeper
+            if validator.check_for_initial_duplicates(dataset):
+                print("\nDuplicate Question/Cypher pairs found. Halting process. Please clean raw data.")
+                sys.exit(1) # Exit the script with an error code
+
+            # 4. Enrich the dataset since it passed the initial check
+            dataset = validator.enrich_dataset(dataset)
             
-            # First, check for duplicates. The script will halt if any are found.
-            if validator.check_for_duplicates(dataset):
-                print("\nDuplicate questions found. Halting further validation.")
-            else:
-                # If no duplicates are found, proceed with all other validations.
-                validator.run_all_validators(dataset) 
+            # 5. Save the enriched dataset
+            pd.DataFrame(dataset).to_csv(ENRICHED_DATASET_FILE, index=False)
+            print(f"Enriched dataset saved to: {ENRICHED_DATASET_FILE}")
+
+            # 6. Run the full validation suite on the in-memory enriched data
+            validator.run_all_validators(dataset)
 
         except FileNotFoundError as e:
-            print(f"Error: {e}. Please make sure the file paths are correct.")
+            print(f"Error: {e}. Please make sure file paths are correct.")
         except Exception as e:
             print(f"An unexpected error occurred: {e}")
         finally:
-            validator.close_loggers() # Close log files
-            validator.close() # Close Neo4j connection
+            validator.close_loggers()
+            validator.close()
     else:
         print("Cannot run validations because connection to Neo4j failed.")
