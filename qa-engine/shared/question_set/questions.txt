@@ -1,0 +1,17 @@
+What is a dictionary based password attack and what kind of weaknesses are related to it?
+
+What is the attack pattern that takes advantage of the application feature to help users recover their forgotten passwords and what are the weaknesses to it?
+
+What is the attack pattern that modifies content to make it contain something other than what the original content producer intended and what kind of technique is used for it?
+
+What kind of weaknesses are related to the attack pattern that lifts sensitive data embedded in cache?
+
+What are the most exploited Apple vulnerabilities?
+
+What are some defence techniques to prevent internal spearphishing?
+
+How can I defend against the attack technique that enumerates objects in cloud storage infrastructure?
+
+What kind of vulnerabilities does the platform version of Microsoft SQLServer 6.5 have?
+
+What are some examples of path traversal weaknesses?
