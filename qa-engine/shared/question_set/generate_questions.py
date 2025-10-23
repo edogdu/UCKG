@@ -111,6 +111,6 @@ Each object must include:
 
 # Generate questions
 chain = LLMChain(llm = llm, prompt = prompt)
-responses = chain.invoke(context = context, schema = schema)
+responses = chain.invoke(context = context, schema = schema, questions = questions)
 
 print(responses)
