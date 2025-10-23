@@ -1,0 +1,9 @@
+{
+  "labels": [
+    "UcoexMITRED3FEND"
+  ],
+  "properties": {
+    "ucoexMITRED3FEND_DEFINITION": "Encrypting a hard disk partition to prevent cleartext access to a file system.",
+    "ucoexMITRED3FEND_LABEL": "Disk Encryption",
+  },
+}

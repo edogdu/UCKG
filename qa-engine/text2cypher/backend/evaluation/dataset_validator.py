@@ -190,27 +190,86 @@ class DatasetValidator:
 
     def check_for_initial_duplicates(self, dataset: List[Dict[str, str]]) -> bool:
         """
-        Strictly checks for duplicate (Question, Cypher) pairs in the raw dataset.
+        Checks for duplicate Questions, duplicate Cypher queries, 
+        duplicate (Question, Cypher) pairs, and 
+        duplicate (NaturalLanguageQuestion, generated_question) pairs in the raw dataset.
         """
-        print("\nRunning initial check for duplicate Question/Cypher pairs...")
+        print("\nRunning initial check for duplicates (Questions, Queries, Pairs, and NL/Gen Pairs)...")
+        seen_questions = {}
+        seen_queries = {}
         seen_pairs = {}
+        seen_nl_gen_pairs = {} # <-- 1. Initialize new tracker
+        
         for i, row in enumerate(dataset):
+            # 1. Normalize all text fields
             question = str(row.get('NaturalLanguageQuestion', '')).strip().lower()
             query = str(row.get('CypherQuery', '')).strip()
+            gen_question = str(row.get('generated_question', '')).strip().lower() # <-- 2. Get new field
+            
             pair = (question, query)
+            nl_gen_pair = (question, gen_question) # <-- 3. Create new pair
+            
+            # 2. Track seen items and their entry numbers
+            if question not in seen_questions: seen_questions[question] = []
+            seen_questions[question].append(i + 1)
+            
+            if query not in seen_queries: seen_queries[query] = []
+            seen_queries[query].append(i + 1)
+
             if pair not in seen_pairs: seen_pairs[pair] = []
             seen_pairs[pair].append(i + 1)
+            
+            if nl_gen_pair not in seen_nl_gen_pairs: seen_nl_gen_pairs[nl_gen_pair] = [] # <-- 4. Track new pair
+            seen_nl_gen_pairs[nl_gen_pair].append(i + 1)
 
-        duplicates = {p: locs for p, locs in seen_pairs.items() if len(locs) > 1}
-        if not duplicates:
-            self._log('duplication', "INITIAL CHECK: PASS - No duplicate Question/Cypher pairs found.")
-            print("PASS - No duplicate Question/Cypher pairs found.")
+
+        # 3. Find duplicates for all four categories
+        duplicate_questions = {q: locs for q, locs in seen_questions.items() if len(locs) > 1}
+        duplicate_queries = {c: locs for c, locs in seen_queries.items() if len(locs) > 1}
+        duplicate_pairs = {p: locs for p, locs in seen_pairs.items() if len(locs) > 1}
+        duplicate_nl_gen_pairs = {p: locs for p, locs in seen_nl_gen_pairs.items() if len(locs) > 1} # <-- 5. Find new duplicates
+
+        # 4. Check if any duplicates were found
+        has_duplicates = bool(
+            duplicate_questions or 
+            duplicate_queries or 
+            duplicate_pairs or 
+            duplicate_nl_gen_pairs # <-- 6. Add to check
+        )
+
+        if not has_duplicates:
+            self._log('duplication', "INITIAL CHECK: PASS - No duplicate Questions, Queries, Pairs, or NL/Gen Pairs found.")
+            print("PASS - No duplicate Questions, Queries, Pairs, or NL/Gen Pairs found.")
             return False
         else:
-            self._log('duplication', f"INITIAL CHECK: FAIL - Found {len(duplicates)} duplicate Question/Cypher pairs.")
-            print(f"FAIL - Found {len(duplicates)} duplicate pairs. See duplication_check.txt for details.")
-            for (q, c), entry_ids in duplicates.items():
-                self._log('duplication', f"  - Question: '{q}' | Cypher: '{c}' | Found at entries: {entry_ids}")
+            # Main failure log
+            self._log('duplication', "INITIAL CHECK: FAIL - Duplicates found in raw dataset.")
+            print(f"FAIL - Duplicates found. See duplication_check.txt for details.")
+            
+            # Log duplicate questions (Item 1)
+            if duplicate_questions:
+                self._log('duplication', f"\n--- Found {len(duplicate_questions)} Duplicate Questions ---")
+                for question, entry_ids in duplicate_questions.items():
+                    self._log('duplication', f"  - Question: '{question}' | Found at entries: {entry_ids}")
+            
+            # Log duplicate queries (Item 2)
+            if duplicate_queries:
+                self._log('duplication', f"\n--- Found {len(duplicate_queries)} Duplicate Cypher Queries ---")
+                for query, entry_ids in duplicate_queries.items():
+                    self._log('duplication', f"  - Cypher: '{query}' | Found at entries: {entry_ids}")
+            
+            # Log duplicate pairs (Item 3)
+            if duplicate_pairs:
+                self._log('duplication', f"\n--- Found {len(duplicate_pairs)} Duplicate (Question, Cypher) Pairs ---")
+                for (q, c), entry_ids in duplicate_pairs.items():
+                    self._log('duplication', f"  - Question: '{q}' | Cypher: '{c}' | Found at entries: {entry_ids}")
+            
+            # Log duplicate NL/Gen pairs (Item 4)
+            if duplicate_nl_gen_pairs: # <-- 7. Add new log block
+                self._log('duplication', f"\n--- Found {len(duplicate_nl_gen_pairs)} Duplicate (NaturalLanguageQuestion, generated_question) Pairs ---")
+                for (nl, gen), entry_ids in duplicate_nl_gen_pairs.items():
+                    self._log('duplication', f"  - NL Question: '{nl}' | Gen Question: '{gen}' | Found at entries: {entry_ids}")
+            
             return True
 
     def validate_extracted_values_in_question(self, question: str, row: dict, entry_id: int) -> bool:
@@ -285,7 +344,13 @@ class DatasetValidator:
         found_rels = set(re.findall(r'\[\w*:(\w+)', cypher_query))
 
         # 3. FIX: Use the robust, two-part property detection.
-        props_dot_notation = set(re.findall(r'\w+\.(\w+)', cypher_query))
+        
+        # *** ADJUSTMENT HERE ***
+        # The original regex r'\w+\.(\w+)' incorrectly matched '3.9', 
+        # capturing '9' as a property.
+        # This new regex r'[a-zA-Z_]\w*\.(\w+)' ensures the part *before* # the dot is a valid variable name (starts with a letter or _), 
+        # not a number.
+        props_dot_notation = set(re.findall(r'[a-zA-Z_]\w*\.(\w+)', cypher_query))
         props_map_notation = set(re.findall(r'{\s*(\w+)\s*:', cypher_query))
         found_props = props_dot_notation.union(props_map_notation)
 
@@ -304,6 +369,7 @@ class DatasetValidator:
         for prop in found_props:
             prop_found_in_schema = any(prop in props for props in self.schema['nodes'].values())
             if not prop_found_in_schema:
+                # This check now correctly ignores '.9'
                 errors.append(f"Property '.{prop}' not found on any node in schema.")
 
         if not errors:
@@ -392,18 +458,24 @@ class DatasetValidator:
             return False
 
     # RENAME the existing `validate_ner_consistency` to this for clarity:
-    def validate_semantic_relevance(self, question: str, cypher_query: str, entry_id: int, threshold: float = 0.7) -> bool:
+    def validate_semantic_relevance(
+        self, 
+        natural_language_question: str, 
+        generated_question: str, 
+        entry_id: int, 
+        threshold: float = 0.7
+    ) -> bool:
         """
-        Validates semantic relevance between the question and the Cypher query
-        using a sentence-transformer model.
+        Validates semantic relevance between the NaturalLanguageQuestion and 
+        the generated_question (from Cypher) using a sentence-transformer model.
         """
         if not SENTENCE_TRANSFORMER_AVAILABLE:
             self._log('relevance', f"Entry #{entry_id}: SKIP - sentence-transformers library not available.")
             return False
 
-        # 1. Encode both the question and the query into vector embeddings
-        embedding1 = model.encode(question, convert_to_tensor=True)
-        embedding2 = model.encode(cypher_query, convert_to_tensor=True)
+        # 1. Encode both questions into vector embeddings
+        embedding1 = model.encode(natural_language_question, convert_to_tensor=True)
+        embedding2 = model.encode(generated_question, convert_to_tensor=True)
 
         # 2. Compute cosine similarity
         cosine_score = util.pytorch_cos_sim(embedding1, embedding2).item()
@@ -413,7 +485,9 @@ class DatasetValidator:
             self._log('relevance', f"Entry #{entry_id}: PASS (Similarity: {cosine_score:.4f})")
             return True
         else:
-            self._log('relevance', f"Entry #{entry_id}: FAIL - Question: '{question}' | Query: '{cypher_query}' | Similarity: {cosine_score:.4f} is below threshold of {threshold}")
+            self._log('relevance', f"Entry #{entry_id}: FAIL - Similarity: {cosine_score:.4f} is below threshold of {threshold}")
+            self._log('relevance', f"  - NL Question: '{natural_language_question}'")
+            self._log('relevance', f"  - Gen Question: '{generated_question}'")
             return False
 
     # REPLACE the old `run_all_validators` with this one.
@@ -427,13 +501,23 @@ class DatasetValidator:
             entry_id = i + 1
             question = str(row['NaturalLanguageQuestion'])
             query = str(row['CypherQuery'])
+            # Get the new generated_question field
+            gen_question = str(row.get('generated_question', '')) 
             
             print(f"Processing Entry {entry_id}/{total_entries}...")
             if self.validate_schema_elements(query, entry_id): pass_counts['schema'] += 1
             if self.validate_query_executability(query, entry_id): pass_counts['execution'] += 1
             if self.validate_expected_entities_match_query(query, row, entry_id): pass_counts['entity'] += 1
-            if self.validate_semantic_relevance(question, query, entry_id): pass_counts['relevance'] += 1
             if self.validate_extracted_values_in_question(question, row, entry_id): pass_counts['value'] += 1
+
+            # --- ADJUSTED SEMANTIC CHECK ---
+            # Check if gen_question is present before validating
+            if not gen_question:
+                self._log('relevance', f"Entry #{entry_id}: SKIP - 'generated_question' column is empty.")
+            # Call the validator with the two questions
+            elif self.validate_semantic_relevance(question, gen_question, entry_id): 
+                pass_counts['relevance'] += 1
+            # -------------------------------
 
         print("\n----- Validation Summary -----")
         for check_type, count in pass_counts.items():
@@ -455,7 +539,7 @@ if __name__ == '__main__':
     NEO4J_PASSWORD = "abcd90909090"
     SCHEMA_FILE = 'schema_cache.txt'
     # Use a different name for the raw input file
-    RAW_DATASET_FILE = r'C:\Users\User\Downloads\UCKG\qa-engine\text2cypher\backend\dataset\neo4j_evaluation_dataset.csv'
+    RAW_DATASET_FILE = r'C:\Users\User\Downloads\UCKG\qa-engine\text2cypher\backend\dataset\neo4j_NaturalLanguageQuestion_ADJUSTED.csv'
     ENRICHED_DATASET_FILE = r'C:\Users\User\Downloads\UCKG\qa-engine\text2cypher\backend\dataset\neo4j_evaluation_dataset_ENRICHED.csv'
     LOG_DIRECTORY = r'C:\Users\User\Downloads\UCKG\qa-engine\text2cypher\backend\validation_log'
 

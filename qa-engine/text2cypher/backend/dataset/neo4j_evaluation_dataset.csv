@@ -1,90 +1,518 @@
-Category,NaturalLanguageQuestion,CypherQuery,ExpectedNodeLabels,ExpectedRelationshipTypes,ExpectedProperties,Hops
-"Node Lookup Queries","Find a specific CVE by its label, for example, 'CVE-2021-44228'.","MATCH (c:UcoCVE {label: 'CVE-2021-44228'}) RETURN c","[""UcoCVE""]","[]","[""label""]",0
-"Node Lookup Queries","Retrieve the details of the CWE with the ID 'CWE-89'.","MATCH (c:UcoCWE {ucocweID: 'CWE-89'}) RETURN c.ucocweName, c.ucodescription","[""UcoCWE""]","[]","[""ucocweID"", ""ucocweName"", ""ucodescription""]",0
-"Node Lookup Queries","Find information about the attack campaign named 'SolarWinds Orion'.","MATCH (c:UcoexCAMPAIGNS {ucoexNAME: 'SolarWinds Orion'}) RETURN c","[""UcoexCAMPAIGNS""]","[]","[""ucoexNAME""]",0
-"Node Lookup Queries","Get the details for the MITRE ATT&CK technique named 'Phishing'.","MATCH (t:UcoexMITREATTACK {ucoexNAME: 'Phishing'}) RETURN t.ucoexDESCRIPTION, t.ucoexDOMAIN","[""UcoexMITREATTACK""]","[]","[""ucoexNAME"", ""ucoexDESCRIPTION"", ""ucoexDOMAIN""]",0
-"Node Lookup Queries","Find the software known as 'Mimikatz'.","MATCH (s:UcoexSOFTWARE {ucoexNAME: 'Mimikatz'}) RETURN s","[""UcoexSOFTWARE""]","[]","[""ucoexNAME""]",0
-"Node Lookup Queries","Retrieve all campaigns associated with the 'FIN7' group.","MATCH (g:UcoexGROUPS {ucoexNAME: 'FIN7'})<-[:UCOEXATTRIBUTEDTO]-(c:UcoexCAMPAIGNS) RETURN c.ucoexNAME","[""UcoexGROUPS"", ""UcoexCAMPAIGNS""]","[""UCOEXATTRIBUTEDTO""]","[""ucoexNAME""]",1
-"Node Lookup Queries","Find the CAPEC pattern with the ID 'CAPEC-540'.","MATCH (c:UcoexCAPEC {ucoexCAPEC_id: 'CAPEC-540'}) RETURN c.ucoexCAPEC_name, c.ucoexDescription","[""UcoexCAPEC""]","[]","[""ucoexCAPEC_id"", ""ucoexCAPEC_name"", ""ucoexDescription""]",0
-"Node Lookup Queries","List all known threat groups.","MATCH (g:UcoexGROUPS) RETURN g.ucoexNAME","[""UcoexGROUPS""]","[]","[""ucoexNAME""]",0
-"Node Lookup Queries","Get the description of the mitigation 'User Account Control'.","MATCH (m:UcoexMITIGATIONS {ucoexNAME: 'User Account Control'}) RETURN m.ucoexDESCRIPTION","[""UcoexMITIGATIONS""]","[]","[""ucoexNAME"", ""ucoexDESCRIPTION""]",0
-"Node Lookup Queries","Find all vulnerabilities published on '2017-03-14'.","MATCH (v:UcoVulnerability) WHERE v.ucopublishedDateTime = datetime('2017-03-14T00:00:00Z') RETURN v.ucosummary","[""UcoVulnerability""]","[]","[""ucopublishedDateTime"", ""ucosummary""]",0
-"Relationship Traversal Queries","What software is used by the group 'APT28'?","MATCH (g:UcoexGROUPS {ucoexNAME: 'APT28'})-[:UCOEXGROUPUSESSOFTWARE]->(s:UcoexSOFTWARE) RETURN s.ucoexNAME","[""UcoexGROUPS"", ""UcoexSOFTWARE""]","[""UCOEXGROUPUSESSOFTWARE""]","[""ucoexNAME""]",1
-"Relationship Traversal Queries","Which campaigns are attributed to the 'Lazarus Group'?","MATCH (g:UcoexGROUPS {ucoexNAME: 'Lazarus Group'})<-[:UCOEXATTRIBUTEDTO]-(c:UcoexCAMPAIGNS) RETURN c.ucoexNAME","[""UcoexGROUPS"", ""UcoexCAMPAIGNS""]","[""UCOEXATTRIBUTEDTO""]","[""ucoexNAME""]",1
-"Relationship Traversal Queries","What ATT&CK techniques does the 'FIN7' group use?","MATCH (g:UcoexGROUPS {ucoexNAME: 'FIN7'})-[:UCOEXGROUPUSESTECHNIQUE]->(t:UcoexMITREATTACK) RETURN t.ucoexNAME","[""UcoexGROUPS"", ""UcoexMITREATTACK""]","[""UCOEXGROUPUSESTECHNIQUE""]","[""ucoexNAME""]",1
-"Relationship Traversal Queries","Find the CVE associated with the 'EternalBlue' vulnerability.","MATCH (v:UcoVulnerability {uri: 'vuln-eternalblue'})-[:UCOHASCVE_ID]->(c:UcoCVE) RETURN c.label","[""UcoVulnerability"", ""UcoCVE""]","[""UCOHASCVE_ID""]","[""uri"", ""label""]",1
-"Relationship Traversal Queries","Which techniques are mitigated by 'Network Segmentation'?","MATCH (m:UcoexMITIGATIONS {ucoexNAME: 'Network Segmentation'})-[:UCOEXMITIGATES]->(t:UcoexMITREATTACK) RETURN t.ucoexNAME","[""UcoexMITIGATIONS"", ""UcoexMITREATTACK""]","[""UCOEXMITIGATES""]","[""ucoexNAME""]",1
-"Relationship Traversal Queries","What software is used in the 'WannaCry' campaign?","MATCH (c:UcoexCAMPAIGNS {ucoexNAME: 'WannaCry Ransomware Attack'})-[:UCOEXCAMPAIGNUSESSOFTWARE]->(s:UcoexSOFTWARE) RETURN s.ucoexNAME","[""UcoexCAMPAIGNS"", ""UcoexSOFTWARE""]","[""UCOEXCAMPAIGNUSESSOFTWARE""]","[""ucoexNAME""]",1
-"Relationship Traversal Queries","Find related weaknesses for the CAPEC pattern 'CAPEC-115'.","MATCH (capec:UcoexCAPEC {ucoexCAPEC_id: 'CAPEC-115'})-[:UCOEXHASRELATEDWEAKNESS]->(cwe:UcoCWE) RETURN cwe.ucocweID, cwe.ucocweName","[""UcoexCAPEC"", ""UcoCWE""]","[""UCOEXHASRELATEDWEAKNESS""]","[""ucoexCAPEC_id"", ""ucocweID"", ""ucocweName""]",1
-"Relationship Traversal Queries","Which D3FEND countermeasures are related to the ATT&CK technique 'T1003'?","MATCH (d:UcoexMITRED3FEND)-[:UCOEXHASMITREATTACK]->(t:UcoexMITREATTACK {ucoexNAME: 'T1003'}) RETURN d.ucoexMITRED3FEND_LABEL","[""UcoexMITRED3FEND"", ""UcoexMITREATTACK""]","[""UCOEXHASMITREATTACK""]","[""ucoexNAME"", ""ucoexMITRED3FEND_LABEL""]",1
-"Relationship Traversal Queries","Which CPEs are associated with CVE 'CVE-2021-44228'?","MATCH (:UcoCVE {label: 'CVE-2021-44228'})-[:UCOEXHASCPE]->(cpe:UcoexCPE) RETURN cpe.cpeName","[""UcoCVE"", ""UcoexCPE""]","[""UCOEXHASCPE""]","[""label"", ""cpeName""]",1
-"Relationship Traversal Queries","Find observed examples for CWE 'CWE-79'.","MATCH (:UcoCWE {ucocweID: 'CWE-79'})-[:UCOHASOBSERVEDEXAMPLE]->(ex:UcoexObservedExample) RETURN ex.ucoexDESCRIPTION","[""UcoCWE"", ""UcoexObservedExample""]","[""UCOHASOBSERVEDEXAMPLE""]","[""ucocweID"", ""ucoexDESCRIPTION""]",1
-"Multi-hop Queries","What software is used by groups that are attributed to the 'SolarWinds' campaign?","MATCH (g:UcoexGROUPS)<-[:UCOEXATTRIBUTEDTO]-(:UcoexCAMPAIGNS {ucoexNAME: 'SolarWinds Orion Attack'})-[:UCOEXGROUPUSESSOFTWARE]->(s:UcoexSOFTWARE) RETURN s.ucoexNAME","[""UcoexGROUPS"", ""UcoexCAMPAIGNS"", ""UcoexSOFTWARE""]","[""UCOEXATTRIBUTEDTO"", ""UCOEXGROUPUSESSOFTWARE""]","[""ucoexNAME""]",2
-"Multi-hop Queries","Find the CVEs for vulnerabilities exploited by the 'WannaCry' campaign.","MATCH (:UcoexCAMPAIGNS {ucoexNAME: 'WannaCry Ransomware Attack'})-[:UCOEXCAMPAIGNUSESTECHNIQUE]->(t:UcoexMITREATTACK)<-[:UCOEXHASTAXONOMYMAPPING]-(:UcoexCAPEC)-[:UCOEXHASRELATEDWEAKNESS]->(:UcoCWE)<-[:UCOHASWEAKNESS]-(et:UcoExploitTarget)-[:UCOHASVULNERABILITY]->(v:UcoVulnerability)-[:UCOHASCVE_ID]->(cve:UcoCVE) RETURN cve.label","[""UcoexCAMPAIGNS"", ""UcoexMITREATTACK"", ""UcoexCAPEC"", ""UcoCWE"", ""UcoExploitTarget"", ""UcoVulnerability"", ""UcoCVE""]","[""UCOEXCAMPAIGNUSESTECHNIQUE"", ""UCOEXHASTAXONOMYMAPPING"", ""UCOEXHASRELATEDWEAKNESS"", ""UCOHASWEAKNESS"", ""UCOHASVULNERABILITY"", ""UCOHASCVE_ID""]","[""ucoexNAME"", ""label""]",6
-"Multi-hop Queries","Which groups use techniques that can be mitigated by 'Network Segmentation'?","MATCH (g:UcoexGROUPS)-[:UCOEXGROUPUSESTECHNIQUE]->(t:UcoexMITREATTACK)<-[:UCOEXMITIGATES]-(:UcoexMITIGATIONS {ucoexNAME: 'Network Segmentation'}) RETURN g.ucoexNAME","[""UcoexGROUPS"", ""UcoexMITREATTACK"", ""UcoexMITIGATIONS""]","[""UCOEXGROUPUSESTECHNIQUE"", ""UCOEXMITIGATES""]","[""ucoexNAME""]",2
-"Multi-hop Queries","List techniques used by 'APT28' that are related to CAPEC patterns.","MATCH (:UcoexGROUPS {ucoexNAME: 'APT28'})-[:UCOEXGROUPUSESTECHNIQUE]->(t:UcoexMITREATTACK)<-[:UCOEXHASTAXONOMYMAPPING]-(c:UcoexCAPEC) RETURN t.ucoexNAME, c.ucoexCAPEC_name","[""UcoexGROUPS"", ""UcoexMITREATTACK"", ""UcoexCAPEC""]","[""UCOEXGROUPUSESTECHNIQUE"", ""UCOEXHASTAXONOMYMAPPING""]","[""ucoexNAME"", ""ucoexCAPEC_name""]",2
-"Multi-hop Queries","What are the names of vulnerabilities related to weaknesses observed in examples for CVE 'CVE-2017-0144'?","MATCH (:UcoCVE {label: 'CVE-2017-0144'})<-[:UCOEXEXAMPLEOBSERVEDIN]-(:UcoexObservedExample)<-[:UCOHASOBSERVEDEXAMPLE]-(w:UcoCWE)<-[:UCOHASWEAKNESS]-(:UcoExploitTarget)-[:UCOHASVULNERABILITY]->(v:UcoVulnerability) RETURN v.ucosummary","[""UcoCVE"", ""UcoexObservedExample"", ""UcoCWE"", ""UcoExploitTarget"", ""UcoVulnerability""]","[""UCOEXEXAMPLEOBSERVEDIN"", ""UCOHASOBSERVEDEXAMPLE"", ""UCOHASWEAKNESS"", ""UCOHASVULNERABILITY""]","[""label"", ""ucosummary""]",4
-"Multi-hop Queries","Find mitigations for techniques used by software employed by the 'FIN7' group.","MATCH (:UcoexGROUPS {ucoexNAME: 'FIN7'})-[:UCOEXGROUPUSESSOFTWARE]->(:UcoexSOFTWARE)-[:UCOEXSOFTWAREUSESTECHNIQUE]->(t:UcoexMITREATTACK)<-[:UCOEXMITIGATES]-(m:UcoexMITIGATIONS) RETURN m.ucoexNAME","[""UcoexGROUPS"", ""UcoexSOFTWARE"", ""UcoexMITREATTACK"", ""UcoexMITIGATIONS""]","[""UCOEXGROUPUSESSOFTWARE"", ""UCOEXSOFTWAREUSESTECHNIQUE"", ""UCOEXMITIGATES""]","[""ucoexNAME""]",3
-"Multi-hop Queries","Which campaigns use software that uses the 'PowerShell' technique?","MATCH (c:UcoexCAMPAIGNS)-[:UCOEXCAMPAIGNUSESSOFTWARE]->(:UcoexSOFTWARE)-[:UCOEXSOFTWAREUSESTECHNIQUE]->(:UcoexMITREATTACK {ucoexNAME: 'PowerShell'}) RETURN c.ucoexNAME","[""UcoexCAMPAIGNS"", ""UcoexSOFTWARE"", ""UcoexMITREATTACK""]","[""UCOEXCAMPAIGNUSESSOFTWARE"", ""UCOEXSOFTWAREUSESTECHNIQUE""]","[""ucoexNAME""]",2
-"Multi-hop Queries","List groups that use the same techniques as the 'SolarWinds' campaign.","MATCH (:UcoexCAMPAIGNS {ucoexNAME: 'SolarWinds Orion Attack'})-[:UCOEXCAMPAIGNUSESTECHNIQUE]->(t:UcoexMITREATTACK)<-[:UCOEXGROUPUSESTECHNIQUE]-(g:UcoexGROUPS) RETURN g.ucoexNAME","[""UcoexCAMPAIGNS"", ""UcoexMITREATTACK"", ""UcoexGROUPS""]","[""UCOEXCAMPAIGNUSESTECHNIQUE"", ""UCOEXGROUPUSESTECHNIQUE""]","[""ucoexNAME""]",2
-"Multi-hop Queries","Find the CWEs for weaknesses related to CAPEC patterns that map to the 'Phishing' technique.","MATCH (:UcoexMITREATTACK {ucoexNAME: 'Phishing'})<-[:UCOEXHASTAXONOMYMAPPING]-(:UcoexCAPEC)-[:UCOEXHASRELATEDWEAKNESS]->(cwe:UcoCWE) RETURN cwe.ucocweID","[""UcoexMITREATTACK"", ""UcoexCAPEC"", ""UcoCWE""]","[""UCOEXHASTAXONOMYMAPPING"", ""UCOEXHASRELATEDWEAKNESS""]","[""ucoexNAME"", ""ucocweID""]",2
-"Multi-hop Queries","What are the D3FEND countermeasures for techniques related to the 'Lazarus Group'?","MATCH (:UcoexGROUPS {ucoexNAME: 'Lazarus Group'})-[:UCOEXGROUPUSESTECHNIQUE]->(t:UcoexMITREATTACK)<-[:UCOEXHASMITREATTACK]-(d:UcoexMITRED3FEND) RETURN d.ucoexMITRED3FEND_LABEL","[""UcoexGROUPS"", ""UcoexMITREATTACK"", ""UcoexMITRED3FEND""]","[""UCOEXGROUPUSESTECHNIQUE"", ""UCOEXHASMITREATTACK""]","[""ucoexNAME"", ""ucoexMITRED3FEND_LABEL""]",2
-"Aggregation and Counting","How many techniques are associated with the 'APT28' group?","MATCH (g:UcoexGROUPS {ucoexNAME: 'APT28'})-[:UCOEXGROUPUSESTECHNIQUE]->(t:UcoexMITREATTACK) RETURN count(t)","[""UcoexGROUPS"", ""UcoexMITREATTACK""]","[""UCOEXGROUPUSESTECHNIQUE""]","[""ucoexNAME""]",1
-"Aggregation and Counting","Count the number of campaigns attributed to each threat group.","MATCH (g:UcoexGROUPS)<-[:UCOEXATTRIBUTEDTO]-(c:UcoexCAMPAIGNS) RETURN g.ucoexNAME, count(c) AS campaignCount","[""UcoexGROUPS"", ""UcoexCAMPAIGNS""]","[""UCOEXATTRIBUTEDTO""]","[""ucoexNAME""]",1
-"Aggregation and Counting","What is the average exploitability score for all CVEs?","MATCH (c:UcoCVE) RETURN avg(toInteger(c.ucoexploitabilityScore))","[""UcoCVE""]","[]","[""ucoexploitabilityScore""]",0
-"Aggregation and Counting","How many distinct pieces of software are used by all known groups?","MATCH (:UcoexGROUPS)-[:UCOEXGROUPUSESSOFTWARE]->(s:UcoexSOFTWARE) RETURN count(DISTINCT s)","[""UcoexGROUPS"", ""UcoexSOFTWARE""]","[""UCOEXGROUPUSESSOFTWARE""]","[]",1
-"Aggregation and Counting","Find the maximum impact score among all CVEs.","MATCH (c:UcoCVE) RETURN max(toInteger(c.ucoimpactScore))","[""UcoCVE""]","[]","[""ucoimpactScore""]",0
-"Aggregation and Counting","How many related weaknesses does each CAPEC pattern have?","MATCH (capec:UcoexCAPEC)-[:UCOEXHASRELATEDWEAKNESS]->(cwe:UcoCWE) RETURN capec.ucoexCAPEC_name, count(cwe) AS weaknessCount","[""UcoexCAPEC"", ""UcoCWE""]","[""UCOEXHASRELATEDWEAKNESS""]","[""ucoexCAPEC_name""]",1
-"Aggregation and Counting","Count the total number of vulnerabilities in the database.","MATCH (v:UcoVulnerability) RETURN count(v)","[""UcoVulnerability""]","[]","[]",0
-"Aggregation and Counting","List the number of techniques associated with each mitigation.","MATCH (m:UcoexMITIGATIONS)-[:UCOEXMITIGATES]->(t:UcoexMITREATTACK) RETURN m.ucoexNAME, count(t) AS techniqueCount","[""UcoexMITIGATIONS"", ""UcoexMITREATTACK""]","[""UCOEXMITIGATES""]","[""ucoexNAME""]",1
-"Aggregation and Counting","What is the total number of observed examples for all CWEs?","MATCH (:UcoCWE)-[:UCOHASOBSERVEDEXAMPLE]->(ex:UcoexObservedExample) RETURN count(ex)","[""UcoCWE"", ""UcoexObservedExample""]","[""UCOHASOBSERVEDEXAMPLE""]","[]",1
-"Aggregation and Counting","How many campaigns use the 'PowerShell' technique?","MATCH (c:UcoexCAMPAIGNS)-[:UCOEXCAMPAIGNUSESTECHNIQUE]->(:UcoexMITREATTACK {ucoexNAME: 'PowerShell'}) RETURN count(c)","[""UcoexCAMPAIGNS"", ""UcoexMITREATTACK""]","[""UCOEXCAMPAIGNUSESTECHNIQUE""]","[""ucoexNAME""]",1
-"Conditional and Boolean Queries","Find CVEs with an impact score greater than 5 and where user interaction is not required.","MATCH (c:UcoCVE) WHERE toInteger(c.ucoimpactScore) > 5 AND c.ucouserInteractionRequired = 'false' RETURN c.label, c.ucoimpactScore","[""UcoCVE""]","[]","[""ucoimpactScore"", ""ucouserInteractionRequired"", ""label""]",0
-"Conditional and Boolean Queries","List all software that is either 'open-source' or a 'commercial' tool.","MATCH (s:UcoexSOFTWARE) WHERE s.ucoexDOMAIN = 'open-source' OR s.ucoexDOMAIN = 'commercial' RETURN s.ucoexNAME, s.ucoexDOMAIN","[""UcoexSOFTWARE""]","[]","[""ucoexDOMAIN"", ""ucoexNAME""]",0
-"Conditional and Boolean Queries","Find campaigns that are not attributed to 'APT28'.","MATCH (c:UcoexCAMPAIGNS) WHERE NOT EXISTS((c)-[:UCOEXATTRIBUTEDTO]->(:UcoexGROUPS {ucoexNAME: 'APT28'})) RETURN c.ucoexNAME","[""UcoexCAMPAIGNS"", ""UcoexGROUPS""]","[""UCOEXATTRIBUTEDTO""]","[""ucoexNAME""]",1
-"Conditional and Boolean Queries","Retrieve techniques that are not 'Phishing' and are used by the 'Lazarus Group'.","MATCH (:UcoexGROUPS {ucoexNAME: 'Lazarus Group'})-[:UCOEXGROUPUSESTECHNIQUE]->(t:UcoexMITREATTACK) WHERE t.ucoexNAME <> 'Phishing' RETURN t.ucoexNAME","[""UcoexGROUPS"", ""UcoexMITREATTACK""]","[""UCOEXGROUPUSESTECHNIQUE""]","[""ucoexNAME""]",1
-"Conditional and Boolean Queries","List all CRITICAL severity CVEs published after 2020.","MATCH (c:UcoCVE) WHERE c.ucobaseSeverity = 'CRITICAL' AND c.ucopublishedDateTime > datetime('2020-01-01T00:00:00Z') RETURN c.label","[""UcoCVE""]","[]","[""ucobaseSeverity"", ""ucopublishedDateTime"", ""label""]",0
-"Conditional and Boolean Queries","Find threat groups that are not Russian and use 'Cobalt Strike'.","MATCH (g:UcoexGROUPS)-[:UCOEXGROUPUSESSOFTWARE]->(:UcoexSOFTWARE {ucoexNAME: 'Cobalt Strike'}) WHERE NOT g.ucoexDESCRIPTION CONTAINS 'Russian' RETURN g.ucoexNAME","[""UcoexGROUPS"", ""UcoexSOFTWARE""]","[""UCOEXGROUPUSESSOFTWARE""]","[""ucoexNAME"", ""ucoexDESCRIPTION""]",1
-"Conditional and Boolean Queries","List vulnerabilities where obtaining all privileges is possible but no user interaction is required.","MATCH (v:UcoVulnerability)-[:UCOHASCVE_ID]->(c:UcoCVE) WHERE c.ucoobtainAllPrivilege = 'true' AND c.ucouserInteractionRequired = 'false' RETURN v.ucosummary","[""UcoVulnerability"", ""UcoCVE""]","[""UCOHASCVE_ID""]","[""ucoobtainAllPrivilege"", ""ucouserInteractionRequired"", ""ucosummary""]",1
-"Conditional and Boolean Queries","Find CAPEC patterns with 'High' severity and 'Low' likelihood of exploit.","MATCH (c:UcoexCAPEC) WHERE c.ucoexSeverity = 'High' AND c.ucoexLikelihood = 'Low' RETURN c.ucoexCAPEC_name","[""UcoexCAPEC""]","[]","[""ucoexSeverity"", ""ucoexLikelihood"", ""ucoexCAPEC_name""]",0
-"Conditional and Boolean Queries","Get all mitigations that are not 'Network Segmentation'.","MATCH (m:UcoexMITIGATIONS) WHERE m.ucoexNAME <> 'Network Segmentation' RETURN m.ucoexNAME","[""UcoexMITIGATIONS""]","[]","[""ucoexNAME""]",0
-"Path Queries (Variable-length)","Find all techniques that are reachable from the 'FIN7' group within 3 hops.","MATCH (g:UcoexGROUPS {ucoexNAME: 'FIN7'})-[*1..3]->(t:UcoexMITREATTACK) RETURN DISTINCT t.ucoexNAME","[""UcoexGROUPS"", ""UcoexMITREATTACK""]","[]","[""ucoexNAME""]",3
-"Path Queries (Variable-length)","Is there a connection between the 'SolarWinds' campaign and the 'Mimikatz' software?","MATCH p = (:UcoexCAMPAIGNS {ucoexNAME: 'SolarWinds Orion Attack'})-[*]-(:UcoexSOFTWARE {ucoexNAME: 'Mimikatz'}) RETURN CASE WHEN length(p) > 0 THEN true ELSE false END AS connectionExists LIMIT 1","[""UcoexCAMPAIGNS"", ""UcoexSOFTWARE""]","[]","[""ucoexNAME""]",-1
-"Path Queries (Variable-length)","Find the shortest path between 'APT28' and the 'PowerShell' technique.","MATCH p = shortestPath((:UcoexGROUPS {ucoexNAME: 'APT28'})-[*]-(:UcoexMITREATTACK {ucoexNAME: 'PowerShell'})) RETURN p","[""UcoexGROUPS"", ""UcoexMITREATTACK""]","[]","[""ucoexNAME""]",-1
-"Path Queries (Variable-length)","Find all software connected to 'Lazarus Group' through any path.","MATCH (:UcoexGROUPS {ucoexNAME: 'Lazarus Group'})-[*]->(s:UcoexSOFTWARE) RETURN DISTINCT s.ucoexNAME","[""UcoexGROUPS"", ""UcoexSOFTWARE""]","[]","[""ucoexNAME""]",-1
-"Path Queries (Variable-length)","Show the chain of attack from a campaign to a specific CVE, like 'CVE-2017-0144'.","MATCH p = (:UcoexCAMPAIGNS)-[*]->(:UcoCVE {label: 'CVE-2017-0144'}) RETURN p","[""UcoexCAMPAIGNS"", ""UcoCVE""]","[]","[""label""]",-1
-"Path Queries (Variable-length)","What mitigations are indirectly related to the 'FIN7' group?","MATCH (:UcoexGROUPS {ucoexNAME: 'FIN7'})-[*2]->(m:UcoexMITIGATIONS) RETURN DISTINCT m.ucoexNAME","[""UcoexGROUPS"", ""UcoexMITIGATIONS""]","[]","[""ucoexNAME""]",2
-"Path Queries (Variable-length)","Find all nodes connected to 'CVE-2021-44228' up to 2 hops away.","MATCH (c:UcoCVE {label: 'CVE-2021-44228'})-[*1..2]-(n) RETURN DISTINCT labels(n), n.uri, n.ucoexNAME, n.label","[""UcoCVE""]","[]","[""label"", ""uri"", ""ucoexNAME""]",2
-"Path Queries (Variable-length)","Are there any groups that are 3 or more steps away from any mitigations?","MATCH p = (g:UcoexGROUPS)-[*3..]-(m:UcoexMITIGATIONS) RETURN g.ucoexNAME, m.ucoexNAME LIMIT 10","[""UcoexGROUPS"", ""UcoexMITIGATIONS""]","[]","[""ucoexNAME""]",-1
-"Path Queries (Variable-length)","Find a path from any campaign to any vulnerability.","MATCH p = (:UcoexCAMPAIGNS)-[*]-(:UcoVulnerability) RETURN p LIMIT 1","[""UcoexCAMPAIGNS"", ""UcoVulnerability""]","[]","[]",-1
-"Path Queries (Variable-length)","Explore all relationships stemming from the 'WannaCry' campaign up to 4 levels deep.","MATCH p = (:UcoexCAMPAIGNS {ucoexNAME: 'WannaCry Ransomware Attack'})-[*1..4]->(n) RETURN p","[""UcoexCAMPAIGNS""]","[]","[""ucoexNAME""]",4
-"Graph Pattern Matching","Find groups that use both 'PowerShell' and 'Phishing' techniques.","MATCH (t1:UcoexMITREATTACK {ucoexNAME: 'PowerShell'})<-[:UCOEXGROUPUSESTECHNIQUE]-(g:UcoexGROUPS)-[:UCOEXGROUPUSESTECHNIQUE]->(t2:UcoexMITREATTACK {ucoexNAME: 'Phishing'}) RETURN g.ucoexNAME","[""UcoexMITREATTACK"", ""UcoexGROUPS""]","[""UCOEXGROUPUSESTECHNIQUE""]","[""ucoexNAME""]",2
-"Graph Pattern Matching","Identify campaigns that use software also used by the 'APT28' group.","MATCH (:UcoexGROUPS {ucoexNAME: 'APT28'})-[:UCOEXGROUPUSESSOFTWARE]->(s:UcoexSOFTWARE)<-[:UCOEXCAMPAIGNUSESSOFTWARE]-(c:UcoexCAMPAIGNS) RETURN c.ucoexNAME, s.ucoexNAME","[""UcoexGROUPS"", ""UcoexSOFTWARE"", ""UcoexCAMPAIGNS""]","[""UCOEXGROUPUSESSOFTWARE"", ""UCOEXCAMPAIGNUSESSOFTWARE""]","[""ucoexNAME""]",2
-"Graph Pattern Matching","Find a 'triangle' pattern: a group uses a technique which is mitigated by a mitigation.","MATCH (g:UcoexGROUPS)-[:UCOEXGROUPUSESTECHNIQUE]->(t:UcoexMITREATTACK)<-[:UCOEXMITIGATES]-(m:UcoexMITIGATIONS) RETURN g.ucoexNAME, t.ucoexNAME, m.ucoexNAME LIMIT 10","[""UcoexGROUPS"", ""UcoexMITREATTACK"", ""UcoexMITIGATIONS""]","[""UCOEXGROUPUSESTECHNIQUE"", ""UCOEXMITIGATES""]","[""ucoexNAME""]",2
-"Graph Pattern Matching","List software that serves as a bridge between two distinct threat groups.","MATCH (g1:UcoexGROUPS)-[:UCOEXGROUPUSESSOFTWARE]->(s:UcoexSOFTWARE)<-[:UCOEXGROUPUSESSOFTWARE]-(g2:UcoexGROUPS) WHERE g1 <> g2 RETURN s.ucoexNAME, g1.ucoexNAME, g2.ucoexNAME","[""UcoexGROUPS"", ""UcoexSOFTWARE""]","[""UCOEXGROUPUSESSOFTWARE""]","[""ucoexNAME""]",2
-"Graph Pattern Matching","Find campaigns that use techniques related to CWEs with 'High' abstraction.","MATCH (c:UcoexCAMPAIGNS)-[:UCOEXCAMPAIGNUSESTECHNIQUE]->(:UcoexMITREATTACK)<-[:UCOEXHASTAXONOMYMAPPING]-(:UcoexCAPEC)-[:UCOEXHASRELATEDWEAKNESS]->(w:UcoCWE {ucoabstraction: 'High'}) RETURN c.ucoexNAME","[""UcoexCAMPAIGNS"", ""UcoexMITREATTACK"", ""UcoexCAPEC"", ""UcoCWE""]","[""UCOEXCAMPAIGNUSESTECHNIQUE"", ""UCOEXHASTAXONOMYMAPPING"", ""UCOEXHASRELATEDWEAKNESS""]","[""ucoexNAME"", ""ucoabstraction""]",3
-"Graph Pattern Matching","Identify two campaigns that share a common technique.","MATCH (c1:UcoexCAMPAIGNS)-[:UCOEXCAMPAIGNUSESTECHNIQUE]->(t:UcoexMITREATTACK)<-[:UCOEXCAMPAIGNUSESTECHNIQUE]-(c2:UcoexCAMPAIGNS) WHERE id(c1) < id(c2) RETURN c1.ucoexNAME, t.ucoexNAME, c2.ucoexNAME LIMIT 10","[""UcoexCAMPAIGNS"", ""UcoexMITREATTACK""]","[""UCOEXCAMPAIGNUSESTECHNIQUE""]","[""ucoexNAME""]",2
-"Graph Pattern Matching","Find groups that target vulnerabilities with 'CRITICAL' severity.","MATCH (g:UcoexGROUPS)-[:UCOEXGROUPUSESTECHNIQUE]->(:UcoexMITREATTACK)<-[:UCOEXHASTAXONOMYMAPPING]-(:UcoexCAPEC)-[:UCOEXHASRELATEDWEAKNESS]->(:UcoCWE)<-[:UCOHASWEAKNESS]-(:UcoExploitTarget)-[:UCOHASVULNERABILITY]->(:UcoVulnerability)-[:UCOHASCVE_ID]->(c:UcoCVE {ucobaseSeverity: 'CRITICAL'}) RETURN g.ucoexNAME","[""UcoexGROUPS"", ""UcoexMITREATTACK"", ""UcoexCAPEC"", ""UcoCWE"", ""UcoExploitTarget"", ""UcoVulnerability"", ""UcoCVE""]","[""UCOEXGROUPUSESTECHNIQUE"", ""UCOEXHASTAXONOMYMAPPING"", ""UCOEXHASRELATEDWEAKNESS"", ""UCOHASWEAKNESS"", ""UCOHASVULNERABILITY"", ""UCOHASCVE_ID""]","[""ucoexNAME"", ""ucobaseSeverity""]",6
-"Graph Pattern Matching","List CVEs that have CPEs and are related to CWEs with observed examples.","MATCH (cve:UcoCVE)-[:UCOEXHASCPE]->(:UcoexCPE), (cve)<-[:UCOHASCVE_ID]-(:UcoVulnerability)<-[:UCOHASVULNERABILITY]-(:UcoExploitTarget)-[:UCOHASWEAKNESS]->(cwe:UcoCWE)-[:UCOHASOBSERVEDEXAMPLE]->(:UcoexObservedExample) RETURN DISTINCT cve.label","[""UcoCVE"", ""UcoexCPE"", ""UcoVulnerability"", ""UcoExploitTarget"", ""UcoCWE"", ""UcoexObservedExample""]","[""UCOEXHASCPE"", ""UCOHASCVE_ID"", ""UCOHASVULNERABILITY"", ""UCOHASWEAKNESS"", ""UCOHASOBSERVEDEXAMPLE""]","[""label""]",4
-"Graph Pattern Matching","Find a campaign that uses a technique, which is also used by a software tool.","MATCH (c:UcoexCAMPAIGNS)-[:UCOEXCAMPAIGNUSESTECHNIQUE]->(t:UcoexMITREATTACK)<-[:UCOEXSOFTWAREUSESTECHNIQUE]-(s:UcoexSOFTWARE) RETURN c.ucoexNAME, t.ucoexNAME, s.ucoexNAME LIMIT 10","[""UcoexCAMPAIGNS"", ""UcoexMITREATTACK"", ""UcoexSOFTWARE""]","[""UCOEXCAMPAIGNUSESTECHNIQUE"", ""UCOEXSOFTWAREUSESTECHNIQUE""]","[""ucoexNAME""]",2
-"Graph Pattern Matching","Identify groups using software that is not PowerShell.","MATCH (g:UcoexGROUPS)-[:UCOEXGROUPUSESSOFTWARE]->(s:UcoexSOFTWARE) WHERE s.ucoexNAME <> 'PowerShell' RETURN g.ucoexNAME, s.ucoexNAME","[""UcoexGROUPS"", ""UcoexSOFTWARE""]","[""UCOEXGROUPUSESSOFTWARE""]","[""ucoexNAME""]",1
-"Comparative and Ranking","Which vulnerabilities have higher exploitability scores than impact scores?","MATCH (c:UcoCVE) WHERE toInteger(c.ucoexploitabilityScore) > toInteger(c.ucoimpactScore) RETURN c.label, c.ucoexploitabilityScore, c.ucoimpactScore","[""UcoCVE""]","[]","[""ucoexploitabilityScore"", ""ucoimpactScore"", ""label""]",0
-"Comparative and Ranking","List the top 5 techniques by the number of associated threat groups.","MATCH (g:UcoexGROUPS)-[:UCOEXGROUPUSESTECHNIQUE]->(t:UcoexMITREATTACK) RETURN t.ucoexNAME, count(g) AS groupCount ORDER BY groupCount DESC LIMIT 5","[""UcoexGROUPS"", ""UcoexMITREATTACK""]","[""UCOEXGROUPUSESTECHNIQUE""]","[""ucoexNAME""]",1
-"Comparative and Ranking","Find the top 3 most used software across all campaigns.","MATCH (c:UcoexCAMPAIGNS)-[:UCOEXCAMPAIGNUSESSOFTWARE]->(s:UcoexSOFTWARE) RETURN s.ucoexNAME, count(c) AS campaignUsage ORDER BY campaignUsage DESC LIMIT 3","[""UcoexCAMPAIGNS"", ""UcoexSOFTWARE""]","[""UCOEXCAMPAIGNUSESSOFTWARE""]","[""ucoexNAME""]",1
-"Comparative and Ranking","Rank groups by the number of distinct software they use.","MATCH (g:UcoexGROUPS)-[:UCOEXGROUPUSESSOFTWARE]->(s:UcoexSOFTWARE) RETURN g.ucoexNAME, count(DISTINCT s) AS softwareCount ORDER BY softwareCount DESC","[""UcoexGROUPS"", ""UcoexSOFTWARE""]","[""UCOEXGROUPUSESSOFTWARE""]","[""ucoexNAME""]",1
-"Comparative and Ranking","Which CVE has the lowest exploitability score?","MATCH (c:UcoCVE) RETURN c.label ORDER BY toInteger(c.ucoexploitabilityScore) ASC LIMIT 1","[""UcoCVE""]","[]","[""label"", ""ucoexploitabilityScore""]",0
-"Comparative and Ranking","List the top 10 CWEs by the number of related CAPEC patterns.","MATCH (cwe:UcoCWE)<-[:UCOEXHASRELATEDWEAKNESS]-(capec:UcoexCAPEC) RETURN cwe.ucocweName, count(capec) AS capecCount ORDER BY capecCount DESC LIMIT 10","[""UcoCWE"", ""UcoexCAPEC""]","[""UCOEXHASRELATEDWEAKNESS""]","[""ucocweName""]",1
-"Comparative and Ranking","Find campaigns that use more than 3 techniques.","MATCH (c:UcoexCAMPAIGNS)-[:UCOEXCAMPAIGNUSESTECHNIQUE]->(t:UcoexMITREATTACK) WITH c, count(t) AS techCount WHERE techCount > 3 RETURN c.ucoexNAME, techCount","[""UcoexCAMPAIGNS"", ""UcoexMITREATTACK""]","[""UCOEXCAMPAIGNUSESTECHNIQUE""]","[""ucoexNAME""]",1
-"Comparative and Ranking","Which mitigation covers the most techniques?","MATCH (m:UcoexMITIGATIONS)-[:UCOEXMITIGATES]->(t:UcoexMITREATTACK) RETURN m.ucoexNAME, count(t) AS techniqueCount ORDER BY techniqueCount DESC LIMIT 1","[""UcoexMITIGATIONS"", ""UcoexMITREATTACK""]","[""UCOEXMITIGATES""]","[""ucoexNAME""]",1
-"Comparative and Ranking","List all software and rank them by the number of groups that use them.","MATCH (g:UcoexGROUPS)-[:UCOEXGROUPUSESSOFTWARE]->(s:UcoexSOFTWARE) RETURN s.ucoexNAME, count(g) AS groupUsage ORDER BY groupUsage DESC","[""UcoexGROUPS"", ""UcoexSOFTWARE""]","[""UCOEXGROUPUSESSOFTWARE""]","[""ucoexNAME""]",1
-"Comparative and Ranking","Which group is associated with the highest number of CRITICAL CVEs?","MATCH (g:UcoexGROUPS)-[:UCOEXGROUPUSESTECHNIQUE]->(:UcoexMITREATTACK)<-[:UCOEXHASTAXONOMYMAPPING]-(:UcoexCAPEC)-[:UCOEXHASRELATEDWEAKNESS]->(:UcoCWE)<-[:UCOHASWEAKNESS]-(:UcoExploitTarget)-[:UCOHASVULNERABILITY]->(:UcoVulnerability)-[:UCOHASCVE_ID]->(c:UcoCVE {ucobaseSeverity: 'CRITICAL'}) RETURN g.ucoexNAME, count(c) as criticalCVEs ORDER BY criticalCVEs DESC LIMIT 1","[""UcoexGROUPS"", ""UcoexMITREATTACK"", ""UcoexCAPEC"", ""UcoCWE"", ""UcoExploitTarget"", ""UcoVulnerability"", ""UcoCVE""]","[""UCOEXGROUPUSESTECHNIQUE"", ""UCOEXHASTAXONOMYMAPPING"", ""UCOEXHASRELATEDWEAKNESS"", ""UCOHASWEAKNESS"", ""UCOHASVULNERABILITY"", ""UCOHASCVE_ID""]","[""ucoexNAME"", ""ucobaseSeverity""]",6
-"Existence and Set Operations Queries","List all threat groups that have a description property.","MATCH (g:UcoexGROUPS) WHERE g.ucoexDESCRIPTION IS NOT NULL RETURN g.ucoexNAME","[""UcoexGROUPS""]","[]","[""ucoexDESCRIPTION"", ""ucoexNAME""]",0
-"Existence and Set Operations Queries","Which CVEs have at least one associated CPE?","MATCH (c:UcoCVE) WHERE EXISTS((c)-[:UCOEXHASCPE]->()) RETURN c.label","[""UcoCVE""]","[""UCOEXHASCPE""]","[""label""]",1
-"Existence and Set Operations Queries","List all software for which there is no associated campaign.","MATCH (s:UcoexSOFTWARE) WHERE NOT EXISTS(()-[:UCOEXCAMPAIGNUSESSOFTWARE]->(s)) RETURN s.ucoexNAME","[""UcoexSOFTWARE""]","[""UCOEXCAMPAIGNUSESSOFTWARE""]","[""ucoexNAME""]",1
-"Existence and Set Operations Queries","Find all MITRE ATT&CK techniques that are either 'Phishing', 'Spearphishing Attachment', or 'Drive-by Compromise'.","MATCH (t:UcoexMITREATTACK) WHERE t.ucoexNAME IN ['Phishing', 'Spearphishing Attachment', 'Drive-by Compromise'] RETURN t.ucoexNAME","[""UcoexMITREATTACK""]","[]","[""ucoexNAME""]",0
-"Existence and Set Operations Queries","Does the threat group 'APT28' exist in the database?","OPTIONAL MATCH (g:UcoexGROUPS {ucoexNAME: 'APT28'}) RETURN g IS NOT NULL AS groupExists","[""UcoexGROUPS""]","[]","[""ucoexNAME""]",0
-"Existence and Set Operations Queries","Find all groups that use software, but specifically not 'Mimikatz'.","MATCH (g:UcoexGROUPS)-[:UCOEXGROUPUSESSOFTWARE]->(s:UcoexSOFTWARE) WHERE s.ucoexNAME <> 'Mimikatz' RETURN DISTINCT g.ucoexNAME","[""UcoexGROUPS"", ""UcoexSOFTWARE""]","[""UCOEXGROUPUSESSOFTWARE""]","[""ucoexNAME""]",1
-"Existence and Set Operations Queries","List all techniques that are not associated with any CAPEC patterns.","MATCH (t:UcoexMITREATTACK) WHERE NOT EXISTS((t)<-[:UCOEXHASTAXONOMYMAPPING]-()) RETURN t.ucoexNAME","[""UcoexMITREATTACK""]","[""UCOEXHASTAXONOMYMAPPING""]","[""ucoexNAME""]",1
-"Existence and Set Operations Queries","Find campaigns that use any of the techniques used by the 'APT28' group.","MATCH (:UcoexGROUPS {ucoexNAME: 'APT28'})-[:UCOEXGROUPUSESTECHNIQUE]->(t:UcoexMITREATTACK) WITH collect(t) as apt28Techniques MATCH (c:UcoexCAMPAIGNS)-[:UCOEXCAMPAIGNUSESTECHNIQUE]->(t2) WHERE t2 in apt28Techniques RETURN DISTINCT c.ucoexNAME","[""UcoexGROUPS"", ""UcoexMITREATTACK"", ""UcoexCAMPAIGNS""]","[""UCOEXGROUPUSESTECHNIQUE"", ""UCOEXCAMPAIGNUSESTECHNIQUE""]","[""ucoexNAME""]",2
-"Existence and Set Operations Queries","Does any single campaign use both 'Cobalt Strike' and 'Mimikatz' software?","MATCH (s1:UcoexSOFTWARE {ucoexNAME: 'Cobalt Strike'})<-[:UCOEXCAMPAIGNUSESSOFTWARE]-(c:UcoexCAMPAIGNS)-[:UCOEXCAMPAIGNUSESSOFTWARE]->(s2:UcoexSOFTWARE {ucoexNAME: 'Mimikatz'}) RETURN CASE WHEN count(c) > 0 THEN true ELSE false END AS usesBoth","[""UcoexSOFTWARE"", ""UcoexCAMPAIGNS""]","[""UCOEXCAMPAIGNUSESSOFTWARE""]","[""ucoexNAME""]",2
-"Existence and Set Operations Queries","List all mitigations that have a description.","MATCH (m:UcoexMITIGATIONS) WHERE m.ucoexDESCRIPTION IS NOT NULL RETURN m.ucoexNAME","[""UcoexMITIGATIONS""]","[]","[""ucoexDESCRIPTION"", ""ucoexNAME""]",0
+"Category","NaturalLanguageQuestion","CypherQuery"
+"Node Lookup Queries","Find a specific CVE by its label, for example, 'CVE-2021-44228'.","MATCH (c:UcoCVE {label: 'CVE-2021-44228'}) RETURN c"
+"Node Lookup Queries","Retrieve the details of the CWE with the ID 'CWE-89'.","MATCH (c:UcoCWE {ucocweID: 'CWE-89'}) RETURN c.ucocweName, c.ucodescription"
+"Node Lookup Queries","Find information about the attack campaign named 'SolarWinds Orion'.","MATCH (c:UcoexCAMPAIGNS {ucoexNAME: 'SolarWinds Orion'}) RETURN c"
+"Node Lookup Queries","Get the details for the MITRE ATT&CK technique named 'Phishing'.","MATCH (t:UcoexMITREATTACK {ucoexNAME: 'Phishing'}) RETURN t.ucoexDESCRIPTION, t.ucoexDOMAIN"
+"Node Lookup Queries","Find the software known as 'Mimikatz'.","MATCH (s:UcoexSOFTWARE {ucoexNAME: 'Mimikatz'}) RETURN s"
+"Node Lookup Queries","Retrieve all campaigns associated with the 'FIN7' group.","MATCH (g:UcoexGROUPS {ucoexNAME: 'FIN7'})<-[:UCOEXATTRIBUTEDTO]-(c:UcoexCAMPAIGNS) RETURN c.ucoexNAME"
+"Node Lookup Queries","Find the CAPEC pattern with the ID 'CAPEC-540'.","MATCH (c:UcoexCAPEC {ucoexCAPEC_id: 'CAPEC-540'}) RETURN c.ucoexCAPEC_name, c.ucoexDescription"
+"Node Lookup Queries","List all known threat groups.","MATCH (g:UcoexGROUPS) RETURN g.ucoexNAME"
+"Node Lookup Queries","Get the description of the mitigation 'User Account Control'.","MATCH (m:UcoexMITIGATIONS {ucoexNAME: 'User Account Control'}) RETURN m.ucoexDESCRIPTION"
+"Node Lookup Queries","Find all vulnerabilities published on '2017-03-14'.","MATCH (v:UcoVulnerability) WHERE v.ucopublishedDateTime = datetime('2017-03-14T00:00:00Z') RETURN v.ucosummary"
+"Relationship Traversal Queries","What software is used by the group 'APT28'?","MATCH (g:UcoexGROUPS {ucoexNAME: 'APT28'})-[:UCOEXGROUPUSESSOFTWARE]->(s:UcoexSOFTWARE) RETURN s.ucoexNAME"
+"Relationship Traversal Queries","Which campaigns are attributed to the 'Lazarus Group'?","MATCH (g:UcoexGROUPS {ucoexNAME: 'Lazarus Group'})<-[:UCOEXATTRIBUTEDTO]-(c:UcoexCAMPAIGNS) RETURN c.ucoexNAME"
+"Relationship Traversal Queries","What ATT&CK techniques does the 'FIN7' group use?","MATCH (g:UcoexGROUPS {ucoexNAME: 'FIN7'})-[:UCOEXGROUPUSESTECHNIQUE]->(t:UcoexMITREATTACK) RETURN t.ucoexNAME"
+"Relationship Traversal Queries","Find the CVE associated with the 'EternalBlue' vulnerability.","MATCH (v:UcoVulnerability {uri: 'vuln-eternalblue'})-[:UCOHASCVE_ID]->(c:UcoCVE) RETURN c.label"
+"Relationship Traversal Queries","Which techniques are mitigated by 'Network Segmentation'?","MATCH (m:UcoexMITIGATIONS {ucoexNAME: 'Network Segmentation'})-[:UCOEXMITIGATES]->(t:UcoexMITREATTACK) RETURN t.ucoexNAME"
+"Relationship Traversal Queries","What software is used in the 'WannaCry' campaign?","MATCH (c:UcoexCAMPAIGNS {ucoexNAME: 'WannaCry Ransomware Attack'})-[:UCOEXCAMPAIGNUSESSOFTWARE]->(s:UcoexSOFTWARE) RETURN s.ucoexNAME"
+"Relationship Traversal Queries","Find related weaknesses for the CAPEC pattern 'CAPEC-115'.","MATCH (capec:UcoexCAPEC {ucoexCAPEC_id: 'CAPEC-115'})-[:UCOEXHASRELATEDWEAKNESS]->(cwe:UcoCWE) RETURN cwe.ucocweID, cwe.ucocweName"
+"Relationship Traversal Queries","Which D3FEND countermeasures are related to the ATT&CK technique 'T1003'?","MATCH (d:UcoexMITRED3FEND)-[:UCOEXHASMITREATTACK]->(t:UcoexMITREATTACK {ucoexNAME: 'T1003'}) RETURN d.ucoexMITRED3FEND_LABEL"
+"Relationship Traversal Queries","Which CPEs are associated with CVE 'CVE-2021-44228'?","MATCH (:UcoCVE {label: 'CVE-2021-44228'})-[:UCOEXHASCPE]->(cpe:UcoexCPE) RETURN cpe.cpeName"
+"Relationship Traversal Queries","Find observed examples for CWE 'CWE-79'.","MATCH (:UcoCWE {ucocweID: 'CWE-79'})-[:UCOHASOBSERVEDEXAMPLE]->(ex:UcoexObservedExample) RETURN ex.ucoexDESCRIPTION"
+"Multi-hop Queries","What software is used by groups that are attributed to the 'SolarWinds' campaign?","MATCH (g:UcoexGROUPS)<-[:UCOEXATTRIBUTEDTO]-(:UcoexCAMPAIGNS {ucoexNAME: 'SolarWinds Orion Attack'})-[:UCOEXGROUPUSESSOFTWARE]->(s:UcoexSOFTWARE) RETURN s.ucoexNAME"
+"Multi-hop Queries","Find the CVEs for vulnerabilities exploited by the 'WannaCry' campaign.","MATCH (:UcoexCAMPAIGNS {ucoexNAME: 'WannaCry Ransomware Attack'})-[:UCOEXCAMPAIGNUSESTECHNIQUE]->(t:UcoexMITREATTACK)<-[:UCOEXHASTAXONOMYMAPPING]-(:UcoexCAPEC)-[:UCOEXHASRELATEDWEAKNESS]->(:UcoCWE)<-[:UCOHASWEAKNESS]-(et:UcoExploitTarget)-[:UCOHASVULNERABILITY]->(v:UcoVulnerability)-[:UCOHASCVE_ID]->(cve:UcoCVE) RETURN cve.label"
+"Multi-hop Queries","Which groups use techniques that can be mitigated by 'Network Segmentation'?","MATCH (g:UcoexGROUPS)-[:UCOEXGROUPUSESTECHNIQUE]->(t:UcoexMITREATTACK)<-[:UCOEXMITIGATES]-(:UcoexMITIGATIONS {ucoexNAME: 'Network Segmentation'}) RETURN g.ucoexNAME"
+"Multi-hop Queries","List techniques used by 'APT28' that are related to CAPEC patterns.","MATCH (:UcoexGROUPS {ucoexNAME: 'APT28'})-[:UCOEXGROUPUSESTECHNIQUE]->(t:UcoexMITREATTACK)<-[:UCOEXHASTAXONOMYMAPPING]-(c:UcoexCAPEC) RETURN t.ucoexNAME, c.ucoexCAPEC_name"
+"Multi-hop Queries","What are the names of vulnerabilities related to weaknesses observed in examples for CVE 'CVE-2017-0144'?","MATCH (:UcoCVE {label: 'CVE-2017-0144'})<-[:UCOEXEXAMPLEOBSERVEDIN]-(:UcoexObservedExample)<-[:UCOHASOBSERVEDEXAMPLE]-(w:UcoCWE)<-[:UCOHASWEAKNESS]-(:UcoExploitTarget)-[:UCOHASVULNERABILITY]->(v:UcoVulnerability) RETURN v.ucosummary"
+"Multi-hop Queries","Find mitigations for techniques used by software employed by the 'FIN7' group.","MATCH (:UcoexGROUPS {ucoexNAME: 'FIN7'})-[:UCOEXGROUPUSESSOFTWARE]->(:UcoexSOFTWARE)-[:UCOEXSOFTWAREUSESTECHNIQUE]->(t:UcoexMITREATTACK)<-[:UCOEXMITIGATES]-(m:UcoexMITIGATIONS) RETURN m.ucoexNAME"
+"Multi-hop Queries","Which campaigns use software that uses the 'PowerShell' technique?","MATCH (c:UcoexCAMPAIGNS)-[:UCOEXCAMPAIGNUSESSOFTWARE]->(:UcoexSOFTWARE)-[:UCOEXSOFTWAREUSESTECHNIQUE]->(:UcoexMITREATTACK {ucoexNAME: 'PowerShell'}) RETURN c.ucoexNAME"
+"Multi-hop Queries","List groups that use the same techniques as the 'SolarWinds' campaign.","MATCH (:UcoexCAMPAIGNS {ucoexNAME: 'SolarWinds Orion Attack'})-[:UCOEXCAMPAIGNUSESTECHNIQUE]->(t:UcoexMITREATTACK)<-[:UCOEXGROUPUSESTECHNIQUE]-(g:UcoexGROUPS) RETURN g.ucoexNAME"
+"Multi-hop Queries","Find the CWEs for weaknesses related to CAPEC patterns that map to the 'Phishing' technique.","MATCH (:UcoexMITREATTACK {ucoexNAME: 'Phishing'})<-[:UCOEXHASTAXONOMYMAPPING]-(:UcoexCAPEC)-[:UCOEXHASRELATEDWEAKNESS]->(cwe:UcoCWE) RETURN cwe.ucocweID"
+"Multi-hop Queries","What are the D3FEND countermeasures for techniques related to the 'Lazarus Group'?","MATCH (:UcoexGROUPS {ucoexNAME: 'Lazarus Group'})-[:UCOEXGROUPUSESTECHNIQUE]->(t:UcoexMITREATTACK)<-[:UCOEXHASMITREATTACK]-(d:UcoexMITRED3FEND) RETURN d.ucoexMITRED3FEND_LABEL"
+"Aggregation and Counting","How many techniques are associated with the 'APT28' group?","MATCH (g:UcoexGROUPS {ucoexNAME: 'APT28'})-[:UCOEXGROUPUSESTECHNIQUE]->(t:UcoexMITREATTACK) RETURN count(t)"
+"Aggregation and Counting","Count the number of campaigns attributed to each threat group.","MATCH (g:UcoexGROUPS)<-[:UCOEXATTRIBUTEDTO]-(c:UcoexCAMPAIGNS) RETURN g.ucoexNAME, count(c) AS campaignCount"
+"Aggregation and Counting","What is the average exploitability score for all CVEs?","MATCH (c:UcoCVE) RETURN avg(toInteger(c.ucoexploitabilityScore))"
+"Aggregation and Counting","How many distinct pieces of software are used by all known groups?","MATCH (:UcoexGROUPS)-[:UCOEXGROUPUSESSOFTWARE]->(s:UcoexSOFTWARE) RETURN count(DISTINCT s)"
+"Aggregation and Counting","Find the maximum impact score among all CVEs.","MATCH (c:UcoCVE) RETURN max(toInteger(c.ucoimpactScore))"
+"Aggregation and Counting","How many related weaknesses does each CAPEC pattern have?","MATCH (capec:UcoexCAPEC)-[:UCOEXHASRELATEDWEAKNESS]->(cwe:UcoCWE) RETURN capec.ucoexCAPEC_name, count(cwe) AS weaknessCount"
+"Aggregation and Counting","Count the total number of vulnerabilities in the database.","MATCH (v:UcoVulnerability) RETURN count(v)"
+"Aggregation and Counting","List the number of techniques associated with each mitigation.","MATCH (m:UcoexMITIGATIONS)-[:UCOEXMITIGATES]->(t:UcoexMITREATTACK) RETURN m.ucoexNAME, count(t) AS techniqueCount"
+"Aggregation and Counting","What is the total number of observed examples for all CWEs?","MATCH (:UcoCWE)-[:UCOHASOBSERVEDEXAMPLE]->(ex:UcoexObservedExample) RETURN count(ex)"
+"Aggregation and Counting","How many campaigns use the 'PowerShell' technique?","MATCH (c:UcoexCAMPAIGNS)-[:UCOEXCAMPAIGNUSESTECHNIQUE]->(:UcoexMITREATTACK {ucoexNAME: 'PowerShell'}) RETURN count(c)"
+"Conditional and Boolean Queries","Find CVEs with an impact score greater than 5 and where user interaction is not required.","MATCH (c:UcoCVE) WHERE toInteger(c.ucoimpactScore) > 5 AND c.ucouserInteractionRequired = 'false' RETURN c.label, c.ucoimpactScore"
+"Conditional and Boolean Queries","List all software that is either 'open-source' or a 'commercial' tool.","MATCH (s:UcoexSOFTWARE) WHERE s.ucoexDOMAIN = 'open-source' OR s.ucoexDOMAIN = 'commercial' RETURN s.ucoexNAME, s.ucoexDOMAIN"
+"Conditional and Boolean Queries","Find campaigns that are not attributed to 'APT28'.","MATCH (c:UcoexCAMPAIGNS) WHERE NOT EXISTS((c)-[:UCOEXATTRIBUTEDTO]->(:UcoexGROUPS {ucoexNAME: 'APT28'})) RETURN c.ucoexNAME"
+"Conditional and Boolean Queries","Retrieve techniques that are not 'Phishing' and are used by the 'Lazarus Group'.","MATCH (:UcoexGROUPS {ucoexNAME: 'Lazarus Group'})-[:UCOEXGROUPUSESTECHNIQUE]->(t:UcoexMITREATTACK) WHERE t.ucoexNAME <> 'Phishing' RETURN t.ucoexNAME"
+"Conditional and Boolean Queries","List all CRITICAL severity CVEs published after 2020.","MATCH (c:UcoCVE) WHERE c.ucobaseSeverity = 'CRITICAL' AND c.ucopublishedDateTime > datetime('2020-01-01T00:00:00Z') RETURN c.label"
+"Conditional and Boolean Queries","Find threat groups that are not Russian and use 'Cobalt Strike'.","MATCH (g:UcoexGROUPS)-[:UCOEXGROUPUSESSOFTWARE]->(:UcoexSOFTWARE {ucoexNAME: 'Cobalt Strike'}) WHERE NOT g.ucoexDESCRIPTION CONTAINS 'Russian' RETURN g.ucoexNAME"
+"Conditional and Boolean Queries","List vulnerabilities where obtaining all privileges is possible but no user interaction is required.","MATCH (v:UcoVulnerability)-[:UCOHASCVE_ID]->(c:UcoCVE) WHERE c.ucoobtainAllPrivilege = 'true' AND c.ucouserInteractionRequired = 'false' RETURN v.ucosummary"
+"Conditional and Boolean Queries","Find CAPEC patterns with 'High' severity and 'Low' likelihood of exploit.","MATCH (c:UcoexCAPEC) WHERE c.ucoexSeverity = 'High' AND c.ucoexLikelihood = 'Low' RETURN c.ucoexCAPEC_name"
+"Conditional and Boolean Queries","Get all mitigations that are not 'Network Segmentation'.","MATCH (m:UcoexMITIGATIONS) WHERE m.ucoexNAME <> 'Network Segmentation' RETURN m.ucoexNAME"
+"Path Queries (Variable-length)","Find all techniques that are reachable from the 'FIN7' group within 3 hops.","MATCH (g:UcoexGROUPS {ucoexNAME: 'FIN7'})-[*1..3]->(t:UcoexMITREATTACK) RETURN DISTINCT t.ucoexNAME"
+"Path Queries (Variable-length)","Is there a connection between the 'SolarWinds' campaign and the 'Mimikatz' software?","MATCH p = (:UcoexCAMPAIGNS {ucoexNAME: 'SolarWinds Orion Attack'})-[*]-(:UcoexSOFTWARE {ucoexNAME: 'Mimikatz'}) RETURN CASE WHEN length(p) > 0 THEN true ELSE false END AS connectionExists LIMIT 1"
+"Path Queries (Variable-length)","Find the shortest path between 'APT28' and the 'PowerShell' technique.","MATCH p = shortestPath((:UcoexGROUPS {ucoexNAME: 'APT28'})-[*]-(:UcoexMITREATTACK {ucoexNAME: 'PowerShell'})) RETURN p"
+"Path Queries (Variable-length)","Find all software connected to 'Lazarus Group' through any path.","MATCH (:UcoexGROUPS {ucoexNAME: 'Lazarus Group'})-[*]->(s:UcoexSOFTWARE) RETURN DISTINCT s.ucoexNAME"
+"Path Queries (Variable-length)","Show the chain of attack from a campaign to a specific CVE, like 'CVE-2017-0144'.","MATCH p = (:UcoexCAMPAIGNS)-[*]->(:UcoCVE {label: 'CVE-2017-0144'}) RETURN p"
+"Path Queries (Variable-length)","What mitigations are indirectly related to the 'FIN7' group?","MATCH (:UcoexGROUPS {ucoexNAME: 'FIN7'})-[*2]->(m:UcoexMITIGATIONS) RETURN DISTINCT m.ucoexNAME"
+"Path Queries (Variable-length)","Find all nodes connected to 'CVE-2021-44228' up to 2 hops away.","MATCH (c:UcoCVE {label: 'CVE-2021-44228'})-[*1..2]-(n) RETURN DISTINCT labels(n), n.uri, n.ucoexNAME, n.label"
+"Path Queries (Variable-length)","Are there any groups that are 3 or more steps away from any mitigations?","MATCH p = (g:UcoexGROUPS)-[*3..]-(m:UcoexMITIGATIONS) RETURN g.ucoexNAME, m.ucoexNAME LIMIT 10"
+"Path Queries (Variable-length)","Find a path from any campaign to any vulnerability.","MATCH p = (:UcoexCAMPAIGNS)-[*]-(:UcoVulnerability) RETURN p LIMIT 1"
+"Path Queries (Variable-length)","Explore all relationships stemming from the 'WannaCry' campaign up to 4 levels deep.","MATCH p = (:UcoexCAMPAIGNS {ucoexNAME: 'WannaCry Ransomware Attack'})-[*1..4]->(n) RETURN p"
+"Graph Pattern Matching","Find groups that use both 'PowerShell' and 'Phishing' techniques.","MATCH (t1:UcoexMITREATTACK {ucoexNAME: 'PowerShell'})<-[:UCOEXGROUPUSESTECHNIQUE]-(g:UcoexGROUPS)-[:UCOEXGROUPUSESTECHNIQUE]->(t2:UcoexMITREATTACK {ucoexNAME: 'Phishing'}) RETURN g.ucoexNAME"
+"Graph Pattern Matching","Identify campaigns that use software also used by the 'APT28' group.","MATCH (:UcoexGROUPS {ucoexNAME: 'APT28'})-[:UCOEXGROUPUSESSOFTWARE]->(s:UcoexSOFTWARE)<-[:UCOEXCAMPAIGNUSESSOFTWARE]-(c:UcoexCAMPAIGNS) RETURN c.ucoexNAME, s.ucoexNAME"
+"Graph Pattern Matching","Find a 'triangle' pattern: a group uses a technique which is mitigated by a mitigation.","MATCH (g:UcoexGROUPS)-[:UCOEXGROUPUSESTECHNIQUE]->(t:UcoexMITREATTACK)<-[:UCOEXMITIGATES]-(m:UcoexMITIGATIONS) RETURN g.ucoexNAME, t.ucoexNAME, m.ucoexNAME LIMIT 10"
+"Graph Pattern Matching","List software that serves as a bridge between two distinct threat groups.","MATCH (g1:UcoexGROUPS)-[:UCOEXGROUPUSESSOFTWARE]->(s:UcoexSOFTWARE)<-[:UCOEXGROUPUSESSOFTWARE]-(g2:UcoexGROUPS) WHERE g1 <> g2 RETURN s.ucoexNAME, g1.ucoexNAME, g2.ucoexNAME"
+"Graph Pattern Matching","Find campaigns that use techniques related to CWEs with 'High' abstraction.","MATCH (c:UcoexCAMPAIGNS)-[:UCOEXCAMPAIGNUSESTECHNIQUE]->(:UcoexMITREATTACK)<-[:UCOEXHASTAXONOMYMAPPING]-(:UcoexCAPEC)-[:UCOEXHASRELATEDWEAKNESS]->(w:UcoCWE {ucoabstraction: 'High'}) RETURN c.ucoexNAME"
+"Graph Pattern Matching","Identify two campaigns that share a common technique.","MATCH (c1:UcoexCAMPAIGNS)-[:UCOEXCAMPAIGNUSESTECHNIQUE]->(t:UcoexMITREATTACK)<-[:UCOEXCAMPAIGNUSESTECHNIQUE]-(c2:UcoexCAMPAIGNS) WHERE id(c1) < id(c2) RETURN c1.ucoexNAME, t.ucoexNAME, c2.ucoexNAME LIMIT 10"
+"Graph Pattern Matching","Find groups that target vulnerabilities with 'CRITICAL' severity.","MATCH (g:UcoexGROUPS)-[:UCOEXGROUPUSESTECHNIQUE]->(:UcoexMITREATTACK)<-[:UCOEXHASTAXONOMYMAPPING]-(:UcoexCAPEC)-[:UCOEXHASRELATEDWEAKNESS]->(:UcoCWE)<-[:UCOHASWEAKNESS]-(:UcoExploitTarget)-[:UCOHASVULNERABILITY]->(:UcoVulnerability)-[:UCOHASCVE_ID]->(c:UcoCVE {ucobaseSeverity: 'CRITICAL'}) RETURN g.ucoexNAME"
+"Graph Pattern Matching","List CVEs that have CPEs and are related to CWEs with observed examples.","MATCH (cve:UcoCVE)-[:UCOEXHASCPE]->(:UcoexCPE), (cve)<-[:UCOHASCVE_ID]-(:UcoVulnerability)<-[:UCOHASVULNERABILITY]-(:UcoExploitTarget)-[:UCOHASWEAKNESS]->(cwe:UcoCWE)-[:UCOHASOBSERVEDEXAMPLE]->(:UcoexObservedExample) RETURN DISTINCT cve.label"
+"Graph Pattern Matching","Find a campaign that uses a technique, which is also used by a software tool.","MATCH (c:UcoexCAMPAIGNS)-[:UCOEXCAMPAIGNUSESTECHNIQUE]->(t:UcoexMITREATTACK)<-[:UCOEXSOFTWAREUSESTECHNIQUE]-(s:UcoexSOFTWARE) RETURN c.ucoexNAME, t.ucoexNAME, s.ucoexNAME LIMIT 10"
+"Graph Pattern Matching","Identify groups using software that is not PowerShell.","MATCH (g:UcoexGROUPS)-[:UCOEXGROUPUSESSOFTWARE]->(s:UcoexSOFTWARE) WHERE s.ucoexNAME <> 'PowerShell' RETURN g.ucoexNAME, s.ucoexNAME"
+"Comparative and Ranking","Which vulnerabilities have higher exploitability scores than impact scores?","MATCH (c:UcoCVE) WHERE toInteger(c.ucoexploitabilityScore) > toInteger(c.ucoimpactScore) RETURN c.label, c.ucoexploitabilityScore, c.ucoimpactScore"
+"Comparative and Ranking","List the top 5 techniques by the number of associated threat groups.","MATCH (g:UcoexGROUPS)-[:UCOEXGROUPUSESTECHNIQUE]->(t:UcoexMITREATTACK) RETURN t.ucoexNAME, count(g) AS groupCount ORDER BY groupCount DESC LIMIT 5"
+"Comparative and Ranking","Find the top 3 most used software across all campaigns.","MATCH (c:UcoexCAMPAIGNS)-[:UCOEXCAMPAIGNUSESSOFTWARE]->(s:UcoexSOFTWARE) RETURN s.ucoexNAME, count(c) AS campaignUsage ORDER BY campaignUsage DESC LIMIT 3"
+"Comparative and Ranking","Rank groups by the number of distinct software they use.","MATCH (g:UcoexGROUPS)-[:UCOEXGROUPUSESSOFTWARE]->(s:UcoexSOFTWARE) RETURN g.ucoexNAME, count(DISTINCT s) AS softwareCount ORDER BY softwareCount DESC"
+"Comparative and Ranking","Which CVE has the lowest exploitability score?","MATCH (c:UcoCVE) RETURN c.label ORDER BY toInteger(c.ucoexploitabilityScore) ASC LIMIT 1"
+"Comparative and Ranking","List the top 10 CWEs by the number of related CAPEC patterns.","MATCH (cwe:UcoCWE)<-[:UCOEXHASRELATEDWEAKNESS]-(capec:UcoexCAPEC) RETURN cwe.ucocweName, count(capec) AS capecCount ORDER BY capecCount DESC LIMIT 10"
+"Comparative and Ranking","Find campaigns that use more than 3 techniques.","MATCH (c:UcoexCAMPAIGNS)-[:UCOEXCAMPAIGNUSESTECHNIQUE]->(t:UcoexMITREATTACK) WITH c, count(t) AS techCount WHERE techCount > 3 RETURN c.ucoexNAME, techCount"
+"Comparative and Ranking","Which mitigation covers the most techniques?","MATCH (m:UcoexMITIGATIONS)-[:UCOEXMITIGATES]->(t:UcoexMITREATTACK) RETURN m.ucoexNAME, count(t) AS techniqueCount ORDER BY techniqueCount DESC LIMIT 1"
+"Comparative and Ranking","List all software and rank them by the number of groups that use them.","MATCH (g:UcoexGROUPS)-[:UCOEXGROUPUSESSOFTWARE]->(s:UcoexSOFTWARE) RETURN s.ucoexNAME, count(g) AS groupUsage ORDER BY groupUsage DESC"
+"Comparative and Ranking","Which group is associated with the highest number of CRITICAL CVEs?","MATCH (g:UcoexGROUPS)-[:UCOEXGROUPUSESTECHNIQUE]->(:UcoexMITREATTACK)<-[:UCOEXHASTAXONOMYMAPPING]-(:UcoexCAPEC)-[:UCOEXHASRELATEDWEAKNESS]->(:UcoCWE)<-[:UCOHASWEAKNESS]-(:UcoExploitTarget)-[:UCOHASVULNERABILITY]->(:UcoVulnerability)-[:UCOHASCVE_ID]->(c:UcoCVE {ucobaseSeverity: 'CRITICAL'}) RETURN g.ucoexNAME, count(c) as criticalCVEs ORDER BY criticalCVEs DESC LIMIT 1"
+"Existence and Set Operations Queries","List all threat groups that have a description property.","MATCH (g:UcoexGROUPS) WHERE g.ucoexDESCRIPTION IS NOT NULL RETURN g.ucoexNAME"
+"Existence and Set Operations Queries","Which CVEs have at least one associated CPE?","MATCH (c:UcoCVE) WHERE EXISTS((c)-[:UCOEXHASCPE]->()) RETURN c.label"
+"Existence and Set Operations Queries","List all software for which there is no associated campaign.","MATCH (s:UcoexSOFTWARE) WHERE NOT EXISTS(()-[:UCOEXCAMPAIGNUSESSOFTWARE]->(s)) RETURN s.ucoexNAME"
+"Existence and Set Operations Queries","Find all MITRE ATT&CK techniques that are either 'Phishing', 'Spearphishing Attachment', or 'Drive-by Compromise'.","MATCH (t:UcoexMITREATTACK) WHERE t.ucoexNAME IN ['Phishing', 'Spearphishing Attachment', 'Drive-by Compromise'] RETURN t.ucoexNAME"
+"Existence and Set Operations Queries","Does the threat group 'APT28' exist in the database?","OPTIONAL MATCH (g:UcoexGROUPS {ucoexNAME: 'APT28'}) RETURN g IS NOT NULL AS groupExists"
+"Existence and Set Operations Queries","Find all groups that use software, but specifically not 'Mimikatz'.","MATCH (g:UcoexGROUPS)-[:UCOEXGROUPUSESSOFTWARE]->(s:UcoexSOFTWARE) WHERE s.ucoexNAME <> 'Mimikatz' RETURN DISTINCT g.ucoexNAME"
+"Existence and Set Operations Queries","List all techniques that are not associated with any CAPEC patterns.","MATCH (t:UcoexMITREATTACK) WHERE NOT EXISTS((t)<-[:UCOEXHASTAXONOMYMAPPING]-()) RETURN t.ucoexNAME"
+"Existence and Set Operations Queries","Find campaigns that use any of the techniques used by the 'APT28' group.","MATCH (:UcoexGROUPS {ucoexNAME: 'APT28'})-[:UCOEXGROUPUSESTECHNIQUE]->(t:UcoexMITREATTACK) WITH collect(t) as apt28Techniques MATCH (c:UcoexCAMPAIGNS)-[:UCOEXCAMPAIGNUSESTECHNIQUE]->(t2) WHERE t2 in apt28Techniques RETURN DISTINCT c.ucoexNAME"
+"Existence and Set Operations Queries","Does any single campaign use both 'Cobalt Strike' and 'Mimikatz' software?","MATCH (s1:UcoexSOFTWARE {ucoexNAME: 'Cobalt Strike'})<-[:UCOEXCAMPAIGNUSESSOFTWARE]-(c:UcoexCAMPAIGNS)-[:UCOEXCAMPAIGNUSESSOFTWARE]->(s2:UcoexSOFTWARE {ucoexNAME: 'Mimikatz'}) RETURN CASE WHEN count(c) > 0 THEN true ELSE false END AS usesBoth"
+"Existence and Set Operations Queries","List all mitigations that have a description.","MATCH (m:UcoexMITIGATIONS) WHERE m.ucoexDESCRIPTION IS NOT NULL RETURN m.ucoexNAME"
+"Node Lookup Queries","Find the details for CVE 'CVE-2009-2228'.","MATCH (c:UcoCVE {label: 'CVE-2009-2228'}) RETURN c"
+"Node Lookup Queries","Find the details for CVE 'CVE-2000-5395'.","MATCH (c:UcoCVE {label: 'CVE-2000-5395'}) RETURN c"
+"Node Lookup Queries","Find the details for CVE 'CVE-2013-3014'.","MATCH (c:UcoCVE {label: 'CVE-2013-3014'}) RETURN c"
+"Node Lookup Queries","Find the details for CVE 'CVE-2001-8911'.","MATCH (c:UcoCVE {label: 'CVE-2001-8911'}) RETURN c"
+"Node Lookup Queries","Find the details for CVE 'CVE-2001-2833'.","MATCH (c:UcoCVE {label: 'CVE-2001-2833'}) RETURN c"
+"Node Lookup Queries","Find the details for CVE 'CVE-2008-4165'.","MATCH (c:UcoCVE {label: 'CVE-2008-4165'}) RETURN c"
+"Node Lookup Queries","Find the details for CVE 'CVE-2008-4893'.","MATCH (c:UcoCVE {label: 'CVE-2008-4893'}) RETURN c"
+"Node Lookup Queries","Find the details for CVE 'CVE-2000-3853'.","MATCH (c:UcoCVE {label: 'CVE-2000-3853'}) RETURN c"
+"Node Lookup Queries","Find the details for CVE 'CVE-2022-8752'.","MATCH (c:UcoCVE {label: 'CVE-2022-8752'}) RETURN c"
+"Node Lookup Queries","Find the details for CVE 'CVE-2004-8211'.","MATCH (c:UcoCVE {label: 'CVE-2004-8211'}) RETURN c"
+"Node Lookup Queries","Find the details for CVE 'CVE-2018-1193'.","MATCH (c:UcoCVE {label: 'CVE-2018-1193'}) RETURN c"
+"Node Lookup Queries","Find the details for CVE 'CVE-2001-5323'.","MATCH (c:UcoCVE {label: 'CVE-2001-5323'}) RETURN c"
+"Node Lookup Queries","Find the details for CVE 'CVE-2004-1107'.","MATCH (c:UcoCVE {label: 'CVE-2004-1107'}) RETURN c"
+"Node Lookup Queries","Find the details for CVE 'CVE-2017-4289'.","MATCH (c:UcoCVE {label: 'CVE-2017-4289'}) RETURN c"
+"Node Lookup Queries","Find the details for CVE 'CVE-2004-5733'.","MATCH (c:UcoCVE {label: 'CVE-2004-5733'}) RETURN c"
+"Node Lookup Queries","Find the details for CVE 'CVE-2009-4235'.","MATCH (c:UcoCVE {label: 'CVE-2009-4235'}) RETURN c"
+"Node Lookup Queries","Find the details for CVE 'CVE-2001-9291'.","MATCH (c:UcoCVE {label: 'CVE-2001-9291'}) RETURN c"
+"Node Lookup Queries","Find the details for CVE 'CVE-2001-2379'.","MATCH (c:UcoCVE {label: 'CVE-2001-2379'}) RETURN c"
+"Node Lookup Queries","Find the details for CVE 'CVE-2019-4134'.","MATCH (c:UcoCVE {label: 'CVE-2019-4134'}) RETURN c"
+"Node Lookup Queries","Find the details for CVE 'CVE-2019-4711'.","MATCH (c:UcoCVE {label: 'CVE-2019-4711'}) RETURN c"
+"Node Lookup Queries","Find the details for CVE 'CVE-2004-8833'.","MATCH (c:UcoCVE {label: 'CVE-2004-8833'}) RETURN c"
+"Node Lookup Queries","Find the details for CVE 'CVE-2019-2865'.","MATCH (c:UcoCVE {label: 'CVE-2019-2865'}) RETURN c"
+"Node Lookup Queries","Find the details for CVE 'CVE-2018-8093'.","MATCH (c:UcoCVE {label: 'CVE-2018-8093'}) RETURN c"
+"Node Lookup Queries","Find the details for CVE 'CVE-2008-3397'.","MATCH (c:UcoCVE {label: 'CVE-2008-3397'}) RETURN c"
+"Node Lookup Queries","Find the details for CVE 'CVE-2008-1843'.","MATCH (c:UcoCVE {label: 'CVE-2008-1843'}) RETURN c"
+"Node Lookup Queries","Find the details for CVE 'CVE-2019-4499'.","MATCH (c:UcoCVE {label: 'CVE-2019-4499'}) RETURN c"
+"Node Lookup Queries","Find the details for CVE 'CVE-2007-4014'.","MATCH (c:UcoCVE {label: 'CVE-2007-4014'}) RETURN c"
+"Node Lookup Queries","Find the details for CVE 'CVE-2005-1133'.","MATCH (c:UcoCVE {label: 'CVE-2005-1133'}) RETURN c"
+"Node Lookup Queries","Find the details for CVE 'CVE-2009-5368'.","MATCH (c:UcoCVE {label: 'CVE-2009-5368'}) RETURN c"
+"Node Lookup Queries","Find the details for CVE 'CVE-2017-7028'.","MATCH (c:UcoCVE {label: 'CVE-2017-7028'}) RETURN c"
+"Node Lookup Queries","Find the details for CVE 'CVE-2004-4919'.","MATCH (c:UcoCVE {label: 'CVE-2004-4919'}) RETURN c"
+"Node Lookup Queries","Find the details for CVE 'CVE-2005-8499'.","MATCH (c:UcoCVE {label: 'CVE-2005-8499'}) RETURN c"
+"Node Lookup Queries","Find the details for CVE 'CVE-2005-0646'.","MATCH (c:UcoCVE {label: 'CVE-2005-0646'}) RETURN c"
+"Node Lookup Queries","Find the details for CVE 'CVE-2005-4311'.","MATCH (c:UcoCVE {label: 'CVE-2005-4311'}) RETURN c"
+"Node Lookup Queries","Find the details for CVE 'CVE-2005-7382'.","MATCH (c:UcoCVE {label: 'CVE-2005-7382'}) RETURN c"
+"Node Lookup Queries","Find the details for CVE 'CVE-2005-1302'.","MATCH (c:UcoCVE {label: 'CVE-2005-1302'}) RETURN c"
+"Node Lookup Queries","Find the details for CVE 'CVE-2005-4309'.","MATCH (c:UcoCVE {label: 'CVE-2005-4309'}) RETURN c"
+"Node Lookup Queries","Find the details for CVE 'CVE-2005-1311'.","MATCH (c:UcoCVE {label: 'CVE-2005-1311'}) RETURN c"
+"Node Lookup Queries","Find the details for CVE 'CVE-2005-1312'.","MATCH (c:UcoCVE {label: 'CVE-2005-1312'}) RETURN c"
+"Node Lookup Queries","Find the details for CVE 'CVE-2005-1313'.","MATCH (c:UcoCVE {label: 'CVE-2005-1313'}) RETURN c"
+"Node Lookup Queries","List all CVEs with a 'HIGH' base severity.","MATCH (c:UcoCVE {ucobaseSeverity: 'HIGH'}) RETURN c"
+"Node Lookup Queries","List all CVEs with a 'MEDIUM' base severity.","MATCH (c:UcoCVE {ucobaseSeverity: 'MEDIUM'}) RETURN c"
+"Node Lookup Queries","List all CVEs with a 'LOW' base severity.","MATCH (c:UcoCVE {ucobaseSeverity: 'LOW'}) RETURN c"
+"Node Lookup Queries","Find all CVEs with a vulnerability status of 'Deferred'.","MATCH (c:UcoCVE {ucovulnStatus: 'Deferred'}) RETURN c"
+"Node Lookup Queries","Find all CVEs with a vulnerability status of 'Analyzed'.","MATCH (c:UcoCVE {ucovulnStatus: 'Analyzed'}) RETURN c"
+"Node Lookup Queries","Find all CVEs with a vulnerability status of 'Modified'.","MATCH (c:UcoCVE {ucovulnStatus: 'Modified'}) RETURN c"
+"Node Lookup Queries","Find all CVEs with a vulnerability status of 'Awaiting Analysis'.","MATCH (c:UcoCVE {ucovulnStatus: 'Awaiting Analysis'}) RETURN c"
+"Node Lookup Queries","Find all CVEs with a vulnerability status of 'Rejected'.","MATCH (c:UcoCVE {ucovulnStatus: 'Rejected'}) RETURN c"
+"Node Lookup Queries","Find all CVEs with a vulnerability status of 'Undergoing Analysis'.","MATCH (c:UcoCVE {ucovulnStatus: 'Undergoing Analysis'}) RETURN c"
+"Node Lookup Queries","Find all CVEs with a vulnerability status of 'Received'.","MATCH (c:UcoCVE {ucovulnStatus: 'Received'}) RETURN c"
+"Node Lookup Queries","Find all CVEs with an impact score less than 3.9.","MATCH (c:UcoCVE) WHERE toFloat(c.ucoimpactScore) < 3.9 RETURN c"
+"Node Lookup Queries","Find all CVEs with an exploitability score greater than 9.2.","MATCH (c:UcoCVE) WHERE toFloat(c.ucoexploitabilityScore) > 9.2 RETURN c"
+"Node Lookup Queries","Find all CVEs with an exploitability score less than 9.5.","MATCH (c:UcoCVE) WHERE toFloat(c.ucoexploitabilityScore) < 9.5 RETURN c"
+"Node Lookup Queries","Find all CVEs with an impact score less than 8.8.","MATCH (c:UcoCVE) WHERE toFloat(c.ucoimpactScore) < 8.8 RETURN c"
+"Node Lookup Queries","Find all CVEs with an exploitability score less than 5.3.","MATCH (c:UcoCVE) WHERE toFloat(c.ucoexploitabilityScore) < 5.3 RETURN c"
+"Node Lookup Queries","Find all CVEs with an impact score greater than 2.8.","MATCH (c:UcoCVE) WHERE toFloat(c.ucoimpactScore) > 2.8 RETURN c"
+"Node Lookup Queries","Find all CVEs with an exploitability score less than 1.1.","MATCH (c:UcoCVE) WHERE toFloat(c.ucoexploitabilityScore) < 1.1 RETURN c"
+"Node Lookup Queries","Find all CVEs with an impact score less than 1.4.","MATCH (c:UcoCVE) WHERE toFloat(c.ucoimpactScore) < 1.4 RETURN c"
+"Node Lookup Queries","Find all CVEs with an impact score greater than 8.2.","MATCH (c:UcoCVE) WHERE toFloat(c.ucoimpactScore) > 8.2 RETURN c"
+"Node Lookup Queries","Find all CVEs with an exploitability score greater than 3.4.","MATCH (c:UcoCVE) WHERE toFloat(c.ucoexploitabilityScore) > 3.4 RETURN c"
+"Node Lookup Queries","Find all CVEs with an impact score less than 5.4.","MATCH (c:UcoCVE) WHERE toFloat(c.ucoimpactScore) < 5.4 RETURN c"
+"Node Lookup Queries","Find all CVEs with an exploitability score less than 6.4.","MATCH (c:UcoCVE) WHERE toFloat(c.ucoexploitabilityScore) < 6.4 RETURN c"
+"Node Lookup Queries","Find all CVEs with an impact score less than 6.2.","MATCH (c:UcoCVE) WHERE toFloat(c.ucoimpactScore) < 6.2 RETURN c"
+"Node Lookup Queries","Find all CVEs with an exploitability score greater than 2.4.","MATCH (c:UcoCVE) WHERE toFloat(c.ucoexploitabilityScore) > 2.4 RETURN c"
+"Node Lookup Queries","Find all CVEs with an exploitability score greater than 1.4.","MATCH (c:UcoCVE) WHERE toFloat(c.ucoexploitabilityScore) > 1.4 RETURN c"
+"Node Lookup Queries","Find all CVEs with an exploitability score less than 8.2.","MATCH (c:UcoCVE) WHERE toFloat(c.ucoexploitabilityScore) < 8.2 RETURN c"
+"Node Lookup Queries","Find all CVEs with an exploitability score less than 4.8.","MATCH (c:UcoCVE) WHERE toFloat(c.ucoexploitabilityScore) < 4.8 RETURN c"
+"Node Lookup Queries","Find all CVEs with an impact score greater than 9.4.","MATCH (c:UcoCVE) WHERE toFloat(c.ucoimpactScore) > 9.4 RETURN c"
+"Node Lookup Queries","Find all CVEs with an impact score less than 9.3.","MATCH (c:UcoCVE) WHERE toFloat(c.ucoimpactScore) < 9.3 RETURN c"
+"Node Lookup Queries","Find all CVEs with an impact score greater than 6.4.","MATCH (c:UcoCVE) WHERE toFloat(c.ucoimpactScore) > 6.4 RETURN c"
+"Node Lookup Queries","List all CVEs with a 'LOW' severity and where user interaction is 'true'.","MATCH (c:UcoCVE {ucobaseSeverity: 'LOW', ucouserInteractionRequired: 'true'}) RETURN c"
+"Node Lookup Queries","List all CVEs with a status of 'Analyzed' and where obtaining all privilege is 'true'.","MATCH (c:UcoCVE {ucovulnStatus: 'Analyzed', ucoobtainAllPrivilege: 'true'}) RETURN c"
+"Node Lookup Queries","List all CVEs with a 'HIGH' severity and where user interaction is 'true'.","MATCH (c:UcoCVE {ucobaseSeverity: 'HIGH', ucouserInteractionRequired: 'true'}) RETURN c"
+"Node Lookup Queries","List all CVEs with a status of 'Received' and where obtaining all privilege is 'false'.","MATCH (c:UcoCVE {ucovulnStatus: 'Received', ucoobtainAllPrivilege: 'false'}) RETURN c"
+"Node Lookup Queries","List all CVEs with a status of 'Modified' and where obtaining all privilege is 'true'.","MATCH (c:UcoCVE {ucovulnStatus: 'Modified', ucoobtainAllPrivilege: 'true'}) RETURN c"
+"Node Lookup Queries","List all CVEs with a 'MEDIUM' severity and where user interaction is 'true'.","MATCH (c:UcoCVE {ucobaseSeverity: 'MEDIUM', ucouserInteractionRequired: 'true'}) RETURN c"
+"Node Lookup Queries","List all CVEs with a status of 'Awaiting Analysis' and where obtaining all privilege is 'true'.","MATCH (c:UcoCVE {ucovulnStatus: 'Awaiting Analysis', ucoobtainAllPrivilege: 'true'}) RETURN c"
+"Node Lookup Queries","List all CVEs with a status of 'Undergoing Analysis' and where obtaining all privilege is 'true'.","MATCH (c:UcoCVE {ucovulnStatus: 'Undergoing Analysis', ucoobtainAllPrivilege: 'true'}) RETURN c"
+"Node Lookup Queries","List all CVEs with a 'LOW' severity and where user interaction is 'false'.","MATCH (c:UcoCVE {ucobaseSeverity: 'LOW', ucouserInteractionRequired: 'false'}) RETURN c"
+"Node Lookup Queries","List all CVEs with a status of 'Rejected' and where obtaining all privilege is 'true'.","MATCH (c:UcoCVE {ucovulnStatus: 'Rejected', ucoobtainAllPrivilege: 'true'}) RETURN c"
+"Node Lookup Queries","List all CVEs with a status of 'Deferred' and where obtaining all privilege is 'true'.","MATCH (c:UcoCVE {ucovulnStatus: 'Deferred', ucoobtainAllPrivilege: 'true'}) RETURN c"
+"Node Lookup Queries","List all CVEs with a status of 'Awaiting Analysis' and where obtaining all privilege is 'false'.","MATCH (c:UcoCVE {ucovulnStatus: 'Awaiting Analysis', ucoobtainAllPrivilege: 'false'}) RETURN c"
+"Node Lookup Queries","List all CVEs with a status of 'Received' and where obtaining all privilege is 'true'.","MATCH (c:UcoCVE {ucovulnStatus: 'Received', ucoobtainAllPrivilege: 'true'}) RETURN c"
+"Node Lookup Queries","List all CVEs with a status of 'Undergoing Analysis' and where obtaining all privilege is 'false'.","MATCH (c:UcoCVE {ucovulnStatus: 'Undergoing Analysis', ucoobtainAllPrivilege: 'false'}) RETURN c"
+"Node Lookup Queries","List all CVEs with a 'HIGH' severity and where user interaction is 'false'.","MATCH (c:UcoCVE {ucobaseSeverity: 'HIGH', ucouserInteractionRequired: 'false'}) RETURN c"
+"Node Lookup Queries","List all CVEs with a status of 'Rejected' and where obtaining all privilege is 'false'.","MATCH (c:UcoCVE {ucovulnStatus: 'Rejected', ucoobtainAllPrivilege: 'false'}) RETURN c"
+"Node Lookup Queries","List all CVEs with a status of 'Modified' and where obtaining all privilege is 'false'.","MATCH (c:UcoCVE {ucovulnStatus: 'Modified', ucoobtainAllPrivilege: 'false'}) RETURN c"
+"Node Lookup Queries","List all CVEs with a status of 'Analyzed' and where obtaining all privilege is 'false'.","MATCH (c:UcoCVE {ucovulnStatus: 'Analyzed', ucoobtainAllPrivilege: 'false'}) RETURN c"
+"Node Lookup Queries","List all CVEs with a 'MEDIUM' severity and where user interaction is 'false'.","MATCH (c:UcoCVE {ucobaseSeverity: 'MEDIUM', ucouserInteractionRequired: 'false'}) RETURN c"
+"Node Lookup Queries","List all CVEs with a status of 'Deferred' and where obtaining all privilege is 'false'.","MATCH (c:UcoCVE {ucovulnStatus: 'Deferred', ucoobtainAllPrivilege: 'false'}) RETURN c"
+"Node Lookup Queries","Show me all 'LOW' severity CVEs with a status of 'Analyzed' that require user interaction to be 'true'.","MATCH (c:UcoCVE {ucobaseSeverity: 'LOW', ucovulnStatus: 'Analyzed', ucouserInteractionRequired: 'true'}) RETURN c"
+"Node Lookup Queries","Show me all 'HIGH' severity CVEs with a status of 'Awaiting Analysis' that require user interaction to be 'false'.","MATCH (c:UcoCVE {ucobaseSeverity: 'HIGH', ucovulnStatus: 'Awaiting Analysis', ucouserInteractionRequired: 'false'}) RETURN c"
+"Node Lookup Queries","Show me all 'MEDIUM' severity CVEs with a status of 'Modified' that require user interaction to be 'true'.","MATCH (c:UcoCVE {ucobaseSeverity: 'MEDIUM', ucovulnStatus: 'Modified', ucouserInteractionRequired: 'true'}) RETURN c"
+"Node Lookup Queries","Show me all 'LOW' severity CVEs with a status of 'Received' that require user interaction to be 'false'.","MATCH (c:UcoCVE {ucobaseSeverity: 'LOW', ucovulnStatus: 'Received', ucouserInteractionRequired: 'false'}) RETURN c"
+"Node Lookup Queries","Show me all 'HIGH' severity CVEs with a status of 'Rejected' that require user interaction to be 'true'.","MATCH (c:UcoCVE {ucobaseSeverity: 'HIGH', ucovulnStatus: 'Rejected', ucouserInteractionRequired: 'true'}) RETURN c"
+"Node Lookup Queries","Show me all 'MEDIUM' severity CVEs with a status of 'Deferred' that require user interaction to be 'false'.","MATCH (c:UcoCVE {ucobaseSeverity: 'MEDIUM', ucovulnStatus: 'Deferred', ucouserInteractionRequired: 'false'}) RETURN c"
+"Node Lookup Queries","Show me all 'LOW' severity CVEs with a status of 'Undergoing Analysis' that require user interaction to be 'true'.","MATCH (c:UcoCVE {ucobaseSeverity: 'LOW', ucovulnStatus: 'Undergoing Analysis', ucouserInteractionRequired: 'true'}) RETURN c"
+"Node Lookup Queries","Find vulnerabilities published on '2020-01-15'.","MATCH (v:UcoVulnerability) WHERE v.ucopublishedDateTime STARTS WITH '2020-01-15' RETURN v"
+"Node Lookup Queries","Find vulnerabilities modified after '2021-06-01'.","MATCH (v:UcoVulnerability) WHERE v.ucolastModifiedDateTime > '2021-06-01T00:00:00' RETURN v"
+"Node Lookup Queries","Find vulnerabilities with 'remote code execution' in their summary.","MATCH (v:UcoVulnerability) WHERE v.ucosummary CONTAINS 'remote code execution' RETURN v"
+"Node Lookup Queries","List all vulnerabilities with 'CRITICAL' base severity.","MATCH (v:UcoVulnerability {ucobaseSeverity: 'CRITICAL'}) RETURN v"
+"Node Lookup Queries","List all vulnerabilities with 'HIGH' base severity.","MATCH (v:UcoVulnerability {ucobaseSeverity: 'HIGH'}) RETURN v"
+"Node Lookup Queries","List all vulnerabilities with 'MEDIUM' base severity.","MATCH (v:UcoVulnerability {ucobaseSeverity: 'MEDIUM'}) RETURN v"
+"Node Lookup Queries","List all vulnerabilities with 'LOW' base severity.","MATCH (v:UcoVulnerability {ucobaseSeverity: 'LOW'}) RETURN v"
+"Node Lookup Queries","Find vulnerabilities with status 'Analyzed'.","MATCH (v:UcoVulnerability {ucovulnStatus: 'Analyzed'}) RETURN v"
+"Node Lookup Queries","Find vulnerabilities with status 'Rejected'.","MATCH (v:UcoVulnerability {ucovulnStatus: 'Rejected'}) RETURN v"
+"Node Lookup Queries","Find vulnerabilities where user interaction is required.","MATCH (v:UcoVulnerability {ucouserInteractionRequired: 'true'}) RETURN v"
+"Node Lookup Queries","Find vulnerabilities where user interaction is not required.","MATCH (v:UcoVulnerability {ucouserInteractionRequired: 'false'}) RETURN v"
+"Node Lookup Queries","Find vulnerabilities where obtaining all privileges is possible.","MATCH (v:UcoVulnerability {ucoobtainAllPrivilege: 'true'}) RETURN v"
+"Node Lookup Queries","Find vulnerabilities with impact score greater than 9.0.","MATCH (v:UcoVulnerability) WHERE toFloat(v.ucoimpactScore) > 9.0 RETURN v"
+"Node Lookup Queries","Find vulnerabilities with exploitability score less than 3.0.","MATCH (v:UcoVulnerability) WHERE toFloat(v.ucoexploitabilityScore) < 3.0 RETURN v"
+"Node Lookup Queries","List critical vulnerabilities requiring user interaction.","MATCH (v:UcoVulnerability {ucobaseSeverity: 'CRITICAL', ucouserInteractionRequired: 'true'}) RETURN v"
+"Node Lookup Queries","Find vulnerabilities with 'buffer overflow' in summary and 'HIGH' severity.","MATCH (v:UcoVulnerability {ucobaseSeverity: 'HIGH'}) WHERE v.ucosummary CONTAINS 'buffer overflow' RETURN v"
+"Node Lookup Queries","Find vulnerabilities published before '2019-01-01'.","MATCH (v:UcoVulnerability) WHERE v.ucopublishedDateTime < '2019-01-01T00:00:00' RETURN v"
+"Node Lookup Queries","Find vulnerabilities modified between '2022-01-01' and '2022-12-31'.","MATCH (v:UcoVulnerability) WHERE v.ucolastModifiedDateTime >= '2022-01-01T00:00:00' AND v.ucolastModifiedDateTime <= '2022-12-31T23:59:59' RETURN v"
+"Node Lookup Queries","List vulnerabilities with 'denial of service' in summary and 'MEDIUM' severity.","MATCH (v:UcoVulnerability {ucobaseSeverity: 'MEDIUM'}) WHERE v.ucosummary CONTAINS 'denial of service' RETURN v"
+"Node Lookup Queries","Find vulnerabilities with impact score between 7.0 and 8.0.","MATCH (v:UcoVulnerability) WHERE toFloat(v.ucoimpactScore) >= 7.0 AND toFloat(v.ucoimpactScore) <= 8.0 RETURN v"
+"Node Lookup Queries","Find vulnerabilities with exploitability score between 4.0 and 5.0.","MATCH (v:UcoVulnerability) WHERE toFloat(v.ucoexploitabilityScore) >= 4.0 AND toFloat(v.ucoexploitabilityScore) <= 5.0 RETURN v"
+"Node Lookup Queries","List vulnerabilities with status 'Modified' and no user interaction.","MATCH (v:UcoVulnerability {ucovulnStatus: 'Modified', ucouserInteractionRequired: 'false'}) RETURN v"
+"Node Lookup Queries","Find vulnerabilities where all privileges can be obtained and published in 2023.","MATCH (v:UcoVulnerability {ucoobtainAllPrivilege: 'true'}) WHERE v.ucopublishedDateTime STARTS WITH '2023' RETURN v"
+"Node Lookup Queries","Find vulnerabilities with 'SQL injection' in summary.","MATCH (v:UcoVulnerability) WHERE v.ucosummary CONTAINS 'SQL injection' RETURN v"
+"Node Lookup Queries","List vulnerabilities with 'authentication bypass' in summary.","MATCH (v:UcoVulnerability) WHERE v.ucosummary CONTAINS 'authentication bypass' RETURN v"
+"Node Lookup Queries","Find vulnerabilities with 'cross-site scripting' in summary.","MATCH (v:UcoVulnerability) WHERE v.ucosummary CONTAINS 'cross-site scripting' RETURN v"
+"Node Lookup Queries","Find vulnerabilities with 'privilege escalation' in summary.","MATCH (v:UcoVulnerability) WHERE v.ucosummary CONTAINS 'privilege escalation' RETURN v"
+"Node Lookup Queries","List vulnerabilities with 'information disclosure' in summary.","MATCH (v:UcoVulnerability) WHERE v.ucosummary CONTAINS 'information disclosure' RETURN v"
+"Node Lookup Queries","Find vulnerabilities with 'directory traversal' in summary.","MATCH (v:UcoVulnerability) WHERE v.ucosummary CONTAINS 'directory traversal' RETURN v"
+"Node Lookup Queries","Find vulnerabilities with 'command injection' in summary.","MATCH (v:UcoVulnerability) WHERE v.ucosummary CONTAINS 'command injection' RETURN v"
+"Node Lookup Queries","List vulnerabilities with 'file upload' in summary.","MATCH (v:UcoVulnerability) WHERE v.ucosummary CONTAINS 'file upload' RETURN v"
+"Node Lookup Queries","Find vulnerabilities with 'insecure deserialization' in summary.","MATCH (v:UcoVulnerability) WHERE v.ucosummary CONTAINS 'insecure deserialization' RETURN v"
+"Node Lookup Queries","Find vulnerabilities with 'weak password' in summary.","MATCH (v:UcoVulnerability) WHERE v.ucosummary CONTAINS 'weak password' RETURN v"
+"Node Lookup Queries","List vulnerabilities with 'session fixation' in summary.","MATCH (v:UcoVulnerability) WHERE v.ucosummary CONTAINS 'session fixation' RETURN v"
+"Node Lookup Queries","Find vulnerabilities with 'open redirect' in summary.","MATCH (v:UcoVulnerability) WHERE v.ucosummary CONTAINS 'open redirect' RETURN v"
+"Node Lookup Queries","Find vulnerabilities with 'server-side request forgery' in summary.","MATCH (v:UcoVulnerability) WHERE v.ucosummary CONTAINS 'server-side request forgery' RETURN v"
+"Node Lookup Queries","List vulnerabilities with 'XML external entity' in summary.","MATCH (v:UcoVulnerability) WHERE v.ucosummary CONTAINS 'XML external entity' RETURN v"
+"Node Lookup Queries","Find vulnerabilities with 'unauthorized access' in summary.","MATCH (v:UcoVulnerability) WHERE v.ucosummary CONTAINS 'unauthorized access' RETURN v"
+"Node Lookup Queries","Find vulnerabilities with 'memory corruption' in summary.","MATCH (v:UcoVulnerability) WHERE v.ucosummary CONTAINS 'memory corruption' RETURN v"
+"Node Lookup Queries","List vulnerabilities with 'race condition' in summary.","MATCH (v:UcoVulnerability) WHERE v.ucosummary CONTAINS 'race condition' RETURN v"
+"Node Lookup Queries","Find vulnerabilities with 'format string' in summary.","MATCH (v:UcoVulnerability) WHERE v.ucosummary CONTAINS 'format string' RETURN v"
+"Node Lookup Queries","Find vulnerabilities with 'integer overflow' in summary.","MATCH (v:UcoVulnerability) WHERE v.ucosummary CONTAINS 'integer overflow' RETURN v"
+"Node Lookup Queries","List vulnerabilities with 'use-after-free' in summary.","MATCH (v:UcoVulnerability) WHERE v.ucosummary CONTAINS 'use-after-free' RETURN v"
+"Node Lookup Queries","Find vulnerabilities with 'double free' in summary.","MATCH (v:UcoVulnerability) WHERE v.ucosummary CONTAINS 'double free' RETURN v"
+"Node Lookup Queries","Find vulnerabilities with 'heap overflow' in summary.","MATCH (v:UcoVulnerability) WHERE v.ucosummary CONTAINS 'heap overflow' RETURN v"
+"Node Lookup Queries","List vulnerabilities with 'stack overflow' in summary.","MATCH (v:UcoVulnerability) WHERE v.ucosummary CONTAINS 'stack overflow' RETURN v"
+"Node Lookup Queries","Find vulnerabilities with 'logic error' in summary.","MATCH (v:UcoVulnerability) WHERE v.ucosummary CONTAINS 'logic error' RETURN v"
+"Node Lookup Queries","Find vulnerabilities with 'configuration error' in summary.","MATCH (v:UcoVulnerability) WHERE v.ucosummary CONTAINS 'configuration error' RETURN v"
+"Node Lookup Queries","List vulnerabilities with 'missing encryption' in summary.","MATCH (v:UcoVulnerability) WHERE v.ucosummary CONTAINS 'missing encryption' RETURN v"
+"Node Lookup Queries","Find vulnerabilities published in the year 2024.","MATCH (v:UcoVulnerability) WHERE v.ucopublishedDateTime STARTS WITH '2024' RETURN v"
+"Node Lookup Queries","Find vulnerabilities modified in the month of March.","MATCH (v:UcoVulnerability) WHERE v.ucolastModifiedDateTime CONTAINS '-03-' RETURN v"
+"Node Lookup Queries","Find vulnerabilities with 'zero-day' in their summary.","MATCH (v:UcoVulnerability) WHERE v.ucosummary CONTAINS 'zero-day' RETURN v"
+"Node Lookup Queries","List all vulnerabilities with 'INFORMATIONAL' base severity.","MATCH (v:UcoVulnerability {ucobaseSeverity: 'INFORMATIONAL'}) RETURN v"
+"Node Lookup Queries","Find vulnerabilities with status 'Pending'.","MATCH (v:UcoVulnerability {ucovulnStatus: 'Pending'}) RETURN v"
+"Node Lookup Queries","Find vulnerabilities where obtaining all privileges is false.","MATCH (v:UcoVulnerability {ucoobtainAllPrivilege: 'false'}) RETURN v"
+"Node Lookup Queries","Find vulnerabilities with impact score exactly 5.0.","MATCH (v:UcoVulnerability) WHERE toFloat(v.ucoimpactScore) = 5.0 RETURN v"
+"Node Lookup Queries","Find vulnerabilities with exploitability score exactly 7.0.","MATCH (v:UcoVulnerability) WHERE toFloat(v.ucoexploitabilityScore) = 7.0 RETURN v"
+"Node Lookup Queries","List vulnerabilities with 'HIGH' severity and no user interaction.","MATCH (v:UcoVulnerability {ucobaseSeverity: 'HIGH', ucouserInteractionRequired: 'false'}) RETURN v"
+"Node Lookup Queries","Find vulnerabilities with 'malware' in summary and 'MEDIUM' severity.","MATCH (v:UcoVulnerability {ucobaseSeverity: 'MEDIUM'}) WHERE v.ucosummary CONTAINS 'malware' RETURN v"
+"Node Lookup Queries","Find vulnerabilities published in 2022 and with 'LOW' severity.","MATCH (v:UcoVulnerability {ucobaseSeverity: 'LOW'}) WHERE v.ucopublishedDateTime STARTS WITH '2022' RETURN v"
+"Node Lookup Queries","Find vulnerabilities modified in the last 30 days (assuming current date is 2025-10-20).","MATCH (v:UcoVulnerability) WHERE v.ucolastModifiedDateTime >= '2025-09-20T00:00:00' RETURN v"
+"Node Lookup Queries","List vulnerabilities with 'phishing' in summary and 'CRITICAL' severity.","MATCH (v:UcoVulnerability {ucobaseSeverity: 'CRITICAL'}) WHERE v.ucosummary CONTAINS 'phishing' RETURN v"
+"Node Lookup Queries","Find vulnerabilities with impact score less than 2.0 or greater than 8.0.","MATCH (v:UcoVulnerability) WHERE toFloat(v.ucoimpactScore) < 2.0 OR toFloat(v.ucoimpactScore) > 8.0 RETURN v"
+"Node Lookup Queries","Find vulnerabilities with exploitability score not equal to 6.0.","MATCH (v:UcoVulnerability) WHERE toFloat(v.ucoexploitabilityScore) <> 6.0 RETURN v"
+"Node Lookup Queries","List vulnerabilities with status 'Undergoing Analysis' and user interaction required.","MATCH (v:UcoVulnerability {ucovulnStatus: 'Undergoing Analysis', ucouserInteractionRequired: 'true'}) RETURN v"
+"Node Lookup Queries","Find vulnerabilities where all privileges can be obtained and modified in 2024.","MATCH (v:UcoVulnerability {ucoobtainAllPrivilege: 'true'}) WHERE v.ucolastModifiedDateTime STARTS WITH '2024' RETURN v"
+"Node Lookup Queries","Find vulnerabilities with 'data breach' in summary.","MATCH (v:UcoVulnerability) WHERE v.ucosummary CONTAINS 'data breach' RETURN v"
+"Node Lookup Queries","List vulnerabilities with 'ransomware' in summary.","MATCH (v:UcoVulnerability) WHERE v.ucosummary CONTAINS 'ransomware' RETURN v"
+"Node Lookup Queries","Find vulnerabilities with 'supply chain attack' in summary.","MATCH (v:UcoVulnerability) WHERE v.ucosummary CONTAINS 'supply chain attack' RETURN v"
+"Node Lookup Queries","Find vulnerabilities with 'web application' in summary.","MATCH (v:UcoVulnerability) WHERE v.ucosummary CONTAINS 'web application' RETURN v"
+"Node Lookup Queries","List vulnerabilities with 'mobile application' in summary.","MATCH (v:UcoVulnerability) WHERE v.ucosummary CONTAINS 'mobile application' RETURN v"
+"Node Lookup Queries","Find vulnerabilities with 'cloud security' in summary.","MATCH (v:UcoVulnerability) WHERE v.ucosummary CONTAINS 'cloud security' RETURN v"
+"Node Lookup Queries","Find vulnerabilities with 'IoT device' in summary.","MATCH (v:UcoVulnerability) WHERE v.ucosummary CONTAINS 'IoT device' RETURN v"
+"Node Lookup Queries","List vulnerabilities with 'firmware' in summary.","MATCH (v:UcoVulnerability) WHERE v.ucosummary CONTAINS 'firmware' RETURN v"
+"Node Lookup Queries","Find vulnerabilities with 'network protocol' in summary.","MATCH (v:UcoVulnerability) WHERE v.ucosummary CONTAINS 'network protocol' RETURN v"
+"Node Lookup Queries","Find vulnerabilities with 'operating system' in summary.","MATCH (v:UcoVulnerability) WHERE v.ucosummary CONTAINS 'operating system' RETURN v"
+"Node Lookup Queries","List vulnerabilities with 'third-party library' in summary.","MATCH (v:UcoVulnerability) WHERE v.ucosummary CONTAINS 'third-party library' RETURN v"
+"Node Lookup Queries","Find vulnerabilities with 'software component' in summary.","MATCH (v:UcoVulnerability) WHERE v.ucosummary CONTAINS 'software component' RETURN v"
+"Node Lookup Queries","Find vulnerabilities with 'hardware vulnerability' in summary.","MATCH (v:UcoVulnerability) WHERE v.ucosummary CONTAINS 'hardware vulnerability' RETURN v"
+"Node Lookup Queries","List vulnerabilities with 'physical access' in summary.","MATCH (v:UcoVulnerability) WHERE v.ucosummary CONTAINS 'physical access' RETURN v"
+"Node Lookup Queries","Find vulnerabilities with 'social engineering' in summary.","MATCH (v:UcoVulnerability) WHERE v.ucosummary CONTAINS 'social engineering' RETURN v"
+"Node Lookup Queries","Find vulnerabilities with 'insider threat' in summary.","MATCH (v:UcoVulnerability) WHERE v.ucosummary CONTAINS 'insider threat' RETURN v"
+"Node Lookup Queries","List vulnerabilities with 'misconfiguration' in summary.","MATCH (v:UcoVulnerability) WHERE v.ucosummary CONTAINS 'misconfiguration' RETURN v"
+"Node Lookup Queries","Find vulnerabilities with 'default credentials' in summary.","MATCH (v:UcoVulnerability) WHERE v.ucosummary CONTAINS 'default credentials' RETURN v"
+"Node Lookup Queries","Find vulnerabilities with 'weak authentication' in summary.","MATCH (v:UcoVulnerability) WHERE v.ucosummary CONTAINS 'weak authentication' RETURN v"
+"Node Lookup Queries","List vulnerabilities with 'broken access control' in summary.","MATCH (v:UcoVulnerability) WHERE v.ucosummary CONTAINS 'broken access control' RETURN v"
+"Node Lookup Queries","Find vulnerabilities with 'sensitive data exposure' in summary.","MATCH (v:UcoVulnerability) WHERE v.ucosummary CONTAINS 'sensitive data exposure' RETURN v"
+"Node Lookup Queries","Find vulnerabilities with 'security misconfiguration' in summary.","MATCH (v:UcoVulnerability) WHERE v.ucosummary CONTAINS 'security misconfiguration' RETURN v"
+"Node Lookup Queries","List vulnerabilities with 'logging and monitoring' in summary.","MATCH (v:UcoVulnerability) WHERE v.ucosummary CONTAINS 'logging and monitoring' RETURN v"
+"Node Lookup Queries","Find vulnerabilities with 'server-side template injection' in summary.","MATCH (v:UcoVulnerability) WHERE v.ucosummary CONTAINS 'server-side template injection' RETURN v"
+"Node Lookup Queries","Find vulnerabilities with 'host header injection' in summary.","MATCH (v:UcoVulnerability) WHERE v.ucosummary CONTAINS 'host header injection' RETURN v"
+"Node Lookup Queries","List vulnerabilities with 'HTTP parameter pollution' in summary.","MATCH (v:UcoVulnerability) WHERE v.ucosummary CONTAINS 'HTTP parameter pollution' RETURN v"
+"Node Lookup Queries","Find vulnerabilities with 'reflected XSS' in summary.","MATCH (v:UcoVulnerability) WHERE v.ucosummary CONTAINS 'reflected XSS' RETURN v"
+"Node Lookup Queries","Find vulnerabilities with 'stored XSS' in summary.","MATCH (v:UcoVulnerability) WHERE v.ucosummary CONTAINS 'stored XSS' RETURN v"
+"Node Lookup Queries","List vulnerabilities with 'DOM XSS' in summary.","MATCH (v:UcoVulnerability) WHERE v.ucosummary CONTAINS 'DOM XSS' RETURN v"
+"Node Lookup Queries","Find vulnerabilities with 'blind SQL injection' in summary.","MATCH (v:UcoVulnerability) WHERE v.ucosummary CONTAINS 'blind SQL injection' RETURN v"
+"Node Lookup Queries","Find vulnerabilities with 'time-based SQL injection' in summary.","MATCH (v:UcoVulnerability) WHERE v.ucosummary CONTAINS 'time-based SQL injection' RETURN v"
+"Node Lookup Queries","List vulnerabilities with 'error-based SQL injection' in summary.","MATCH (v:UcoVulnerability) WHERE v.ucosummary CONTAINS 'error-based SQL injection' RETURN v"
+"Node Lookup Queries","Find vulnerabilities with 'out-of-band SQL injection' in summary.","MATCH (v:UcoVulnerability) WHERE v.ucosummary CONTAINS 'out-of-band SQL injection' RETURN v"
+"Node Lookup Queries","Get details for CWE-120.","MATCH (c:UcoCWE {ucocweID: 'CWE-120'}) RETURN c"
+"Node Lookup Queries","Find weakness 'Buffer Copy without Checking Size of Input ('Classic Buffer Overflow')'.","MATCH (c:UcoCWE {ucocweName: 'Buffer Copy without Checking Size of Input (\'Classic Buffer Overflow\')'}) RETURN c"
+"Node Lookup Queries","Show CWEs with 'Pillar' abstraction and 'Draft' status.","MATCH (c:UcoCWE {ucoabstraction: 'Pillar', ucostatus: 'Draft'}) RETURN c"
+"Node Lookup Queries","List all 'Class' level CWEs with 'Simple' structure and 'Incomplete' status.","MATCH (c:UcoCWE {ucoabstraction: 'Class', ucostructure: 'Simple', ucostatus: 'Incomplete'}) RETURN c"
+"Node Lookup Queries","Find CWEs with 'code execution' in their description.","MATCH (c:UcoCWE) WHERE c.ucodescription CONTAINS 'code execution' RETURN c"
+"Node Lookup Queries","Get details for CWE-416.","MATCH (c:UcoCWE {ucocweID: 'CWE-416'}) RETURN c"
+"Node Lookup Queries","Find weakness 'Use After Free'.","MATCH (c:UcoCWE {ucocweName: 'Use After Free'}) RETURN c"
+"Node Lookup Queries","List all 'Base' level CWEs with 'Composite' structure and 'Stable' status.","MATCH (c:UcoCWE {ucoabstraction: 'Base', ucostructure: 'Composite', ucostatus: 'Stable'}) RETURN c"
+"Node Lookup Queries","Find CWEs with 'denial of service' in their description.","MATCH (c:UcoCWE) WHERE c.ucodescription CONTAINS 'denial of service' RETURN c"
+"Node Lookup Queries","Get details for CWE-404.","MATCH (c:UcoCWE {ucocweID: 'CWE-404'}) RETURN c"
+"Node Lookup Queries","Find weakness 'Improper Resource Shutdown or Release'.","MATCH (c:UcoCWE {ucocweName: 'Improper Resource Shutdown or Release'}) RETURN c"
+"Node Lookup Queries","List all 'Pillar' level CWEs with 'Simple' structure and 'Stable' status.","MATCH (c:UcoCWE {ucoabstraction: 'Pillar', ucostructure: 'Simple', ucostatus: 'Stable'}) RETURN c"
+"Node Lookup Queries","Find CWEs with 'data integrity' in their description.","MATCH (c:UcoCWE) WHERE c.ucodescription CONTAINS 'data integrity' RETURN c"
+"Node Lookup Queries","Get details for CWE-345.","MATCH (c:UcoCWE {ucocweID: 'CWE-345'}) RETURN c"
+"Node Lookup Queries","Find weakness 'Insufficient Verification of Data Authenticity'.","MATCH (c:UcoCWE {ucocweName: 'Insufficient Verification of Data Authenticity'}) RETURN c"
+"Node Lookup Queries","Show CWEs with 'Class' abstraction and 'Stable' status and 'Simple' structure.","MATCH (c:UcoCWE {ucoabstraction: 'Class', ucostatus: 'Stable', ucostructure: 'Simple'}) RETURN c"
+"Node Lookup Queries","List all 'Variant' level CWEs with 'Draft' status.","MATCH (c:UcoCWE {ucoabstraction: 'Variant', ucostatus: 'Draft'}) RETURN c"
+"Node Lookup Queries","Find CWEs with 'confidentiality' in their description.","MATCH (c:UcoCWE) WHERE c.ucodescription CONTAINS 'confidentiality' RETURN c"
+"Node Lookup Queries","Get details for CWE-359.","MATCH (c:UcoCWE {ucocweID: 'CWE-359'}) RETURN c"
+"Node Lookup Queries","Find weakness 'Exposure of Private Information to an Unauthorized Actor'.","MATCH (c:UcoCWE {ucocweName: 'Exposure of Private Information to an Unauthorized Actor'}) RETURN c"
+"Node Lookup Queries","Show CWEs with 'Base' abstraction and 'Incomplete' status and 'Composite' structure.","MATCH (c:UcoCWE {ucoabstraction: 'Base', ucostatus: 'Incomplete', ucostructure: 'Composite'}) RETURN c"
+"Node Lookup Queries","List all 'Compound' level CWEs with 'Deprecated' status.","MATCH (c:UcoCWE {ucoabstraction: 'Compound', ucostatus: 'Deprecated'}) RETURN c"
+"Node Lookup Queries","Find CWEs with 'integrity' in their description.","MATCH (c:UcoCWE) WHERE c.ucodescription CONTAINS 'integrity' RETURN c"
+"Node Lookup Queries","Get details for CWE-611.","MATCH (c:UcoCWE {ucocweID: 'CWE-611'}) RETURN c"
+"Node Lookup Queries","Find weakness 'Improper Restriction of XML External Entity Reference'.","MATCH (c:UcoCWE {ucocweName: 'Improper Restriction of XML External Entity Reference'}) RETURN c"
+"Node Lookup Queries","Show CWEs with 'Pillar' abstraction and 'Stable' status and 'Composite' structure.","MATCH (c:UcoCWE {ucoabstraction: 'Pillar', ucostatus: 'Stable', ucostructure: 'Composite'}) RETURN c"
+"Node Lookup Queries","List all 'Class' level CWEs with 'Draft' status and 'Simple' structure.","MATCH (c:UcoCWE {ucoabstraction: 'Class', ucostatus: 'Draft', ucostructure: 'Simple'}) RETURN c"
+"Node Lookup Queries","Find CWEs with 'availability' in their description.","MATCH (c:UcoCWE) WHERE c.ucodescription CONTAINS 'availability' RETURN c"
+"Node Lookup Queries","Get details for CWE-476.","MATCH (c:UcoCWE {ucocweID: 'CWE-476'}) RETURN c"
+"Node Lookup Queries","Find weakness 'NULL Pointer Dereference'.","MATCH (c:UcoCWE {ucocweName: 'NULL Pointer Dereference'}) RETURN c"
+"Node Lookup Queries","Show CWEs with 'Variant' abstraction and 'Incomplete' status and 'Simple' structure.","MATCH (c:UcoCWE {ucoabstraction: 'Variant', ucostatus: 'Incomplete', ucostructure: 'Simple'}) RETURN c"
+"Node Lookup Queries","List all 'Base' level CWEs with 'Deprecated' status and 'Simple' structure.","MATCH (c:UcoCWE {ucoabstraction: 'Base', ucostatus: 'Deprecated', ucostructure: 'Simple'}) RETURN c"
+"Node Lookup Queries","Find CWEs with 'input validation' in their description.","MATCH (c:UcoCWE) WHERE c.ucodescription CONTAINS 'input validation' RETURN c"
+"Node Lookup Queries","Get details for CWE-77.","MATCH (c:UcoCWE {ucocweID: 'CWE-77'}) RETURN c"
+"Node Lookup Queries","Find weakness 'Improper Neutralization of Special Elements used in a Command ('Command Injection')'.","MATCH (c:UcoCWE {ucocweName: 'Improper Neutralization of Special Elements used in a Command (\'Command Injection\')'}) RETURN c"
+"Node Lookup Queries","Show CWEs with 'Compound' abstraction and 'Stable' status and 'Simple' structure.","MATCH (c:UcoCWE {ucoabstraction: 'Compound', ucostatus: 'Stable', ucostructure: 'Simple'}) RETURN c"
+"Node Lookup Queries","List all 'Pillar' level CWEs with 'Draft' status and 'Composite' structure.","MATCH (c:UcoCWE {ucoabstraction: 'Pillar', ucostatus: 'Draft', ucostructure: 'Composite'}) RETURN c"
+"Node Lookup Queries","Find CWEs with 'output encoding' in their description.","MATCH (c:UcoCWE) WHERE c.ucodescription CONTAINS 'output encoding' RETURN c"
+"Node Lookup Queries","Get details for CWE-116.","MATCH (c:UcoCWE {ucocweID: 'CWE-116'}) RETURN c"
+"Node Lookup Queries","Find weakness 'Improper Encoding or Escaping of Output'.","MATCH (c:UcoCWE {ucocweName: 'Improper Encoding or Escaping of Output'}) RETURN c"
+"Node Lookup Queries","Show CWEs with 'Class' abstraction and 'Incomplete' status and 'Composite' structure.","MATCH (c:UcoCWE {ucoabstraction: 'Class', ucostatus: 'Incomplete', ucostructure: 'Composite'}) RETURN c"
+"Node Lookup Queries","List all 'Variant' level CWEs with 'Stable' status and 'Composite' structure.","MATCH (c:UcoCWE {ucoabstraction: 'Variant', ucostatus: 'Stable', ucostructure: 'Composite'}) RETURN c"
+"Node Lookup Queries","Find CWEs with 'session management' in their description.","MATCH (c:UcoCWE) WHERE c.ucodescription CONTAINS 'session management' RETURN c"
+"Node Lookup Queries","Get details for CWE-384.","MATCH (c:UcoCWE {ucocweID: 'CWE-384'}) RETURN c"
+"Node Lookup Queries","Find weakness 'Session Fixation'.","MATCH (c:UcoCWE {ucocweName: 'Session Fixation'}) RETURN c"
+"Node Lookup Queries","Show CWEs with 'Base' abstraction and 'Draft' status and 'Composite' structure.","MATCH (c:UcoCWE {ucoabstraction: 'Base', ucostatus: 'Draft', ucostructure: 'Composite'}) RETURN c"
+"Node Lookup Queries","List all 'Compound' level CWEs with 'Incomplete' status and 'Composite' structure.","MATCH (c:UcoCWE {ucoabstraction: 'Compound', ucostatus: 'Incomplete', ucostructure: 'Composite'}) RETURN c"
+"Node Lookup Queries","Find CWEs with 'error handling' in their description.","MATCH (c:UcoCWE) WHERE c.ucodescription CONTAINS 'error handling' RETURN c"
+"Node Lookup Queries","Show me all 'MEDIUM' severity CVEs with a status of 'Awaiting Analysis' that require user interaction to be 'true'.","MATCH (c:UcoCVE {ucobaseSeverity: 'MEDIUM', ucovulnStatus: 'Awaiting Analysis', ucouserInteractionRequired: 'true'}) RETURN c"
+"Node Lookup Queries","Show me all 'LOW' severity CVEs with a status of 'Modified' that require user interaction to be 'false'.","MATCH (c:UcoCVE {ucobaseSeverity: 'LOW', ucovulnStatus: 'Modified', ucouserInteractionRequired: 'false'}) RETURN c"
+"Node Lookup Queries","Get me the details for CWE-1004","MATCH (c:UcoCWE {ucocweID: 'CWE-1004'}) RETURN c"
+"Node Lookup Queries","Find the weakness CWE-1007","MATCH (c:UcoCWE {ucocweID: 'CWE-1007'}) RETURN c"
+"Node Lookup Queries","Show details for CWE-102","MATCH (c:UcoCWE {ucocweID: 'CWE-102'}) RETURN c"
+"Node Lookup Queries","Retrieve information on CWE-1035","MATCH (c:UcoCWE {ucocweID: 'CWE-1035'}) RETURN c"
+"Node Lookup Queries","What is CWE-104?","MATCH (c:UcoCWE {ucocweID: 'CWE-104'}) RETURN c"
+"Node Lookup Queries","Get me the details for CWE-1048","MATCH (c:UcoCWE {ucocweID: 'CWE-1048'}) RETURN c"
+"Node Lookup Queries","Find the weakness CWE-1050","MATCH (c:UcoCWE {ucocweID: 'CWE-1050'}) RETURN c"
+"Node Lookup Queries","Show details for CWE-1051","MATCH (c:UcoCWE {ucocweID: 'CWE-1051'}) RETURN c"
+"Node Lookup Queries","Retrieve information on CWE-1053","MATCH (c:UcoCWE {ucocweID: 'CWE-1053'}) RETURN c"
+"Node Lookup Queries","What is CWE-1054?","MATCH (c:UcoCWE {ucocweID: 'CWE-1054'}) RETURN c"
+"Node Lookup Queries","Get me the details for CWE-1055","MATCH (c:UcoCWE {ucocweID: 'CWE-1055'}) RETURN c"
+"Node Lookup Queries","Find the weakness CWE-1056","MATCH (c:UcoCWE {ucocweID: 'CWE-1056'}) RETURN c"
+"Node Lookup Queries","Show details for CWE-1057","MATCH (c:UcoCWE {ucocweID: 'CWE-1057'}) RETURN c"
+"Node Lookup Queries","Retrieve information on CWE-1058","MATCH (c:UcoCWE {ucocweID: 'CWE-1058'}) RETURN c"
+"Node Lookup Queries","What is CWE-1059?","MATCH (c:UcoCWE {ucocweID: 'CWE-1059'}) RETURN c"
+"Node Lookup Queries","Get me the details for CWE-1060","MATCH (c:UcoCWE {ucocweID: 'CWE-1060'}) RETURN c"
+"Node Lookup Queries","Find the weakness CWE-1061","MATCH (c:UcoCWE {ucocweID: 'CWE-1061'}) RETURN c"
+"Node Lookup Queries","Show details for CWE-1062","MATCH (c:UcoCWE {ucocweID: 'CWE-1062'}) RETURN c"
+"Node Lookup Queries","Retrieve information on CWE-1063","MATCH (c:UcoCWE {ucocweID: 'CWE-1063'}) RETURN c"
+"Node Lookup Queries","What is CWE-1064?","MATCH (c:UcoCWE {ucocweID: 'CWE-1064'}) RETURN c"
+"Node Lookup Queries","Find all CWEs with the abstraction level 'Pillar'.","MATCH (c:UcoCWE {ucoabstraction: 'Pillar'}) RETURN c"
+"Node Lookup Queries","List all CWEs that are considered 'Class' level abstractions.","MATCH (c:UcoCWE {ucoabstraction: 'Class'}) RETURN c"
+"Node Lookup Queries","Show me all CWEs with a 'Base' abstraction.","MATCH (c:UcoCWE {ucoabstraction: 'Base'}) RETURN c"
+"Node Lookup Queries","Find all CWEs that are 'Variant' abstractions.","MATCH (c:UcoCWE {ucoabstraction: 'Variant'}) RETURN c"
+"Node Lookup Queries","List all CWEs with a 'Compound' abstraction level.","MATCH (c:UcoCWE {ucoabstraction: 'Compound'}) RETURN c"
+"Node Lookup Queries","Show all CWEs that have a 'Draft' status.","MATCH (c:UcoCWE {ucostatus: 'Draft'}) RETURN c"
+"Node Lookup Queries","Find all CWEs with a status of 'Incomplete'.","MATCH (c:UcoCWE {ucostatus: 'Incomplete'}) RETURN c"
+"Node Lookup Queries","List all CWEs that are considered 'Stable'.","MATCH (c:UcoCWE {ucostatus: 'Stable'}) RETURN c"
+"Node Lookup Queries","Show me all 'Deprecated' CWEs.","MATCH (c:UcoCWE {ucostatus: 'Deprecated'}) RETURN c"
+"Node Lookup Queries","Find all CWEs with a 'Simple' structure.","MATCH (c:UcoCWE {ucostructure: 'Simple'}) RETURN c"
+"Node Lookup Queries","List all CWEs that have a 'Composite' structure.","MATCH (c:UcoCWE {ucostructure: 'Composite'}) RETURN c"
+"Node Lookup Queries","Find weaknesses related to 'Improper Authentication'.","MATCH (c:UcoCWE {ucocweName: 'Improper Authentication'}) RETURN c"
+"Node Lookup Queries","Show me details about 'Cross-Site Scripting'.","MATCH (c:UcoCWE {ucocweName: 'Cross-Site Scripting'}) RETURN c"
+"Node Lookup Queries","Find information on 'Code Injection' weaknesses.","MATCH (c:UcoCWE {ucocweName: 'Code Injection'}) RETURN c"
+"Node Lookup Queries","List weaknesses titled 'Missing Authorization'.","MATCH (c:UcoCWE {ucocweName: 'Missing Authorization'}) RETURN c"
+"Node Lookup Queries","Find details for 'Use of Hard-coded Credentials'.","MATCH (c:UcoCWE {ucocweName: 'Use of Hard-coded Credentials'}) RETURN c"
+"Node Lookup Queries","Show me information about 'Unrestricted Upload of File with Dangerous Type'.","MATCH (c:UcoCWE {ucocweName: 'Unrestricted Upload of File with Dangerous Type'}) RETURN c"
+"Node Lookup Queries","Find weaknesses named 'Reliance on Untrusted Inputs in a Security Decision'.","MATCH (c:UcoCWE {ucocweName: 'Reliance on Untrusted Inputs in a Security Decision'}) RETURN c"
+"Node Lookup Queries","List details for 'Insecure Default Initialization of Resource'.","MATCH (c:UcoCWE {ucocweName: 'Insecure Default Initialization of Resource'}) RETURN c"
+"Node Lookup Queries","Find information on 'Missing Encryption of Sensitive Data'.","MATCH (c:UcoCWE {ucocweName: 'Missing Encryption of Sensitive Data'}) RETURN c"
+"Node Lookup Queries","Show details for 'Use of a Broken or Risky Cryptographic Algorithm'.","MATCH (c:UcoCWE {ucocweName: 'Use of a Broken or Risky Cryptographic Algorithm'}) RETURN c"
+"Node Lookup Queries","Find any CWE that mentions 'authentication' in its summary.","MATCH (c:UcoCWE) WHERE c.ucocweSummary CONTAINS 'authentication' RETURN c"
+"Node Lookup Queries","Are there any weaknesses related to 'buffer'?","MATCH (c:UcoCWE) WHERE c.ucodescription CONTAINS 'buffer' RETURN c"
+"Node Lookup Queries","List all CWEs that talk about 'injection'.","MATCH (c:UcoCWE) WHERE c.ucodescription CONTAINS 'injection' RETURN c"
+"Node Lookup Queries","Find CWEs with 'path traversal' in their description.","MATCH (c:UcoCWE) WHERE c.ucodescription CONTAINS 'path traversal' RETURN c"
+"Node Lookup Queries","Show weaknesses involving 'credentials'.","MATCH (c:UcoCWE) WHERE c.ucodescription CONTAINS 'credentials' RETURN c"
+"Node Lookup Queries","Find all 'Base' abstractions and have a 'Stable' status.","MATCH (c:UcoCWE {ucoabstraction: 'Base', ucostatus: 'Stable'}) RETURN c"
+"Node Lookup Queries","List all 'Variant' CWEs that are 'Incomplete'.","MATCH (c:UcoCWE {ucoabstraction: 'Variant', ucostatus: 'Incomplete'}) RETURN c"
+"Node Lookup Queries","Show me all 'Class' level weaknesses with a 'Simple' structure.","MATCH (c:UcoCWE {ucoabstraction: 'Class', ucostructure: 'Simple'}) RETURN c"
+"Node Lookup Queries","Find all 'Pillar' CWEs that are currently 'Stable'.","MATCH (c:UcoCWE {ucoabstraction: 'Pillar', ucostatus: 'Stable'}) RETURN c"
+"Node Lookup Queries","List 'Compound' weaknesses that are in a 'Draft' status.","MATCH (c:UcoCWE {ucoabstraction: 'Compound', ucostatus: 'Draft'}) RETURN c"
+"Node Lookup Queries","Get me the details for CWE-1065","MATCH (c:UcoCWE {ucocweID: 'CWE-1065'}) RETURN c"
+"Node Lookup Queries","Find the weakness CWE-1066","MATCH (c:UcoCWE {ucocweID: 'CWE-1066'}) RETURN c"
+"Node Lookup Queries","Show details for CWE-1067","MATCH (c:UcoCWE {ucocweID: 'CWE-1067'}) RETURN c"
+"Node Lookup Queries","Retrieve information on CWE-1068","MATCH (c:UcoCWE {ucocweID: 'CWE-1068'}) RETURN c"
+"Node Lookup Queries","What is CWE-1069?","MATCH (c:UcoCWE {ucocweID: 'CWE-1069'}) RETURN c"
+"Node Lookup Queries","Get me the details for CWE-1070","MATCH (c:UcoCWE {ucocweID: 'CWE-1070'}) RETURN c"
+"Node Lookup Queries","Find the weakness CWE-1071","MATCH (c:UcoCWE {ucocweID: 'CWE-1071'}) RETURN c"
+"Node Lookup Queries","Show details for CWE-1072","MATCH (c:UcoCWE {ucocweID: 'CWE-1072'}) RETURN c"
+"Node Lookup Queries","Retrieve information on CWE-1073","MATCH (c:UcoCWE {ucocweID: 'CWE-1073'}) RETURN c"
+"Node Lookup Queries","What is CWE-1074?","MATCH (c:UcoCWE {ucocweID: 'CWE-1074'}) RETURN c"
+"Node Lookup Queries","Get me the details for CWE-1075","MATCH (c:UcoCWE {ucocweID: 'CWE-1075'}) RETURN c"
+"Node Lookup Queries","Find the weakness CWE-1076","MATCH (c:UcoCWE {ucocweID: 'CWE-1076'}) RETURN c"
+"Node Lookup Queries","Show details for CWE-1077","MATCH (c:UcoCWE {ucocweID: 'CWE-1077'}) RETURN c"
+"Node Lookup Queries","Retrieve information on CWE-1078","MATCH (c:UcoCWE {ucocweID: 'CWE-1078'}) RETURN c"
+"Node Lookup Queries","What is CWE-1079?","MATCH (c:UcoCWE {ucocweID: 'CWE-1079'}) RETURN c"
+"Node Lookup Queries","Get me the details for CWE-1080","MATCH (c:UcoCWE {ucocweID: 'CWE-1080'}) RETURN c"
+"Node Lookup Queries","Find the weakness CWE-1081","MATCH (c:UcoCWE {ucocweID: 'CWE-1081'}) RETURN c"
+"Node Lookup Queries","Show details for CWE-1082","MATCH (c:UcoCWE {ucocweID: 'CWE-1082'}) RETURN c"
+"Node Lookup Queries","Retrieve information on CWE-1083","MATCH (c:UcoCWE {ucocweID: 'CWE-1083'}) RETURN c"
+"Node Lookup Queries","What is CWE-1084?","MATCH (c:UcoCWE {ucocweID: 'CWE-1084'}) RETURN c"
+"Node Lookup Queries","Find all 'Pillar' abstractions that are also 'Deprecated'.","MATCH (c:UcoCWE {ucoabstraction: 'Pillar', ucostatus: 'Deprecated'}) RETURN c"
+"Node Lookup Queries","List all 'Base' weaknesses that are in a 'Draft' status.","MATCH (c:UcoCWE {ucoabstraction: 'Base', ucostatus: 'Draft'}) RETURN c"
+"Node Lookup Queries","Find any CWE that mentions 'SQL' in its description.","MATCH (c:UcoCWE) WHERE c.ucodescription CONTAINS 'SQL' RETURN c"
+"Node Lookup Queries","Are there any weaknesses related to 'cross-site scripting'?","MATCH (c:UcoCWE) WHERE c.ucodescription CONTAINS 'cross-site scripting' RETURN c"
+"Node Lookup Queries","List all CWEs that talk about 'memory leak'.","MATCH (c:UcoCWE) WHERE c.ucodescription CONTAINS 'memory leak' RETURN c"
+"Node Lookup Queries","Show weaknesses involving 'deserialization'.","MATCH (c:UcoCWE) WHERE c.ucodescription CONTAINS 'deserialization' RETURN c"
+"Node Lookup Queries","Find any CWE that mentions 'privilege' in its summary.","MATCH (c:UcoCWE) WHERE c.ucocweSummary CONTAINS 'privilege' RETURN c"
+"Node Lookup Queries","Are there any weaknesses related to 'file inclusion'?","MATCH (c:UcoCWE) WHERE c.ucodescription CONTAINS 'file inclusion' RETURN c"
+"Node Lookup Queries","List all CWEs that talk about 'directory traversal'.","MATCH (c:UcoCWE) WHERE c.ucodescription CONTAINS 'directory traversal' RETURN c"
+"Node Lookup Queries","Find CWEs with 'XML External Entity' in their name.","MATCH (c:UcoCWE {ucocweName: 'XML External Entity'}) RETURN c"
+"Node Lookup Queries","Show weaknesses involving 'command injection'.","MATCH (c:UcoCWE) WHERE c.ucodescription CONTAINS 'command injection' RETURN c"
+"Node Lookup Queries","List all 'Variant' CWEs that are 'Stable'.","MATCH (c:UcoCWE {ucoabstraction: 'Variant', ucostatus: 'Stable'}) RETURN c"
+"Node Lookup Queries","Show me all 'Class' level weaknesses with a 'Composite' structure.","MATCH (c:UcoCWE {ucoabstraction: 'Class', ucostructure: 'Composite'}) RETURN c"
+"Node Lookup Queries","Find any CWE that mentions 'security' in its summary.","MATCH (c:UcoCWE) WHERE c.ucocweSummary CONTAINS 'security' RETURN c"
+"Node Lookup Queries","Are there any weaknesses related to 'permission'?","MATCH (c:UcoCWE) WHERE c.ucodescription CONTAINS 'permission' RETURN c"
+"Node Lookup Queries","List all CWEs that talk about 'malicious'.","MATCH (c:UcoCWE) WHERE c.ucodescription CONTAINS 'malicious' RETURN c"
+"Node Lookup Queries","Show weaknesses involving 'sensitive information'.","MATCH (c:UcoCWE) WHERE c.ucodescription CONTAINS 'sensitive information' RETURN c"
+"Node Lookup Queries","Find all 'Class' abstractions that are 'Deprecated'.","MATCH (c:UcoCWE {ucoabstraction: 'Class', ucostatus: 'Deprecated'}) RETURN c"
+"Node Lookup Queries","Show me all 'Variant' level weaknesses with a 'Simple' structure.","MATCH (c:UcoCWE {ucoabstraction: 'Variant', ucostructure: 'Simple'}) RETURN c"
+Node Lookup Queries,Find all CAPEC patterns with 'High' severity.,MATCH (c:UcoexCAPEC {ucoexSeverity: 'High'}) RETURN c
+Node Lookup Queries,Find all CAPEC patterns with 'Medium' severity.,MATCH (c:UcoexCAPEC {ucoexSeverity: 'Medium'}) RETURN c
+Node Lookup Queries,Find all CAPEC patterns with 'Low' severity.,MATCH (c:UcoexCAPEC {ucoexSeverity: 'Low'}) RETURN c
+Node Lookup Queries,Find all CAPEC patterns with 'Unknown' severity.,MATCH (c:UcoexCAPEC {ucoexSeverity: 'Unknown'}) RETURN c
+Node Lookup Queries,List CAPEC patterns with a 'High' likelihood of attack.,MATCH (c:UcoexCAPEC {ucoexLikelihood: 'High'}) RETURN c
+Node Lookup Queries,List CAPEC patterns with a 'Medium' likelihood of attack.,MATCH (c:UcoexCAPEC {ucoexLikelihood: 'Medium'}) RETURN c
+Node Lookup Queries,List CAPEC patterns with a 'Low' likelihood of attack.,MATCH (c:UcoexCAPEC {ucoexLikelihood: 'Low'}) RETURN c
+Node Lookup Queries,List CAPEC patterns with a 'Unknown' likelihood of attack.,MATCH (c:UcoexCAPEC {ucoexLikelihood: 'Unknown'}) RETURN c
+Node Lookup Queries,Show all CAPEC patterns with a 'Detailed' abstraction level.,MATCH (c:UcoexCAPEC {ucoexAbstraction: 'Detailed'}) RETURN c
+Node Lookup Queries,Show all CAPEC patterns with a 'Standard' abstraction level.,MATCH (c:UcoexCAPEC {ucoexAbstraction: 'Standard'}) RETURN c
+Node Lookup Queries,Show all CAPEC patterns with a 'Meta' abstraction level.,MATCH (c:UcoexCAPEC {ucoexAbstraction: 'Meta'}) RETURN c
+Node Lookup Queries,Show all CAPEC patterns with a 'Pillar' abstraction level.,MATCH (c:UcoexCAPEC {ucoexAbstraction: 'Pillar'}) RETURN c
+Node Lookup Queries,Show all CAPEC patterns with a 'Element' abstraction level.,MATCH (c:UcoexCAPEC {ucoexAbstraction: 'Element'}) RETURN c
+Node Lookup Queries,Get details for CAPEC ID '519'.,MATCH (c:UcoexCAPEC {ucoexCAPEC_id: '519'}) RETURN c
+Node Lookup Queries,Get details for CAPEC ID '1'.,MATCH (c:UcoexCAPEC {ucoexCAPEC_id: '1'}) RETURN c
+Node Lookup Queries,Get details for CAPEC ID '100'.,MATCH (c:UcoexCAPEC {ucoexCAPEC_id: '100'}) RETURN c
+Node Lookup Queries,Get details for CAPEC ID '22'.,MATCH (c:UcoexCAPEC {ucoexCAPEC_id: '22'}) RETURN c
+Node Lookup Queries,Get details for CAPEC ID '66'.,MATCH (c:UcoexCAPEC {ucoexCAPEC_id: '66'}) RETURN c
+Node Lookup Queries,Get details for CAPEC ID '447'.,MATCH (c:UcoexCAPEC {ucoexCAPEC_id: '447'}) RETURN c
+Node Lookup Queries,Get details for CAPEC ID '540'.,MATCH (c:UcoexCAPEC {ucoexCAPEC_id: '540'}) RETURN c
+Node Lookup Queries,Find CAPEC patterns whose name contains 'Alteration'.,MATCH (c:UcoexCAPEC) WHERE c.ucoexCAPEC_name CONTAINS 'Alteration' RETURN c
+Node Lookup Queries,Find CAPEC patterns whose name contains 'Spoofing'.,MATCH (c:UcoexCAPEC) WHERE c.ucoexCAPEC_name CONTAINS 'Spoofing' RETURN c
+Node Lookup Queries,Find CAPEC patterns whose name contains 'Injection'.,MATCH (c:UcoexCAPEC) WHERE c.ucoexCAPEC_name CONTAINS 'Injection' RETURN c
+Node Lookup Queries,Find CAPEC patterns whose name contains 'Timing'.,MATCH (c:UcoexCAPEC) WHERE c.ucoexCAPEC_name CONTAINS 'Timing' RETURN c
+Node Lookup Queries,Find CAPEC patterns whose name contains 'Filter'.,MATCH (c:UcoexCAPEC) WHERE c.ucoexCAPEC_name CONTAINS 'Filter' RETURN c
+Node Lookup Queries,Find CAPEC patterns whose name contains 'Authentication'.,MATCH (c:UcoexCAPEC) WHERE c.ucoexCAPEC_name CONTAINS 'Authentication' RETURN c
+Node Lookup Queries,Find CAPEC patterns whose name contains 'Hijacking'.,MATCH (c:UcoexCAPEC) WHERE c.ucoexCAPEC_name CONTAINS 'Hijacking' RETURN c
+Node Lookup Queries,Find CAPEC patterns whose description mentions 'attacker'.,MATCH (c:UcoexCAPEC) WHERE c.ucoexDescription CONTAINS 'attacker' RETURN c
+Node Lookup Queries,Find CAPEC patterns whose description mentions 'maliciously'.,MATCH (c:UcoexCAPEC) WHERE c.ucoexDescription CONTAINS 'maliciously' RETURN c
+Node Lookup Queries,Find CAPEC patterns whose description mentions 'bypass'.,MATCH (c:UcoexCAPEC) WHERE c.ucoexDescription CONTAINS 'bypass' RETURN c
+Node Lookup Queries,Find CAPEC patterns whose description mentions 'credentials'.,MATCH (c:UcoexCAPEC) WHERE c.ucoexDescription CONTAINS 'credentials' RETURN c
+Node Lookup Queries,Find CAPEC patterns whose description mentions 'database'.,MATCH (c:UcoexCAPEC) WHERE c.ucoexDescription CONTAINS 'database' RETURN c
+Node Lookup Queries,Find CAPEC patterns whose description mentions 'system'.,MATCH (c:UcoexCAPEC) WHERE c.ucoexDescription CONTAINS 'system' RETURN c
+Node Lookup Queries,Find CAPEC patterns whose description mentions 'network'.,MATCH (c:UcoexCAPEC) WHERE c.ucoexDescription CONTAINS 'network' RETURN c
+Node Lookup Queries,List CAPEC patterns requiring the skill 'Level:High'.,MATCH (c:UcoexCAPEC) WHERE ANY(s IN c.ucoexSkills_Required WHERE s CONTAINS 'Level:High') RETURN c
+Node Lookup Queries,List CAPEC patterns requiring the skill 'Level:Medium'.,MATCH (c:UcoexCAPEC) WHERE ANY(s IN c.ucoexSkills_Required WHERE s CONTAINS 'Level:Medium') RETURN c
+Node Lookup Queries,List CAPEC patterns requiring the skill 'Level:Low'.,MATCH (c:UcoexCAPEC) WHERE ANY(s IN c.ucoexSkills_Required WHERE s CONTAINS 'Level:Low') RETURN c
+Node Lookup Queries,List CAPEC patterns requiring the skill 'physical access'.,MATCH (c:UcoexCAPEC) WHERE ANY(s IN c.ucoexSkills_Required WHERE s CONTAINS 'physical access') RETURN c
+Node Lookup Queries,List CAPEC patterns requiring the skill 'interpret documentation'.,MATCH (c:UcoexCAPEC) WHERE ANY(s IN c.ucoexSkills_Required WHERE s CONTAINS 'interpret documentation') RETURN c
+Node Lookup Queries,Retrieve details for CWE ID 'CWE-79'.,"MATCH (c:UcoCWE {ucocweID: 'CWE-79'}) RETURN c.ucocweName, c.ucodescription"
+Node Lookup Queries,Retrieve details for CWE ID 'CWE-125'.,"MATCH (c:UcoCWE {ucocweID: 'CWE-125'}) RETURN c.ucocweName, c.ucodescription"
+Node Lookup Queries,Retrieve details for CWE ID 'CWE-416'.,"MATCH (c:UcoCWE {ucocweID: 'CWE-416'}) RETURN c.ucocweName, c.ucodescription"
+Node Lookup Queries,Retrieve details for CWE ID 'CWE-787'.,"MATCH (c:UcoCWE {ucocweID: 'CWE-787'}) RETURN c.ucocweName, c.ucodescription"
+Node Lookup Queries,Retrieve details for CWE ID 'CWE-20'.,"MATCH (c:UcoCWE {ucocweID: 'CWE-20'}) RETURN c.ucocweName, c.ucodescription"
+Node Lookup Queries,Retrieve details for CWE ID 'CWE-22'.,"MATCH (c:UcoCWE {ucocweID: 'CWE-22'}) RETURN c.ucocweName, c.ucodescription"
+Node Lookup Queries,Retrieve details for CWE ID 'CWE-119'.,"MATCH (c:UcoCWE {ucocweID: 'CWE-119'}) RETURN c.ucocweName, c.ucodescription"
+Node Lookup Queries,Retrieve details for CWE ID 'CWE-190'.,"MATCH (c:UcoCWE {ucocweID: 'CWE-190'}) RETURN c.ucocweName, c.ucodescription"
+Node Lookup Queries,Retrieve details for CWE ID 'CWE-352'.,"MATCH (c:UcoCWE {ucocweID: 'CWE-352'}) RETURN c.ucocweName, c.ucodescription"
+Node Lookup Queries,Retrieve details for CWE ID 'CWE-400'.,"MATCH (c:UcoCWE {ucocweID: 'CWE-400'}) RETURN c.ucocweName, c.ucodescription"
+Node Lookup Queries,Find 'Base' CWEs that are 'Incomplete'.,"MATCH (c:UcoCWE {ucoabstraction: 'Base', ucostatus: 'Incomplete'}) RETURN c"
+Node Lookup Queries,Find 'Base' CWEs that are 'Deprecated'.,"MATCH (c:UcoCWE {ucoabstraction: 'Base', ucostatus: 'Deprecated'}) RETURN c"
+Node Lookup Queries,Find 'Class' CWEs that are 'Stable'.,"MATCH (c:UcoCWE {ucoabstraction: 'Class', ucostatus: 'Stable'}) RETURN c"
+Node Lookup Queries,Find 'Class' CWEs that are 'Incomplete'.,"MATCH (c:UcoCWE {ucoabstraction: 'Class', ucostatus: 'Incomplete'}) RETURN c"
+Node Lookup Queries,Find 'Variant' CWEs that are 'Deprecated'.,"MATCH (c:UcoCWE {ucoabstraction: 'Variant', ucostatus: 'Deprecated'}) RETURN c"
+Node Lookup Queries,Find 'Compound' CWEs that are 'Stable'.,"MATCH (c:UcoCWE {ucoabstraction: 'Compound', ucostatus: 'Stable'}) RETURN c"
+Node Lookup Queries,Find 'Compound' CWEs that are 'Incomplete'.,"MATCH (c:UcoCWE {ucoabstraction: 'Compound', ucostatus: 'Incomplete'}) RETURN c"
+Node Lookup Queries,Find CWEs with 'injection' in their summary.,MATCH (c:UcoCWE) WHERE c.ucocweSummary CONTAINS 'injection' RETURN c
+Node Lookup Queries,Find CWEs with 'cross-site' in their summary.,MATCH (c:UcoCWE) WHERE c.ucocweSummary CONTAINS 'cross-site' RETURN c
+Node Lookup Queries,Find CWEs with 'overflow' in their summary.,MATCH (c:UcoCWE) WHERE c.ucocweSummary CONTAINS 'overflow' RETURN c
+Node Lookup Queries,Find CWEs with 'permissions' in their summary.,MATCH (c:UcoCWE) WHERE c.ucocweSummary CONTAINS 'permissions' RETURN c
+Node Lookup Queries,Find CWEs with 'path traversal' in their summary.,MATCH (c:UcoCWE) WHERE c.ucocweSummary CONTAINS 'path traversal' RETURN c
+Node Lookup Queries,Find CWEs with 'deserialization' in their summary.,MATCH (c:UcoCWE) WHERE c.ucocweSummary CONTAINS 'deserialization' RETURN c
+Node Lookup Queries,Find the CVE with label 'CVE-2024-1001'.,MATCH (c:UcoCVE {label: 'CVE-2024-1001'}) RETURN c
+Node Lookup Queries,Find the CVE with label 'CVE-2023-5000'.,MATCH (c:UcoCVE {label: 'CVE-2023-5000'}) RETURN c
+Node Lookup Queries,Find the CVE with label 'CVE-2022-3019'.,MATCH (c:UcoCVE {label: 'CVE-2022-3019'}) RETURN c
+Node Lookup Queries,Find the CVE with label 'CVE-2017-0144'.,MATCH (c:UcoCVE {label: 'CVE-2017-0144'}) RETURN c
+Node Lookup Queries,Find the CVE with label 'CVE-2019-0708'.,MATCH (c:UcoCVE {label: 'CVE-2019-0708'}) RETURN c
+Node Lookup Queries,Find the CVE with label 'CVE-2023-34362'.,MATCH (c:UcoCVE {label: 'CVE-2023-34362'}) RETURN c
+Node Lookup Queries,Get details for MITRE ATT&CK technique 'Command and Control'.,MATCH (t:UcoexMITREATTACK {ucoexNAME: 'Command and Control'}) RETURN t
+Node Lookup Queries,Get details for MITRE ATT&CK technique 'Lateral Movement'.,MATCH (t:UcoexMITREATTACK {ucoexNAME: 'Lateral Movement'}) RETURN t
+Node Lookup Queries,Get details for MITRE ATT&CK technique 'Exfiltration'.,MATCH (t:UcoexMITREATTACK {ucoexNAME: 'Exfiltration'}) RETURN t
+Node Lookup Queries,Get details for MITRE ATT&CK technique 'Credential Access'.,MATCH (t:UcoexMITREATTACK {ucoexNAME: 'Credential Access'}) RETURN t
+Node Lookup Queries,Get details for MITRE ATT&CK technique 'Initial Access'.,MATCH (t:UcoexMITREATTACK {ucoexNAME: 'Initial Access'}) RETURN t
+Node Lookup Queries,Get details for MITRE ATT&CK technique 'Persistence'.,MATCH (t:UcoexMITREATTACK {ucoexNAME: 'Persistence'}) RETURN t
+Node Lookup Queries,Get details for MITRE ATT&CK technique 'Defense Evasion'.,MATCH (t:UcoexMITREATTACK {ucoexNAME: 'Defense Evasion'}) RETURN t
+Node Lookup Queries,List all MITRE ATT&CK techniques in the 'Enterprise' domain.,MATCH (t:UcoexMITREATTACK {ucoexDOMAIN: 'Enterprise'}) RETURN t.ucoexNAME
+Node Lookup Queries,List all MITRE ATT&CK techniques in the 'Mobile' domain.,MATCH (t:UcoexMITREATTACK {ucoexDOMAIN: 'Mobile'}) RETURN t.ucoexNAME
+Node Lookup Queries,List all MITRE ATT&CK techniques in the 'ICS' domain.,MATCH (t:UcoexMITREATTACK {ucoexDOMAIN: 'ICS'}) RETURN t.ucoexNAME
+Node Lookup Queries,Find the software entry for 'powershell'.,MATCH (s:UcoexSOFTWARE {ucoexNAME: 'powershell'}) RETURN s
+Node Lookup Queries,Find the software entry for 'netcat'.,MATCH (s:UcoexSOFTWARE {ucoexNAME: 'netcat'}) RETURN s
+Node Lookup Queries,Find the software entry for 'Cobalt Strike'.,MATCH (s:UcoexSOFTWARE {ucoexNAME: 'Cobalt Strike'}) RETURN s
+Node Lookup Queries,Find the software entry for 'Metasploit'.,MATCH (s:UcoexSOFTWARE {ucoexNAME: 'Metasploit'}) RETURN s
+Node Lookup Queries,Find the software entry for 'Empire'.,MATCH (s:UcoexSOFTWARE {ucoexNAME: 'Empire'}) RETURN s
+Node Lookup Queries,Find the software entry for 'PsExec'.,MATCH (s:UcoexSOFTWARE {ucoexNAME: 'PsExec'}) RETURN s
+Node Lookup Queries,Find information on the group 'APT28'.,MATCH (g:UcoexGROUPS {ucoexNAME: 'APT28'}) RETURN g
+Node Lookup Queries,Find information on the group 'APT29'.,MATCH (g:UcoexGROUPS {ucoexNAME: 'APT29'}) RETURN g
+Node Lookup Queries,Find information on the group 'Lazarus Group'.,MATCH (g:UcoexGROUPS {ucoexNAME: 'Lazarus Group'}) RETURN g
+Node Lookup Queries,Find information on the group 'Sandworm'.,MATCH (g:UcoexGROUPS {ucoexNAME: 'Sandworm'}) RETURN g
+Node Lookup Queries,Find information on the group 'FIN7'.,MATCH (g:UcoexGROUPS {ucoexNAME: 'FIN7'}) RETURN g
+Node Lookup Queries,Find information on the group 'Cozy Bear'.,MATCH (g:UcoexGROUPS {ucoexNAME: 'Cozy Bear'}) RETURN g
+Node Lookup Queries,Get details for the 'NotPetya' campaign.,MATCH (c:UcoexCAMPAIGNS {ucoexNAME: 'NotPetya'}) RETURN c
+Node Lookup Queries,Get details for the 'WannaCry' campaign.,MATCH (c:UcoexCAMPAIGNS {ucoexNAME: 'WannaCry'}) RETURN c
