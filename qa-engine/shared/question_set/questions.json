@@ -1,0 +1,227 @@
+[
+    {
+        "question": "Through what weakness category is ICMP error-message echoing linked to exposure of system status or metadata?",
+        "type": "<s,*,o>",
+        "first_node": "UcoexCAPEC",
+        "used_properties1": ["ucoexDescription", "ucoexExtendedDescription", "ucoexSeverity"],
+        "relationship": null,
+        "second_node": "UcoCWE",
+        "used_properties2": ["ucocweName", "ucocweExtendedSummary"]
+    },
+    {
+        "question": "Which weaknesses most commonly relate to ICMP error-message echoing when stacks alter quoted headers or byte order?",
+        "type": "<s,p,*>",
+        "first_node": "UcoexCAPEC",
+        "used_properties1": ["ucoexExtendedDescription", "ucoexDescription"],
+        "relationship": "UCOEXHASRELATEDWEAKNESS",
+        "second_node": "UcoCWE",
+        "used_properties2": ["ucocweName"]
+    },
+    {
+        "question": "How could ICMP error-message echoing contribute to exposing sensitive data through implementation mistakes?",
+        "type": "<s,p,o>",
+        "first_node": "UcoexCAPEC",
+        "used_properties1": ["ucoexDescription", "ucoexExtendedDescription"],
+        "relationship": "UCOEXHASRELATEDWEAKNESS",
+        "second_node": "UcoCWE",
+        "used_properties2": ["ucodescription", "ucocweExtendedSummary"]
+    },
+    {
+        "question": "Which design practices help reduce data exposure caused by ICMP error-message echoing?",
+        "type": "<s,p,*>",
+        "first_node": "UcoexCAPEC",
+        "used_properties1": ["ucoexDescription"],
+        "relationship": "UCOEXHASRELATEDWEAKNESS",
+        "second_node": "UcoCWE",
+        "used_properties2": ["ucopotentialMitigations"]
+    },
+    {
+        "question": "How is ICMP error-message echoing associated with unintended exposure of system or firmware information?",
+        "type": "<s,*,o>",
+        "first_node": "UcoexCAPEC",
+        "used_properties1": ["ucoexExtendedDescription", "ucoexSeverity"],
+        "relationship": null,
+        "second_node": "UcoCWE",
+        "used_properties2": ["ucocweExtendedSummary"]
+    },
+    {
+        "question": "How does an observable internal behavioral discrepancy manifest in real-world examples of information leakage during authentication?",
+        "type": "<s,*,o>",
+        "first_node": "UcoCWE",
+        "used_properties1": ["ucocweName", "ucocweExtendedSummary"],
+        "relationship": "UCOHASOBSERVEDEXAMPLE",
+        "second_node": "UcoexObservedExample",
+        "used_properties2": ["ucoexDESCRIPTION"]
+    },
+    {
+        "question": "Which observable behaviors during login could allow attackers to infer internal states based on interface feedback?",
+        "type": "<s,p,*>",
+        "first_node": "UcoCWE",
+        "used_properties1": ["ucocweExtendedSummary", "ucodescription"],
+        "relationship": "UCOHASOBSERVEDEXAMPLE",
+        "second_node": "UcoexObservedExample",
+        "used_properties2": []
+    },
+    {
+        "question": "How could a GUI-based infoleak illustrate the weakness of observable internal behavioral discrepancy in authentication systems?",
+        "type": "<s,*,o>",
+        "first_node": "UcoCWE",
+        "used_properties1": ["ucocweName", "ucocweSummary"],
+        "relationship": "UCOHASOBSERVEDEXAMPLE",
+        "second_node": "UcoexObservedExample",
+        "used_properties2": ["ucoexDESCRIPTION"]
+    },
+    {
+        "question": "What mitigations can reduce the exposure of internal decision points observable through system responses?",
+        "type": "<s,p,*>",
+        "first_node": "UcoCWE",
+        "used_properties1": ["ucopotentialMitigations", "ucocweExtendedSummary"],
+        "relationship": null,
+        "second_node": null,
+        "used_properties2": []
+    },
+    {
+        "question": "In what ways do observed behavioral infoleaks validate the risks described in observable internal behavioral discrepancy?",
+        "type": "<s,p,o>",
+        "first_node": "UcoCWE",
+        "used_properties1": ["ucocweName", "ucocweSummary"],
+        "relationship": "UCOHASOBSERVEDEXAMPLE",
+        "second_node": "UcoexObservedExample",
+        "used_properties2": ["ucoexDESCRIPTION"]
+    },
+    {
+        "question": "Which architectural mitigations most effectively limit exposure of sensitive internal state that timestamp requests could exploit?",
+        "type": "<s,p,>",
+        "first_node": "UcoCWE",
+        "used_properties1": ["ucocweName", "ucocweExtendedSummary", "ucopotentialMitigations"],
+        "relationship": "UCOEXHASRELATEDWEAKNESS",
+        "second_node": "UcoexCAPEC",
+        "used_properties2": ["ucoexCAPEC_name", "ucoexDescription", "ucoexSeverity"]
+    },
+    {
+        "question": "How might timestamp requests reveal sensitive system metadata and thereby increase exposure of internal state?",
+        "type": "<s,,o>",
+        "first_node": "UcoCWE",
+        "used_properties1": ["ucocweExtendedSummary", "ucocweSummary"],
+        "relationship": "UCOEXHASRELATEDWEAKNESS",
+        "second_node": "UcoexCAPEC",
+        "used_properties2": ["ucoexDescription", "ucoexExample"]
+    },
+    {
+        "question": "Which aspects of sensitive-information exposure enable timestamp replies to weaken time-based authentication or RNG protections?",
+        "type": "<s,p,o>",
+        "first_node": "UcoCWE",
+        "used_properties1": ["ucocweSummary", "ucodescription"],
+        "relationship": "UCOEXHASRELATEDWEAKNESS",
+        "second_node": "UcoexCAPEC",
+        "used_properties2": ["ucoexDescription", "ucoexCAPEC_name"]
+    },
+    {
+        "question": "Which logging and error-handling practices reduce the risk that time-revealing responses expose sensitive information?",
+        "type": "<s,p,>",
+        "first_node": "UcoCWE",
+        "used_properties1": ["ucodemonstrativeExamples", "ucopotentialMitigations"],
+        "relationship": null,
+        "second_node": null,
+        "used_properties2": []
+    },
+    {
+        "question": "What do low-severity timestamp request examples reveal about likely attack paths to harvest system time and target time-based RNGs?",
+        "type": "<s,,o>",
+        "first_node": "UcoCWE",
+        "used_properties1": ["ucocweExtendedSummary", "ucocweName"],
+        "relationship": "UCOEXHASRELATEDWEAKNESS",
+        "second_node": "UcoexCAPEC",
+        "used_properties2": ["ucoexSeverity", "ucoexExample"]
+    },
+    {
+        "question": "Which implementation mitigations best prevent dynamic variable evaluation from allowing attackers to read or modify other users' data?",
+        "type": "<s,p,>",
+        "first_node": "UcoCWE",
+        "used_properties1": ["ucopotentialMitigations", "ucocweSummary"],
+        "relationship": "UCOHASOBSERVEDEXAMPLE",
+        "second_node": "UcoexObservedExample",
+        "used_properties2": ["ucoexDESCRIPTION"]
+    },
+    {
+        "question": "How could the mail program's dynamic variable evaluation lead to arbitrary variable access and cross-user attachment modification?",
+        "type": "<s,,o>",
+        "first_node": "UcoCWE",
+        "used_properties1": ["ucocweExtendedSummary", "ucocweName"],
+        "relationship": "UCOHASOBSERVEDEXAMPLE",
+        "second_node": "UcoexObservedExample",
+        "used_properties2": ["ucoexDESCRIPTION"]
+    },
+    {
+        "question": "Through what path does dynamic variable evaluation enable the observed mail example to modify other users' attachments?",
+        "type": "<s,p,o>",
+        "first_node": "UcoCWE",
+        "used_properties1": ["ucodescription", "ucocweName"],
+        "relationship": "UCOHASOBSERVEDEXAMPLE",
+        "second_node": "UcoexObservedExample",
+        "used_properties2": ["ucoexDESCRIPTION"]
+    },
+    {
+        "question": "Which allowlist strategies reduce the risk that user-controlled names invoke unintended functions or variables at runtime?",
+        "type": "<s,p,>",
+        "first_node": "UcoCWE",
+        "used_properties1": ["ucopotentialMitigations"],
+        "relationship": null,
+        "second_node": null,
+        "used_properties2": []
+    },
+    {
+        "question": "What code refactoring steps would most directly stop the mail program's dynamic evaluation from exposing user preferences and attachments?",
+        "type": "<s,,o>",
+        "first_node": "UcoCWE",
+        "used_properties1": ["ucopotentialMitigations", "ucocweSummary"],
+        "relationship": "UCOHASOBSERVEDEXAMPLE",
+        "second_node": "UcoexObservedExample",
+        "used_properties2": ["ucoexDESCRIPTION"]
+    },
+    {
+        "question": "How does understated SOAP array size trigger overflow via the related incorrect-length weakness during message parsing?",
+        "type": "<s,p,o>",
+        "first_node": "UcoexCAPEC",
+        "used_properties1": ["ucoexCAPEC_name", "ucoexDescription", "ucoexSeverity"],
+        "relationship": "UCOEXHASRELATEDWEAKNESS",
+        "second_node": "UcoCWE",
+        "used_properties2": ["ucocweName", "ucocweExtendedSummary"]
+    },
+    {
+        "question": "Which server-side validations and bounds checks most effectively stop trusting declared array lengths in SOAP requests?",
+        "type": "<s,p,>",
+        "first_node": "UcoexCAPEC",
+        "used_properties1": ["ucoexMitigations", "ucoexDescription"],
+        "relationship": null,
+        "second_node": null,
+        "used_properties2": []
+    },
+    {
+        "question": "Through what parsing path is this array-overflow attack linked to the incorrect-length weakness that reads beyond buffer bounds?",
+        "type": "<s,,o>",
+        "first_node": "UcoexCAPEC",
+        "used_properties1": ["ucoexDescription"],
+        "relationship": "UCOEXHASRELATEDWEAKNESS",
+        "second_node": "UcoCWE",
+        "used_properties2": ["ucocweSummary", "ucodescription"]
+    },
+    {
+        "question": "Which mitigation actions directly limit over-read or overwrite when actual array elements exceed the stated count?",
+        "type": "<s,p,*>",
+        "first_node": "UcoexCAPEC",
+        "used_properties1": ["ucoexMitigations", "ucoexDescription"],
+        "relationship": null,
+        "second_node": null,
+        "used_properties2": []
+    },
+    {
+        "question": "Which length-calculation mistakes in the related weakness most enable high-severity SOAP array overflows in naive implementations?",
+        "type": "<s,p,o>",
+        "first_node": "UcoexCAPEC",
+        "used_properties1": ["ucoexDescription", "ucoexSeverity"],
+        "relationship": "UCOEXHASRELATEDWEAKNESS",
+        "second_node": "UcoCWE",
+        "used_properties2": ["ucocweSummary", "ucodemonstrativeExamples"]
+    }
+]

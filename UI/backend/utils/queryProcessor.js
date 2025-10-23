@@ -118,7 +118,11 @@ function processQueryResult(query, result) {
       return { 
         type: 'graph', 
         nodes, 
-        relationships 
+        relationships,
+        summary: {
+          total_nodes: nodes.length,
+          total_relationships: relationships.length
+        }
       };
     }
     

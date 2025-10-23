@@ -45,7 +45,7 @@ export const executeText2Cypher = async (query) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        query,
+        query: query,
         execute: true,
         explain: true
       })
