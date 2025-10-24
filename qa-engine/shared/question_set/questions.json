@@ -1,227 +1,227 @@
 [
     {
-        "question": "Through what weakness category is ICMP error-message echoing linked to exposure of system status or metadata?",
+        "question": "How could a SOAP Array Overflow arise from weaknesses in buffer length handling within related systems?",
+        "type": "<s,,o>",
+        "first_node": "UcoexCAPEC",
+        "used_properties_of_first_node": ["label", "ucoexDescription"],
+        "relationship": "UCOEXHASRELATEDWEAKNESS",
+        "second_node": "UcoCWE",
+        "used_properties_of_second_node": ["ucocweName", "ucocweSummary"]
+    },
+    {
+        "question": "What core programming error enables this SOAP Array Overflow to connect with a buffer length misuse issue?",
+        "type": "<s,p,o>",
+        "first_node": "UcoexCAPEC",
+        "used_properties_of_first_node": ["label", "ucoexDescription"],
+        "relationship": "UCOEXHASRELATEDWEAKNESS",
+        "second_node": "UcoCWE",
+        "used_properties_of_second_node": ["ucocweName", "ucocweExtendedSummary"]
+    },
+    {
+        "question": "How does the SOAP Array Overflow scenario illustrate the risks described in the related buffer misuse weakness?",
+        "type": "<s,,o>",
+        "first_node": "UcoexCAPEC",
+        "used_properties_of_first_node": ["label", "ucoexDescription"],
+        "relationship": "UCOEXHASRELATEDWEAKNESS",
+        "second_node": "UcoCWE",
+        "used_properties_of_second_node": ["ucocweSummary"]
+    },
+    {
+        "question": "In which context could incorrect length validation make the SOAP Array Overflow more severe?",
+        "type": "<s,p,o>",
+        "first_node": "UcoexCAPEC",
+        "used_properties_of_first_node": ["label", "ucoexDescription"],
+        "relationship": "UCOEXHASRELATEDWEAKNESS",
+        "second_node": "UcoCWE",
+        "used_properties_of_second_node": ["ucocweExtendedSummary"]
+    },
+    {
+        "question": "What insights from this SOAP Array Overflow help analysts understand its connection to the underlying weakness?",
+        "type": "<s,p,*>",
+        "first_node": "UcoexCAPEC",
+        "used_properties_of_first_node": ["label", "ucoexDescription"],
+        "relationship": "UCOEXHASRELATEDWEAKNESS",
+        "second_node": null,
+        "used_properties_of_second_node": []
+    },
+    {
+        "question": "How could improper neutralization of path sequences enable manipulation of web inputs to reach unintended file system locations?",
         "type": "<s,*,o>",
-        "first_node": "UcoexCAPEC",
-        "used_properties1": ["ucoexDescription", "ucoexExtendedDescription", "ucoexSeverity"],
-        "relationship": null,
-        "second_node": "UcoCWE",
-        "used_properties2": ["ucocweName", "ucocweExtendedSummary"]
-    },
-    {
-        "question": "Which weaknesses most commonly relate to ICMP error-message echoing when stacks alter quoted headers or byte order?",
-        "type": "<s,p,*>",
-        "first_node": "UcoexCAPEC",
-        "used_properties1": ["ucoexExtendedDescription", "ucoexDescription"],
+        "first_node": "Relative Path Traversal",
+        "used_properties_of_first_node": ["ucocweSummary", "ucodescription"],
         "relationship": "UCOEXHASRELATEDWEAKNESS",
-        "second_node": "UcoCWE",
-        "used_properties2": ["ucocweName"]
+        "second_node": "Manipulating Web Input to File System Calls",
+        "used_properties_of_second_node": ["ucoexDescription"]
     },
     {
-        "question": "How could ICMP error-message echoing contribute to exposing sensitive data through implementation mistakes?",
+        "question": "What security implications arise when user-controlled paths in web input lead to unauthorized file access or modification?",
+        "type": "<s,p,*>",
+        "first_node": "Relative Path Traversal",
+        "used_properties_of_first_node": ["ucocweSummary", "ucodemonstrativeExamples"],
+        "relationship": "UCOEXHASRELATEDWEAKNESS",
+        "second_node": "Manipulating Web Input to File System Calls",
+        "used_properties_of_second_node": []
+    },
+    {
+        "question": "Which mitigation techniques effectively prevent path traversal when handling web input to file system commands?",
         "type": "<s,p,o>",
-        "first_node": "UcoexCAPEC",
-        "used_properties1": ["ucoexDescription", "ucoexExtendedDescription"],
+        "first_node": "Relative Path Traversal",
+        "used_properties_of_first_node": ["ucopotentialMitigations"],
         "relationship": "UCOEXHASRELATEDWEAKNESS",
-        "second_node": "UcoCWE",
-        "used_properties2": ["ucodescription", "ucocweExtendedSummary"]
+        "second_node": "Manipulating Web Input to File System Calls",
+        "used_properties_of_second_node": ["ucoexMitigations"]
     },
     {
-        "question": "Which design practices help reduce data exposure caused by ICMP error-message echoing?",
-        "type": "<s,p,*>",
-        "first_node": "UcoexCAPEC",
-        "used_properties1": ["ucoexDescription"],
-        "relationship": "UCOEXHASRELATEDWEAKNESS",
-        "second_node": "UcoCWE",
-        "used_properties2": ["ucopotentialMitigations"]
-    },
-    {
-        "question": "How is ICMP error-message echoing associated with unintended exposure of system or firmware information?",
+        "question": "How does relative path traversal contribute to an attacker’s ability to manipulate file system operations through web inputs?",
         "type": "<s,*,o>",
-        "first_node": "UcoexCAPEC",
-        "used_properties1": ["ucoexExtendedDescription", "ucoexSeverity"],
-        "relationship": null,
-        "second_node": "UcoCWE",
-        "used_properties2": ["ucocweExtendedSummary"]
+        "first_node": "Relative Path Traversal",
+        "used_properties_of_first_node": ["ucocweSummary", "ucodemonstrativeExamples"],
+        "relationship": "UCOEXHASRELATEDWEAKNESS",
+        "second_node": "Manipulating Web Input to File System Calls",
+        "used_properties_of_second_node": ["ucoexDescription", "ucoexExample"]
     },
     {
-        "question": "How does an observable internal behavioral discrepancy manifest in real-world examples of information leakage during authentication?",
+        "question": "What programming validation practices can mitigate risks of relative path traversal exploited through manipulated web inputs?",
+        "type": "<s,p,*>",
+        "first_node": "Relative Path Traversal",
+        "used_properties_of_first_node": ["ucopotentialMitigations"],
+        "relationship": "UCOEXHASRELATEDWEAKNESS",
+        "second_node": "Manipulating Web Input to File System Calls",
+        "used_properties_of_second_node": []
+    },
+    {
+        "question": "How could changing system settings let an attacker make programs run automatically on login?",
         "type": "<s,*,o>",
-        "first_node": "UcoCWE",
-        "used_properties1": ["ucocweName", "ucocweExtendedSummary"],
-        "relationship": "UCOHASOBSERVEDEXAMPLE",
-        "second_node": "UcoexObservedExample",
-        "used_properties2": ["ucoexDESCRIPTION"]
+        "first_node": "External Control of System or Configuration Setting",
+        "used_properties_of_first_node": ["ucocweExtendedSummary"],
+        "relationship": "UCOEXHASRELATEDWEAKNESS",
+        "second_node": "Modification of Registry Run Keys",
+        "used_properties_of_second_node": ["ucoexDescription"]
     },
     {
-        "question": "Which observable behaviors during login could allow attackers to infer internal states based on interface feedback?",
+        "question": "What could happen if users are allowed to control critical configuration values?",
         "type": "<s,p,*>",
-        "first_node": "UcoCWE",
-        "used_properties1": ["ucocweExtendedSummary", "ucodescription"],
-        "relationship": "UCOHASOBSERVEDEXAMPLE",
-        "second_node": "UcoexObservedExample",
-        "used_properties2": []
+        "first_node": "External Control of System or Configuration Setting",
+        "used_properties_of_first_node": ["ucocweSummary"],
+        "relationship": "UCOEXHASRELATEDWEAKNESS",
+        "second_node": "Modification of Registry Run Keys",
+        "used_properties_of_second_node": []
     },
     {
-        "question": "How could a GUI-based infoleak illustrate the weakness of observable internal behavioral discrepancy in authentication systems?",
+        "question": "Which defenses help stop attackers from using startup entries to stay on a system?",
+        "type": "<s,p,o>",
+        "first_node": "External Control of System or Configuration Setting",
+        "used_properties_of_first_node": ["ucopotentialMitigations"],
+        "relationship": "UCOEXHASRELATEDWEAKNESS",
+        "second_node": "Modification of Registry Run Keys",
+        "used_properties_of_second_node": ["ucoexMitigations"]
+    },
+    {
+        "question": "Why would an attacker want to control a setting that runs code at startup?",
         "type": "<s,*,o>",
-        "first_node": "UcoCWE",
-        "used_properties1": ["ucocweName", "ucocweSummary"],
-        "relationship": "UCOHASOBSERVEDEXAMPLE",
-        "second_node": "UcoexObservedExample",
-        "used_properties2": ["ucoexDESCRIPTION"]
+        "first_node": "External Control of System or Configuration Setting",
+        "used_properties_of_first_node": ["ucocweExtendedSummary"],
+        "relationship": "UCOEXHASRELATEDWEAKNESS",
+        "second_node": "Modification of Registry Run Keys",
+        "used_properties_of_second_node": ["ucoexExample"]
     },
     {
-        "question": "What mitigations can reduce the exposure of internal decision points observable through system responses?",
+        "question": "How can developers stop external inputs from changing system behavior unexpectedly?",
         "type": "<s,p,*>",
-        "first_node": "UcoCWE",
-        "used_properties1": ["ucopotentialMitigations", "ucocweExtendedSummary"],
-        "relationship": null,
-        "second_node": null,
-        "used_properties2": []
+        "first_node": "External Control of System or Configuration Setting",
+        "used_properties_of_first_node": ["ucopotentialMitigations"],
+        "relationship": "UCOEXHASRELATEDWEAKNESS",
+        "second_node": "Modification of Registry Run Keys",
+        "used_properties_of_second_node": []
     },
     {
-        "question": "In what ways do observed behavioral infoleaks validate the risks described in observable internal behavioral discrepancy?",
-        "type": "<s,p,o>",
-        "first_node": "UcoCWE",
-        "used_properties1": ["ucocweName", "ucocweSummary"],
+        "question": "How could a shortcut file lead an application to access files it shouldn’t?",
+        "type": "<s,*,*>",
+        "first_node": "Windows Shortcut Following (.LNK)",
+        "used_properties_of_first_node": ["ucocweSummary", "ucocweExtendedSummary"],
         "relationship": "UCOHASOBSERVEDEXAMPLE",
-        "second_node": "UcoexObservedExample",
-        "used_properties2": ["ucoexDESCRIPTION"]
+        "second_node": "Mail client bypassing warning with .lnk file",
+        "used_properties_of_second_node": ["ucoexDESCRIPTION"]
     },
     {
-        "question": "Which architectural mitigations most effectively limit exposure of sensitive internal state that timestamp requests could exploit?",
-        "type": "<s,p,>",
-        "first_node": "UcoCWE",
-        "used_properties1": ["ucocweName", "ucocweExtendedSummary", "ucopotentialMitigations"],
-        "relationship": "UCOEXHASRELATEDWEAKNESS",
-        "second_node": "UcoexCAPEC",
-        "used_properties2": ["ucoexCAPEC_name", "ucoexDescription", "ucoexSeverity"]
-    },
-    {
-        "question": "How might timestamp requests reveal sensitive system metadata and thereby increase exposure of internal state?",
-        "type": "<s,,o>",
-        "first_node": "UcoCWE",
-        "used_properties1": ["ucocweExtendedSummary", "ucocweSummary"],
-        "relationship": "UCOEXHASRELATEDWEAKNESS",
-        "second_node": "UcoexCAPEC",
-        "used_properties2": ["ucoexDescription", "ucoexExample"]
-    },
-    {
-        "question": "Which aspects of sensitive-information exposure enable timestamp replies to weaken time-based authentication or RNG protections?",
-        "type": "<s,p,o>",
-        "first_node": "UcoCWE",
-        "used_properties1": ["ucocweSummary", "ucodescription"],
-        "relationship": "UCOEXHASRELATEDWEAKNESS",
-        "second_node": "UcoexCAPEC",
-        "used_properties2": ["ucoexDescription", "ucoexCAPEC_name"]
-    },
-    {
-        "question": "Which logging and error-handling practices reduce the risk that time-revealing responses expose sensitive information?",
-        "type": "<s,p,>",
-        "first_node": "UcoCWE",
-        "used_properties1": ["ucodemonstrativeExamples", "ucopotentialMitigations"],
-        "relationship": null,
-        "second_node": null,
-        "used_properties2": []
-    },
-    {
-        "question": "What do low-severity timestamp request examples reveal about likely attack paths to harvest system time and target time-based RNGs?",
-        "type": "<s,,o>",
-        "first_node": "UcoCWE",
-        "used_properties1": ["ucocweExtendedSummary", "ucocweName"],
-        "relationship": "UCOEXHASRELATEDWEAKNESS",
-        "second_node": "UcoexCAPEC",
-        "used_properties2": ["ucoexSeverity", "ucoexExample"]
-    },
-    {
-        "question": "Which implementation mitigations best prevent dynamic variable evaluation from allowing attackers to read or modify other users' data?",
-        "type": "<s,p,>",
-        "first_node": "UcoCWE",
-        "used_properties1": ["ucopotentialMitigations", "ucocweSummary"],
-        "relationship": "UCOHASOBSERVEDEXAMPLE",
-        "second_node": "UcoexObservedExample",
-        "used_properties2": ["ucoexDESCRIPTION"]
-    },
-    {
-        "question": "How could the mail program's dynamic variable evaluation lead to arbitrary variable access and cross-user attachment modification?",
-        "type": "<s,,o>",
-        "first_node": "UcoCWE",
-        "used_properties1": ["ucocweExtendedSummary", "ucocweName"],
-        "relationship": "UCOHASOBSERVEDEXAMPLE",
-        "second_node": "UcoexObservedExample",
-        "used_properties2": ["ucoexDESCRIPTION"]
-    },
-    {
-        "question": "Through what path does dynamic variable evaluation enable the observed mail example to modify other users' attachments?",
-        "type": "<s,p,o>",
-        "first_node": "UcoCWE",
-        "used_properties1": ["ucodescription", "ucocweName"],
-        "relationship": "UCOHASOBSERVEDEXAMPLE",
-        "second_node": "UcoexObservedExample",
-        "used_properties2": ["ucoexDESCRIPTION"]
-    },
-    {
-        "question": "Which allowlist strategies reduce the risk that user-controlled names invoke unintended functions or variables at runtime?",
-        "type": "<s,p,>",
-        "first_node": "UcoCWE",
-        "used_properties1": ["ucopotentialMitigations"],
-        "relationship": null,
-        "second_node": null,
-        "used_properties2": []
-    },
-    {
-        "question": "What code refactoring steps would most directly stop the mail program's dynamic evaluation from exposing user preferences and attachments?",
-        "type": "<s,,o>",
-        "first_node": "UcoCWE",
-        "used_properties1": ["ucopotentialMitigations", "ucocweSummary"],
-        "relationship": "UCOHASOBSERVEDEXAMPLE",
-        "second_node": "UcoexObservedExample",
-        "used_properties2": ["ucoexDESCRIPTION"]
-    },
-    {
-        "question": "How does understated SOAP array size trigger overflow via the related incorrect-length weakness during message parsing?",
-        "type": "<s,p,o>",
-        "first_node": "UcoexCAPEC",
-        "used_properties1": ["ucoexCAPEC_name", "ucoexDescription", "ucoexSeverity"],
-        "relationship": "UCOEXHASRELATEDWEAKNESS",
-        "second_node": "UcoCWE",
-        "used_properties2": ["ucocweName", "ucocweExtendedSummary"]
-    },
-    {
-        "question": "Which server-side validations and bounds checks most effectively stop trusting declared array lengths in SOAP requests?",
-        "type": "<s,p,>",
-        "first_node": "UcoexCAPEC",
-        "used_properties1": ["ucoexMitigations", "ucoexDescription"],
-        "relationship": null,
-        "second_node": null,
-        "used_properties2": []
-    },
-    {
-        "question": "Through what parsing path is this array-overflow attack linked to the incorrect-length weakness that reads beyond buffer bounds?",
-        "type": "<s,,o>",
-        "first_node": "UcoexCAPEC",
-        "used_properties1": ["ucoexDescription"],
-        "relationship": "UCOEXHASRELATEDWEAKNESS",
-        "second_node": "UcoCWE",
-        "used_properties2": ["ucocweSummary", "ucodescription"]
-    },
-    {
-        "question": "Which mitigation actions directly limit over-read or overwrite when actual array elements exceed the stated count?",
+        "question": "Why might a program mishandle shortcuts that point outside its control area?",
         "type": "<s,p,*>",
-        "first_node": "UcoexCAPEC",
-        "used_properties1": ["ucoexMitigations", "ucoexDescription"],
-        "relationship": null,
-        "second_node": null,
-        "used_properties2": []
+        "first_node": "Windows Shortcut Following (.LNK)",
+        "used_properties_of_first_node": ["ucocweSummary"],
+        "relationship": "UCOHASOBSERVEDEXAMPLE",
+        "second_node": "Mail client bypassing warning with .lnk file",
+        "used_properties_of_second_node": []
     },
     {
-        "question": "Which length-calculation mistakes in the related weakness most enable high-severity SOAP array overflows in naive implementations?",
+        "question": "What kind of behavior allows attackers to disguise dangerous attachments using shortcut files?",
+        "type": "<s,*,o>",
+        "first_node": "Windows Shortcut Following (.LNK)",
+        "used_properties_of_first_node": ["ucocweExtendedSummary"],
+        "relationship": "UCOHASOBSERVEDEXAMPLE",
+        "second_node": "Mail client bypassing warning with .lnk file",
+        "used_properties_of_second_node": ["ucoexDESCRIPTION"]
+    },
+    {
+        "question": "Which design steps can stop systems from following unsafe shortcut links?",
+        "type": "<s,p,*>",
+        "first_node": "Windows Shortcut Following (.LNK)",
+        "used_properties_of_first_node": ["ucopotentialMitigations"],
+        "relationship": "UCOHASOBSERVEDEXAMPLE",
+        "second_node": "Mail client bypassing warning with .lnk file",
+        "used_properties_of_second_node": []
+    },
+    {
+        "question": "How could attackers exploit shortcut files to hide executable attachments from users?",
         "type": "<s,p,o>",
-        "first_node": "UcoexCAPEC",
-        "used_properties1": ["ucoexDescription", "ucoexSeverity"],
+        "first_node": "Windows Shortcut Following (.LNK)",
+        "used_properties_of_first_node": ["ucocweSummary"],
+        "relationship": "UCOHASOBSERVEDEXAMPLE",
+        "second_node": "Mail client bypassing warning with .lnk file",
+        "used_properties_of_second_node": ["ucoexDESCRIPTION"]
+    },
+    {
+        "question": "How could flaws in input validation allow unsafe queries through ORM frameworks?",
+        "type": "<s,*,o>",
+        "first_node": "Object Relational Mapping Injection",
+        "used_properties_of_first_node": ["ucoexDescription"],
         "relationship": "UCOEXHASRELATEDWEAKNESS",
-        "second_node": "UcoCWE",
-        "used_properties2": ["ucocweSummary", "ucodemonstrativeExamples"]
+        "second_node": "Improper Input Validation",
+        "used_properties_of_second_node": ["ucocweSummary"]
+    },
+    {
+        "question": "What happens when ORM-generated queries fail to properly check user input?",
+        "type": "<s,p,*>",
+        "first_node": "Object Relational Mapping Injection",
+        "used_properties_of_first_node": ["ucoexDescription"],
+        "relationship": "UCOEXHASRELATEDWEAKNESS",
+        "second_node": "Improper Input Validation",
+        "used_properties_of_second_node": []
+    },
+    {
+        "question": "Which coding mistakes make ORM frameworks vulnerable to improper input handling?",
+        "type": "<s,*,*>",
+        "first_node": "Object Relational Mapping Injection",
+        "used_properties_of_first_node": ["ucoexDescription"],
+        "relationship": "UCOEXHASRELATEDWEAKNESS",
+        "second_node": "Improper Input Validation",
+        "used_properties_of_second_node": ["ucocweExtendedSummary"]
+    },
+    {
+        "question": "How can secure input validation reduce the risk of ORM-based injection attacks?",
+        "type": "<s,p,o>",
+        "first_node": "Object Relational Mapping Injection",
+        "used_properties_of_first_node": ["ucoexMitigations"],
+        "relationship": "UCOEXHASRELATEDWEAKNESS",
+        "second_node": "Improper Input Validation",
+        "used_properties_of_second_node": ["ucopotentialMitigations"]
+    },
+    {
+        "question": "Why does improper input validation often lead to ORM query manipulation?",
+        "type": "<s,p,o>",
+        "first_node": "Object Relational Mapping Injection",
+        "used_properties_of_first_node": ["ucoexDescription"],
+        "relationship": "UCOEXHASRELATEDWEAKNESS",
+        "second_node": "Improper Input Validation",
+        "used_properties_of_second_node": ["ucocweSummary"]
     }
 ]

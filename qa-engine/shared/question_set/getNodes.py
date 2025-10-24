@@ -88,7 +88,7 @@ def get_single_node(node_id):
         
         # Format the response with filtered properties and labels
         node_data = filter_node_properties(dict(node))
-        node_data["labels"] = list(node.labels)[0]
+        node_data["labels"] = list(node.labels)
         
         response = {
             "node": node_data
@@ -140,10 +140,10 @@ def get_two_connected_nodes(node_id_1, node_id_2):
         
         # Format the response with filtered properties and labels included
         node1_data = filter_node_properties(dict(node1))
-        node1_data["labels"] = list(node1.labels)[0]
+        node1_data["labels"] = list(node1.labels)
         
         node2_data = filter_node_properties(dict(node2))
-        node2_data["labels"] = list(node2.labels)[0]
+        node2_data["labels"] = list(node2.labels)
         
         response = {
             "node1": node1_data,
@@ -204,13 +204,13 @@ def get_three_connected_nodes(node_id_1, node_id_2, node_id_3):
         
         # Format the response with filtered properties and labels included
         node1_data = filter_node_properties(dict(node1))
-        node1_data["labels"] = list(node1.labels)[0]
+        node1_data["labels"] = list(node1.labels)
         
         node2_data = filter_node_properties(dict(node2))
-        node2_data["labels"] = list(node2.labels)[0]
+        node2_data["labels"] = list(node2.labels)
         
         node3_data = filter_node_properties(dict(node3))
-        node3_data["labels"] = list(node3.labels)[0]
+        node3_data["labels"] = list(node3.labels)
         
         response = {
             "node1": node1_data,
@@ -249,7 +249,7 @@ if __name__ == "__main__":
     # List of node tuples to process (can be 1, 2, or 3 nodes)
     node_groups = [
         # ("782755",)  # 1 node
-        ("783461", "2382"),  # 2 nodes
+        ("783339", "812"),  # 2 nodes
         # ("783162", "6440", "5254"),  # 3 nodes
     ]
     
