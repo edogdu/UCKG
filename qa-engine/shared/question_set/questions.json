@@ -45,106 +45,106 @@
         "used_properties_of_second_node": []
     },
     {
-        "question": "How could improper neutralization of path sequences enable manipulation of web inputs to reach unintended file system locations?",
+        "question": "How could relative path traversal enable attackers to access files outside the intended directory through web input manipulation?",
         "type": "<s,*,o>",
         "first_node": "Relative Path Traversal",
-        "used_properties_of_first_node": ["ucocweSummary", "ucodescription"],
+        "used_properties_of_first_node": ["ucocweSummary"],
         "relationship": "UCOEXHASRELATEDWEAKNESS",
-        "second_node": "Manipulating Web Input to File System Calls",
+        "second_node": "CAPEC-76: Manipulating Web Input to File System Calls",
         "used_properties_of_second_node": ["ucoexDescription"]
     },
     {
-        "question": "What security implications arise when user-controlled paths in web input lead to unauthorized file access or modification?",
-        "type": "<s,p,*>",
-        "first_node": "Relative Path Traversal",
-        "used_properties_of_first_node": ["ucocweSummary", "ucodemonstrativeExamples"],
-        "relationship": "UCOEXHASRELATEDWEAKNESS",
-        "second_node": "Manipulating Web Input to File System Calls",
-        "used_properties_of_second_node": []
-    },
-    {
-        "question": "Which mitigation techniques effectively prevent path traversal when handling web input to file system commands?",
+        "question": "What conditions allow unvalidated file paths to expose sensitive files when combined with user-controlled web inputs?",
         "type": "<s,p,o>",
         "first_node": "Relative Path Traversal",
-        "used_properties_of_first_node": ["ucopotentialMitigations"],
+        "used_properties_of_first_node": ["ucocweSummary"],
         "relationship": "UCOEXHASRELATEDWEAKNESS",
-        "second_node": "Manipulating Web Input to File System Calls",
-        "used_properties_of_second_node": ["ucoexMitigations"]
+        "second_node": "CAPEC-76: Manipulating Web Input to File System Calls",
+        "used_properties_of_second_node": ["ucoexDescription"]
     },
     {
-        "question": "How does relative path traversal contribute to an attacker’s ability to manipulate file system operations through web inputs?",
-        "type": "<s,*,o>",
+        "question": "Which safeguards can stop attackers from exploiting path traversal through file system calls?",
+        "type": "<s,p,o>",
         "first_node": "Relative Path Traversal",
-        "used_properties_of_first_node": ["ucocweSummary", "ucodemonstrativeExamples"],
+        "used_properties_of_first_node": ["ucocweSummary"],
         "relationship": "UCOEXHASRELATEDWEAKNESS",
-        "second_node": "Manipulating Web Input to File System Calls",
-        "used_properties_of_second_node": ["ucoexDescription", "ucoexExample"]
-    },
-    {
-        "question": "What programming validation practices can mitigate risks of relative path traversal exploited through manipulated web inputs?",
-        "type": "<s,p,*>",
-        "first_node": "Relative Path Traversal",
-        "used_properties_of_first_node": ["ucopotentialMitigations"],
-        "relationship": "UCOEXHASRELATEDWEAKNESS",
-        "second_node": "Manipulating Web Input to File System Calls",
+        "second_node": "CAPEC-76: Manipulating Web Input to File System Calls",
         "used_properties_of_second_node": []
     },
     {
-        "question": "How could changing system settings let an attacker make programs run automatically on login?",
+        "question": "How does improper handling of relative paths lead to unauthorized file access in web applications?",
+        "type": "<s,p,*>",
+        "first_node": "Relative Path Traversal",
+        "used_properties_of_first_node": ["ucocweSummary"],
+        "relationship": "UCOEXHASRELATEDWEAKNESS",
+        "second_node": "CAPEC-76: Manipulating Web Input to File System Calls",
+        "used_properties_of_second_node": []
+    },
+    {
+        "question": "Why might web input-based file operations result in directory traversal and unauthorized data exposure?",
         "type": "<s,*,o>",
+        "first_node": "Relative Path Traversal",
+        "used_properties_of_first_node": ["ucocweSummary"],
+        "relationship": "UCOEXHASRELATEDWEAKNESS",
+        "second_node": "CAPEC-76: Manipulating Web Input to File System Calls",
+        "used_properties_of_second_node": ["ucoexDescription"]
+    },
+    {
+        "question": "How could externally controlled settings enable registry run-key persistence at user login?",
+        "type": "<s,,o>",
+        "first_node": "External Control of System or Configuration Setting",
+        "used_properties_of_first_node": ["ucocweExtendedSummary", "ucocweSummary"],
+        "relationship": "UCOEXHASRELATEDWEAKNESS",
+        "second_node": "CAPEC-270: Modification of Registry Run Keys",
+        "used_properties_of_second_node": ["label", "ucoexDescription"]
+    },
+    {
+        "question": "Which safeguards block untrusted configuration changes from enabling registry-based startup execution?",
+        "type": "<s,p,o>",
         "first_node": "External Control of System or Configuration Setting",
         "used_properties_of_first_node": ["ucocweExtendedSummary"],
         "relationship": "UCOEXHASRELATEDWEAKNESS",
-        "second_node": "Modification of Registry Run Keys",
+        "second_node": "CAPEC-270: Modification of Registry Run Keys",
         "used_properties_of_second_node": ["ucoexDescription"]
     },
     {
-        "question": "What could happen if users are allowed to control critical configuration values?",
+        "question": "What signs indicate attackers abused externally changeable settings to add programs under run keys?",
+        "type": "<s,,o>",
+        "first_node": "External Control of System or Configuration Setting",
+        "used_properties_of_first_node": ["ucocweSummary"],
+        "relationship": "UCOEXHASRELATEDWEAKNESS",
+        "second_node": "CAPEC-270: Modification of Registry Run Keys",
+        "used_properties_of_second_node": ["ucoexDescription"]
+    },
+    {
+        "question": "How does restricting who can change system settings reduce run-key persistence risk?",
+        "type": "<s,p,o>",
+        "first_node": "External Control of System or Configuration Setting",
+        "used_properties_of_first_node": ["ucocweExtendedSummary"],
+        "relationship": "UCOEXHASRELATEDWEAKNESS",
+        "second_node": "CAPEC-270: Modification of Registry Run Keys",
+        "used_properties_of_second_node": ["label"]
+    },
+    {
+        "question": "Which processes are most impacted when users can change configuration that controls startup behavior?",
         "type": "<s,p,*>",
         "first_node": "External Control of System or Configuration Setting",
         "used_properties_of_first_node": ["ucocweSummary"],
         "relationship": "UCOEXHASRELATEDWEAKNESS",
-        "second_node": "Modification of Registry Run Keys",
+        "second_node": "CAPEC-270: Modification of Registry Run Keys",
         "used_properties_of_second_node": []
     },
     {
-        "question": "Which defenses help stop attackers from using startup entries to stay on a system?",
-        "type": "<s,p,o>",
-        "first_node": "External Control of System or Configuration Setting",
-        "used_properties_of_first_node": ["ucopotentialMitigations"],
-        "relationship": "UCOEXHASRELATEDWEAKNESS",
-        "second_node": "Modification of Registry Run Keys",
-        "used_properties_of_second_node": ["ucoexMitigations"]
-    },
-    {
-        "question": "Why would an attacker want to control a setting that runs code at startup?",
-        "type": "<s,*,o>",
-        "first_node": "External Control of System or Configuration Setting",
-        "used_properties_of_first_node": ["ucocweExtendedSummary"],
-        "relationship": "UCOEXHASRELATEDWEAKNESS",
-        "second_node": "Modification of Registry Run Keys",
-        "used_properties_of_second_node": ["ucoexExample"]
-    },
-    {
-        "question": "How can developers stop external inputs from changing system behavior unexpectedly?",
+        "question": "How could improper handling of Windows shortcuts allow attackers to access or modify restricted files?",
         "type": "<s,p,*>",
-        "first_node": "External Control of System or Configuration Setting",
-        "used_properties_of_first_node": ["ucopotentialMitigations"],
-        "relationship": "UCOEXHASRELATEDWEAKNESS",
-        "second_node": "Modification of Registry Run Keys",
-        "used_properties_of_second_node": []
-    },
-    {
-        "question": "How could a shortcut file lead an application to access files it shouldn’t?",
-        "type": "<s,*,*>",
         "first_node": "Windows Shortcut Following (.LNK)",
         "used_properties_of_first_node": ["ucocweSummary", "ucocweExtendedSummary"],
         "relationship": "UCOHASOBSERVEDEXAMPLE",
         "second_node": "Mail client bypassing warning with .lnk file",
-        "used_properties_of_second_node": ["ucoexDESCRIPTION"]
+        "used_properties_of_second_node": []
     },
     {
-        "question": "Why might a program mishandle shortcuts that point outside its control area?",
+        "question": "Why might following a shortcut file lead an application to operate on unauthorized files or directories?",
         "type": "<s,p,*>",
         "first_node": "Windows Shortcut Following (.LNK)",
         "used_properties_of_first_node": ["ucocweSummary"],
@@ -153,7 +153,7 @@
         "used_properties_of_second_node": []
     },
     {
-        "question": "What kind of behavior allows attackers to disguise dangerous attachments using shortcut files?",
+        "question": "How does exploiting shortcut behavior help attackers hide executable attachments from user warnings?",
         "type": "<s,*,o>",
         "first_node": "Windows Shortcut Following (.LNK)",
         "used_properties_of_first_node": ["ucocweExtendedSummary"],
@@ -162,16 +162,7 @@
         "used_properties_of_second_node": ["ucoexDESCRIPTION"]
     },
     {
-        "question": "Which design steps can stop systems from following unsafe shortcut links?",
-        "type": "<s,p,*>",
-        "first_node": "Windows Shortcut Following (.LNK)",
-        "used_properties_of_first_node": ["ucopotentialMitigations"],
-        "relationship": "UCOHASOBSERVEDEXAMPLE",
-        "second_node": "Mail client bypassing warning with .lnk file",
-        "used_properties_of_second_node": []
-    },
-    {
-        "question": "How could attackers exploit shortcut files to hide executable attachments from users?",
+        "question": "Which conditions allow malicious shortcut files to bypass attachment security prompts in mail clients?",
         "type": "<s,p,o>",
         "first_node": "Windows Shortcut Following (.LNK)",
         "used_properties_of_first_node": ["ucocweSummary"],
@@ -180,48 +171,57 @@
         "used_properties_of_second_node": ["ucoexDESCRIPTION"]
     },
     {
-        "question": "How could flaws in input validation allow unsafe queries through ORM frameworks?",
+        "question": "What risks arise when a program follows shortcut files that reference external or sensitive targets?",
+        "type": "<s,p,*>",
+        "first_node": "Windows Shortcut Following (.LNK)",
+        "used_properties_of_first_node": ["ucocweExtendedSummary"],
+        "relationship": "UCOHASOBSERVEDEXAMPLE",
+        "second_node": "Mail client bypassing warning with .lnk file",
+        "used_properties_of_second_node": []
+    },
+    {
+        "question": "How can improper input validation lead to SQL-like injection through ORM frameworks?",
         "type": "<s,*,o>",
-        "first_node": "Object Relational Mapping Injection",
+        "first_node": "CAPEC-109: Object Relational Mapping Injection",
         "used_properties_of_first_node": ["ucoexDescription"],
         "relationship": "UCOEXHASRELATEDWEAKNESS",
         "second_node": "Improper Input Validation",
         "used_properties_of_second_node": ["ucocweSummary"]
     },
     {
-        "question": "What happens when ORM-generated queries fail to properly check user input?",
-        "type": "<s,p,*>",
-        "first_node": "Object Relational Mapping Injection",
-        "used_properties_of_first_node": ["ucoexDescription"],
-        "relationship": "UCOEXHASRELATEDWEAKNESS",
-        "second_node": "Improper Input Validation",
-        "used_properties_of_second_node": []
-    },
-    {
-        "question": "Which coding mistakes make ORM frameworks vulnerable to improper input handling?",
-        "type": "<s,*,*>",
-        "first_node": "Object Relational Mapping Injection",
+        "question": "Which validation flaws enable attackers to exploit ORM-generated data access layers for database manipulation?",
+        "type": "<s,p,o>",
+        "first_node": "CAPEC-109: Object Relational Mapping Injection",
         "used_properties_of_first_node": ["ucoexDescription"],
         "relationship": "UCOEXHASRELATEDWEAKNESS",
         "second_node": "Improper Input Validation",
         "used_properties_of_second_node": ["ucocweExtendedSummary"]
     },
     {
-        "question": "How can secure input validation reduce the risk of ORM-based injection attacks?",
-        "type": "<s,p,o>",
-        "first_node": "Object Relational Mapping Injection",
-        "used_properties_of_first_node": ["ucoexMitigations"],
+        "question": "What coding practices cause ORM injection when developers mishandle user inputs?",
+        "type": "<s,p,*>",
+        "first_node": "CAPEC-109: Object Relational Mapping Injection",
+        "used_properties_of_first_node": ["ucoexDescription"],
         "relationship": "UCOEXHASRELATEDWEAKNESS",
         "second_node": "Improper Input Validation",
-        "used_properties_of_second_node": ["ucopotentialMitigations"]
+        "used_properties_of_second_node": []
     },
     {
-        "question": "Why does improper input validation often lead to ORM query manipulation?",
+        "question": "How does weak validation in ORM layers increase the risk of command injection?",
         "type": "<s,p,o>",
-        "first_node": "Object Relational Mapping Injection",
+        "first_node": "CAPEC-109: Object Relational Mapping Injection",
         "used_properties_of_first_node": ["ucoexDescription"],
         "relationship": "UCOEXHASRELATEDWEAKNESS",
         "second_node": "Improper Input Validation",
         "used_properties_of_second_node": ["ucocweSummary"]
+    },
+    {
+        "question": "Why does improper handling of structured inputs in ORM tools often result in injection vulnerabilities?",
+        "type": "<s,*,o>",
+        "first_node": "CAPEC-109: Object Relational Mapping Injection",
+        "used_properties_of_first_node": ["ucoexDescription"],
+        "relationship": "UCOEXHASRELATEDWEAKNESS",
+        "second_node": "Improper Input Validation",
+        "used_properties_of_second_node": ["ucocweExtendedSummary"]
     }
 ]

@@ -77,7 +77,7 @@ Object (o): the second node.
 - Prefer open analytical forms (“How could…?”, “What causes…?”, “Which factor connects…?”).
 - Avoid yes/no questions and multi-part phrasing.
 - Use cybersecurity reasoning naturally: exploitability, overflow, mitigation, validation, propagation, etc.
-- Ensure diversity in question structure — mix of ⟨s,p,*⟩, ⟨s,*,o⟩, ⟨s,p,o⟩.
+- Ensure diversity in question structure — mix of ⟨s,p,*⟩, ⟨s,*,o⟩, ⟨s,p,o⟩ but no <s,*,*> structure.
 - Use only the following node properties for reasoning context:
     - CWE: ucocweSummary, ucocweExtendedSummary, ucocweName
     - CAPEC: label, ucoexDescription
