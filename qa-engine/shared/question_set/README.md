@@ -66,9 +66,11 @@ This script queries the Neo4j database to extract nodes and their relationships.
    ```
 
 4. **Output**: `nodes.json` file containing:
-   - Filtered node properties (name, description, summary, etc.)
+   - Filtered node properties (label-specific properties only)
    - Node labels
    - Relationship types between nodes
+   
+   **Note**: Only properties defined in `LABEL_PROPERTIES_MAP` for matching labels will be included
 
 #### Supported Node ID Formats:
 - **Numeric IDs** (old format): `"782755"`
@@ -173,10 +175,27 @@ Where:
 
 ## Node Property Filtering
 
-The `filter_node_properties()` function extracts only relevant properties containing these keywords:
-- `name`, `summary`, `mitigation`, `example`
-- `label`, `description`, `severity`, `title`
-- `domain`, `definition`
+The `filter_node_properties()` function uses **label-specific property filtering** based on a predefined mapping (`LABEL_PROPERTIES_MAP`). 
+
+### Supported Labels and Properties:
+
+| Label Pattern | Allowed Properties |
+|--------------|-------------------|
+| `CWE` | `ucocweSummary`, `ucocweExtendedSummary`, `ucocweName` |
+| `CVE` | `label`, `ucobaseSeverity` |
+| `Vulnerability` | `ucosummary` |
+| `CPE` | `cpeName`, `titles` |
+| `CAPEC` | `label`, `ucoexDescription` |
+| `Softwares` | `ucoexDESCRIPTION`, `ucoexDOMAIN` |
+| `Groups` | `ucoexDESCRIPTION`, `ucoexDOMAIN` |
+| `CAMPAIGNS` | `ucoexDESCRIPTION`, `ucoexDOMAIN` |
+| `MITIGATIONS` | `ucoexDESCRIPTION`, `ucoexDOMAIN`, `ucoexName` |
+| `MITREATTACK` | `ucoexDESCRIPTION`, `ucoexDOMAIN`, `ucoexName` |
+| `ObservedExample` | `ucoexDESCRIPTION` |
+| `TACTICS` | `ucoexDESCRIPTION`, `ucoexDOMAIN` |
+| `D3FEND` | `ucoexMITRED3FEND_DEFINITION`, `ucoexMITRED3FEND_LABEL` |
+
+**Note**: The matching is case-sensitive substring matching. For example, `UcoCWE` contains `CWE` and will match.
 
 
 ## Troubleshooting
@@ -213,7 +232,18 @@ Edit the prompt template in `generate_questions.py` (lines 45-110) to change:
 - Output format
 
 ### Change Node Properties Used
-Edit keywords in `filter_node_properties()` in `getNodes.py` (line 42) to include/exclude properties.
+Edit the `LABEL_PROPERTIES_MAP` dictionary in `getNodes.py` (lines 28-43) to:
+- Add new label patterns and their allowed properties
+- Modify existing property lists for labels
+- Add or remove properties for specific node types
+
+Example:
+```python
+LABEL_PROPERTIES_MAP = {
+    "CWE": ["ucocweSummary", "ucocweName"],  # Removed ucocweExtendedSummary
+    "NewLabel": ["property1", "property2"]    # Added new label
+}
+```
 
 ### Add Support for More Nodes
 Extend the functions in `getNodes.py` to support 4+ connected nodes by following the pattern of existing functions.
