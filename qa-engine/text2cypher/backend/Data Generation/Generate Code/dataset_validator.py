@@ -539,9 +539,9 @@ if __name__ == '__main__':
     NEO4J_PASSWORD = "abcd90909090"
     SCHEMA_FILE = 'schema_cache.txt'
     # Use a different name for the raw input file
-    RAW_DATASET_FILE = r'C:\Users\User\Downloads\UCKG\qa-engine\text2cypher\backend\dataset\neo4j_NaturalLanguageQuestion_ADJUSTED.csv'
-    ENRICHED_DATASET_FILE = r'C:\Users\User\Downloads\UCKG\qa-engine\text2cypher\backend\dataset\neo4j_evaluation_dataset_ENRICHED.csv'
-    LOG_DIRECTORY = r'C:\Users\User\Downloads\UCKG\qa-engine\text2cypher\backend\validation_log'
+    RAW_DATASET_FILE = r'C:\Users\User\Downloads\UCKG\qa-engine\text2cypher\backend\Data Generation\Dataset Generation Process\technical dataset\technical_dataset_gen_question.csv'
+    ENRICHED_DATASET_FILE = r'C:\Users\User\Downloads\UCKG\qa-engine\text2cypher\backend\Data Generation\Dataset Generation Process\technical dataset\technical_dataset_ENRICH.csv'
+    LOG_DIRECTORY = r'C:\Users\User\Downloads\UCKG\qa-engine\text2cypher\backend\Data Generation\validation_log'
 
     # --- Execution ---
     validator = DatasetValidator(SCHEMA_FILE, NEO4J_URI, NEO4J_USER, NEO4J_PASSWORD)
