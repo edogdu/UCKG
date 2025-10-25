@@ -88,18 +88,36 @@ This script uses an LLM to generate evaluation questions based on the extracted 
    - `../schema_cache.txt` (graph schema)
    - `questions.txt` (example questions for style reference)
 
-2. **Configure LLM** (optional):
+2. **Select the appropriate prompt** (lines 45-189):
+   - **1-hop prompt** (lines 45-108, currently commented out): For 2 connected nodes (Node1—Node2)
+   - **2-hop prompt** (lines 111-189, currently active): For 3 connected nodes (Node1—Node2—Node3)
+   - Comment/uncomment the appropriate prompt based on your `nodes.json` structure
+
+3. **Configure LLM** (optional):
    - Default: Uses Ollama with `gpt-oss:120b`
    - To use OpenAI: Uncomment lines 28-36 and add your API key
 
-3. **Run the script**:
+4. **Run the script**:
    ```bash
    python generate_questions.py
    ```
 
-4. **Output**: Generates 5 questions per node group with metadata
+5. **Output**: Generates 5 questions per node group with metadata
 
 #### Question Generation Strategy
+
+The script includes two different prompt templates optimized for different graph patterns:
+
+**1-Hop Questions** (2 connected nodes: Node1—Node2):
+- Focuses on single-hop relationships
+- Uses question types: `⟨s,p,*⟩`, `⟨s,*,o⟩`, `⟨s,p,o⟩`
+- Object `o` refers to the second node
+
+**2-Hop Questions** (3 connected nodes: Node1—Node2—Node3):
+- Focuses on multi-hop reasoning across two relationships
+- Primarily uses `⟨s,*,o⟩` structure
+- Object `o` refers to the third (final) node
+- Questions must require understanding of both relationships in the chain
 
 Questions are categorized using **PolyG-style triple notation** `⟨s, p, o⟩`:
 
@@ -110,8 +128,8 @@ Questions are categorized using **PolyG-style triple notation** `⟨s, p, o⟩`:
 
 Where:
 - `s` (subject) = First node
-- `p` (predicate) = Relationship type
-- `o` (object) = Second node
+- `p` (predicate) = Relationship type(s)
+- `o` (object) = Final node in the chain
 
 #### Question Quality Constraints:
 - ≤ 25 words
@@ -145,7 +163,7 @@ Where:
 [
     {
         "node1": {
-        "label": "CAPEC-256: SOAP Array Overflow",
+        "name": "CAPEC-256: SOAP Array Overflow",
         "ucoexDescription": "...",
         "labels": "UcoexCAPEC"
         },
@@ -160,16 +178,32 @@ Where:
 ]
 ```
 
-### Expected Output:
+### Expected Output (1-hop):
 ```json
 {
-    "question": "How does SOAP array overflow exploit buffer vulnerabilities?",
-    "type": "<s,*,o>",
-    "first_node": "UcoexCAPEC",
-    "used_properties_of_first_node": ["label", "ucoexDescription"],
-    "relationship": "UCOEXHASRELATEDWEAKNESS",
-    "second_node": "UcoCWE",
-    "used_properties_of_second_node": ["ucocweName"]
+   "question": "How does SOAP array overflow exploit buffer vulnerabilities?",
+   "type": "<s,*,o>",
+   "first_node": "UcoexCAPEC",
+   "used_properties_of_first_node": ["name", "ucoexDescription"],
+   "relationship": "UCOEXHASRELATEDWEAKNESS",
+   "second_node": "UcoCWE",
+   "used_properties_of_second_node": ["ucocweName"]
+}
+```
+
+### Expected Output (2-hop):
+```json
+{
+   "question": "What risk scenarios arise when UNIX symlink handling weaknesses interact with container copy vulnerabilities in Kubernetes?",
+   "type": "<s,*,o>",
+   "first_node": "UNIX Symbolic Link (Symlink) Following",
+   "used_properties_of_first_node": ["ucocweSummary"],
+   "relationship_1": "UCOHASWEAKNESS",
+   "second_node": "UcoExploitTarget",
+   "used_properties_of_second_node": [],
+   "relationship_2": "UCOHASVULNERABILITY",
+   "third_node": "Kubernetes kubectl cp vulnerability",
+   "used_properties_of_third_node": ["ucosummary"]
 }
 ```
 
@@ -177,15 +211,17 @@ Where:
 
 The `filter_node_properties()` function uses **label-specific property filtering** based on a predefined mapping (`LABEL_PROPERTIES_MAP`). 
 
+**Note**: Any property named "label" is automatically renamed to "name" in the JSON output for better clarity.
+
 ### Supported Labels and Properties:
 
 | Label Pattern | Allowed Properties |
 |--------------|-------------------|
 | `CWE` | `ucocweSummary`, `ucocweExtendedSummary`, `ucocweName` |
-| `CVE` | `label`, `ucobaseSeverity` |
+| `CVE` | `label` → `name`, `ucobaseSeverity` |
 | `Vulnerability` | `ucosummary` |
 | `CPE` | `cpeName`, `titles` |
-| `CAPEC` | `label`, `ucoexDescription` |
+| `CAPEC` | `label` → `name`, `ucoexDescription` |
 | `Softwares` | `ucoexDESCRIPTION`, `ucoexDOMAIN` |
 | `Groups` | `ucoexDESCRIPTION`, `ucoexDOMAIN` |
 | `CAMPAIGNS` | `ucoexDESCRIPTION`, `ucoexDOMAIN` |
@@ -194,8 +230,6 @@ The `filter_node_properties()` function uses **label-specific property filtering
 | `ObservedExample` | `ucoexDESCRIPTION` |
 | `TACTICS` | `ucoexDESCRIPTION`, `ucoexDOMAIN` |
 | `D3FEND` | `ucoexMITRED3FEND_DEFINITION`, `ucoexMITRED3FEND_LABEL` |
-
-**Note**: The matching is case-sensitive substring matching. For example, `UcoCWE` contains `CWE` and will match.
 
 
 ## Troubleshooting
@@ -224,10 +258,20 @@ ollama pull gpt-oss:120b
 
 ## Customization
 
+### Switch Between 1-Hop and 2-Hop Prompts
+The script includes two prompt templates in `generate_questions.py`:
+- **1-hop prompt**: Lines 45-108 (currently commented out)
+- **2-hop prompt**: Lines 111-189 (currently active)
+
+To switch:
+1. Comment out the active prompt
+2. Uncomment the desired prompt
+3. Ensure you're using the correct `nodes.json` structure (2 or 3 nodes)
+
 ### Modify Question Style
-Edit the prompt template in `generate_questions.py` (lines 45-110) to change:
+Edit either prompt template in `generate_questions.py` to change:
 - Question length constraints
-- Category types
+- Category types (⟨s,p,*⟩, ⟨s,*,o⟩, etc.)
 - Property focus
 - Output format
 

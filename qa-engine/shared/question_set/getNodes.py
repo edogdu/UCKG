@@ -81,6 +81,10 @@ def filter_node_properties(properties, labels):
             else:
                 filtered[key] = value
     
+    # Rename "label" property to "name" if it exists
+    if "label" in filtered:
+        filtered["name"] = filtered.pop("label")
+    
     return filtered
 
 
@@ -285,8 +289,8 @@ if __name__ == "__main__":
     # List of node tuples to process (can be 1, 2, or 3 nodes)
     node_groups = [
         # ("782755",)  # 1 node
-        ("783339", "812"),  # 2 nodes
-        # ("783162", "6440", "5254"),  # 3 nodes
+        # ("783339", "812"),  # 2 nodes
+        ("3778", "782755", "6501"),  # 3 nodes
     ]
     
     # Save results to JSON file
