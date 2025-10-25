@@ -23,6 +23,26 @@ except Exception as e:
     exit(1)
 
 
+# Label-to-properties mapping
+# Defines which properties are allowed for each node label
+LABEL_PROPERTIES_MAP = {
+    "CWE": ["ucocweSummary", "ucocweExtendedSummary", "ucocweName"],
+    "CVE": ["label", "ucobaseSeverity"],
+    "Vulnerability": ["ucosummary"],
+    "CPE": ["cpeName", "titles"],
+    "CAPEC": ["label", "ucoexDescription"],
+    "ATT&CK": [],
+    "Softwares": ["ucoexDESCRIPTION", "ucoexDOMAIN"],
+    "Groups": ["ucoexDESCRIPTION", "ucoexDOMAIN"],
+    "CAMPAIGNS": ["ucoexDESCRIPTION", "ucoexDOMAIN"],
+    "MITIGATIONS": ["ucoexDESCRIPTION", "ucoexDOMAIN", "ucoexName"],
+    "MITREATTACK": ["ucoexDESCRIPTION", "ucoexDOMAIN", "ucoexName"],
+    "ObservedExample": ["ucoexDESCRIPTION"],
+    "TACTICS": ["ucoexDESCRIPTION", "ucoexDOMAIN"],
+    "D3FEND": ["ucoexMITRED3FEND_DEFINITION", "ucoexMITRED3FEND_LABEL"]
+}
+
+
 def normalize_whitespace(text):
     
     if not isinstance(text, str):
@@ -37,14 +57,24 @@ def normalize_whitespace(text):
     return '\n'.join(lines).strip()
 
 
-def filter_node_properties(properties):
-    
-    keywords = ["name", "summary", "mitigation", "example", "label", "description", "severity", "title", "domain", "definition"]
+def filter_node_properties(properties, labels):
     filtered = {}
     
+    # Collect all allowed properties for all labels of this node
+    # Check if any label contains the mapping key (partial match)
+    allowed_properties = set()
+    for label in labels:
+        for map_key, props in LABEL_PROPERTIES_MAP.items():
+            if map_key in label:
+                allowed_properties.update(props)
+    
+    # If no labels match or no properties defined, return empty dict
+    if not allowed_properties:
+        return filtered
+    
+    # Filter properties based on allowed list
     for key, value in properties.items():
-        key_lower = key.lower()
-        if any(keyword in key_lower for keyword in keywords):
+        if key in allowed_properties:
             # Normalize whitespace in string values
             if isinstance(value, str):
                 filtered[key] = normalize_whitespace(value)
@@ -87,8 +117,9 @@ def get_single_node(node_id):
         node = record["n"]
         
         # Format the response with filtered properties and labels
-        node_data = filter_node_properties(dict(node))
-        node_data["labels"] = list(node.labels)[0]
+        labels = list(node.labels)
+        node_data = filter_node_properties(dict(node), labels)
+        node_data["labels"] = labels
         
         response = {
             "node": node_data
@@ -139,11 +170,13 @@ def get_two_connected_nodes(node_id_1, node_id_2):
         relationships = record["relationships"]
         
         # Format the response with filtered properties and labels included
-        node1_data = filter_node_properties(dict(node1))
-        node1_data["labels"] = list(node1.labels)[0]
+        labels1 = list(node1.labels)
+        node1_data = filter_node_properties(dict(node1), labels1)
+        node1_data["labels"] = labels1
         
-        node2_data = filter_node_properties(dict(node2))
-        node2_data["labels"] = list(node2.labels)[0]
+        labels2 = list(node2.labels)
+        node2_data = filter_node_properties(dict(node2), labels2)
+        node2_data["labels"] = labels2
         
         response = {
             "node1": node1_data,
@@ -203,14 +236,17 @@ def get_three_connected_nodes(node_id_1, node_id_2, node_id_3):
         rels_2_3 = record["rels_2_3"]
         
         # Format the response with filtered properties and labels included
-        node1_data = filter_node_properties(dict(node1))
-        node1_data["labels"] = list(node1.labels)[0]
+        labels1 = list(node1.labels)
+        node1_data = filter_node_properties(dict(node1), labels1)
+        node1_data["labels"] = labels1
         
-        node2_data = filter_node_properties(dict(node2))
-        node2_data["labels"] = list(node2.labels)[0]
+        labels2 = list(node2.labels)
+        node2_data = filter_node_properties(dict(node2), labels2)
+        node2_data["labels"] = labels2
         
-        node3_data = filter_node_properties(dict(node3))
-        node3_data["labels"] = list(node3.labels)[0]
+        labels3 = list(node3.labels)
+        node3_data = filter_node_properties(dict(node3), labels3)
+        node3_data["labels"] = labels3
         
         response = {
             "node1": node1_data,
@@ -249,7 +285,7 @@ if __name__ == "__main__":
     # List of node tuples to process (can be 1, 2, or 3 nodes)
     node_groups = [
         # ("782755",)  # 1 node
-        ("783461", "2382"),  # 2 nodes
+        ("783339", "812"),  # 2 nodes
         # ("783162", "6440", "5254"),  # 3 nodes
     ]
     
