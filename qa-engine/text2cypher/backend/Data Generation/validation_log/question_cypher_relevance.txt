@@ -1,0 +1,77 @@
+Entry #1: PASS (Similarity: 0.7389)
+Entry #2: PASS (Similarity: 0.8911)
+Entry #3: PASS (Similarity: 0.8505)
+Entry #4: PASS (Similarity: 0.8387)
+Entry #5: PASS (Similarity: 0.9135)
+Entry #6: PASS (Similarity: 0.7092)
+Entry #7: PASS (Similarity: 0.8283)
+Entry #8: PASS (Similarity: 0.7570)
+Entry #9: PASS (Similarity: 0.7064)
+Entry #10: PASS (Similarity: 0.9317)
+Entry #11: PASS (Similarity: 0.8212)
+Entry #12: FAIL - Similarity: 0.6397 is below threshold of 0.7
+  - NL Question: 'Show me all threat groups, the techniques they use, and the mitigations for those techniques.'
+  - Gen Question: 'Map threat groups to their TTPs and the corresponding mitigations.'
+Entry #13: PASS (Similarity: 0.7733)
+Entry #14: FAIL - Similarity: 0.4836 is below threshold of 0.7
+  - NL Question: 'Show me which groups use software that in turn employ specific ATT&CK techniques.'
+  - Gen Question: 'Show group-to-software-to-TTP relationships.'
+Entry #15: PASS (Similarity: 0.7599)
+Entry #16: FAIL - Similarity: 0.6076 is below threshold of 0.7
+  - NL Question: 'Show attack patterns (CAPEC), their related weaknesses (CWE), and the CVEs where those weaknesses were observed.'
+  - Gen Question: 'Connect CAPEC patterns to their related CWEs and the CVEs where they were observed.'
+Entry #17: FAIL - Similarity: 0.6842 is below threshold of 0.7
+  - NL Question: 'Find threat groups and campaigns that both use the same ATT&CK technique.'
+  - Gen Question: 'Identify shared TTPs between threat groups and campaigns.'
+Entry #18: PASS (Similarity: 0.8270)
+Entry #19: PASS (Similarity: 0.7179)
+Entry #20: PASS (Similarity: 0.9781)
+Entry #21: FAIL - Similarity: 0.6986 is below threshold of 0.7
+  - NL Question: 'What ATT&CK techniques are used by both 'APT29' and 'Lazarus Group'?'
+  - Gen Question: 'What TTPs are leveraged by both APT29 and Lazarus Group?'
+Entry #22: PASS (Similarity: 0.8134)
+Entry #23: FAIL - Similarity: 0.3997 is below threshold of 0.7
+  - NL Question: 'Find groups using techniques for which there are no mitigations listed.'
+  - Gen Question: 'Which threat groups are using TTPs with no documented mitigations?'
+Entry #24: PASS (Similarity: 0.7703)
+Entry #25: FAIL - Similarity: 0.6915 is below threshold of 0.7
+  - NL Question: 'What campaigns use the same techniques as the 'Mimikatz' software?'
+  - Gen Question: 'What campaigns leverage TTPs associated with 'Mimikatz'?'
+Entry #26: PASS (Similarity: 0.9268)
+Entry #27: PASS (Similarity: 0.7801)
+Entry #28: PASS (Similarity: 0.9537)
+Entry #29: PASS (Similarity: 0.9589)
+Entry #30: FAIL - Similarity: 0.6148 is below threshold of 0.7
+  - NL Question: 'Which weaknesses (CWEs) are associated with the most attack patterns (CAPECs)?'
+  - Gen Question: 'Which 10 CWEs are related to the highest number of CAPEC patterns?'
+Entry #31: PASS (Similarity: 0.9619)
+Entry #32: PASS (Similarity: 0.9309)
+Entry #33: PASS (Similarity: 0.8466)
+Entry #34: PASS (Similarity: 0.8764)
+Entry #35: PASS (Similarity: 0.9531)
+Entry #36: PASS (Similarity: 0.9401)
+Entry #37: PASS (Similarity: 0.9717)
+Entry #38: PASS (Similarity: 0.8192)
+Entry #39: PASS (Similarity: 0.9787)
+Entry #40: PASS (Similarity: 0.7044)
+Entry #41: PASS (Similarity: 0.9376)
+Entry #42: PASS (Similarity: 0.8304)
+Entry #43: PASS (Similarity: 0.9301)
+Entry #44: PASS (Similarity: 0.7546)
+Entry #45: PASS (Similarity: 0.8335)
+Entry #46: PASS (Similarity: 0.8783)
+Entry #47: PASS (Similarity: 0.8682)
+Entry #48: PASS (Similarity: 0.9278)
+Entry #49: PASS (Similarity: 0.9205)
+Entry #50: PASS (Similarity: 0.8545)
+Entry #51: FAIL - Similarity: 0.5591 is below threshold of 0.7
+  - NL Question: 'Find techniques used by both 'APT28' AND 'Lazarus Group' (Intersection).'
+  - Gen Question: 'What TTPs are shared between APT28 and Lazarus Group?'
+Entry #52: FAIL - Similarity: 0.6268 is below threshold of 0.7
+  - NL Question: 'List all techniques used by 'APT28' OR 'Lazarus Group' (Union).'
+  - Gen Question: 'List all unique TTPs used by either APT28 or Lazarus Group.'
+Entry #53: PASS (Similarity: 0.9203)
+Entry #54: FAIL - Similarity: 0.5891 is below threshold of 0.7
+  - NL Question: 'Find all 'Enterprise' ATT&CK techniques that are not used by any known group.'
+  - Gen Question: 'List all 'Enterprise' TTPs that are not associated with any known threat group.'
+Entry #55: PASS (Similarity: 0.9492)

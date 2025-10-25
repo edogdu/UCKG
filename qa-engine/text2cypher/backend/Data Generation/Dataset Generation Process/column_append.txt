@@ -1,0 +1,55 @@
+Show all CWEs within 3 hops of CAPEC-100 (SQL Injection).
+What are the shared relationships (up to 3 hops) between APT28 and Lazarus Group?
+Find the shortest attack path (max 4 hops) from 'microsoft:windows_10' to 'Sandworm Team'.
+Show the 2-hop neighborhood for the 'Access Token Manipulation' mitigation.
+Map the relationship (max 5 hops) between D3FEND 'File Access Pattern Analysis' and CVE-2017-0199.
+Show the relationship path (max 3 hops) between CVE-2021-44228 and CVE-2021-45046.
+Find all CAPEC patterns within 2 hops of the 'Process Injection' TTP.
+Show the immediate 1-hop neighborhood for the 'SolarWinds' campaign.
+Find the shortest path (max 5 hops) from an RCE vulnerability to APT29.
+What software is related (max 4 hops) to CWE-78 (OS Command Injection)?
+Show the relationship path (max 3 hops) between 'Mimikatz' and 'PowerShell'.
+Map threat groups to their TTPs and the corresponding mitigations.
+List campaigns, their attributed groups, and the TTPs employed.
+Show group-to-software-to-TTP relationships.
+Map exploit targets to vulnerabilities, their CVEs, and affected CPEs.
+Connect CAPEC patterns to their related CWEs and the CVEs where they were observed.
+Identify shared TTPs between threat groups and campaigns.
+Identify shared software tooling between threat groups and campaigns.
+Map D3FEND mitigations to the ATT&CK TTPs they counter and the groups that use them.
+What software tools are common to both APT28 and Sandworm Team?
+What TTPs are leveraged by both APT29 and Lazarus Group?
+Identify distinct CWEs with observed examples in CVEs affecting 'microsoft:windows_10'.
+Which threat groups are using TTPs with no documented mitigations?
+What groups use TTPs that map from 'High' severity CAPEC patterns?
+What campaigns leverage TTPs associated with 'Mimikatz'?
+Find critical CVEs and their root-cause CWEs affecting 'apache:log4j'.
+Rank threat groups by their total count of 'Enterprise' TTPs.
+List the top 10 most exploitable 'CRITICAL' CVEs that grant full privileges.
+What are the top 5 software tools most frequently used by threat groups?
+Which 10 CWEs are related to the highest number of CAPEC patterns?
+List CAPEC patterns, ordered first by highest severity, then by highest likelihood.
+Identify CVEs where the impact score exceeds the exploitability score.
+What are the top 10 products (CPEs) with the most 'CRITICAL' vulnerabilities?
+Rank 'Mobile' ATT&CK techniques by their number of available mitigations.
+Which campaigns have the highest number of attributed threat groups?
+List all CWEs, ranked by their likelihood of exploit (High to Low).
+Rank CAPEC patterns first by severity (descending) and then by skill required (ascending).
+Identify the top 5 least-mitigated 'Enterprise' TTPs used by APT29.
+Find CVEs with an exploitability score over 3.5 and an impact score under 5.0.
+List all threat groups with at least one associated TTP.
+Identify all ATT&CK techniques that have no documented mitigations.
+List all software tools that are not mapped to any ATT&CK technique.
+Identify all CWEs that lack any observed real-world examples.
+Pull all data for CVE-2023-0001 and CVE-2023-0002.
+Which distinct groups use either 'Phishing' or 'Data Encrypted for Impact'?
+List all CVEs that are not associated with any specific product (CPE).
+List all campaigns that have a known attribution to a threat group.
+Find all CWEs where the 'likelihoodOfExploit' property is populated.
+Pull all CVEs with a status of 'Analyzed' or 'Awaiting Analysis'.
+Identify exploit targets that have no linked vulnerabilities or weaknesses.
+What TTPs are shared between APT28 and Lazarus Group?
+List all unique TTPs used by either APT28 or Lazarus Group.
+What software in Sandworm Team's arsenal is not used by APT29?
+List all 'Enterprise' TTPs that are not associated with any known threat group.
+Identify all CAPEC patterns that have defined prerequisites.

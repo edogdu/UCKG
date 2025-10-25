@@ -36,7 +36,7 @@ Creates `evaluation_dataset.json` with this structure:
     {
       "id": 1,
       "question": "What is SQL injection?",
-      "context": "=== GRAPH-BASED KNOWLEDGE NETWORK ===\n[1] PRIMARY NODE: CWE-89...",
+      "context": "[1] PRIMARY NODE: CWE-89...",
       "response": "SQL injection (CWE-89) is a vulnerability...",
       "metadata": {
         "mode": "graphrag",
@@ -111,21 +111,6 @@ Each question goes through:
 - **File**: `evaluation_dataset.json`
 - **Size**: ~1-2MB for 151 questions
 - **Format**: JSON with full context and responses
-
-## Use Cases
-
-1. **Evaluation**: Test RAG configurations
-2. **Fine-tuning**: Train LLMs on domain data
-3. **Benchmarking**: Compare retrieval strategies
-4. **Testing**: Regression testing for pipeline changes
-
-## Troubleshooting
-
-**Neo4j warnings about `id()`**: Expected, doesn't affect functionality
-
-**Slow processing**: Normal! Each question takes ~5-10 seconds
-
-**Empty responses**: Check Ollama is running and models are loaded
 
 ---
 

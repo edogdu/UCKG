@@ -1,0 +1,22 @@
+Cypher query: MATCH (c:UcoCVE) RETURN distinct c.
+
+{
+  "labels": [
+    "UcoCVE"
+  ],
+  "properties": {
+    "ucoobtainAllPrivilege": "false",
+    "ucoexploitabilityScore": "10.0",
+    "ucoimpactScore": "2.9",
+    "ucouserInteractionRequired": "false",
+    "ucobaseSeverity": "MEDIUM",
+    "ucovulnStatus": "Deferred",
+    "label": "CVE-1999-0001",
+    "ucoevaluatorSolution": ""
+  }
+}
+
+"ucoobtainAllPrivilege": "false", "true"
+"ucouserInteractionRequired": "false",, "true"
+"ucobaseSeverity": "HIGH", "MEDIUM", "LOW, ""
+"ucovulnStatus": "Deferred", "Analyzed", "Modified", "Awaiting Analysis", "Rejected", "Undergoing Analysis", "Received"

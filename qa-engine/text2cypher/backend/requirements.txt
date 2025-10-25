@@ -14,4 +14,7 @@ pandas>=2.2
 cypher-guard>=0.1.0
 
 # Optional: Ollama integration (if using Text2Cypher with Ollama)
-ollama>=0.1.2    
+ollama>=0.1.2   
+
+# Semantic similarity for relevance validation
+sentence_transformers
