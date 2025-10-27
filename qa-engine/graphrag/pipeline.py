@@ -14,20 +14,7 @@ from .utils import GraphRAGConfig, RAGMode, NEO4J_URI, NEO4J_USER, NEO4J_PASSWOR
 from .retrieval import GraphRetriever
 from .reranking import GraphReranker
 from .generation import ContextFormatter, AnswerGenerator
-
-# Import optional components from shared modules
-sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
-try:
-    from shared.hop_selector import HopSelector
-except ImportError:
-    HopSelector = None
-
-try:
-    from test_relationship_prediction import RelationshipPredictor
-    from text2cypher.backend.ollama_llm import OllamaLLM
-except ImportError:
-    RelationshipPredictor = None
-    OllamaLLM = None
+from .query_processor import HopSelector, RelationshipPredictor, QueryRouter
 
 
 class GraphRAGSimilarity:
@@ -67,17 +54,20 @@ class GraphRAGSimilarity:
         # Initialize optional components
         self._initialize_hop_selector()
         self._initialize_relationship_predictor()
+        self._initialize_query_router()
 
     def _initialize_hop_selector(self):
         """Initialize hop selector if enabled"""
-        if self.config.enable_dynamic_hop_selection and HopSelector:
+        if self.config.enable_dynamic_hop_selection:
             try:
+                schema_file = os.path.join(os.path.dirname(__file__), '..', 'shared', 'uckg_schema_llm.txt')
                 self.hop_selector = HopSelector(
                     llm=self.router_llm,
                     use_llm_threshold=self.config.hop_selection_llm_threshold,
-                    enable_llm=self.config.hop_selection_enable_llm
+                    enable_llm=self.config.hop_selection_enable_llm,
+                    schema_file=schema_file
                 )
-                print(f"[GraphRAG] Hop selector initialized (LLM: {self.config.hop_selection_enable_llm})")
+                print(f"[GraphRAG] Hop selector initialized with schema (LLM: {self.config.hop_selection_enable_llm})")
             except Exception as e:
                 print(f"WARNING: Hop selector initialization failed: {e}")
                 self.config.enable_dynamic_hop_selection = False
@@ -87,20 +77,29 @@ class GraphRAGSimilarity:
 
     def _initialize_relationship_predictor(self):
         """Initialize relationship predictor if enabled"""
-        if self.config.enable_relationship_prediction and RelationshipPredictor and OllamaLLM:
+        if self.config.enable_relationship_prediction:
             try:
-                llm = OllamaLLM(model=self.config.llm_model)
+                schema_file = os.path.join(os.path.dirname(__file__), '..', 'shared', 'uckg_schema_llm.txt')
                 self.relationship_predictor = RelationshipPredictor(
-                    llm,
-                    schema_file="shared/uckg_schema_llm.txt"
+                    llm=self.router_llm,
+                    schema_file=schema_file
                 )
-                print(f"[GraphRAG] Relationship predictor initialized with model: {self.config.llm_model}")
+                print(f"[GraphRAG] Relationship predictor initialized with schema")
             except Exception as e:
                 print(f"WARNING: Relationship predictor initialization failed: {e}")
                 self.config.enable_relationship_prediction = False
                 self.relationship_predictor = None
         else:
             self.relationship_predictor = None
+
+    def _initialize_query_router(self):
+        """Initialize query router"""
+        try:
+            self.query_router = QueryRouter(llm=self.router_llm)
+            print(f"[GraphRAG] Query router initialized")
+        except Exception as e:
+            print(f"WARNING: Query router initialization failed: {e}")
+            self.query_router = None
 
     def run(self, query: str) -> Dict[str, Any]:
         """
@@ -218,9 +217,20 @@ class GraphRAGSimilarity:
         return []
 
     def _classify_query(self, query: str) -> Tuple[RAGMode, int]:
-        """Classify query to determine retrieval mode (currently forced to graphrag)"""
-        # Force graphrag mode only
-        return RAGMode.graphrag, 5
+        """Classify query to determine retrieval mode using QueryRouter"""
+        if self.query_router:
+            try:
+                mode_str, top_k = self.query_router.route_query(query)
+                # Convert string to RAGMode enum
+                mode = RAGMode(mode_str) if mode_str in [m.value for m in RAGMode] else RAGMode.graphrag
+                return mode, top_k
+            except Exception as e:
+                print(f"WARNING: Query routing failed: {e}")
+                # Fallback to graphrag mode
+                return RAGMode.graphrag, 5
+        else:
+            # Fallback to graphrag mode
+            return RAGMode.graphrag, 5
 
     def _format_zero_hop_results(self, items):
         """Format 0-hop results (semantic only, no graph neighbors)"""

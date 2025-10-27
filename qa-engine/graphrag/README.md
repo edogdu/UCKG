@@ -53,6 +53,7 @@ INDEX_NAME=global_embedding_idx
 graphrag/
 ├── __init__.py          # Clean exports: GraphRAGSimilarity, GraphRAGConfig, RAGMode
 ├── utils.py             # Configuration, enums, helper functions
+├── query_processor.py   # Stage 0: Hop selection, relationship prediction, query routing
 ├── retrieval.py         # Stage 1-2: Semantic search + graph traversal
 ├── reranking.py         # Stage 3: Neighbor-aware reranking
 ├── generation.py        # Stage 4: Context formatting + answer generation
@@ -62,6 +63,7 @@ graphrag/
 ### File Responsibilities
 
 - **utils.py**: Configuration dataclass, constants, cosine similarity, node formatters
+- **query_processor.py**: `HopSelector`, `RelationshipPredictor`, `QueryRouter` - Stage 0 pre-processing components
 - **retrieval.py**: `GraphRetriever` - builds Cypher queries, executes vector + graph search
 - **reranking.py**: `GraphReranker` - filters neighbors, applies relationship bonuses, recalculates scores
 - **generation.py**: `ContextFormatter` + `AnswerGenerator` - formats retrieved data and generates answers
@@ -71,17 +73,26 @@ graphrag/
 
 ### Stage 0: Pre-Processing
 
-**Dynamic Hop Selection** (optional):
-- Analyzes query complexity using rule-based + LLM methods
-- Decides optimal graph traversal depth:
-  - **0-hop**: Semantic search only (simple lookups)
-  - **1-hop**: Primary node + immediate neighbors (moderate complexity)
-  - **2-hop**: Primary + 1-hop + 2-hop neighbors (complex relationships)
+**Dynamic Hop Selection** (`HopSelector`):
+- Hybrid approach combining rule-based patterns with LLM analysis
+- Schema-aware decisions using UCKG knowledge graph structure
+- Analyzes query complexity to determine optimal traversal depth:
+  - **0-hop**: Semantic search only (simple lookups like "What is SQL injection?")
+  - **1-hop**: Primary node + immediate neighbors (direct relationships)
+  - **2-hop**: Primary + 1-hop + 2-hop neighbors (complex multi-hop chains)
+- Confidence-based fallback: Uses LLM when rule-based confidence is low
 
-**Relationship Prediction** (optional):
-- Uses LLM + schema to predict which relationship types are relevant
+**Relationship Prediction** (`RelationshipPredictor`):
+- Schema-aware LLM prediction using full UCKG schema context
+- Prompt engineering with few-shot learning examples
+- Predicts 2-4 most relevant relationship types for focused graph traversal
+- Examples: UCOEXHASRELATEDWEAKNESS, UCOEXMITIGATES, UCOEXGROUPUSESTECHNIQUE
 - Predicted relationships get bonus scores during reranking
-- Limits traversal to top N relationship types per node
+
+**Query Routing** (`QueryRouter`):
+- Routes queries to appropriate GraphRAG modes (graphrag vs hybrid)
+- Pattern-based classification for optimal retrieval strategy
+- Determines top_k parameter based on query complexity
 
 ### Stage 1-2: Retrieval
 
