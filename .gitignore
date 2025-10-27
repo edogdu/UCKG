@@ -26,6 +26,11 @@ ENV/
 # Logs
 logs/
 *.log
+evaluation_run*.log
+nohup.out
+
+# Cached embeddings (can be regenerated)
+**/schema_embeddings.json
 
 # OS files
 .DS_Store
@@ -38,3 +43,4 @@ Thumbs.db
 *.bak
 *.orig
 *plugins/*.jar
+node_modules
