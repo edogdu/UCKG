@@ -1,0 +1,137 @@
+>>>>>>>>>>>>>>>>>>>>  single hop question 1
+
+("5984", "2508")
+
+[
+  {
+    "node1": {
+      "ucocweName": "Improper Control of Generation of Code ('Code Injection')",
+      "ucopotentialMitigations": "{mitigation=[{\"Phase\":\"Architecture and Design\",\"Description\":\"Refactor your program so that you do not have to dynamically generate code.\"},{\"Phase\":\"Architecture and Design\",\"Description\":\"Run your code in a \\\"jail\\\" or similar sandbox environment that enforces strict boundaries between the process and the operating system. This may effectively restrict which code can be executed by your product.\\n Examples include the Unix chroot jail and AppArmor. In general, managed code may provide some protection.\\n This may not be a feasible solution, and it only limits the impact to the operating system; the rest of your application may still be subject to compromise.\\n Be careful to avoid CWE-243 and other weaknesses related to jails.\"},{\"Phase\":\"Implementation\",\"Description\":\"Assume all input is malicious. Use an \\\"accept known good\\\" input validation strategy, i.e., use a list of acceptable inputs that strictly conform to specifications. Reject any input that does not strictly conform to specifications, or transform it into something that does.\\n When performing input validation, consider all potentially relevant properties, including length, type of input, the full range of acceptable values, missing or extra inputs, syntax, consistency across related fields, and conformance to business rules. As an example of business rule logic, \\\"boat\\\" may be syntactically valid because it only contains alphanumeric characters, but it is not valid if the input is only expected to contain colors such as \\\"red\\\" or \\\"blue.\\\"\\n Do not rely exclusively on looking for malicious or malformed inputs. This is likely to miss at least one undesirable input, especially if the code's environment changes. This can give attackers enough room to bypass the intended validation. However, denylists can be useful for detecting potential attacks or determining which inputs are so malformed that they should be rejected outright.\\n To reduce the likelihood of code injection, use stringent allowlists that limit which constructs are allowed. If you are dynamically constructing code that invokes a function, then verifying that the input is alphanumeric might be insufficient. An attacker might still be able to reference a dangerous function that you did not intend to allow, such as system(), exec(), or exit().\"},{\"Phase\":\"Testing\",\"Description\":\"Use automated static analysis tools that target this type of weakness. Many modern techniques use data flow analysis to minimize the number of false positives. This is not a perfect solution, since 100% accuracy and coverage are not feasible.\"},{\"Phase\":\"Testing\",\"Description\":\"Use dynamic tools and techniques that interact with the product using large test suites with many diverse inputs, such as fuzz testing (fuzzing), robustness testing, and fault injection. The product's operation may slow down, but it should not become unstable, crash, or generate incorrect results.\"},{\"Phase\":\"Operation\",\"Description\":\"Run the code in an environment that performs automatic taint propagation and prevents any command execution that uses tainted variables, such as Perl's \\\"-T\\\" switch. This will force the program to perform validation steps that remove the taint, although you must be careful to correctly validate your inputs so that you do not accidentally mark dangerous inputs as untainted (see CWE-183 and CWE-184).\"},{\"Phase\":\"Operation\",\"Description\":\"Run the code in an environment that performs automatic taint propagation and prevents any command execution that uses tainted variables, such as Perl's \\\"-T\\\" switch. This will force the program to perform validation steps that remove the taint, although you must be careful to correctly validate your inputs so that you do not accidentally mark dangerous inputs as untainted (see CWE-183 and CWE-184).\"},{\"Phase\":\"Implementation\",\"Description\":\"For Python programs, it is frequently encouraged to use the ast.literal_eval() function instead of eval, since it is intentionally designed to avoid executing code. However, an adversary could still cause excessive memory or stack consumption via deeply nested structures [REF-1372], so the python documentation discourages use of ast.literal_eval() on untrusted data [REF-1373].\"}]}",
+      "ucodemonstrativeExamples": "This example attempts to write user messages to a message file and allow users to view them.\n$MessageFile = \"messages.out\";if ($_GET[\"action\"] == \"NewMessage\") {$name = $_GET[\"name\"];$message = $_GET[\"message\"];$handle = fopen($MessageFile, \"a+\");fwrite($handle, \"<b>$name</b> says '$message'<hr>\\n\");fclose($handle);echo \"Message Saved!<p>\\n\";}else if ($_GET[\"action\"] == \"ViewMessages\") {include($MessageFile);}\nWhile the programmer intends for the MessageFile to only include data, an attacker can provide a message such as:\nname=h4x0rmessage=%3C?php%20system(%22/bin/ls%20-l%22);?%3E\nwhich will decode to the following:\n<?php system(\"/bin/ls -l\");?>\nThe programmer thought they were just including the contents of a regular data file, but PHP parsed it and executed the code. Now, this code is executed any time people view messages.\nNotice that XSS (CWE-79) is also possible in this situation.\nedit-config.pl: This CGI script is used to modify settings in a configuration file.\nuse CGI qw(:standard);\nsub config_file_add_key {\nmy ($fname, $key, $arg) = @_;\n# code to add a field/key to a file goes here\n}\nsub config_file_set_key {\nmy ($fname, $key, $arg) = @_;\n# code to set key to a particular file goes here\n}\nsub config_file_delete_key {\nmy ($fname, $key, $arg) = @_;\n# code to delete key from a particular file goes here\n}\nsub handleConfigAction {\nmy ($fname, $action) = @_;my $key = param('key');my $val = param('val');\n# this is super-efficient code, especially if you have to invoke\n# any one of dozens of different functions!\nmy $code = \"config_file_$action_key(\\$fname, \\$key, \\$val);\";eval($code);\n}\n$configfile = \"/home/cwe/config.txt\";print header;if (defined(param('action'))) {handleConfigAction($configfile, param('action'));}else {print \"No action specified!\\n\";}\nThe script intends to take the 'action' parameter and invoke one of a variety of functions based on the value of that parameter - config_file_add_key(), config_file_set_key(), or config_file_delete_key(). It could set up a conditional to invoke each function separately, but eval() is a powerful way of doing the same thing in fewer lines of code, especially when a large number of functions or variables are involved. Unfortunately, in this case, the attacker can provide other values in the action parameter, such as:\nadd_key(\",\",\"); system(\"/bin/ls\");\nThis would produce the following string in handleConfigAction():\nconfig_file_add_key(\",\",\"); system(\"/bin/ls\");\nAny arbitrary Perl code could be added after the attacker has \"closed off\" the construction of the original function call, in order to prevent parsing errors from causing the malicious eval() to fail before the attacker's payload is activated. This particular manipulation would fail after the system() call, because the \"_key(\\$fname, \\$key, \\$val)\" portion of the string would cause an error, but this is irrelevant to the attack because the payload has already been activated.\nThis simple script asks a user to supply a list of numbers as input and adds them together.\ndef main():\nsum = 0\nnumbers = eval(input(\"Enter a space-separated list of numbers: \"))\nfor num in numbers:\nsum = sum + num\nprint(f\"Sum of {numbers} = {sum}\")\nmain()\nThe eval() function can take the user-supplied list and convert it into a Python list object, therefore allowing the programmer to use list comprehension methods to work with the data. However, if code is supplied to the eval() function, it will execute that code. For example, a malicious user could supply the following string:\n__import__('subprocess').getoutput('rm -r *')\nThis would delete all the files in the current directory. For this reason, it is not recommended to use eval() with untrusted input.\nA way to accomplish this without the use of eval() is to apply an integer conversion on the input within a try/except block. If the user-supplied input is not numeric, this will raise a ValueError. By avoiding eval(), there is no opportunity for the input string to be executed as code.\ndef main():\nsum = 0\nnumbers = input(\"Enter a space-separated list of numbers: \").split(\" \")\ntry:\nfor num in numbers:\nsum = sum + int(num)\nprint(f\"Sum of {numbers} = {sum}\")\nexcept ValueError:\nprint(\"Error: invalid input\")\nmain()\nAn alternative, commonly-cited mitigation for this kind of weakness is to use the ast.literal_eval() function, since it is intentionally designed to avoid executing code. However, an adversary could still cause excessive memory or stack consumption via deeply nested structures [REF-1372], so the python documentation discourages use of ast.literal_eval() on untrusted data [REF-1373].",
+      "ucocweSummary": "The product constructs all or part of a code segment using externally-influenced input from an upstream component, but it does not neutralize or incorrectly neutralizes special elements that could modify the syntax or behavior of the intended code segment.",
+      "ucodescription": "The product constructs all or part of a code segment using externally-influenced input from an upstream component, but it does not neutralize or incorrectly neutralizes special elements that could modify the syntax or behavior of the intended code segment.",
+      "labels": "Resource"
+    },
+    "node2": {
+      "ucoexDESCRIPTION": "Perl code directly injected into CGI library file from parameters to another CGI program.",
+      "labels": "UcoexObservedExample"
+    },
+    "relationships": [
+      {
+        "type": "UCOHASOBSERVEDEXAMPLE"
+      }
+    ]
+  }
+]
+
+
+
+>>>>>>>>>>>>>>>>>>>>>>>>>> single hop question 2
+
+("771525", "772575")
+
+[
+  {
+    "node1": {
+      "ucoexDESCRIPTION": "[Cobalt Strike](https://attack.mitre.org/software/S0154) is a commercial, full-featured, remote access tool that bills itself as “adversary simulation software designed to execute targeted attacks and emulate the post-exploitation actions of advanced threat actors”. Cobalt Strike’s interactive post-exploit capabilities cover the full range of ATT&CK tactics, all executed within a single, integrated system.(Citation: cobaltstrike manual)\nIn addition to its own capabilities, [Cobalt Strike](https://attack.mitre.org/software/S0154) leverages the capabilities of other well-known tools such as Metasploit and [Mimikatz](https://attack.mitre.org/software/S0002).(Citation: cobaltstrike manual)",
+      "ucoexNAME": "Cobalt Strike",
+      "ucoexDOMAIN": "enterprise-attack",
+      "labels": "UcoexSOFTWARE"
+    },
+    "node2": {
+      "ucoexDESCRIPTION": "Adversaries may impersonate legitimate protocols or web service traffic to disguise command and control activity and thwart analysis efforts. By impersonating legitimate protocols or web services, adversaries can make their command and control traffic blend in with legitimate network traffic.\nAdversaries may impersonate a fake SSL/TLS handshake to make it look like subsequent traffic is SSL/TLS encrypted, potentially interfering with some security tooling, or to make the traffic look like it is related with a trusted entity.\nAdversaries may also leverage legitimate protocols to impersonate expected web traffic or trusted services. For example, adversaries may manipulate HTTP headers, URI endpoints, SSL certificates, and transmitted data to disguise C2 communications or mimic legitimate services such as Gmail, Google Drive, and Yahoo Messenger.(Citation: ESET Okrum July 2019)(Citation: Malleable-C2-U42)",
+      "ucoexNAME": "Data Obfuscation: Protocol or Service Impersonation",
+      "ucoexDOMAIN": "enterprise-attack",
+      "labels": "Resource"
+    },
+    "relationships": [
+      {
+        "type": "UCOEXSOFTWAREUSESTECHNIQUE"
+      }
+    ]
+  }
+]
+
+
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> single hop question3
+
+
+("909", "6757")
+
+[
+  {
+    "node1": {
+      "ucocweName": "Improper Resolution of Path Equivalence",
+      "ucocweExtendedSummary": "Path equivalence is usually employed in order to circumvent access controls expressed using an incomplete set of file name or file path representations. This is different from path traversal, wherein the manipulations are performed to generate a name for a different object.",
+      "ucopotentialMitigations": "{mitigation=[{\"Phase\":\"Implementation\",\"Description\":\"Assume all input is malicious. Use an \\\"accept known good\\\" input validation strategy, i.e., use a list of acceptable inputs that strictly conform to specifications. Reject any input that does not strictly conform to specifications, or transform it into something that does.\\n When performing input validation, consider all potentially relevant properties, including length, type of input, the full range of acceptable values, missing or extra inputs, syntax, consistency across related fields, and conformance to business rules. As an example of business rule logic, \\\"boat\\\" may be syntactically valid because it only contains alphanumeric characters, but it is not valid if the input is only expected to contain colors such as \\\"red\\\" or \\\"blue.\\\"\\n Do not rely exclusively on looking for malicious or malformed inputs. This is likely to miss at least one undesirable input, especially if the code's environment changes. This can give attackers enough room to bypass the intended validation. However, denylists can be useful for detecting potential attacks or determining which inputs are so malformed that they should be rejected outright.\"},{\"Phase\":\"Implementation\",\"Description\":\"Use and specify an output encoding that can be handled by the downstream component that is reading the output. Common encodings include ISO-8859-1, UTF-7, and UTF-8. When an encoding is not specified, a downstream component may choose a different encoding, either by assuming a default encoding or automatically inferring which encoding is being used, which can be erroneous. When the encodings are inconsistent, the downstream component might treat some character or byte sequences as special, even if they are not special in the original encoding. Attackers might then be able to exploit this discrepancy and conduct injection attacks; they even might be able to bypass protection mechanisms that assume the original encoding is also being used by the downstream component.\"},{\"Phase\":\"Implementation\",\"Description\":\"Inputs should be decoded and canonicalized to the application's current internal representation before being validated (CWE-180). Make sure that the application does not decode the same input twice (CWE-174). Such errors could be used to bypass allowlist validation schemes by introducing dangerous inputs after they have been checked.\"}]}",
+      "ucocweSummary": "The product is vulnerable to file system contents disclosure through path equivalence. Path equivalence involves the use of special characters in file and directory names. The associated manipulations are intended to generate multiple names for the same object.",
+      "ucodescription": "The product is vulnerable to file system contents disclosure through path equivalence. Path equivalence involves the use of special characters in file and directory names. The associated manipulations are intended to generate multiple names for the same object.",
+      "labels": "UcoCWE"
+    },
+    "node2": {
+      "ucoexDESCRIPTION": "Source code disclosure using trailing dot",
+      "labels": "Resource"
+    },
+    "relationships": [
+      {
+        "type": "UCOHASOBSERVEDEXAMPLE"
+      }
+    ]
+  }
+]
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>   Single hop question4
+
+("772092", "771843")
+
+[
+  {
+    "node1": {
+      "ucoexDESCRIPTION": "[Agent Smith](https://attack.mitre.org/software/S0440) is mobile malware that generates financial gain by replacing legitimate applications on devices with malicious versions that include fraudulent ads. As of July 2019 [Agent Smith](https://attack.mitre.org/software/S0440) had infected around 25 million devices, primarily targeting India though effects had been observed in other Asian countries as well as Saudi Arabia, the United Kingdom, and the United States.(Citation: CheckPoint Agent Smith)",
+      "ucoexNAME": "Agent Smith",
+      "ucoexDOMAIN": "mobile-attack",
+      "labels": "UcoexSOFTWARE"
+    },
+    "node2": {
+      "ucoexDESCRIPTION": "Adversaries may use steganography techniques in order to prevent the detection of hidden information. Steganographic techniques can be used to hide data in digital media such as images, audio tracks, video clips, or text files.",
+      "ucoexNAME": "Steganography",
+      "ucoexDOMAIN": "mobile-attack",
+      "labels": "UcoexMITREATTACK"
+    },
+    "relationships": [
+      {
+        "type": "UCOEXSOFTWAREUSESTECHNIQUE"
+      }
+    ]
+  }
+]
+
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>  Single hop question5
+
+("771132", "771810")
+
+[
+  {
+    "node1": {
+      "ucoexDESCRIPTION": "[Operation Dream Job](https://attack.mitre.org/campaigns/C0022) was a cyber espionage operation likely conducted by [Lazarus Group](https://attack.mitre.org/groups/G0032) that targeted the defense, aerospace, government, and other sectors in the United States, Israel, Australia, Russia, and India. In at least one case, the cyber actors tried to monetize their network access to conduct a business email compromise (BEC) operation. In 2020, security researchers noted overlapping TTPs, to include fake job lures and code similarities, between [Operation Dream Job](https://attack.mitre.org/campaigns/C0022), Operation North Star, and Operation Interception; by 2022 security researchers described [Operation Dream Job](https://attack.mitre.org/campaigns/C0022) as an umbrella term covering both Operation Interception and Operation North Star.(Citation: ClearSky Lazarus Aug 2020)(Citation: McAfee Lazarus Jul 2020)(Citation: ESET Lazarus Jun 2020)(Citation: The Hacker News Lazarus Aug 2022)",
+      "ucoexNAME": "Operation Dream Job",
+      "ucoexDOMAIN": "enterprise-attack",
+      "labels": "UcoexCAMPAIGNS"
+    },
+    "node2": {
+      "ucoexDESCRIPTION": "An adversary may rely upon a user clicking a malicious link in order to gain execution. Users may be subjected to social engineering to get them to click on a link that will lead to code execution. This user action will typically be observed as follow-on behavior from [Spearphishing Link](https://attack.mitre.org/techniques/T1566/002). Clicking on a link may also lead to other execution techniques such as exploitation of a browser or application vulnerability via [Exploitation for Client Execution](https://attack.mitre.org/techniques/T1203). Links may also lead users to download files that require execution via [Malicious File](https://attack.mitre.org/techniques/T1204/002).",
+      "ucoexNAME": "User Execution: Malicious Link",
+      "ucoexDOMAIN": "enterprise-attack",
+      "labels": "UcoexMITREATTACK"
+    },
+    "relationships": [
+      {
+        "type": "UCOEXCAMPAIGNUSESTECHNIQUE"
+      }
+    ]
+  }
+]
+
+

@@ -1,0 +1,90 @@
+Instruction:
+You are an experienced cybersecurity analyst who possesses a small knowledge portion of cybersecurity. The knowledge you will be receiving will be in the form of a collection of one relationship between two nodes. For example; there will be a relationship between the nodes node1 and node2; node1 containing information about UcoExploitTarget and node2 about UcoVulnerability. Node1 will be connected in a way that a will be connected to node2 with relationship “r” with the relationship type called Therefore, there will always be a start node and an end node only.
+You will be helping users by looking at the knowledge portion and designing one question by using the provided cybersecurity knowledge portion and that cybersecurity knowledge portion only. Your question should be in natural English. It should be simple and easy to be understood by normal readers.
+In real application, we will use neo4j database. We want questions in a way that the user have to answer in a manner by reading a question and depending on the words in the question, the user needs to find a the first node (the root node of course). And then the user have to look into the outgoing relationship of the root node to find the end node. This is because the answer will always come from the end node.
+The catch in creating the question is that the question should only contain words from description, summary or other properties of the root node. The question should also contain a part from the answer node (the end node) so the user will know what part of the answer node it has to look into when once the user can finally get to the final node. Moreover, it is also advised to not make the question very detailed with so many key words. Key words are ok but not in a way the entire question is easy to answer by just looking at keywords.
+*It is also important to not visit the links once you are creating question. In other words, we don’t allow words from the content of the link to appear in the question. It is best not to visit links and just ignore the links once you see one.
+In the output indicator below, you will see what kind of question we would like to get from a node. You can reference the style of the question from the output indicator below. 
+
+Context:
+This is the schema of our database. 
+NODES:
+UcoCVE { label: string, ucobaseSeverity: string, ucoevaluatorSolution: string, ucoexploitabilityScore: string, ucoimpactScore: string, ucoobtainAllPrivilege: string, ucouserInteractionRequired: string, ucovectorString: string, ucovulnStatus: string, uri: string }
+UcoCWE { ucoabstraction: string, ucoapplicablePlatform: string, ucocommonConsequences: string, ucocweExtendedSummary: string, ucocweID: string, ucocweName: string, ucocweSummary: string, ucodemonstrativeExamples: string, ucodescription: string, ucodetectionMethods: string, ucolikelihoodOfExploit: string, ucomappingNotes: string, ucomodesOfIntroduction: string, ucopotentialMitigations: string, ucoreferences: string, ucorelatedAttackPatterns: string, ucostatus: string, ucostructure: string, ucotimeOfIntroduction: unknown, uri: string }
+UcoExploitTarget { uri: string }
+UcoVulnerability { ucolastModifiedDateTime: unknown, ucopublishedDateTime: unknown, ucosummary: string, uri: string }
+UcoexCAMPAIGNS { ucoexDESCRIPTION: string, ucoexDOMAIN: string, ucoexNAME: string, ucoexURL: string, uri: string }
+UcoexCAPEC { label: string, ucoexAbstraction: string, ucoexCAPEC_id: string, ucoexCAPEC_name: string, ucoexConsequences: list<string>, ucoexDescription: string, ucoexExample: list<string>, ucoexExecutionFlowTechnique: list<string>, ucoexExtendedDescription: list<string>, ucoexLikelihood: string, ucoexMitigations: list<string>, ucoexPrerequisites: list<string>, ucoexRelatedAttPattern: list<string>, ucoexRelatedWeaknesses: list<string>, ucoexResources_Required: list<string>, ucoexSeverity: string, ucoexSkills_Required: list<string>, ucoexTaxonomyMappingATTACK: list<string>, uri: string }
+UcoexCPE { cpeName: string, cpeNameId: string, dictionary_found: boolean, lastModified: unknown, titles: string, uri: string }
+UcoexGROUPS { ucoexDESCRIPTION: string, ucoexDOMAIN: string, ucoexNAME: string, ucoexURL: string, uri: string }
+UcoexMITIGATIONS { ucoexDESCRIPTION: string, ucoexDOMAIN: string, ucoexNAME: string, ucoexURL: string, uri: string }
+UcoexMITREATTACK { ucoexDESCRIPTION: string, ucoexDOMAIN: string, ucoexNAME: string, ucoexURL: string, uri: string }
+UcoexMITRED3FEND { ucoexMITRED3FEND_DEFINITION: string, ucoexMITRED3FEND_LABEL: string, uri: string }
+UcoexObservedExample { ucoexDESCRIPTION: string, uri: string }
+UcoexSOFTWARE { ucoexDESCRIPTION: string, ucoexDOMAIN: string, ucoexNAME: string, ucoexURL: string, uri: string }
+UcoexTACTICS { ucoexDESCRIPTION: string, ucoexDOMAIN: string, ucoexNAME: string, ucoexURL: string, uri: string }
+
+RELATIONSHIPS:
+(:UcoCVE) -[:UCOEXHASCPE]-> (:UcoexCPE)
+(:UcoCWE) -[:UCOHASOBSERVEDEXAMPLE]-> (:UcoexObservedExample)
+(:UcoExploitTarget) -[:UCOHASVULNERABILITY]-> (:UcoVulnerability)
+(:UcoExploitTarget) -[:UCOHASWEAKNESS]-> (:UcoCWE)
+(:UcoVulnerability) -[:UCOHASCVE_ID]-> (:UcoCVE)
+(:UcoexCAMPAIGNS) -[:UCOEXATTRIBUTEDTO]-> (:UcoexGROUPS)
+(:UcoexCAMPAIGNS) -[:UCOEXCAMPAIGNUSESSOFTWARE]-> (:UcoexSOFTWARE)
+(:UcoexCAMPAIGNS) -[:UCOEXCAMPAIGNUSESTECHNIQUE]-> (:UcoexMITREATTACK)
+(:UcoexCAPEC) -[:UCOEXHASRELATEDWEAKNESS]-> (:UcoCWE)
+(:UcoexCAPEC) -[:UCOEXHASTAXONOMYMAPPING]-> (:UcoexMITREATTACK)
+(:UcoexGROUPS) -[:UCOEXGROUPUSESSOFTWARE]-> (:UcoexSOFTWARE)
+(:UcoexGROUPS) -[:UCOEXGROUPUSESTECHNIQUE]-> (:UcoexMITREATTACK)
+(:UcoexMITIGATIONS) -[:UCOEXMITIGATES]-> (:UcoexMITREATTACK)
+(:UcoexMITRED3FEND) -[:UCOEXHASMITREATTACK]-> (:UcoexMITREATTACK)
+(:UcoexObservedExample) -[:UCOEXEXAMPLEOBSERVEDIN]-> (:UcoCVE)
+(:UcoexSOFTWARE) -[:UCOEXSOFTWAREUSESTECHNIQUE]-> (:UcoexMITREATTACK)
+
+It shows the type of relationship between each nodes. In our input, this would not be available, but there will be a relationship, the type of relationship, the id of relationship, the start node and the end node. Your duty for this time is to create a question (as mentioned above), that makes the user start at the root node and then make it traverse through the relationship to finally meet the end node where the answer will be.
+Input Data:
+[
+  {
+    "node1": {
+      "ucoexCAPEC_name": "Forceful Browsing",
+      "ucoexMitigations": [
+        "Authenticate request to every resource. In addition, every page or resource must ensure that the request it is handling has been made in an authorized context.",
+        "Forceful browsing can also be made difficult to a large extent by not hard-coding names of application pages or resources. This way, the attacker cannot figure out, from the application alone, the resources available from the present context."
+      ],
+      "label": "CAPEC-87: Forceful Browsing",
+      "ucoexDescription": "An attacker employs forceful browsing (direct URL entry) to access portions of a website that are otherwise unreachable. Usually, a front controller or similar design pattern is employed to protect access to portions of a web application. Forceful browsing enables an attacker to access information, perform privileged operations and otherwise reach sections of the web application that have been improperly protected.",
+      "ucoexSeverity": "High",
+      "ucoexExample": [
+        "A bulletin board application provides an administrative interface at admin.aspx when the user logging in belongs to the administrators group."
+      ],
+      "labels": "UcoexCAPEC"
+    },
+    "node2": {
+      "ucocweName": "Improper Authorization",
+      "ucocweExtendedSummary": "Assuming a user with a given identity, authorization is the process of determining whether that user can access a given resource, based on the user's privileges and any permissions or other access-control specifications that apply to the resource.\nWhen access control checks are not applied consistently - or not at all - users are able to access data or perform actions that they should not be allowed to perform. This can lead to a wide range of problems, including information exposures, denial of service, and arbitrary code execution.",
+      "ucopotentialMitigations": "{mitigation=[{\"Phase\":\"Architecture and Design\",\"Description\":\"Divide the product into anonymous, normal, privileged, and administrative areas. Reduce the attack surface by carefully mapping roles with data and functionality. Use role-based access control (RBAC) to enforce the roles at the appropriate boundaries.\\n Note that this approach may not protect against horizontal authorization, i.e., it will not protect a user from attacking others with the same role.\"},{\"Phase\":\"Architecture and Design\",\"Description\":\"Ensure that you perform access control checks related to your business logic. These checks may be different than the access control checks that you apply to more generic resources such as files, connections, processes, memory, and database records. For example, a database may restrict access for medical records to a specific database user, but each record might only be intended to be accessible to the patient and the patient's doctor.\"},{\"Phase\":\"Architecture and Design\",\"Description\":\"Use a vetted library or framework that does not allow this weakness to occur or provides constructs that make this weakness easier to avoid.\\n For example, consider using authorization frameworks such as the JAAS Authorization Framework [REF-233] and the OWASP ESAPI Access Control feature [REF-45].\"},{\"Phase\":\"Architecture and Design\",\"Description\":\"For web applications, make sure that the access control mechanism is enforced correctly at the server side on every page. Users should not be able to access any unauthorized functionality or information by simply requesting direct access to that page.\\n One way to do this is to ensure that all pages containing sensitive information are not cached, and that all such pages restrict access to requests that are accompanied by an active and authenticated session token associated with a user who has the required permissions to access that page.\"},{\"Phase\":\"System Configuration\",\"Description\":\"Use the access control capabilities of your operating system and server environment and define your access control lists accordingly. Use a \\\"default deny\\\" policy when defining these ACLs.\"}]}",
+      "ucodemonstrativeExamples": "This function runs an arbitrary SQL query on a given database, returning the result of the query.\nfunction runEmployeeQuery($dbName, $name){mysql_select_db($dbName,$globalDbHandle) or die(\"Could not open Database\".$dbName);\n//Use a prepared statement to avoid CWE-89\n$preparedStatement = $globalDbHandle->prepare('SELECT * FROM employees WHERE name = :name');$preparedStatement->execute(array(':name' => $name));return $preparedStatement->fetchAll();}\n/.../\n$employeeRecord = runEmployeeQuery('EmployeeDB',$_GET['EmployeeName']);\nWhile this code is careful to avoid SQL Injection, the function does not confirm the user sending the query is authorized to do so. An attacker may be able to obtain sensitive employee information from the database.\nThe following program could be part of a bulletin board system that allows users to send private messages to each other. This program intends to authenticate the user before deciding whether a private message should be displayed. Assume that LookupMessageObject() ensures that the $id argument is numeric, constructs a filename based on that id, and reads the message details from that file. Also assume that the program stores all private messages for all users in the same directory.\nsub DisplayPrivateMessage {my($id) = @_;my $Message = LookupMessageObject($id);print \"From: \" . encodeHTML($Message->{from}) . \"<br>\\n\";print \"Subject: \" . encodeHTML($Message->{subject}) . \"\\n\";print \"<hr>\\n\";print \"Body: \" . encodeHTML($Message->{body}) . \"\\n\";}\nmy $q = new CGI;\n# For purposes of this example, assume that CWE-309 and\n# CWE-523 do not apply.\nif (! AuthenticateUser($q->param('username'), $q->param('password'))) {ExitError(\"invalid username or password\");}\nmy $id = $q->param('id');DisplayPrivateMessage($id);\nWhile the program properly exits if authentication fails, it does not ensure that the message is addressed to the user. As a result, an authenticated attacker could provide any arbitrary identifier and read private messages that were intended for other users.\nOne way to avoid this problem would be to ensure that the \"to\" field in the message object matches the username of the authenticated user.",
+      "ucocweSummary": "The product does not perform or incorrectly performs an authorization check when an actor attempts to access a resource or perform an action.",
+      "ucodescription": "The product does not perform or incorrectly performs an authorization check when an actor attempts to access a resource or perform an action.",
+      "labels": "UcoCWE"
+    },
+    "relationships": [
+      {
+        "type": "UCOEXHASRELATEDWEAKNESS"
+      }
+    ]
+  }
+]
+
+
+Output Indicator
+{
+ "question": "Which security weakness allows bulletin board attackers to reach administrative functions by entering URLs that lack authentication enforcement?",
+ "answer": "Improper Authorization",
+ "start_node": "node1", 
+"end_node": "node2",
+ "source_breakdown": { 
+"root_node_clues": "bulletin board (from node1 example: 'bulletin board application'), reach administrative functions (from node1: 'administrative interface'), entering URLs (from node1: 'direct URL entry')", 
+"answer_node_clues": "lack authentication enforcement (from node2: 'does not perform...authorization check'), security weakness (from node2: CWE node type)" 
+}

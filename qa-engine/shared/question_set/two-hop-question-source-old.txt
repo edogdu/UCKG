@@ -1,0 +1,210 @@
+>>>>>>>>>>>>>>>>>>>   2 hop question 1 source:
+MATCH (a)-[r]->(b)-[s]->(c) WHERE id(r) = 1275872 and id(s)= 5654 RETURN a,r,b,s,c
+[
+  {
+    "node1": {
+      "ucoexCAPEC_name": "Forceful Browsing",
+      "ucoexMitigations": [
+        "Authenticate request to every resource. In addition, every page or resource must ensure that the request it is handling has been made in an authorized context.",
+        "Forceful browsing can also be made difficult to a large extent by not hard-coding names of application pages or resources. This way, the attacker cannot figure out, from the application alone, the resources available from the present context."
+      ],
+      "label": "CAPEC-87: Forceful Browsing",
+      "ucoexDescription": "An attacker employs forceful browsing (direct URL entry) to access portions of a website that are otherwise unreachable. Usually, a front controller or similar design pattern is employed to protect access to portions of a web application. Forceful browsing enables an attacker to access information, perform privileged operations and otherwise reach sections of the web application that have been improperly protected.",
+      "ucoexSeverity": "High",
+      "ucoexExample": [
+        "A bulletin board application provides an administrative interface at admin.aspx when the user logging in belongs to the administrators group."
+      ],
+      "labels": "UcoexCAPEC"
+    },
+    "node2": {
+      "ucocweName": "Improper Authorization",
+      "ucocweExtendedSummary": "Assuming a user with a given identity, authorization is the process of determining whether that user can access a given resource, based on the user's privileges and any permissions or other access-control specifications that apply to the resource.\nWhen access control checks are not applied consistently - or not at all - users are able to access data or perform actions that they should not be allowed to perform. This can lead to a wide range of problems, including information exposures, denial of service, and arbitrary code execution.",
+      "ucopotentialMitigations": "{mitigation=[{\"Phase\":\"Architecture and Design\",\"Description\":\"Divide the product into anonymous, normal, privileged, and administrative areas. Reduce the attack surface by carefully mapping roles with data and functionality. Use role-based access control (RBAC) to enforce the roles at the appropriate boundaries.\\n Note that this approach may not protect against horizontal authorization, i.e., it will not protect a user from attacking others with the same role.\"},{\"Phase\":\"Architecture and Design\",\"Description\":\"Ensure that you perform access control checks related to your business logic. These checks may be different than the access control checks that you apply to more generic resources such as files, connections, processes, memory, and database records. For example, a database may restrict access for medical records to a specific database user, but each record might only be intended to be accessible to the patient and the patient's doctor.\"},{\"Phase\":\"Architecture and Design\",\"Description\":\"Use a vetted library or framework that does not allow this weakness to occur or provides constructs that make this weakness easier to avoid.\\n For example, consider using authorization frameworks such as the JAAS Authorization Framework [REF-233] and the OWASP ESAPI Access Control feature [REF-45].\"},{\"Phase\":\"Architecture and Design\",\"Description\":\"For web applications, make sure that the access control mechanism is enforced correctly at the server side on every page. Users should not be able to access any unauthorized functionality or information by simply requesting direct access to that page.\\n One way to do this is to ensure that all pages containing sensitive information are not cached, and that all such pages restrict access to requests that are accompanied by an active and authenticated session token associated with a user who has the required permissions to access that page.\"},{\"Phase\":\"System Configuration\",\"Description\":\"Use the access control capabilities of your operating system and server environment and define your access control lists accordingly. Use a \\\"default deny\\\" policy when defining these ACLs.\"}]}",
+      "ucodemonstrativeExamples": "This function runs an arbitrary SQL query on a given database, returning the result of the query.\nfunction runEmployeeQuery($dbName, $name){mysql_select_db($dbName,$globalDbHandle) or die(\"Could not open Database\".$dbName);\n//Use a prepared statement to avoid CWE-89\n$preparedStatement = $globalDbHandle->prepare('SELECT * FROM employees WHERE name = :name');$preparedStatement->execute(array(':name' => $name));return $preparedStatement->fetchAll();}\n/.../\n$employeeRecord = runEmployeeQuery('EmployeeDB',$_GET['EmployeeName']);\nWhile this code is careful to avoid SQL Injection, the function does not confirm the user sending the query is authorized to do so. An attacker may be able to obtain sensitive employee information from the database.\nThe following program could be part of a bulletin board system that allows users to send private messages to each other. This program intends to authenticate the user before deciding whether a private message should be displayed. Assume that LookupMessageObject() ensures that the $id argument is numeric, constructs a filename based on that id, and reads the message details from that file. Also assume that the program stores all private messages for all users in the same directory.\nsub DisplayPrivateMessage {my($id) = @_;my $Message = LookupMessageObject($id);print \"From: \" . encodeHTML($Message->{from}) . \"<br>\\n\";print \"Subject: \" . encodeHTML($Message->{subject}) . \"\\n\";print \"<hr>\\n\";print \"Body: \" . encodeHTML($Message->{body}) . \"\\n\";}\nmy $q = new CGI;\n# For purposes of this example, assume that CWE-309 and\n# CWE-523 do not apply.\nif (! AuthenticateUser($q->param('username'), $q->param('password'))) {ExitError(\"invalid username or password\");}\nmy $id = $q->param('id');DisplayPrivateMessage($id);\nWhile the program properly exits if authentication fails, it does not ensure that the message is addressed to the user. As a result, an authenticated attacker could provide any arbitrary identifier and read private messages that were intended for other users.\nOne way to avoid this problem would be to ensure that the \"to\" field in the message object matches the username of the authenticated user.",
+      "ucocweSummary": "The product does not perform or incorrectly performs an authorization check when an actor attempts to access a resource or perform an action.",
+      "ucodescription": "The product does not perform or incorrectly performs an authorization check when an actor attempts to access a resource or perform an action.",
+      "labels": "UcoCWE"
+    },
+    "node3": {
+      "ucoexDESCRIPTION": "ACL-based protection mechanism treats negative access rights as if they are positive, allowing bypass of intended restrictions.",
+      "labels": "UcoexObservedExample"
+    },
+    "relationships": {
+      "node1_node2": [
+        {
+          "type": "UCOEXHASRELATEDWEAKNESS"
+        }
+      ],
+      "node2_node3": [
+        {
+          "type": "UCOHASOBSERVEDEXAMPLE"
+        }
+      ]
+    }
+  }
+]
+
+>>>>>>>>>>>>>>>>>>>  2 hop question 2 source:
+
+MATCH (a)-[r]->(b)-[s]->(c) WHERE id(r) = 6753 and id(s)=889  RETURN a,r,b,s,c
+
+[
+  {
+    "node1": {
+      "ucocweName": "Improper Control of Generation of Code ('Code Injection')",
+      "ucopotentialMitigations": "{mitigation=[{\"Phase\":\"Architecture and Design\",\"Description\":\"Refactor your program so that you do not have to dynamically generate code.\"},{\"Phase\":\"Architecture and Design\",\"Description\":\"Run your code in a \\\"jail\\\" or similar sandbox environment that enforces strict boundaries between the process and the operating system. This may effectively restrict which code can be executed by your product.\\n Examples include the Unix chroot jail and AppArmor. In general, managed code may provide some protection.\\n This may not be a feasible solution, and it only limits the impact to the operating system; the rest of your application may still be subject to compromise.\\n Be careful to avoid CWE-243 and other weaknesses related to jails.\"},{\"Phase\":\"Implementation\",\"Description\":\"Assume all input is malicious. Use an \\\"accept known good\\\" input validation strategy, i.e., use a list of acceptable inputs that strictly conform to specifications. Reject any input that does not strictly conform to specifications, or transform it into something that does.\\n When performing input validation, consider all potentially relevant properties, including length, type of input, the full range of acceptable values, missing or extra inputs, syntax, consistency across related fields, and conformance to business rules. As an example of business rule logic, \\\"boat\\\" may be syntactically valid because it only contains alphanumeric characters, but it is not valid if the input is only expected to contain colors such as \\\"red\\\" or \\\"blue.\\\"\\n Do not rely exclusively on looking for malicious or malformed inputs. This is likely to miss at least one undesirable input, especially if the code's environment changes. This can give attackers enough room to bypass the intended validation. However, denylists can be useful for detecting potential attacks or determining which inputs are so malformed that they should be rejected outright.\\n To reduce the likelihood of code injection, use stringent allowlists that limit which constructs are allowed. If you are dynamically constructing code that invokes a function, then verifying that the input is alphanumeric might be insufficient. An attacker might still be able to reference a dangerous function that you did not intend to allow, such as system(), exec(), or exit().\"},{\"Phase\":\"Testing\",\"Description\":\"Use automated static analysis tools that target this type of weakness. Many modern techniques use data flow analysis to minimize the number of false positives. This is not a perfect solution, since 100% accuracy and coverage are not feasible.\"},{\"Phase\":\"Testing\",\"Description\":\"Use dynamic tools and techniques that interact with the product using large test suites with many diverse inputs, such as fuzz testing (fuzzing), robustness testing, and fault injection. The product's operation may slow down, but it should not become unstable, crash, or generate incorrect results.\"},{\"Phase\":\"Operation\",\"Description\":\"Run the code in an environment that performs automatic taint propagation and prevents any command execution that uses tainted variables, such as Perl's \\\"-T\\\" switch. This will force the program to perform validation steps that remove the taint, although you must be careful to correctly validate your inputs so that you do not accidentally mark dangerous inputs as untainted (see CWE-183 and CWE-184).\"},{\"Phase\":\"Operation\",\"Description\":\"Run the code in an environment that performs automatic taint propagation and prevents any command execution that uses tainted variables, such as Perl's \\\"-T\\\" switch. This will force the program to perform validation steps that remove the taint, although you must be careful to correctly validate your inputs so that you do not accidentally mark dangerous inputs as untainted (see CWE-183 and CWE-184).\"},{\"Phase\":\"Implementation\",\"Description\":\"For Python programs, it is frequently encouraged to use the ast.literal_eval() function instead of eval, since it is intentionally designed to avoid executing code. However, an adversary could still cause excessive memory or stack consumption via deeply nested structures [REF-1372], so the python documentation discourages use of ast.literal_eval() on untrusted data [REF-1373].\"}]}",
+      "ucodemonstrativeExamples": "This example attempts to write user messages to a message file and allow users to view them.\n$MessageFile = \"messages.out\";if ($_GET[\"action\"] == \"NewMessage\") {$name = $_GET[\"name\"];$message = $_GET[\"message\"];$handle = fopen($MessageFile, \"a+\");fwrite($handle, \"<b>$name</b> says '$message'<hr>\\n\");fclose($handle);echo \"Message Saved!<p>\\n\";}else if ($_GET[\"action\"] == \"ViewMessages\") {include($MessageFile);}\nWhile the programmer intends for the MessageFile to only include data, an attacker can provide a message such as:\nname=h4x0rmessage=%3C?php%20system(%22/bin/ls%20-l%22);?%3E\nwhich will decode to the following:\n<?php system(\"/bin/ls -l\");?>\nThe programmer thought they were just including the contents of a regular data file, but PHP parsed it and executed the code. Now, this code is executed any time people view messages.\nNotice that XSS (CWE-79) is also possible in this situation.\nedit-config.pl: This CGI script is used to modify settings in a configuration file.\nuse CGI qw(:standard);\nsub config_file_add_key {\nmy ($fname, $key, $arg) = @_;\n# code to add a field/key to a file goes here\n}\nsub config_file_set_key {\nmy ($fname, $key, $arg) = @_;\n# code to set key to a particular file goes here\n}\nsub config_file_delete_key {\nmy ($fname, $key, $arg) = @_;\n# code to delete key from a particular file goes here\n}\nsub handleConfigAction {\nmy ($fname, $action) = @_;my $key = param('key');my $val = param('val');\n# this is super-efficient code, especially if you have to invoke\n# any one of dozens of different functions!\nmy $code = \"config_file_$action_key(\\$fname, \\$key, \\$val);\";eval($code);\n}\n$configfile = \"/home/cwe/config.txt\";print header;if (defined(param('action'))) {handleConfigAction($configfile, param('action'));}else {print \"No action specified!\\n\";}\nThe script intends to take the 'action' parameter and invoke one of a variety of functions based on the value of that parameter - config_file_add_key(), config_file_set_key(), or config_file_delete_key(). It could set up a conditional to invoke each function separately, but eval() is a powerful way of doing the same thing in fewer lines of code, especially when a large number of functions or variables are involved. Unfortunately, in this case, the attacker can provide other values in the action parameter, such as:\nadd_key(\",\",\"); system(\"/bin/ls\");\nThis would produce the following string in handleConfigAction():\nconfig_file_add_key(\",\",\"); system(\"/bin/ls\");\nAny arbitrary Perl code could be added after the attacker has \"closed off\" the construction of the original function call, in order to prevent parsing errors from causing the malicious eval() to fail before the attacker's payload is activated. This particular manipulation would fail after the system() call, because the \"_key(\\$fname, \\$key, \\$val)\" portion of the string would cause an error, but this is irrelevant to the attack because the payload has already been activated.\nThis simple script asks a user to supply a list of numbers as input and adds them together.\ndef main():\nsum = 0\nnumbers = eval(input(\"Enter a space-separated list of numbers: \"))\nfor num in numbers:\nsum = sum + num\nprint(f\"Sum of {numbers} = {sum}\")\nmain()\nThe eval() function can take the user-supplied list and convert it into a Python list object, therefore allowing the programmer to use list comprehension methods to work with the data. However, if code is supplied to the eval() function, it will execute that code. For example, a malicious user could supply the following string:\n__import__('subprocess').getoutput('rm -r *')\nThis would delete all the files in the current directory. For this reason, it is not recommended to use eval() with untrusted input.\nA way to accomplish this without the use of eval() is to apply an integer conversion on the input within a try/except block. If the user-supplied input is not numeric, this will raise a ValueError. By avoiding eval(), there is no opportunity for the input string to be executed as code.\ndef main():\nsum = 0\nnumbers = input(\"Enter a space-separated list of numbers: \").split(\" \")\ntry:\nfor num in numbers:\nsum = sum + int(num)\nprint(f\"Sum of {numbers} = {sum}\")\nexcept ValueError:\nprint(\"Error: invalid input\")\nmain()\nAn alternative, commonly-cited mitigation for this kind of weakness is to use the ast.literal_eval() function, since it is intentionally designed to avoid executing code. However, an adversary could still cause excessive memory or stack consumption via deeply nested structures [REF-1372], so the python documentation discourages use of ast.literal_eval() on untrusted data [REF-1373].",
+      "ucocweSummary": "The product constructs all or part of a code segment using externally-influenced input from an upstream component, but it does not neutralize or incorrectly neutralizes special elements that could modify the syntax or behavior of the intended code segment.",
+      "ucodescription": "The product constructs all or part of a code segment using externally-influenced input from an upstream component, but it does not neutralize or incorrectly neutralizes special elements that could modify the syntax or behavior of the intended code segment.",
+      "labels": "Resource"
+    },
+    "node2": {
+      "ucoexDESCRIPTION": "Perl code directly injected into CGI library file from parameters to another CGI program.",
+      "labels": "UcoexObservedExample"
+    },
+    "node3": {
+      "ucobaseSeverity": "HIGH",
+      "label": "CVE-2002-0495",
+      "labels": "Resource"
+    },
+    "relationships": {
+      "node1_node2": [
+        {
+          "type": "UCOHASOBSERVEDEXAMPLE"
+        }
+      ],
+      "node2_node3": [
+        {
+          "type": "UCOEXEXAMPLEOBSERVEDIN"
+        }
+      ]
+    }
+  }
+]
+
+
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>   2 hop question 3
+
+MATCH (a)-[r]->(b)-[s]->(c) WHERE id(r) = 1259733 and id(s)= 1273844 RETURN a,r,b,s,c
+
+[
+  {
+    "node1": {
+      "ucoexDESCRIPTION": "[C0015](https://attack.mitre.org/campaigns/C0015) was a ransomware intrusion during which the unidentified attackers used [Bazar](https://attack.mitre.org/software/S0534), [Cobalt Strike](https://attack.mitre.org/software/S0154), and [Conti](https://attack.mitre.org/software/S0575), along with other tools, over a 5 day period. Security researchers assessed the actors likely used the widely-circulated [Conti](https://attack.mitre.org/software/S0575) ransomware playbook based on the observed pattern of activity and operator errors.(Citation: DFIR Conti Bazar Nov 2021)",
+      "ucoexNAME": "C0015",
+      "ucoexDOMAIN": "enterprise-attack",
+      "labels": "Resource"
+    },
+    "node2": {
+      "ucoexDESCRIPTION": "[Cobalt Strike](https://attack.mitre.org/software/S0154) is a commercial, full-featured, remote access tool that bills itself as “adversary simulation software designed to execute targeted attacks and emulate the post-exploitation actions of advanced threat actors”. Cobalt Strike’s interactive post-exploit capabilities cover the full range of ATT&CK tactics, all executed within a single, integrated system.(Citation: cobaltstrike manual)\nIn addition to its own capabilities, [Cobalt Strike](https://attack.mitre.org/software/S0154) leverages the capabilities of other well-known tools such as Metasploit and [Mimikatz](https://attack.mitre.org/software/S0002).(Citation: cobaltstrike manual)",
+      "ucoexNAME": "Cobalt Strike",
+      "ucoexDOMAIN": "enterprise-attack",
+      "labels": "Resource"
+    },
+    "node3": {
+      "ucoexDESCRIPTION": "Adversaries may impersonate legitimate protocols or web service traffic to disguise command and control activity and thwart analysis efforts. By impersonating legitimate protocols or web services, adversaries can make their command and control traffic blend in with legitimate network traffic.\nAdversaries may impersonate a fake SSL/TLS handshake to make it look like subsequent traffic is SSL/TLS encrypted, potentially interfering with some security tooling, or to make the traffic look like it is related with a trusted entity.\nAdversaries may also leverage legitimate protocols to impersonate expected web traffic or trusted services. For example, adversaries may manipulate HTTP headers, URI endpoints, SSL certificates, and transmitted data to disguise C2 communications or mimic legitimate services such as Gmail, Google Drive, and Yahoo Messenger.(Citation: ESET Okrum July 2019)(Citation: Malleable-C2-U42)",
+      "ucoexNAME": "Data Obfuscation: Protocol or Service Impersonation",
+      "ucoexDOMAIN": "enterprise-attack",
+      "labels": "Resource"
+    },
+    "relationships": {
+      "node1_node2": [
+        {
+          "type": "UCOEXCAMPAIGNUSESSOFTWARE"
+        }
+      ],
+      "node2_node3": [
+        {
+          "type": "UCOEXSOFTWAREUSESTECHNIQUE"
+        }
+      ]
+    }
+  }
+]
+
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>  2 hop question 4
+
+MATCH (a)-[r]->(b)-[s]->(c) WHERE id(r) = 6131 and id(s)= 3577 RETURN a,r,b,s,c
+
+[
+  {
+    "node1": {
+      "ucocweName": "Improper Resolution of Path Equivalence",
+      "ucocweExtendedSummary": "Path equivalence is usually employed in order to circumvent access controls expressed using an incomplete set of file name or file path representations. This is different from path traversal, wherein the manipulations are performed to generate a name for a different object.",
+      "ucopotentialMitigations": "{mitigation=[{\"Phase\":\"Implementation\",\"Description\":\"Assume all input is malicious. Use an \\\"accept known good\\\" input validation strategy, i.e., use a list of acceptable inputs that strictly conform to specifications. Reject any input that does not strictly conform to specifications, or transform it into something that does.\\n When performing input validation, consider all potentially relevant properties, including length, type of input, the full range of acceptable values, missing or extra inputs, syntax, consistency across related fields, and conformance to business rules. As an example of business rule logic, \\\"boat\\\" may be syntactically valid because it only contains alphanumeric characters, but it is not valid if the input is only expected to contain colors such as \\\"red\\\" or \\\"blue.\\\"\\n Do not rely exclusively on looking for malicious or malformed inputs. This is likely to miss at least one undesirable input, especially if the code's environment changes. This can give attackers enough room to bypass the intended validation. However, denylists can be useful for detecting potential attacks or determining which inputs are so malformed that they should be rejected outright.\"},{\"Phase\":\"Implementation\",\"Description\":\"Use and specify an output encoding that can be handled by the downstream component that is reading the output. Common encodings include ISO-8859-1, UTF-7, and UTF-8. When an encoding is not specified, a downstream component may choose a different encoding, either by assuming a default encoding or automatically inferring which encoding is being used, which can be erroneous. When the encodings are inconsistent, the downstream component might treat some character or byte sequences as special, even if they are not special in the original encoding. Attackers might then be able to exploit this discrepancy and conduct injection attacks; they even might be able to bypass protection mechanisms that assume the original encoding is also being used by the downstream component.\"},{\"Phase\":\"Implementation\",\"Description\":\"Inputs should be decoded and canonicalized to the application's current internal representation before being validated (CWE-180). Make sure that the application does not decode the same input twice (CWE-174). Such errors could be used to bypass allowlist validation schemes by introducing dangerous inputs after they have been checked.\"}]}",
+      "ucocweSummary": "The product is vulnerable to file system contents disclosure through path equivalence. Path equivalence involves the use of special characters in file and directory names. The associated manipulations are intended to generate multiple names for the same object.",
+      "ucodescription": "The product is vulnerable to file system contents disclosure through path equivalence. Path equivalence involves the use of special characters in file and directory names. The associated manipulations are intended to generate multiple names for the same object.",
+      "labels": "UcoCWE"
+    },
+    "node2": {
+      "ucoexDESCRIPTION": "Source code disclosure using trailing dot",
+      "labels": "UcoexObservedExample"
+    },
+    "node3": {
+      "ucobaseSeverity": "MEDIUM",
+      "label": "CVE-2005-3293",
+      "labels": "UcoCVE"
+    },
+    "relationships": {
+      "node1_node2": [
+        {
+          "type": "UCOHASOBSERVEDEXAMPLE"
+        }
+      ],
+      "node2_node3": [
+        {
+          "type": "UCOEXEXAMPLEOBSERVEDIN"
+        }
+      ]
+    }
+  }
+]
+
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>  2 hop question 5
+
+MATCH (a)-[r]->(b)-[s]->(c) WHERE id(r) = 1275382 and id(s)= 4895 RETURN a,r,b,s,c
+
+[
+  {
+    "node1": {
+      "ucoexCAPEC_name": "Generic Cross-Browser Cross-Domain Theft",
+      "ucoexExtendedDescription": [
+        "By having control of some text in the victim's domain, the attacker is able to inject a seemingly valid CSS string. It does not matter if this CSS string is preceded by other data. The CSS parser will still locate the CSS string. If the attacker is able to control two injection points, one before the cross domain data that the attacker is interested in receiving and the other one after, the attacker can use this attack to steal all of the data in between these two CSS injection points when referencing the injected CSS while performing rendering on the site that the attacker controls. When rendering, the CSS parser will detect the valid CSS string to parse and ignore the data that \"does not make sense\". That data will simply be rendered. That data is in fact the data that the attacker just stole cross domain. The stolen data may contain sensitive information, such CSRF protection tokens."
+      ],
+      "ucoexMitigations": [
+        "Design: Prior to performing CSS parsing, require the CSS to start with well-formed CSS when it is a cross-domain load and the MIME type is broken. This is a browser level fix.",
+        "Implementation: Perform proper HTML encoding and URL escaping"
+      ],
+      "label": "CAPEC-468: Generic Cross-Browser Cross-Domain Theft",
+      "ucoexDescription": "An attacker makes use of Cascading Style Sheets (CSS) injection to steal data cross domain from the victim's browser. The attack works by abusing the standards relating to loading of CSS: 1. Send cookies on any load of CSS (including cross-domain) 2. When parsing returned CSS ignore all data that does not make sense before a valid CSS descriptor is found by the CSS parser.",
+      "ucoexSeverity": "Medium",
+      "labels": "Resource"
+    },
+    "node2": {
+      "ucocweName": "Improper Neutralization of Quoting Syntax",
+      "ucopotentialMitigations": "{mitigation=[{\"Description\":\"Developers should anticipate that quotes will be injected\\/removed\\/manipulated in the input vectors of their product. Use an appropriate combination of denylists and allowlists to ensure only valid, expected and appropriate input is processed by the system.\"},{\"Phase\":\"Implementation\",\"Description\":\"Assume all input is malicious. Use an \\\"accept known good\\\" input validation strategy, i.e., use a list of acceptable inputs that strictly conform to specifications. Reject any input that does not strictly conform to specifications, or transform it into something that does.\\n When performing input validation, consider all potentially relevant properties, including length, type of input, the full range of acceptable values, missing or extra inputs, syntax, consistency across related fields, and conformance to business rules. As an example of business rule logic, \\\"boat\\\" may be syntactically valid because it only contains alphanumeric characters, but it is not valid if the input is only expected to contain colors such as \\\"red\\\" or \\\"blue.\\\"\\n Do not rely exclusively on looking for malicious or malformed inputs. This is likely to miss at least one undesirable input, especially if the code's environment changes. This can give attackers enough room to bypass the intended validation. However, denylists can be useful for detecting potential attacks or determining which inputs are so malformed that they should be rejected outright.\"},{\"Phase\":\"Implementation\",\"Description\":\"While it is risky to use dynamically-generated query strings, code, or commands that mix control and data together, sometimes it may be unavoidable. Properly quote arguments and escape any special characters within those arguments. The most conservative approach is to escape or filter all characters that do not pass an extremely strict allowlist (such as everything that is not alphanumeric or white space). If some special characters are still needed, such as white space, wrap each argument in quotes after the escaping\\/filtering step. Be careful of argument injection (CWE-88).\"},{\"Phase\":\"Implementation\",\"Description\":\"Inputs should be decoded and canonicalized to the application's current internal representation before being validated (CWE-180). Make sure that the application does not decode the same input twice (CWE-174). Such errors could be used to bypass allowlist validation schemes by introducing dangerous inputs after they have been checked.\"}]}",
+      "ucocweSummary": "Quotes injected into a product can be used to compromise a system. As data are parsed, an injected/absent/duplicate/malformed use of quotes may cause the process to take unexpected actions.",
+      "ucodescription": "Quotes injected into a product can be used to compromise a system. As data are parsed, an injected/absent/duplicate/malformed use of quotes may cause the process to take unexpected actions.",
+      "labels": "UcoCWE"
+    },
+    "node3": {
+      "ucoexDESCRIPTION": "Database allows remote attackers to cause a denial of service (application crash) via a MATCH AGAINST query with an opening double quote but no closing double quote.",
+      "labels": "UcoexObservedExample"
+    },
+    "relationships": {
+      "node1_node2": [
+        {
+          "type": "UCOEXHASRELATEDWEAKNESS"
+        }
+      ],
+      "node2_node3": [
+        {
+          "type": "UCOHASOBSERVEDEXAMPLE"
+        }
+      ]
+    }
+  }
+]

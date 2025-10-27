@@ -1,0 +1,131 @@
+[
+  {
+    "node1": {
+      "ucoexCAPEC_name": "Android Activity Hijack",
+      "ucoexMitigations": [
+        "Never use implicit intents for inter-application communication.",
+        "To mitigate this type of an attack, explicit intents should be used whenever sensitive data is being sent. An 'explicit intent' is delivered to a specific application as declared within the intent, whereas an 'implicit intent' is directed to an application as defined by the Android operating system. If an implicit intent must be used, then it should be assumed that the intent will be received by an unknown application and any response should be treated accordingly (i.e., with appropriate security controls)."
+      ],
+      "label": "CAPEC-501: Android Activity Hijack",
+      "ucoexDescription": "An adversary intercepts an implicit intent sent to launch a Android-based trusted activity and instead launches a counterfeit activity in its place. The malicious activity is then used to mimic the trusted activity's user interface and prompt the target to enter sensitive data as if they were interacting with the trusted activity.",
+      "ucoexSeverity": "Medium",
+      "labels": "UcoexCAPEC"
+    },
+    "node2": {
+      "ucocweName": "Improper Restriction of Communication Channel to Intended Endpoints",
+      "ucocweExtendedSummary": "Attackers might be able to spoof the intended endpoint from a different system or process, thus gaining the same level of access as the intended endpoint.\nWhile this issue frequently involves authentication between network-based clients and servers, other types of communication channels and endpoints can have this weakness.",
+      "ucodemonstrativeExamples": "These cross-domain policy files mean to allow Flash and Silverlight applications hosted on other domains to access its data:\nFlash crossdomain.xml :\n<cross-domain-policy xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"xsi:noNamespaceSchemaLocation=\"http://www.adobe.com/xml/schemas/PolicyFile.xsd\"><allow-access-from domain=\"*.example.com\"/><allow-access-from domain=\"*\"/></cross-domain-policy>\nSilverlight clientaccesspolicy.xml :\n<?xml version=\"1.0\" encoding=\"utf-8\"?><access-policy><cross-domain-access><policy><allow-from http-request-headers=\"SOAPAction\"><domain uri=\"*\"/></allow-from><grant-to><resource path=\"/\" include-subpaths=\"true\"/></grant-to></policy></cross-domain-access></access-policy>\nThese entries are far too permissive, allowing any Flash or Silverlight application to send requests. A malicious application hosted on any other web site will be able to send requests on behalf of any user tricked into executing it.\nThis Android application will remove a user account when it receives an intent to do so:\nIntentFilter filter = new IntentFilter(\"com.example.RemoveUser\");MyReceiver receiver = new MyReceiver();registerReceiver(receiver, filter);\npublic class DeleteReceiver extends BroadcastReceiver {@Overridepublic void onReceive(Context context, Intent intent) {int userID = intent.getIntExtra(\"userID\");destroyUserData(userID);}}\nThis application does not check the origin of the intent, thus allowing any malicious application to remove a user. Always check the origin of an intent, or create an allowlist of trusted applications using the manifest.xml file.",
+      "ucocweSummary": "The product establishes a communication channel to (or from) an endpoint for privileged or protected operations, but it does not properly ensure that it is communicating with the correct endpoint.",
+      "ucodescription": "The product establishes a communication channel to (or from) an endpoint for privileged or protected operations, but it does not properly ensure that it is communicating with the correct endpoint.",
+      "labels": "UcoCWE"
+    },
+    "relationships": [
+      {
+        "type": "UCOEXHASRELATEDWEAKNESS"
+      }
+    ]
+  }
+]
+
+
+
+
+
+
+[
+  {
+    "node1": {
+      "ucoexCAPEC_name": "Schema Poisoning",
+      "ucoexMitigations": [
+        "Implementation: For applications that use a known schema, use a local copy or a known good repository instead of the schema reference supplied in the schema document.",
+        "Design: Protect the schema against unauthorized modification.",
+        "Implementation: For applications that leverage remote schemas, use the HTTPS protocol to prevent modification of traffic in transit and to avoid unauthorized modification."
+      ],
+      "label": "CAPEC-271: Schema Poisoning",
+      "ucoexDescription": "An adversary corrupts or modifies the content of a schema for the purpose of undermining the security of the target. Schemas provide the structure and content definitions for resources used by an application. By replacing or modifying a schema, the adversary can affect how the application handles or interprets a resource, often leading to possible denial of service, entering into an unexpected state, or recording incomplete data.",
+      "ucoexSeverity": "High",
+      "ucoexExample": [
+        "In a JSON Schema Poisoning Attack, an adervary modifies the JSON schema to cause a Denial of Service (DOS) or to submit malicious input:",
+        "In a Database Schema Poisoning Attack, an adversary alters the database schema being used to modify the database in some way. This can result in loss of data, DOS, or malicious input being submitted. Assuming there is a column named \"name\", an adversary could make the following schema change:"
+      ],
+      "labels": "Resource"
+    },
+    "node2": {
+      "ucocweName": "External Control of System or Configuration Setting",
+      "ucocweExtendedSummary": "Allowing external control of system settings can disrupt service or cause an application to behave in unexpected, and potentially malicious ways.",
+      "ucodemonstrativeExamples": "The following C code accepts a number as one of its command line parameters and sets it as the host ID of the current machine.\n...sethostid(argv[1]);...\nAlthough a process must be privileged to successfully invoke sethostid(), unprivileged users may be able to invoke the program. The code in this example allows user input to directly control the value of a system setting. If an attacker provides a malicious value for host ID, the attacker can misidentify the affected machine on the network or cause other unintended behavior.\nThe following Java code snippet reads a string from an HttpServletRequest and sets it as the active catalog for a database Connection.\n...conn.setCatalog(request.getParameter(\"catalog\"));...\nIn this example, an attacker could cause an error by providing a nonexistent catalog name or connect to an unauthorized portion of the database.",
+      "ucopotentialMitigations": "{mitigation=[{\"Phase\":\"Architecture and Design\",\"Description\":\"Compartmentalize the system to have \\\"safe\\\" areas where trust boundaries can be unambiguously drawn. Do not allow sensitive data to go outside of the trust boundary and always be careful when interfacing with a compartment outside of the safe area.\\n Ensure that appropriate compartmentalization is built into the system design, and the compartmentalization allows for and reinforces privilege separation functionality. Architects and designers should rely on the principle of least privilege to decide the appropriate time to use privileges and the time to drop privileges.\"},{\"Phase\":\"Implementation\",\"Description\":\"Because setting manipulation covers a diverse set of functions, any attempt at illustrating it will inevitably be incomplete. Rather than searching for a tight-knit relationship between the functions addressed in the setting manipulation category, take a step back and consider the sorts of system values that an attacker should not be allowed to control.\"},{\"Phase\":\"Implementation\",\"Description\":\"In general, do not allow user-provided or otherwise untrusted data to control sensitive values. The leverage that an attacker gains by controlling these values is not always immediately obvious, but do not underestimate the creativity of the attacker.\"}]}",
+      "ucocweSummary": "One or more system settings or configuration elements can be externally controlled by a user.",
+      "ucodescription": "One or more system settings or configuration elements can be externally controlled by a user.",
+      "labels": "Resource"
+    },
+    "relationships": [
+      {
+        "type": "UCOEXHASRELATEDWEAKNESS"
+      }
+    ]
+  }
+]
+
+
+
+[
+  {
+    "node1": {
+      "ucoexCAPEC_name": "Scanning for Vulnerable Software",
+      "label": "CAPEC-310: Scanning for Vulnerable Software",
+      "ucoexDescription": "An attacker engages in scanning activity to find vulnerable software versions or types, such as operating system versions or network services. Vulnerable or exploitable network configurations, such as improperly firewalled systems, or misconfigured systems in the DMZ or external network, provide windows of opportunity for an attacker. Common types of vulnerable software include unpatched operating systems or services (e.g FTP, Telnet, SMTP, SNMP) running on open ports that the attacker has identified. Attackers usually begin probing for vulnerable software once the external network has been port scanned and potential targets have been revealed.",
+      "ucoexSeverity": "Low",
+      "labels": "Resource"
+    },
+    "node2": {
+      "ucocweName": "Exposure of Sensitive Information to an Unauthorized Actor",
+      "ucocweExtendedSummary": "There are many different kinds of mistakes that introduce information exposures. The severity of the error can range widely, depending on the context in which the product operates, the type of sensitive information that is revealed, and the benefits it may provide to an attacker. Some kinds of sensitive information include:\nprivate, personal information, such as personal messages, financial data, health records, geographic location, or contact details\nsystem status and environment, such as the operating system and installed packages\nbusiness secrets and intellectual property\nnetwork status and configuration\nthe product's own code or internal state\nmetadata, e.g. logging of connections or message headers\nindirect information, such as a discrepancy between two internal operations that can be observed by an outsider\nInformation might be sensitive to different parties, each of which may have their own expectations for whether the information should be protected. These parties include:\nthe product's own users\npeople or organizations whose information is created or used by the product, even if they are not direct product users\nthe product's administrators, including the admins of the system(s) and/or networks on which the product operates\nthe developer\nInformation exposures can occur in different ways:\nthe code explicitly inserts sensitive information into resources or messages that are intentionally made accessible to unauthorized actors, but should not contain the information - i.e., the information should have been \"scrubbed\" or \"sanitized\"\na different weakness or mistake indirectly inserts the sensitive information into resources, such as a web script error revealing the full system path of the program.\nthe code manages resources that intentionally contain sensitive information, but the resources are unintentionally made accessible to unauthorized actors. In this case, the information exposure is resultant - i.e., a different weakness enabled the access to the information in the first place.\nIt is common practice to describe any loss of confidentiality as an \"information exposure,\" but this can lead to overuse of CWE-200 in CWE mapping. From the CWE perspective, loss of confidentiality is a technical impact that can arise from dozens of different weaknesses, such as insecure file permissions or out-of-bounds read. CWE-200 and its lower-level descendants are intended to cover the mistakes that occur in behaviors that explicitly manage, store, transfer, or cleanse sensitive information.",
+      "ucopotentialMitigations": "{mitigation=[{\"Phase\":\"Architecture and Design\",\"Description\":\"Compartmentalize the system to have \\\"safe\\\" areas where trust boundaries can be unambiguously drawn. Do not allow sensitive data to go outside of the trust boundary and always be careful when interfacing with a compartment outside of the safe area.\\n Ensure that appropriate compartmentalization is built into the system design, and the compartmentalization allows for and reinforces privilege separation functionality. Architects and designers should rely on the principle of least privilege to decide the appropriate time to use privileges and the time to drop privileges.\"}]}",
+      "ucodemonstrativeExamples": "The following code checks validity of the supplied username and password and notifies the user of a successful or failed login.\nmy $username=param('username');\nmy $password=param('password');\nif (IsValidUsername($username) == 1)\n{\nif (IsValidPassword($username, $password) == 1)\n{\nprint \"Login Successful\";\n}\nelse\n{\nprint \"Login Failed - incorrect password\";\n}\n}\nelse\n{\nprint \"Login Failed - unknown username\";\n}\nIn the above code, there are different messages for when an incorrect username is supplied, versus when the username is correct but the password is wrong. This difference enables a potential attacker to understand the state of the login function, and could allow an attacker to discover a valid username by trying different values until the incorrect password message is returned. In essence, this makes it easier for an attacker to obtain half of the necessary authentication credentials.\nWhile this type of information may be helpful to a user, it is also useful to a potential attacker. In the above example, the message for both failed cases should be the same, such as:\n\"Login Failed - incorrect username or password\"\nThis code tries to open a database connection, and prints any exceptions that occur.\ntry {openDbConnection();}\n//print exception message that includes exception message and configuration file location\ncatch (Exception $e) {echo 'Caught exception: ', $e->getMessage(), '\\n';echo 'Check credentials in config file at: ', $Mysql_config_location, '\\n';}\nIf an exception occurs, the printed message exposes the location of the configuration file the script is using. An attacker can use this information to target the configuration file (perhaps exploiting a Path Traversal weakness). If the file can be read, the attacker could gain credentials for accessing the database. The attacker may also be able to replace the file with a malicious one, causing the application to use an arbitrary database.\nIn the example below, the method getUserBankAccount retrieves a bank account object from a database using the supplied username and account number to query the database. If an SQLException is raised when querying the database, an error message is created and output to a log file.\npublic BankAccount getUserBankAccount(String username, String accountNumber) {\nBankAccount userAccount = null;String query = null;try {if (isAuthorizedUser(username)) {query = \"SELECT * FROM accounts WHERE owner = \"+ username + \" AND accountID = \" + accountNumber;DatabaseManager dbManager = new DatabaseManager();Connection conn = dbManager.getConnection();Statement stmt = conn.createStatement();ResultSet queryResult = stmt.executeQuery(query);userAccount = (BankAccount)queryResult.getObject(accountNumber);}} catch (SQLException ex) {String logMessage = \"Unable to retrieve account information from database,\\nquery: \" + query;Logger.getLogger(BankManager.class.getName()).log(Level.SEVERE, logMessage, ex);}return userAccount;\n}\nThe error message that is created includes information about the database query that may contain sensitive information about the database or query logic. In this case, the error message will expose the table name and column names used in the database. This data could be used to simplify other attacks, such as SQL injection (CWE-89) to directly access the database.\nThis code stores location information about the current user:\nlocationClient = new LocationClient(this, this, this);locationClient.connect();currentUser.setLocation(locationClient.getLastLocation());\n...\ncatch (Exception e) {AlertDialog.Builder builder = new AlertDialog.Builder(this);builder.setMessage(\"Sorry, this application has experienced an error.\");AlertDialog alert = builder.create();alert.show();Log.e(\"ExampleActivity\", \"Caught exception: \" + e + \" While on User:\" + User.toString());}\nWhen the application encounters an exception it will write the user object to the log. Because the user object contains location information, the user's location is also written to the log.\nThe following is an actual MySQL error statement:\nWarning: mysql_pconnect(): Access denied for user: 'root@localhost' (Using password: N1nj4) in /usr/local/www/wi-data/includes/database.inc on line 4\nThe error clearly exposes the database credentials.\nThis code displays some information on a web page.\nSocial Security Number: <%= ssn %></br>Credit Card Number: <%= ccn %>\nThe code displays a user's credit card and social security numbers, even though they aren't absolutely necessary.\nThe following program changes its behavior based on a debug flag.\n<% if (Boolean.getBoolean(\"debugEnabled\")) {\n%>User account number: <%= acctNo %><%} %>\nThe code writes sensitive debug information to the client browser if the \"debugEnabled\" flag is set to true .\nThis code uses location to determine the user's current US State location.\nFirst the application must declare that it requires the ACCESS_FINE_LOCATION permission in the application's manifest.xml:\n<uses-permission android:name=\"android.permission.ACCESS_FINE_LOCATION\"/>\nDuring execution, a call to getLastLocation() will return a location based on the application's location permissions. In this case the application has permission for the most accurate location possible:\nlocationClient = new LocationClient(this, this, this);locationClient.connect();Location userCurrLocation;userCurrLocation = locationClient.getLastLocation();deriveStateFromCoords(userCurrLocation);\nWhile the application needs this information, it does not need to use the ACCESS_FINE_LOCATION permission, as the ACCESS_COARSE_LOCATION permission will be sufficient to identify which US state the user is in.",
+      "ucocweSummary": "The product exposes sensitive information to an actor that is not explicitly authorized to have access to that information.",
+      "ucodescription": "The product exposes sensitive information to an actor that is not explicitly authorized to have access to that information.",
+      "labels": "Resource"
+    },
+    "relationships": [
+      {
+        "type": "UCOEXHASRELATEDWEAKNESS"
+      }
+    ]
+  }
+]
+
+
+
+
+
+[
+  {
+    "node1": {
+      "ucoexCAPEC_name": "Counterfeit Hardware Component Inserted During Product Assembly",
+      "ucoexMitigations": [
+        "Hardware attacks are often difficult to detect, as inserted components can be difficult to identify or remain dormant for an extended period of time.",
+        "Acquire hardware and hardware components from trusted vendors. Additionally, determine where vendors purchase components or if any components are created/acquired via subcontractors to determine where supply chain risks may exist."
+      ],
+      "label": "CAPEC-520: Counterfeit Hardware Component Inserted During Product Assembly",
+      "ucoexDescription": "An adversary with either direct access to the product assembly process or to the supply of subcomponents used in the product assembly process introduces counterfeit hardware components into product assembly. The assembly containing the counterfeit components results in a system specifically designed for malicious purposes.",
+      "ucoexSeverity": "High",
+      "ucoexExample": [
+        "A manufacturer of a firewall system requires a hardware card which functions as a multi-jack ethernet card with four ethernet ports. The adversary constructs a counterfeit card that functions normally except that packets from the adversary's network are allowed to bypass firewall processing completely. Once deployed at a victim location, this allows the adversary to bypass the firewall unrestricted.",
+        "In 2018 it was discovered that Chinese spies infiltrated several U.S. government agencies and corporations as far back as 2015 by including a malicious microchip within the motherboard of servers sold by Elemental Technologies to the victims. Although these servers were assembled via a U.S. based company, the motherboards used within the servers were manufactured and maliciously altered via a Chinese subcontractor. Elemental Technologies then sold these malicious servers to various U.S. government agencies, such as the DoD and CIA, and corporations like Amazon and Apple. The malicious microchip provided adversaries with a backdoor into the system, which further allowed them to access any network that contained the exploited systems, to exfiltrate data to be sent to the Chinese government.[REF-713]"
+      ],
+      "labels": "Resource"
+    },
+    "node2": {
+      "ucoexDESCRIPTION": "Adversaries may manipulate hardware components in products prior to receipt by a final consumer for the purpose of data or system compromise. By modifying hardware or firmware in the supply chain, adversaries can insert a backdoor into consumer networks that may be difficult to detect and give the adversary a high degree of control over the system. Hardware backdoors may be inserted into various devices, such as servers, workstations, network infrastructure, or peripherals.",
+      "ucoexNAME": "Supply Chain Compromise: Compromise Hardware Supply Chain",
+      "ucoexDOMAIN": "enterprise-attack",
+      "labels": "Resource"
+    },
+    "relationships": [
+      {
+        "type": "UCOEXHASTAXONOMYMAPPING"
+      }
+    ]
+  }
+]

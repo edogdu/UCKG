@@ -1,0 +1,57 @@
+[
+    {
+        "question1": "What example shows authorization bypass in systems where administrative interfaces are accessed without proper permission checks?",
+        "answer": "ACL-based protection mechanism treats negative access rights as if they are positive, allowing bypass of intended restrictions.",
+        "start_node": "node1",
+        "intermediate_node": "node2",
+        "end_node": "node3",
+        "source_breakdown": {
+            "root_node_clues": "administrative interfaces are accessed (from node1: 'administrative interface at admin.aspx'), without proper permission checks (from node1: 'perform privileged operations')",
+            "answer_node_clues": "example (inferred from node3 label: 'UcoexObservedExample'), authorization bypass (from node3: 'bypass' and 'protection mechanism')"
+        }
+    },
+    {
+        "question2": "Which CVE illustrates the attacks exploiting code construction from upstream components that lack input sanitization?",
+        "answer": "CVE-2002-0495",
+        "start_node": "node1",
+        "intermediate_node": "node2",
+        "end_node": "node3",
+        "source_breakdown": {
+            "root_node_clues": "code construction from upstream components (from node1: 'constructs...code segment using externally-influenced input from an upstream component'), lack input sanitization (from node1: 'does not neutralize or incorrectly neutralizes special elements')",
+            "answer_node_clues": "CVE (from node3: label)"
+        }
+    },
+    {
+        "question3": "What technique enables ransomware intrusions to manipulate components of HTTP and URI to mimic trusted services?",
+        "answer": "Data Obfuscation: Protocol or Service Impersonation",
+        "start_node": "node1",
+        "intermediate_node": "node2",
+        "end_node": "node3",
+        "source_breakdown": {
+            "root_node_clues": "ransomware intrusions (from node1: 'ransomware intrusion')",
+            "answer_node_clues": "manipulate HTTP headers and URI endpoints to mimic trusted services (from node3: 'manipulate HTTP headers, URI endpoints' and 'mimic legitimate services')"
+        }
+    },
+    {
+        "question4": "What documented case shows directory manipulation where character encoding creates alternative object references?",
+        "answer": "CVE-2005-3293",
+        "start_node": "node1",
+        "intermediate_node": "node2",
+        "end_node": "node3",
+        "source_breakdown": {
+            "root_node_clues": "directory manipulation (from node1: 'file and directory names'), character encoding creates alternative object references (from node1: 'use of special characters' and 'generate multiple names for the same object')",
+            "answer_node_clues": "documented case (inferred from node3 being a CVE)"
+        }
+    },
+    {
+        "question5": "Which real-world example shows service disruption when browser parsers ignore malformed syntax to render stolen CSRF tokens?",
+        "answer": "Database allows remote attackers to cause a denial of service (application crash) via a MATCH AGAINST query with an opening double quote but no closing double quote.",
+        "start_node": "node1",
+        "intermediate_node": "node2",
+        "end_node": "node3",
+        "source_breakdown": {
+            "root_node_clues": "browser parsers ignore malformed syntax (from node1: 'ignore all data that does not make sense before a valid CSS descriptor'), stolen CSRF tokens (from node1: 'stolen data may contain sensitive information, such CSRF protection tokens')",
+            "answer_node_clues": "service disruption (from node3: 'denial of service'), real-world example (inferred from node3 label 'UcoexObservedExample')"
+        }
+    }
+]

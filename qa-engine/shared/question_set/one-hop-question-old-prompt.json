@@ -1,0 +1,52 @@
+[
+    {
+        "question1": "What documented incident illustrates injection flaws when eval functions process configuration actions without input validation?",
+        "answer": "Perl code directly injected into CGI library file from parameters to another CGI program.",
+        "start_node": "node1",
+        "end_node": "node2",
+        "source_breakdown": {
+            "root_node_clues": "eval functions process configuration actions (from node1 demonstrative examples: 'eval($code)' in 'edit-config.pl'), without input validation (from node1: 'does not neutralize')",
+            "answer_node_clues": "documented incident (from node2: label 'UcoexObservedExample')"
+        }
+    },
+    {
+        "question2": "Which technique allows commercial penetration testing tools to blend control communications with legitimate network traffic?",
+        "answer": "Data Obfuscation: Protocol or Service Impersonation",
+        "start_node": "node1",
+        "end_node": "node2",
+        "source_breakdown": {
+            "root_node_clues": "commercial penetration testing tools (from node1: 'commercial, full-featured, remote access tool')",
+            "answer_node_clues": "blend control communications with legitimate network traffic (from node2: 'make their command and control traffic blend in with legitimate network traffic')"
+        }
+    },
+    {
+        "question3": "What documented instance illustrates directory name manipulation allowing disclosure through character sequence exploitation?",
+        "answer": "Source code disclosure using trailing dot",
+        "start_node": "node1",
+        "end_node": "node2",
+        "source_breakdown": {
+            "root_node_clues": "directory name manipulation (from node1: 'file and directory names'), allowing disclosure (from node1: 'file system contents disclosure'), character sequence exploitation (from node1: 'special characters' and mitigation about 'character or byte sequences')",
+            "answer_node_clues": "documented instance (from node2: observed example type)"
+        }
+    },
+    {
+        "question4": "What evasion technique allows application replacement malware to hide data within multimedia content to avoid detection?",
+        "answer": "Steganography",
+        "start_node": "node1",
+        "end_node": "node2",
+        "source_breakdown": {
+            "root_node_clues": "application replacement malware (from node1: 'replacing legitimate applications...with malicious versions')",
+            "answer_node_clues": "hide data within multimedia content to avoid detection (from node2: 'hide data in digital media' and 'prevent the detection of hidden information'), evasion technique (from node2: ATT&CK technique type)"
+        }
+    },
+    {
+        "question5": "What method do operations targeting multiple countries use to leverage user interaction for follow-on exploitation?",
+        "answer": "User Execution: Malicious Link",
+        "start_node": "node1",
+        "end_node": "node2",
+        "source_breakdown": {
+            "root_node_clues": "operations targeting multiple countries (from node1: 'United States, Israel, Australia, Russia, and India')",
+            "answer_node_clues": "leverage user interaction for follow-on exploitation (from node2: 'rely upon a user clicking' and 'follow-on behavior' and 'lead to...exploitation')"
+        }
+    }
+]
