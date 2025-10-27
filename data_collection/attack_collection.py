@@ -91,7 +91,7 @@ def download_attack_json_file(cfg):
             href = a["href"]
             for prefix in prefixes:
                 # match any version, but we'll filter by hyphens next
-                pattern = f"/docs/{prefix}-v*/{prefix}-v*.xlsx"
+                pattern = f"/docs/attack-excel-files/<version>/{prefix}/{prefix}-v<version>.xlsx"
                 if fnmatch(href, pattern):
                     # grab just the filename portion
                     filename = href.rsplit("/", 1)[-1]

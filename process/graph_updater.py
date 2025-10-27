@@ -13,7 +13,7 @@ logger = logging.getLogger('graph_updater_logger')
 def load_ttl_file(driver, file_path):
        with driver.session() as session:
             try:
-                session.write_transaction(_load_ttl, file_path)
+                session.execute_write(_load_ttl, file_path)
                 logger.info(f"Successfully loaded TTL file from {file_path}")
             except Exception as e:
                 logger.info(f"Error loading TTL file: {e}")

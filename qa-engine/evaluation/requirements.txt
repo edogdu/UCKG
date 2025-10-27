@@ -1,0 +1,20 @@
+# Core dependencies for multi-eval.py
+numpy>=1.21.0
+nltk>=3.7
+rouge-score>=0.1.2
+bert-score>=0.3.11
+
+# Plotting (optional but recommended for graphs)
+matplotlib>=3.6.0
+seaborn>=0.12.0
+
+# Optional - for QAFactEval factuality checking
+qafacteval>=0.1.0
+
+# Additional setup required after installation:
+# 1. Download NLTK data (if missing):
+#    import nltk
+#    nltk.download('punkt')
+#
+# 2. BERTScore downloads model on first run: microsoft/deberta-xlarge-mnli
+# 3. QAFactEval downloads: deepset/roberta-base-squad2 and entailment model above
