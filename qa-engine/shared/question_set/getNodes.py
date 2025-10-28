@@ -26,20 +26,20 @@ except Exception as e:
 # Label-to-properties mapping
 # Defines which properties are allowed for each node label
 LABEL_PROPERTIES_MAP = {
-    "CWE": ["ucocweSummary", "ucocweExtendedSummary", "ucocweName"],
-    "CVE": ["label", "ucobaseSeverity"],
+    "CWE": ["ucocweSummary", "ucocweExtendedSummary", "ucocweName", "uri"],
+    "CVE": ["label", "ucobaseSeverity", "uri"],
     "Vulnerability": ["ucosummary"],
-    "CPE": ["cpeName", "titles"],
-    "CAPEC": ["label", "ucoexDescription"],
-    "ATT&CK": [],
-    "Softwares": ["ucoexDESCRIPTION", "ucoexDOMAIN"],
-    "Groups": ["ucoexDESCRIPTION", "ucoexDOMAIN"],
-    "CAMPAIGNS": ["ucoexDESCRIPTION", "ucoexDOMAIN"],
-    "MITIGATIONS": ["ucoexDESCRIPTION", "ucoexDOMAIN", "ucoexName"],
-    "MITREATTACK": ["ucoexDESCRIPTION", "ucoexDOMAIN", "ucoexName"],
-    "ObservedExample": ["ucoexDESCRIPTION"],
-    "TACTICS": ["ucoexDESCRIPTION", "ucoexDOMAIN"],
-    "D3FEND": ["ucoexMITRED3FEND_DEFINITION", "ucoexMITRED3FEND_LABEL"]
+    "CPE": ["cpeName", "titles", "uri"],
+    "CAPEC": ["label", "ucoexDescription", "uri"],
+    "ATT&CK": ["uri"],
+    "Softwares": ["ucoexDESCRIPTION", "ucoexDOMAIN", "uri"],
+    "Groups": ["ucoexDESCRIPTION", "ucoexDOMAIN", "uri"],
+    "CAMPAIGNS": ["ucoexDESCRIPTION", "ucoexDOMAIN", "uri"],
+    "MITIGATIONS": ["ucoexDESCRIPTION", "ucoexDOMAIN", "ucoexName", "uri"],
+    "MITREATTACK": ["ucoexDESCRIPTION", "ucoexDOMAIN", "ucoexName", "uri"],
+    "ObservedExample": ["ucoexDESCRIPTION", "uri"],
+    "TACTICS": ["ucoexDESCRIPTION", "ucoexDOMAIN", "uri"],
+    "D3FEND": ["ucoexMITRED3FEND_DEFINITION", "ucoexMITRED3FEND_LABEL", "uri"]
 }
 
 
