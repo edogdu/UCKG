@@ -75,8 +75,10 @@ This script queries the Neo4j database to extract nodes and their relationships.
    **Note**: Only properties defined in `LABEL_PROPERTIES_MAP` for matching labels will be included
 
 #### Supported Node ID Formats:
-- **Numeric IDs** (old format): `"782755"`
-- **Element IDs** (new format): `"4:abc123:456"`
+- **Numeric IDs** (old format): `"782755"` - supported by all functions
+- **Element IDs** (new format): `"4:abc123:456"` - supported by 1-node and 2-node queries only
+
+**Note**: The `get_three_connected_nodes()` function currently only supports numeric IDs. Use numeric IDs when querying 3 connected nodes.
 
 
 ### Step 2: Generate Questions (`generate_questions.py`)
@@ -165,13 +167,13 @@ Where:
 [
     {
         "node1": {
-        "name": "CAPEC-256: SOAP Array Overflow",
+        "label": "CAPEC-256: SOAP Array Overflow",
         "ucoexDescription": "...",
-        "labels": "UcoexCAPEC"
+        "labels": ["UcoexCAPEC"]
         },
         "node2": {
         "ucocweName": "Buffer Access with Incorrect Length Value",
-        "labels": "UcoCWE"
+        "labels": ["UcoCWE"]
         },
         "relationships": [
         {"type": "UCOEXHASRELATEDWEAKNESS"}
@@ -186,7 +188,7 @@ Where:
    "question": "How does SOAP array overflow exploit buffer vulnerabilities?",
    "type": "<s,*,o>",
    "first_node": "UcoexCAPEC",
-   "used_properties_of_first_node": ["name", "ucoexDescription"],
+   "used_properties_of_first_node": ["label", "ucoexDescription"],
    "relationship": "UCOEXHASRELATEDWEAKNESS",
    "second_node": "UcoCWE",
    "used_properties_of_second_node": ["ucocweName"]
@@ -211,19 +213,17 @@ Where:
 
 ## Node Property Filtering
 
-The `filter_node_properties()` function uses **label-specific property filtering** based on a predefined mapping (`LABEL_PROPERTIES_MAP`). 
-
-**Note**: Any property named "label" is automatically renamed to "name" in the JSON output for better clarity.
+The `filter_node_properties()` function uses **label-specific property filtering** based on a predefined mapping (`LABEL_PROPERTIES_MAP`). Only properties defined in the mapping for each label will be included in the output.
 
 ### Supported Labels and Properties:
 
 | Label Pattern | Allowed Properties |
 |--------------|-------------------|
 | `CWE` | `ucocweSummary`, `ucocweExtendedSummary`, `ucocweName`, `uri` |
-| `CVE` | `label` → `name`, `ucobaseSeverity`, `uri` |
+| `CVE` | `label`, `ucobaseSeverity`, `uri` |
 | `Vulnerability` | `ucosummary`, `uri` |
 | `CPE` | `cpeName`, `titles`, `uri` |
-| `CAPEC` | `label` → `name`, `ucoexDescription`, `uri` |
+| `CAPEC` | `label`, `ucoexDescription`, `uri` |
 | `ATT&CK` | `uri` |
 | `Softwares` | `ucoexDESCRIPTION`, `ucoexDOMAIN`, `uri` |
 | `Groups` | `ucoexDESCRIPTION`, `ucoexDOMAIN`, `uri` |

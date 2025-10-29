@@ -82,8 +82,8 @@ def filter_node_properties(properties, labels):
                 filtered[key] = value
     
     # Rename "label" property to "name" if it exists
-    if "label" in filtered:
-        filtered["name"] = filtered.pop("label")
+    # if "label" in filtered:
+    #     filtered["name"] = filtered.pop("label")
     
     return filtered
 
