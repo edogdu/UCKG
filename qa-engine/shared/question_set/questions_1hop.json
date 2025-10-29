@@ -2,43 +2,43 @@
     {
         "question": "How could a SOAP Array Overflow arise from weaknesses in buffer length handling within related systems?",
         "type": "<s,,o>",
-        "first_node": "UcoexCAPEC",
+        "first_node": "CAPEC-256: SOAP Array Overflow",
         "used_properties_of_first_node": ["label", "ucoexDescription"],
         "relationship": "UCOEXHASRELATEDWEAKNESS",
-        "second_node": "UcoCWE",
+        "second_node": "Buffer Access with Incorrect Length Value",
         "used_properties_of_second_node": ["ucocweName", "ucocweSummary"]
     },
     {
         "question": "What core programming error enables this SOAP Array Overflow to connect with a buffer length misuse issue?",
         "type": "<s,p,o>",
-        "first_node": "UcoexCAPEC",
+        "first_node": "CAPEC-256: SOAP Array Overflow",
         "used_properties_of_first_node": ["label", "ucoexDescription"],
         "relationship": "UCOEXHASRELATEDWEAKNESS",
-        "second_node": "UcoCWE",
+        "second_node": "Buffer Access with Incorrect Length Value",
         "used_properties_of_second_node": ["ucocweName", "ucocweExtendedSummary"]
     },
     {
         "question": "How does the SOAP Array Overflow scenario illustrate the risks described in the related buffer misuse weakness?",
         "type": "<s,,o>",
-        "first_node": "UcoexCAPEC",
+        "first_node": "CAPEC-256: SOAP Array Overflow",
         "used_properties_of_first_node": ["label", "ucoexDescription"],
         "relationship": "UCOEXHASRELATEDWEAKNESS",
-        "second_node": "UcoCWE",
+        "second_node": "Buffer Access with Incorrect Length Value",
         "used_properties_of_second_node": ["ucocweSummary"]
     },
     {
         "question": "In which context could incorrect length validation make the SOAP Array Overflow more severe?",
         "type": "<s,p,o>",
-        "first_node": "UcoexCAPEC",
+        "first_node": "CAPEC-256: SOAP Array Overflow",
         "used_properties_of_first_node": ["label", "ucoexDescription"],
         "relationship": "UCOEXHASRELATEDWEAKNESS",
-        "second_node": "UcoCWE",
+        "second_node": "Buffer Access with Incorrect Length Value",
         "used_properties_of_second_node": ["ucocweExtendedSummary"]
     },
     {
         "question": "What insights from this SOAP Array Overflow help analysts understand its connection to the underlying weakness?",
         "type": "<s,p,*>",
-        "first_node": "UcoexCAPEC",
+        "first_node": "CAPEC-256: SOAP Array Overflow",
         "used_properties_of_first_node": ["label", "ucoexDescription"],
         "relationship": "UCOEXHASRELATEDWEAKNESS",
         "second_node": null,

@@ -2,6 +2,7 @@
     {
         "node1": {
             "ucocweName": "Weak Password Requirements",
+            "uri": "http://purl.org/cyber/uco#CWE-521",
             "ucocweExtendedSummary": "Authentication mechanisms often rely on a memorized secret (also known as a password) to provide an assertion of identity for a user of a system. It is therefore important that this password be of sufficient complexity and impractical for an adversary to guess. The specific requirements around how complex a password needs to be depends on the type of system being protected. Selecting the correct password requirements and enforcing them through implementation are critical to the overall success of the authentication mechanism.",
             "ucocweSummary": "The product does not require that users should have strong passwords, which makes it easier for attackers to compromise user accounts.",
             "labels": [
@@ -10,15 +11,17 @@
             ]
         },
         "node2": {
+            "uri": "https://capec.mitre.org/data/definitions/16.html",
             "ucoexDescription": "An attacker tries each of the words in a dictionary as passwords to gain access to the system via some user's account. If the password chosen by the user was a word within the dictionary, this attack will be successful (in the absence of other mitigations). This is a specific instance of the password brute forcing attack pattern. Dictionary Attacks differ from similar attacks such as Password Spraying (CAPEC-565) and Credential Stuffing (CAPEC-600), since they leverage unknown username/password combinations and don't care about inducing account lockouts.",
             "name": "CAPEC-16: Dictionary-based Password Attack",
             "labels": [
-                "Resource",
-                "UcoexCAPEC"
+                "UcoexCAPEC",
+                "Resource"
             ]
         },
         "node3": {
             "ucocweName": "Password Aging with Long Expiration",
+            "uri": "http://purl.org/cyber/uco#CWE-263",
             "ucocweExtendedSummary": "Password aging (or password rotation) is a policy that forces users to change their passwords after a defined time period passes, such as every 30 or 90 days. A long expiration provides more time for attackers to conduct password cracking before users are forced to change to a new password.\nNote that while password aging was once considered an important security feature, it has since fallen out of favor by many, because it is not as effective against modern threats compared to other mechanisms such as slow hashes. In addition, forcing frequent changes can unintentionally encourage users to select less-secure passwords. However, password aging is still in use due to factors such as compliance requirements, e.g., Payment Card Industry Data Security Standard (PCI DSS).",
             "ucocweSummary": "The product supports password aging, but the expiration period is too long.",
             "labels": [

@@ -28,7 +28,7 @@ except Exception as e:
 LABEL_PROPERTIES_MAP = {
     "CWE": ["ucocweSummary", "ucocweExtendedSummary", "ucocweName", "uri"],
     "CVE": ["label", "ucobaseSeverity", "uri"],
-    "Vulnerability": ["ucosummary"],
+    "Vulnerability": ["ucosummary", "uri"],
     "CPE": ["cpeName", "titles", "uri"],
     "CAPEC": ["label", "ucoexDescription", "uri"],
     "ATT&CK": ["uri"],

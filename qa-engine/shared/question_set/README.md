@@ -53,10 +53,12 @@ This script queries the Neo4j database to extract nodes and their relationships.
 
 1. **Find Node IDs** in your Neo4j database
 
-2. **Edit `getNodes.py`** (lines 249-254) and manually specify node IDs:
+2. **Edit `getNodes.py`** (lines 290-294) and manually specify node IDs:
    ```python
    node_groups = [
+       # ("783461",) # a node
        ("783461", "2382")  # Two connected nodes
+       # ("3778", "782755", "6501")  # Three connected nodes
    ]
    ```
 
@@ -217,19 +219,20 @@ The `filter_node_properties()` function uses **label-specific property filtering
 
 | Label Pattern | Allowed Properties |
 |--------------|-------------------|
-| `CWE` | `ucocweSummary`, `ucocweExtendedSummary`, `ucocweName` |
-| `CVE` | `label` → `name`, `ucobaseSeverity` |
-| `Vulnerability` | `ucosummary` |
-| `CPE` | `cpeName`, `titles` |
-| `CAPEC` | `label` → `name`, `ucoexDescription` |
-| `Softwares` | `ucoexDESCRIPTION`, `ucoexDOMAIN` |
-| `Groups` | `ucoexDESCRIPTION`, `ucoexDOMAIN` |
-| `CAMPAIGNS` | `ucoexDESCRIPTION`, `ucoexDOMAIN` |
-| `MITIGATIONS` | `ucoexDESCRIPTION`, `ucoexDOMAIN`, `ucoexName` |
-| `MITREATTACK` | `ucoexDESCRIPTION`, `ucoexDOMAIN`, `ucoexName` |
-| `ObservedExample` | `ucoexDESCRIPTION` |
-| `TACTICS` | `ucoexDESCRIPTION`, `ucoexDOMAIN` |
-| `D3FEND` | `ucoexMITRED3FEND_DEFINITION`, `ucoexMITRED3FEND_LABEL` |
+| `CWE` | `ucocweSummary`, `ucocweExtendedSummary`, `ucocweName`, `uri` |
+| `CVE` | `label` → `name`, `ucobaseSeverity`, `uri` |
+| `Vulnerability` | `ucosummary`, `uri` |
+| `CPE` | `cpeName`, `titles`, `uri` |
+| `CAPEC` | `label` → `name`, `ucoexDescription`, `uri` |
+| `ATT&CK` | `uri` |
+| `Softwares` | `ucoexDESCRIPTION`, `ucoexDOMAIN`, `uri` |
+| `Groups` | `ucoexDESCRIPTION`, `ucoexDOMAIN`, `uri` |
+| `CAMPAIGNS` | `ucoexDESCRIPTION`, `ucoexDOMAIN`, `uri` |
+| `MITIGATIONS` | `ucoexDESCRIPTION`, `ucoexDOMAIN`, `ucoexName`, `uri` |
+| `MITREATTACK` | `ucoexDESCRIPTION`, `ucoexDOMAIN`, `ucoexName`, `uri` |
+| `ObservedExample` | `ucoexDESCRIPTION`, `uri` |
+| `TACTICS` | `ucoexDESCRIPTION`, `ucoexDOMAIN`, `uri` |
+| `D3FEND` | `ucoexMITRED3FEND_DEFINITION`, `ucoexMITRED3FEND_LABEL`, `uri` |
 
 
 ## Troubleshooting
