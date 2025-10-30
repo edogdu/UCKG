@@ -9,20 +9,20 @@ from langchain.chains import LLMChain
 # Load environment variables
 load_dotenv()
 
-# Load schema
-with open('../schema_cache.txt', 'r', encoding='utf-8') as file:
-    schema_cache = file.read()
+# Load semantic descriptions
+with open('semantic_descriptions.txt', 'r', encoding='utf-8') as file:
+    semantic_descriptions = file.read()
 
-# Load JSON data
-with open('nodes.json', 'r', encoding='utf-8') as file:
-    json_data = json.load(file)
+# Load context summary
+with open('summary.txt', 'r', encoding='utf-8') as file:
+    summary = file.read()
 
 # Load sample questions
 with open('questions.txt', 'r', encoding='utf-8') as file:
     sample_questions = file.read()
 
-schema = schema_cache
-context = json_data
+terminology = semantic_descriptions
+context = summary
 questions = sample_questions
 
 # # API key for OpenAI
@@ -41,30 +41,92 @@ llm = ChatOllama(
     temperature=0.7
 )
 
-# Prompt for 1-hop questions
+# Prompt for 0-hop questions
 # prompt = PromptTemplate(
-#     input_variables=['context', 'schema', 'questions'],
+#     input_variables=['context', 'terminology', 'questions'],
 #     template="""
 # You are an experienced cybersecurity analyst generating high-quality, reasoning-based questions 
-# from a knowledge graph (CVE, CWE, CAPEC, ATT&CK, Mitigations, CPE, Groups, Campaigns, Software, Vulnerabilities).
+# from a knowledge graph.
+
+# Given:
+# - a graph TERMINOLOGY,
+# - EXAMPLE QUESTIONS (style reference), and
+# - a CONTEXT subgraph (1 single node with all the important properties of the nodes such as Summary and Description but no incoming or outgoing relationship),
 
 # ## Goal
+# generate 3 concise, natural analyst-style questions that a human would realistically ask about the particular provided node.
+
+# ## PolyG-style Categorization
+# Treat each question as a triple ⟨s, p, o⟩ but classify and ask only for the first node s:
+# - ⟨s,*,*⟩ — general exploration of the first and only node
+
+# Subject (s): always the FIRST node in the provided context.
+# Predicate (p): a relationship type from the terminology, if used.
+# Object (o): the second node.
+
+# - Each question must be ≤ 25 words, fluent, and realistic.
+# - Prefer open analytical forms (“How could…?”, “What causes…?”, “Which factor connects…?”).
+# - You will receive a summary about one and only node that cotains one of the aspects of cybersecurity
+# - There will be thousands of cybersecurity related nodes.
+# - Ask in a way that a person will have to look through the thousand of nodes and find the most appropriate answer by matching the description of the question and detail in the summary.
+# - DO NOT mention property names (like “ucocweSummary” or “ucoexDescription”) in the question itself.
+# - Avoid raw IDs, URIs, or field names.
+# - Avoid visiting provided links and URLs in order to generate questions. In other words, don't get into the URLs.
+# - Avoid yes/no questions and multi-part phrasing.
+# - Use cybersecurity reasoning naturally: exploitability, overflow, mitigation, validation, propagation, etc.
+
+# ## Output Format (STRICT JSON)
+# Return ONLY a JSON array of 3 objects.
+
+# Each object must include:
+# {
+#     "question": "string",
+#     "type": "<s,*,*>",
+#     "first_node": "name/label of first node",
+#     "used_properties_of_first_node": ["list"],
+#     "context": "the context"
+# }
+
+# ---
+
+# ## TERMINOLOGY
+# {terminology}
+
+# ---
+
+# ## EXAMPLE QUESTIONS (style reference)
+# {questions}
+
+# ---
+
+# ## CONTEXT
+# {context}
+# """)
+
+
+# Prompt for 1-hop questions
+# prompt = PromptTemplate(
+#     input_variables=['context', 'terminology', 'questions'],
+#     template="""
+# You are an experienced cybersecurity analyst generating high-quality, reasoning-based questions 
+# from a knowledge graph.
+
 # Given:
-# - a graph SCHEMA,
+# - a graph TERMINOLOGY,
 # - EXAMPLE QUESTIONS (style reference), and
 # - a CONTEXT subgraph (2 connected nodes with properties + relationships),
 
+# ## Goal
 # generate 5 concise, natural analyst-style questions that a human would realistically ask.
 
 # ## PolyG-style Categorization
 # Treat each question as a triple ⟨s, p, o⟩ and classify by what is unknown:
-# - ⟨s,*,*⟩ — general exploration of the first node
 # - ⟨s,p,*⟩ — focus on a known predicate
 # - ⟨s,*,o⟩ — relation discovery between known nodes
 # - ⟨s,p,o⟩ — verification of a known predicate between two nodes
 
 # Subject (s): always the FIRST node in the provided context.
-# Predicate (p): a relationship type from the schema, if used.
+# Predicate (p): a relationship type from the terminology, if used.
 # Object (o): the second node.
 
 # ## Style & Constraints
@@ -88,20 +150,25 @@ llm = ChatOllama(
 # {
 #     "question": "string",
 #     "type": "<s,p,*>|<s,*,o>|<s,p,o>",
-#     "first_node": "label/type of first node",
+#     "first_node": "name/label of first node",
 #     "used_properties_of_first_node": ["list"],
 #     "relationship": "relationship name or null",
-#     "second_node": "label/type of second node or null",
-#     "used_properties_of_second_node": ["list"]
+#     "second_node": "name/label of second node or null",
+#     "used_properties_of_second_node": ["list"],
+#     "context": "the context"
 # }
 
 # ---
 
-# ## SCHEMA
-# {schema}
+# ## TERMINOLOGY
+# {terminology}
 
-# ## EXAMPLE QUESTIONS
+# ---
+
+# ## EXAMPLE QUESTIONS (style reference)
 # {questions}
+
+# ---
 
 # ## CONTEXT
 # {context}
@@ -109,33 +176,29 @@ llm = ChatOllama(
 
 # Prompt for 2-hop questions
 prompt = PromptTemplate(
-    input_variables=['context', 'schema', 'questions'],
+    input_variables=['context', 'terminology', 'questions'],
     template="""
 You are an experienced cybersecurity analyst generating high-quality, reasoning-based questions 
-from a knowledge graph (CVE, CWE, CAPEC, ATT&CK, Mitigations, CPE, Groups, Campaigns, Software, Vulnerabilities).
+from a knowledge graph.
+
+Given:
+- a graph TERMINOLOGY,
+- EXAMPLE QUESTIONS (style reference), and
+- a CONTEXT subgraph summary (3 connected nodes with properties + 2 relationships),
 
 ## Goal
-Given:
-- a graph SCHEMA,
-- EXAMPLE QUESTIONS (style reference), and
-- a CONTEXT subgraph (3 connected nodes with properties + 2 relationships),
-
 generate 5 concise, natural analyst-style questions that a human would realistically ask.
-
-The structure of the context is:
-Node1 —(Rel1)— Node2 —(Rel2)— Node3
 
 ---
 
 ## PolyG-style Categorization
 Treat each question as a triple ⟨s, p, o⟩ and classify by what is unknown:
-- ⟨s,*,*⟩ — general exploration of the first node
 - ⟨s,p,*⟩ — focus on a known predicate
 - ⟨s,*,o⟩ — relation discovery between known nodes
 - ⟨s,p,o⟩ — verification of a known predicate between two nodes
 
 **Subject (s)**: always the FIRST node in the context.  
-**Predicate (p)**: one or both relationship types from the schema, if used (Rel1, Rel2).  
+**Predicate (p)**: one or both relationship types from the terminology, if used (Rel1, Rel2).  
 **Object (o)**: the FINAL node (node3).
 
 ---
@@ -162,24 +225,25 @@ Each object must include:
 {
     "question": "string",
     "type": "<s,p,*>|<s,*,o>|<s,p,o>",
-    "first_node": "label/type of first node",
+    "first_node": "name/label of first node",
     "used_properties_of_first_node": ["list"],
     "relationship_1": "name of first relationship",
-    "second_node": "label/type of second node",
+    "second_node": "name/label of second node",
     "used_properties_of_second_node": ["list"],
     "relationship_2": "name of second relationship",
-    "third_node": "label/type of third node",
-    "used_properties_of_third_node": ["list"]
+    "third_node": "name/label of third node",
+    "used_properties_of_third_node": ["list"],
+    "context": "the context"
 }
 
 ---
 
-## SCHEMA
-{schema}
+## TERMINOLOGY
+{terminology}
 
 ---
 
-## EXAMPLE QUESTIONS
+## EXAMPLE QUESTIONS (style reference)
 {questions}
 
 ---
@@ -190,6 +254,6 @@ Each object must include:
 
 # Generate questions
 chain = LLMChain(llm = llm, prompt = prompt)
-responses = chain.invoke(context = context, schema = schema, questions = questions)
+responses = chain.invoke(context = context, terminology = terminology, questions = questions)
 
 print(responses)
