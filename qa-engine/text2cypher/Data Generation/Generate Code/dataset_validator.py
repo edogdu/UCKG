@@ -126,8 +126,9 @@ class DatasetValidator:
 
     # Helper function to count hops
     def _count_hops(self, cypher_query: str) -> int:
-        """Counts the number of relationship traversals '-->' or '<--' in a query."""
-        return len(re.findall(r'-->|<--', cypher_query))
+        """Counts the number of relationship traversals '->', '<-', or '-[]-' in a query."""
+        # return len(re.findall(r'->|<-|-\[\]-', cypher_query))
+        return len(re.findall(r'-\[[^\]]*\]-', cypher_query))
 
     # Helper function to extract literal values
     def _extract_literal_values_from_query(self, cypher_query: str) -> list:
