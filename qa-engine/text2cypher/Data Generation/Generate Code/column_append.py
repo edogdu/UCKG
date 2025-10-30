@@ -3,8 +3,8 @@ from pathlib import Path
 import re
 
 # === CONFIG ===
-input_text_file = Path(r"C:\Users\User\Downloads\UCKG\qa-engine\text2cypher\backend\Data Generation\Dataset Generation Process\column_append.txt")
-target_csv_file = Path(r"C:\Users\User\Downloads\UCKG\qa-engine\text2cypher\backend\Data Generation\Dataset Generation Process\technical dataset\technical_dataset_gen_question.csv")
+input_text_file = Path(r"C:\Users\User\Downloads\UCKG\qa-engine\text2cypher\Data Generation\Dataset Generation Process\column_append.txt")
+target_csv_file = Path(r"C:\Users\User\Downloads\UCKG\qa-engine\text2cypher\Data Generation\Dataset Generation Process\technical dataset\technical_dataset_gen_question.csv")
 
 # === STEP 1: Read, clean, and overwrite input file with one question per line ===
 text = input_text_file.read_text(encoding="utf-8")

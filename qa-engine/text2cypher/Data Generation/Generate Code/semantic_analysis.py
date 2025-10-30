@@ -3,7 +3,7 @@ from pathlib import Path
 import statistics
 
 # === CONFIG ===
-input_file = Path(r"C:\Users\User\Downloads\UCKG\qa-engine\text2cypher\backend\validation_log\question_cypher_relevance.txt")
+input_file = Path(r"C:\Users\User\Downloads\UCKG\qa-engine\text2cypher\Data Generation\validation_log\main dataset logs\question_cypher_relevance.txt")
 
 # === READ FILE ===
 text = input_file.read_text(encoding="utf-8")
@@ -75,7 +75,7 @@ report_lines = [
 ]
 
 # === WRITE TO .TXT FILE ===
-output_txt = input_file.with_name(input_file.stem + "_summary.txt")
+output_txt = input_file.with_name(input_file.stem + "_adjusted_summary.txt")
 output_txt.write_text("\n".join(report_lines), encoding="utf-8")
 
 print(f"✅ Summary saved to: {output_txt}")

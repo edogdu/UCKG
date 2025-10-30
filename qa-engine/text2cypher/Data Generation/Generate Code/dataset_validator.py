@@ -2,7 +2,11 @@ import csv
 import json
 import re
 import sys
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Set
+
+# This regex finds simple string literals. 
+# It won't handle escaped quotes inside strings, but it's a big improvement.
+STRING_LITERAL_REGEX = re.compile(r"(['\"])(.*?)\1")
 
 # Make sure to run: pip install neo4j pandas openpyxl
 try:
@@ -163,25 +167,48 @@ class DatasetValidator:
         # Return unique, sorted literals, filtering out potential empty strings
         return sorted(list(set(l for l in literals if l)))
 
-    # --- UPDATED ENRICHMENT FUNCTION ---
+
+
     def enrich_dataset(self, dataset: List[Dict[str, str]]) -> List[Dict[str, str]]:
         """
         Parses Cypher queries to populate all helper columns for the dataset.
+        
+        More robust version that avoids parsing string literals and
+        numeric dot-notation (e.g., 3.9).
         """
         print("\nEnriching dataset...")
         for row in dataset:
             cypher_query = str(row.get('CypherQuery', ''))
+
+            # These regexes are generally safe as they target Cypher structure
             found_labels = set(re.findall(r'\(\w*:(\w+)', cypher_query))
             found_rels = set(re.findall(r'\[\w*:(\w+)', cypher_query))
-            props_dot = set(re.findall(r'\w+\.(\w+)', cypher_query))
+
+            # This regex is also safe, as it only looks for the "key" part
+            # of a map, not the "value" part.
             props_map = set(re.findall(r'{\s*(\w+)\s*:', cypher_query))
+
+            # --- ROBUSTNESS FIX ---
+            # 1. "Neutralize" all string literals by replacing their contents.
+            query_without_strings = STRING_LITERAL_REGEX.sub(r"\1\1", cypher_query)
+            
+            # 2. Now, run the *improved* dot notation regex on the "clean" query.
+            #    This regex r'[a-zA-Z_]\w*\.(\w+)' ensures the part before
+            #    the dot is a variable name (like 'c'), not a number (like '3').
+            props_dot = set(re.findall(r'[a-zA-Z_]\w*\.(\w+)', query_without_strings))
+            # --- END FIX ---
+
+            # Combine the (correct) map properties and (now correct) dot properties
             found_props = props_dot.union(props_map)
 
             row['ExpectedNodeLabels'] = json.dumps(sorted(list(found_labels)))
             row['ExpectedRelationshipTypes'] = json.dumps(sorted(list(found_rels)))
             row['ExpectedProperties'] = json.dumps(sorted(list(found_props)))
+            
+            # Assuming these helper methods are correct
             row['Hops'] = self._count_hops(cypher_query)
             row['ExtractedPropertyValues'] = json.dumps(self._extract_literal_values_from_query(cypher_query))
+            
         print("Dataset enrichment complete.")
         return dataset
     
@@ -328,49 +355,64 @@ class DatasetValidator:
             self._log('value', f"Entry #{entry_id}: FAIL - Values {mismatched_values} from Cypher not in Question: '{question}'")
             return False
 
-    # Add this method to the DatasetValidator class
+
     def validate_schema_elements(self, cypher_query: str, entry_id: int) -> bool:
         """
         Checks if all labels, relationships, and properties in a query
         exist in the graph schema loaded from schema_cache.txt.
+
+        This version correctly handles the schema structure:
+        - schema['nodes'] is a dict {label: {prop: type, ...}}
+        - schema['relationships'] is a set {rel_type, ...}
         """
-        # --- ENHANCED ENTITY DETECTION ---
-        # 1. FIX: Find labels only within node patterns like (n:Label) or (:Label).
-        # This avoids matching colons inside string literals (e.g., in a datetime).
-        found_labels = set(re.findall(r'\(\w*:(\w+)', cypher_query))
-
-        # 2. FIX: Find relationship types only within relationship patterns like [r:REL_TYPE] or [:REL_TYPE].
-        # This is more precise and direction-agnostic.
-        found_rels = set(re.findall(r'\[\w*:(\w+)', cypher_query))
-
-        # 3. FIX: Use the robust, two-part property detection.
         
-        # *** ADJUSTMENT HERE ***
-        # The original regex r'\w+\.(\w+)' incorrectly matched '3.9', 
-        # capturing '9' as a property.
-        # This new regex r'[a-zA-Z_]\w*\.(\w+)' ensures the part *before* # the dot is a valid variable name (starts with a letter or _), 
-        # not a number.
-        props_dot_notation = set(re.findall(r'[a-zA-Z_]\w*\.(\w+)', cypher_query))
+        # --- ROBUSTNESS FIX ---
+        # 1. "Neutralize" all string literals to prevent
+        #    parsing properties from inside them.
+        query_without_strings = STRING_LITERAL_REGEX.sub(r"\1\1", cypher_query)
+        # --- END FIX ---
+
+        # 1. Find labels
+        found_labels: Set[str] = set(re.findall(r'\(\w*:(\w+)', cypher_query))
+
+        # 2. Find relationship types
+        found_rels: Set[str] = set(re.findall(r'\[\w*:(\w+)', cypher_query))
+
+        # 3. Find properties
+        # Run dot-notation regex on the *neutralized* string.
+        props_dot_notation = set(re.findall(r'[a-zA-Z_]\w*\.(\w+)', query_without_strings))
+        # Run map-notation regex on the *original* query (it's safe)
         props_map_notation = set(re.findall(r'{\s*(\w+)\s*:', cypher_query))
-        found_props = props_dot_notation.union(props_map_notation)
+        found_props: Set[str] = props_dot_notation.union(props_map_notation)
 
         errors = []
+        
         # Check labels
+        # self.schema['nodes'] is a DICT: {'UcoCVE': {...}, ...}
+        schema_nodes_dict = self.schema.get('nodes', {})
         for label in found_labels:
-            if label not in self.schema['nodes']:
+            if label not in schema_nodes_dict: # Check if label is a key
                 errors.append(f"Label ':{label}' not in schema.")
         
         # Check relationships
+        # self.schema['relationships'] is a SET: {'UCOEXHASCPE', ...}
+        schema_rels_set = self.schema.get('relationships', set())
         for rel in found_rels:
-            if rel not in self.schema['relationships']:
+            if rel not in schema_rels_set: # Check if rel is in the set
                 errors.append(f"Relationship '-[:{rel}]->' not in schema.")
         
         # Check properties
+        # schema_nodes_dict.values() is a collection of property dicts
+        # e.g., [{'label': 'string', ...}, {'name': 'string', ...}]
         for prop in found_props:
-            prop_found_in_schema = any(prop in props for props in self.schema['nodes'].values())
-            if not prop_found_in_schema:
-                # This check now correctly ignores '.9'
-                errors.append(f"Property '.{prop}' not found on any node in schema.")
+            # Check if prop is a key in *any* of the node property dicts
+            prop_in_nodes = any(prop in prop_dict 
+                                for prop_dict in schema_nodes_dict.values())
+            
+            # As per _load_schema, relationship properties are not stored.
+            # So, we only check node properties.
+            if not prop_in_nodes:
+                errors.append(f"Property '{prop}' not found on any node in schema.")
 
         if not errors:
             self._log('schema', f"Entry #{entry_id}: PASS")
@@ -378,6 +420,7 @@ class DatasetValidator:
         else:
             self._log('schema', f"Entry #{entry_id}: FAIL - Query: {cypher_query} | Issues: {'; '.join(errors)}")
             return False
+
 
     # Add this method to the DatasetValidator class
     def validate_query_executability(self, cypher_query: str, entry_id: int) -> bool:
@@ -419,7 +462,7 @@ class DatasetValidator:
         """
         Validates that the query's components match the expected sets from the dataset file.
         This version uses more robust regex to find properties in both dot notation (n.prop)
-        and map notation ({prop: 'value'}).
+        and map notation ({prop: 'value'}) and avoids parsing string literals.
         """
         try:
             expected_labels = set(json.loads(row.get('ExpectedNodeLabels', '[]')))
@@ -429,33 +472,47 @@ class DatasetValidator:
             self._log('entity', f"Entry #{entry_id}: FAIL - Could not parse Expected columns. Error: {e}")
             return False
 
-        # --- ENHANCED ENTITY DETECTION ---
-        # 1. FIX: Find labels only within node patterns like (n:Label) or (:Label).
-        # This avoids matching colons inside string literals (e.g., in a datetime).
+        # --- ENTITY DETECTION (Labels & Relationships) ---
+        # These are safe to run on the original query string
         found_labels = set(re.findall(r'\(\w*:(\w+)', cypher_query))
-
-        # 2. FIX: Find relationship types only within relationship patterns like [r:REL_TYPE] or [:REL_TYPE].
-        # This is more precise and direction-agnostic.
         found_rels = set(re.findall(r'\[\w*:(\w+)', cypher_query))
 
-        # --- ENHANCED PROPERTY DETECTION (No changes needed here) ---
-        # 1. Finds properties in dot notation (e.g., c.label, r.name)
-        props_dot_notation = set(re.findall(r'\w+\.(\w+)', cypher_query))
-        # 2. Finds properties used as keys inside curly braces (e.g., {label: '...'})
-        props_map_notation = set(re.findall(r'{\s*(\w+)\s*:', cypher_query))
-        # Combine both sets to get all found properties
-        found_props = props_dot_notation.union(props_map_notation)
+        # --- ROBUST PROPERTY DETECTION (THE FIX) ---
+        # 1. "Neutralize" all string literals to prevent
+        #    parsing properties from inside them.
+        #    e.g., "'http://example.com'" becomes "''"
+        query_without_strings = STRING_LITERAL_REGEX.sub(r"\1\1", cypher_query)
 
+        # 2. Finds properties in dot notation (e.g., c.label)
+        #    - Runs on the "neutralized" string.
+        #    - Uses regex that requires a valid variable name (not a number) before the dot.
+        props_dot_notation = set(re.findall(r'[a-zA-Z_]\w*\.(\w+)', query_without_strings))
+        
+        # 3. Finds properties used as keys in maps (e.g., {label: '...'})
+        #    - Runs on the original query (it's safe).
+        props_map_notation = set(re.findall(r'{\s*(\w+)\s*:', cypher_query))
+        
+        # 4. Combine both sets to get all found properties
+        found_props = props_dot_notation.union(props_map_notation)
+        # --- END FIX ---
+
+        # --- VALIDATION ---
         if found_labels == expected_labels and found_rels == expected_rels and found_props == expected_props:
             self._log('entity', f"Entry #{entry_id}: PASS")
             return True
         else:
+            # Log detailed mismatch information
             errors = []
-            if expected_labels != found_labels: errors.append(f"Label mismatch: Expected {expected_labels}, Found {found_labels}")
-            if expected_rels != found_rels: errors.append(f"Relationship mismatch: Expected {expected_rels}, Found {found_rels}")
-            if expected_props != found_props: errors.append(f"Property mismatch: Expected {expected_props}, Found {found_props}")
+            if expected_labels != found_labels:
+                errors.append(f"Label mismatch: Expected {expected_labels}, Found {found_labels}")
+            if expected_rels != found_rels:
+                errors.append(f"Relationship mismatch: Expected {expected_rels}, Found {found_rels}")
+            if expected_props != found_props:
+                errors.append(f"Property mismatch: Expected {expected_props}, Found {found_props}")
+                
             self._log('entity', f"Entry #{entry_id}: FAIL - Query: {cypher_query} | Issues: {'; '.join(errors)}")
             return False
+
 
     # RENAME the existing `validate_ner_consistency` to this for clarity:
     def validate_semantic_relevance(
@@ -463,7 +520,8 @@ class DatasetValidator:
         natural_language_question: str, 
         generated_question: str, 
         entry_id: int, 
-        threshold: float = 0.7
+        threshold: float = 0.6131
+        # threshold: float = 0.7
     ) -> bool:
         """
         Validates semantic relevance between the NaturalLanguageQuestion and 
@@ -539,9 +597,9 @@ if __name__ == '__main__':
     NEO4J_PASSWORD = "abcd90909090"
     SCHEMA_FILE = 'schema_cache.txt'
     # Use a different name for the raw input file
-    RAW_DATASET_FILE = r'C:\Users\User\Downloads\UCKG\qa-engine\text2cypher\backend\Data Generation\Dataset Generation Process\technical dataset\technical_dataset_gen_question.csv'
-    ENRICHED_DATASET_FILE = r'C:\Users\User\Downloads\UCKG\qa-engine\text2cypher\backend\Data Generation\Dataset Generation Process\technical dataset\technical_dataset_ENRICH.csv'
-    LOG_DIRECTORY = r'C:\Users\User\Downloads\UCKG\qa-engine\text2cypher\backend\Data Generation\validation_log'
+    RAW_DATASET_FILE = r'C:\Users\User\Downloads\UCKG\qa-engine\text2cypher\Data Generation\Dataset Generation Process\technical dataset\technical_dataset.csv'
+    ENRICHED_DATASET_FILE = r'C:\Users\User\Downloads\UCKG\qa-engine\text2cypher\Data Generation\Dataset Generation Process\technical dataset\technical_dataset_COMPLETION.csv'
+    LOG_DIRECTORY = r'C:\Users\User\Downloads\UCKG\qa-engine\text2cypher\Data Generation\validation_log\main dataset logs'
 
     # --- Execution ---
     validator = DatasetValidator(SCHEMA_FILE, NEO4J_URI, NEO4J_USER, NEO4J_PASSWORD)

@@ -1,0 +1,23 @@
+{
+  "identity": 805,
+  "labels": [
+    "Resource",
+    "UcoCWE"
+  ],
+  "properties": {
+    "ucostructure": "Simple",
+    "ucomodesOfIntroduction": "{introduction=[{"Phase":"Implementation"}]}",
+    "ucocweName": "Path Traversal: '../filedir'",
+    "ucocweID": "CWE-24",
+    "ucostatus": "Incomplete",
+    "ucomappingNotes": "{usage=Allowed, rationale=This CWE entry is at the Variant level of abstraction, which is a preferred level of abstraction for mapping to the root causes of vulnerabilities., comments=Carefully read both the name and description to ensure that this mapping is an appropriate fit. Do not try to 'force' a mapping to a lower-level Base/Variant simply to comply with this preferred level of abstraction., reason=[{"Type":"Acceptable-Use"}]}",
+    "ucoabstraction": "Variant",
+    "ucocommonConsequences": "{consequence=[{"Scope":["Confidentiality","Integrity"],"Impact":["Read Files or Directories","Modify Files or Directories"]}]}",
+    "ucoapplicablePlatform": "{Language=[{"Class":"Not Language-Specific","Prevalence":"Undetermined"}]}",
+    "ucocweExtendedSummary": "This allows attackers to traverse the file system to access files or directories that are outside of the restricted directory.
+    "ucotimeOfIntroduction": "2006-07-19T00:00:00",
+    "ucopotentialMitigations": "{mitigation=[{"Phase":"Implementation","Description":"Assume all input is malicious. Use an \"accept known good\" input validation strategy, i.e., use a list of acceptable inputs that strictly conform to specifications. Reject any input that does not strictly conform to specifications, or transform it into something that does.},{"Phase":"Implementation","Description":"Inputs should be decoded and canonicalized to the application's current internal representation before being validated (CWE-180)."}]}",
+    "ucocweSummary": "The product uses external input to construct a pathname that should be within a restricted directory, but it does not properly neutralize "../" sequences that can resolve to a location that is outside of that directory.",
+    "ucodescription": "The product uses external input to construct a pathname that should be within a restricted directory, but it does not properly neutralize "../" sequences that can resolve to a location that is outside of that directory."
+  }
+}

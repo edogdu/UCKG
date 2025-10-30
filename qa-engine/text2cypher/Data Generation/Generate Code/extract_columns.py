@@ -2,11 +2,13 @@ import csv
 from pathlib import Path
 
 # === CONFIG ===
-input_csv_file = Path(r"C:\Users\User\Downloads\UCKG\qa-engine\text2cypher\backend\Data Generation\Dataset Generation Process\technical dataset\technical_dataset_COMPLETION.csv")
-output_csv_file = Path(r"C:\Users\User\Downloads\UCKG\qa-engine\text2cypher\backend\Data Generation\Dataset Generation Process\technical dataset\technical_dataset.csv")
+input_csv_file = Path(r"C:\Users\User\Downloads\UCKG\qa-engine\text2cypher\Data Generation\Generate Code\category_coverage_results.csv")
+output_csv_file = Path(r"C:\Users\User\Downloads\UCKG\qa-engine\text2cypher\Data Generation\Dataset Generation Process\technical dataset\technical_dataset_category_COVERAGE.csv")
 
 # Columns you want to keep — just adjust this list later as needed
-columns_to_keep = ["Category", "NaturalLanguageQuestion", "CypherQuery", "generated_question"]
+# columns_to_keep = ["Category", "NaturalLanguageQuestion", "CypherQuery", "generated_question"]
+
+columns_to_keep = ["Category", "LabelsMissing", "RelationshipsMissing", "PropertiesMissing"]
 
 # === STEP 1: Read input CSV ===
 with input_csv_file.open("r", encoding="utf-8", newline="") as csvfile:

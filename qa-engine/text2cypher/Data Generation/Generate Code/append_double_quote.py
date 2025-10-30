@@ -3,8 +3,8 @@ import os
 from pathlib import Path
 
 # === CONFIGURATION ===
-input_file = Path(r"C:\Users\User\Downloads\UCKG\qa-engine\text2cypher\backend\dataset\neo4j_evaluation_dataset.csv")   # Change to your actual file path
-output_file = Path(r"C:\Users\User\Downloads\UCKG\qa-engine\text2cypher\backend\dataset\neo4j_appending_evaluation_dataset.csv")
+input_file = Path(r"C:\Users\User\Downloads\UCKG\qa-engine\text2cypher\Data Generation\Dataset Generation Process\technical dataset\technical_dataset_dummy.csv")   # Change to your actual file path
+output_file = Path(r"C:\Users\User\Downloads\UCKG\qa-engine\text2cypher\Data Generation\Dataset Generation Process\technical dataset\technical_dataset_dummy_double_quote.csv")
 
 # === Process file ===
 with input_file.open("r", encoding="utf-8", newline="") as inf, \
