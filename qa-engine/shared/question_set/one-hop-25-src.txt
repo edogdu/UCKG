@@ -1,0 +1,287 @@
+MATCH (a)-[r]->(b) WHERE id(a)=866 AND id(b)=1171 RETURN a,r,b
+[
+    {
+        "node1": {
+            "ucocweName": "Improper Handling of Windows Device Names",
+            "uri": "http://purl.org/cyber/uco#CWE-67",
+            "ucocweExtendedSummary": "Not properly handling virtual filenames (e.g. AUX, CON, PRN, COM1, LPT1) can result in different types of vulnerabilities. In some cases an attacker can request a device via injection of a virtual filename in a URL, which may cause an error that leads to a denial of service or an error page that reveals sensitive information. A product that allows device names to bypass filtering runs the risk of an attacker injecting malicious code in a file with the name of a device.",
+            "ucocweSummary": "The product constructs pathnames from user input, but it does not handle or incorrectly handles a pathname containing a Windows device name such as AUX or CON. This typically leads to denial of service or an information exposure when the application attempts to process the pathname as a regular file.",
+            "labels": [
+                "Resource",
+                "UcoCWE"
+            ]
+        },
+        "node2": {
+            "ucoexDESCRIPTION": "Server allows remote attackers to cause a denial of service via an HTTP request for an MS-DOS device name.",
+            "uri": "http://example.com/ucoex#CWE-67-CVE-2002-0200",
+            "labels": [
+                "Resource",
+                "UcoexObservedExample"
+            ]
+        },
+        "relationships": [
+            {
+                "type": "UCOHASOBSERVEDEXAMPLE"
+            }
+        ]
+    }
+]
+
+UcoCWE: Common Weakness Enumeration - software weakness types and categories (e.g., CWE-79 for XSS)
+UcoexObservedExample: Real-world examples of vulnerabilities and attacks being observed
+UCOHASOBSERVEDEXAMPLE: Weakness has real-world observed examples - connects CWEs to observed examples
+
+MATCH (a)-[r]->(b) WHERE id(a)=840 AND id(b)=394 RETURN a,r,b
+[
+    {
+        "node1": {
+            "ucocweName": "Path Traversal: '\\..\\filename'",
+            "uri": "http://purl.org/cyber/uco#CWE-29",
+            "ucocweExtendedSummary": "This allows attackers to traverse the file system to access files or directories that are outside of the restricted directory.\nThis is similar to CWE-25, except using \"\\\" instead of \"/\". Sometimes a program checks for \"..\\\" at the beginning of the input, so a \"\\..\\\" can bypass that check. It is also useful for bypassing path traversal protection schemes that only assume that the \"/\" separator is valid.",
+            "ucocweSummary": "The product uses external input to construct a pathname that should be within a restricted directory, but it does not properly neutralize '\\..\\filename' (leading backslash dot dot) sequences that can resolve to a location that is outside of that directory.",
+            "labels": [
+                "Resource",
+                "UcoCWE"
+            ]
+        },
+        "node2": {
+            "ucoexDESCRIPTION": "Protection mechanism checks for \"/..\" but doesn't account for Windows-specific \"\\..\" allowing read of arbitrary files.",
+            "uri": "http://example.com/ucoex#CWE-29-CVE-2002-1987",
+            "labels": [
+                "Resource",
+                "UcoexObservedExample"
+            ]
+        },
+        "relationships": [
+            {
+                "type": "UCOHASOBSERVEDEXAMPLE"
+            }
+        ]
+    }
+]
+
+UcoCWE: Common Weakness Enumeration - software weakness types and categories (e.g., CWE-79 for XSS)
+UcoexObservedExample: Real-world examples of vulnerabilities and attacks being observed
+UCOHASOBSERVEDEXAMPLE: Weakness has real-world observed examples - connects CWEs to observed examples
+
+
+MATCH (a)-[r]->(b) WHERE id(a)=773000 AND id(b)=6109 RETURN a,r,b
+[
+    {
+        "node1": {
+            "label": "CAPEC-699: Eavesdropping on a Monitor",
+            "ucoexDescription": "An Adversary can eavesdrop on the content of an external monitor through the air without modifying any cable or installing software, just capturing this signal emitted by the cable or video port, with this the attacker will be able to impact the confidentiality of the data without being detected by traditional security tools",
+            "uri": "https://capec.mitre.org/data/definitions/699.html",
+            "labels": [
+                "UcoexCAPEC",
+                "Resource"
+            ]
+        },
+        "node2": {
+            "ucocweName": "Improper Protection of Physical Side Channels",
+            "uri": "http://purl.org/cyber/uco#CWE-1300",
+            "ucocweExtendedSummary": "An adversary could monitor and measure physical\nphenomena to detect patterns and make inferences, even if it\nis not possible to extract the information in the digital\ndomain.\nPhysical side channels have been well-studied for\ndecades in the context of breaking implementations of\ncryptographic algorithms or other attacks against security\nfeatures. These side channels may be easily observed by an\nadversary with physical access to the device, or using a\ntool that is in close proximity. If the adversary can\nmonitor hardware operation and correlate its data processing\nwith power, EME, and acoustic measurements, the adversary\nmight be able to recover of secret keys and data.",
+            "ucocweSummary": "The device does not contain sufficient protection\nmechanisms to prevent physical side channels from exposing\nsensitive information due to patterns in physically observable\nphenomena such as variations in power consumption,\nelectromagnetic emissions (EME), or acoustic emissions.",
+            "labels": [
+                "Resource",
+                "UcoCWE"
+            ]
+        },
+        "relationships": [
+            {
+                "type": "UCOEXHASRELATEDWEAKNESS"
+            }
+        ]
+    }
+]
+
+UcoCWE: Common Weakness Enumeration - software weakness types and categories (e.g., CWE-79 for XSS)
+UcoexCAPEC: Common Attack Pattern Enumeration and Classification - attack patterns and techniques used by adversaries
+UCOEXHASRELATEDWEAKNESS: Attack pattern exploits specific weakness - connects CAPECs to CWEs
+
+
+
+MATCH (a)-[r]->(b) WHERE id(a)=772998 AND id(b)=1954 RETURN a,r,b
+[
+    {
+        "node1": {
+            "label": "CAPEC-481: Contradictory Destinations in Traffic Routing Schemes",
+            "ucoexDescription": "Adversaries can provide contradictory destinations when sending messages. Traffic is routed in networks using the domain names in various headers available at different levels of the OSI model. In a Content Delivery Network (CDN) multiple domains might be available, and if there are contradictory domain names provided it is possible to route traffic to an inappropriate destination. The technique, called Domain Fronting, involves using different domain names in the SNI field of the TLS header and the Host field of the HTTP header. An alternative technique, called Domainless Fronting, is similar, but the SNI field is left blank.",
+            "uri": "https://capec.mitre.org/data/definitions/481.html",
+            "labels": [
+                "Resource",
+                "UcoexCAPEC"
+            ]
+        },
+        "node2": {
+            "ucocweName": "Improper Restriction of Communication Channel to Intended Endpoints",
+            "uri": "http://purl.org/cyber/uco#CWE-923",
+            "ucocweExtendedSummary": "Attackers might be able to spoof the intended endpoint from a different system or process, thus gaining the same level of access as the intended endpoint.\nWhile this issue frequently involves authentication between network-based clients and servers, other types of communication channels and endpoints can have this weakness.",
+            "ucocweSummary": "The product establishes a communication channel to (or from) an endpoint for privileged or protected operations, but it does not properly ensure that it is communicating with the correct endpoint.",
+            "labels": [
+                "UcoCWE",
+                "Resource"
+            ]
+        },
+        "relationships": [
+            {
+                "type": "UCOEXHASRELATEDWEAKNESS"
+            }
+        ]
+    }
+]
+UcoCWE: Common Weakness Enumeration - software weakness types and categories (e.g., CWE-79 for XSS)
+UcoexCAPEC: Common Attack Pattern Enumeration and Classification - attack patterns and techniques used by adversaries
+UCOEXHASRELATEDWEAKNESS: Attack pattern exploits specific weakness - connects CAPECs to CWEs
+
+
+
+
+
+MATCH (a)-[r]->(b) WHERE id(a)=7381 AND id(b)=10037 RETURN a,r,b
+[
+    {
+        "node1": {
+            "ucosummary": "Buffer overflow in krb_rd_req function in Kerberos 4 and 5 allows remote attackers to gain root privileges.",
+            "uri": "http://purl.org/cyber/uco#VULN-CVE-2000-0389",
+            "labels": [
+                "Resource",
+                "UcoVulnerability"
+            ]
+        },
+        "node2": {
+            "ucobaseSeverity": "HIGH",
+            "label": "CVE-2000-0389",
+            "uri": "http://purl.org/cyber/uco#CVE-2000-0389",
+            "labels": [
+                "Resource",
+                "UcoCVE"
+            ]
+        },
+        "relationships": [
+            {
+                "type": "UCOHASCVE_ID"
+            }
+        ]
+    }
+]
+
+UcoCVE: Common Vulnerabilities and Exposures - security vulnerabilities with unique identifiers (e.g., CVE-2023-1234)
+UcoVulnerability: Generic vulnerability information with publication and modification dates
+UCOHASCVE_ID: Vulnerability has specific CVE identifier - connects vulnerabilities to CVEs
+
+
+
+MATCH (a)-[r]->(b) WHERE id(a)=770454 AND id(b)=770509 RETURN a,r,b
+[
+    {
+        "node1": {
+            "ucoexMITRED3FEND_DEFINITION": "A file created for the purposes of deceiving an adversary.",
+            "ucoexMITRED3FEND_LABEL": "Decoy File",
+            "uri": "http://example.com/ucoex#d3f%3ADecoyFile",
+            "labels": [
+                "UcoexMITRED3FEND",
+                "Resource"
+            ]
+        },
+        "node2": {
+            "ucoexDESCRIPTION": "Adversaries may use rootkits to hide the presence of programs, files, network connections, services, drivers, and other system components. Rootkits are programs that hide the existence of malware by intercepting/hooking and modifying operating system API calls that supply system information. (Citation: Symantec Windows Rootkits)\nRootkits or rootkit enabling functionality may reside at the user or kernel level in the operating system or lower, to include a hypervisor, Master Boot Record, or [System Firmware](https://attack.mitre.org/techniques/T1542/001). (Citation: Wikipedia Rootkit) Rootkits have been seen for Windows, Linux, and Mac OS X systems. (Citation: CrowdStrike Linux Rootkit) (Citation: BlackHat Mac OSX Rootkit)",
+            "ucoexDOMAIN": "enterprise-attack",
+            "uri": "http://example.com/ucoex#T1014",
+            "labels": [
+                "Resource",
+                "UcoexMITREATTACK"
+            ]
+        },
+        "relationships": [
+            {
+                "type": "UCOEXHASMITREATTACK"
+            }
+        ]
+    }
+]
+
+UcoexMITREATTACK: MITRE ATT&CK framework techniques, tactics, and procedures used by adversaries
+UcoexMITRED3FEND: MITRE D3FEND framework defensive techniques and countermeasures
+UCOEXHASMITREATTACK: D3FEND technique relates to specific MITRE technique - connects D3FEND to techniques
+
+
+
+
+
+
+
+
+
+
+MATCH (a)-[r]->(b) WHERE id(a)=770443 AND id(b)=770496 RETURN a,r,b
+[
+    {
+        "node1": {
+            "ucoexMITRED3FEND_DEFINITION": "The process of validating the consistency between a file's metadata and its actual content, ensuring that elements like declared lengths, pointers, and checksums accurately describe the file's content.",
+            "ucoexMITRED3FEND_LABEL": "File Metadata Consistency Validation",
+            "uri": "http://example.com/ucoex#d3f%3AFileMetadataConsistencyValidation",
+            "labels": [
+                "UcoexMITRED3FEND",
+                "Resource"
+            ]
+        },
+        "node2": {
+            "ucoexDESCRIPTION": "Adversaries may search local system sources, such as file systems, configuration files, local databases, or virtual machine files, to find files of interest and sensitive data prior to Exfiltration.\nAdversaries may do this using a [Command and Scripting Interpreter](https://attack.mitre.org/techniques/T1059), such as [cmd](https://attack.mitre.org/software/S0106) as well as a [Network Device CLI](https://attack.mitre.org/techniques/T1059/008), which have functionality to interact with the file system to gather information.(Citation: show_run_config_cmd_cisco) Adversaries may also use [Automated Collection](https://attack.mitre.org/techniques/T1119) on the local system.",
+            "ucoexDOMAIN": "enterprise-attack",
+            "uri": "http://example.com/ucoex#T1005",
+            "labels": [
+                "UcoexMITREATTACK",
+                "Resource"
+            ]
+        },
+        "relationships": [
+            {
+                "type": "UCOEXHASMITREATTACK"
+            }
+        ]
+    }
+]
+
+UcoexMITREATTACK: MITRE ATT&CK framework techniques, tactics, and procedures used by adversaries
+UcoexMITRED3FEND: MITRE D3FEND framework defensive techniques and countermeasures
+UCOEXHASMITREATTACK: D3FEND technique relates to specific MITRE technique - connects D3FEND to techniques
+
+
+
+
+MATCH (a)-[r]->(b) WHERE id(a)=772996 AND id(b)=6583 RETURN a,r,b
+[
+    {
+        "node1": {
+            "label": "CAPEC-16: Dictionary-based Password Attack",
+            "ucoexDescription": "An attacker tries each of the words in a dictionary as passwords to gain access to the system via some user's account. If the password chosen by the user was a word within the dictionary, this attack will be successful (in the absence of other mitigations). This is a specific instance of the password brute forcing attack pattern. Dictionary Attacks differ from similar attacks such as Password Spraying (CAPEC-565) and Credential Stuffing (CAPEC-600), since they leverage unknown username/password combinations and don't care about inducing account lockouts.",
+            "uri": "https://capec.mitre.org/data/definitions/16.html",
+            "labels": [
+                "UcoexCAPEC",
+                "Resource"
+            ]
+        },
+        "node2": {
+            "ucocweName": "Use of Password System for Primary Authentication",
+            "uri": "http://purl.org/cyber/uco#CWE-309",
+            "ucocweSummary": "The use of password systems as the primary means of authentication may be subject to several flaws or shortcomings, each reducing the effectiveness of the mechanism.",
+            "labels": [
+                "Resource",
+                "UcoCWE"
+            ]
+        },
+        "relationships": [
+            {
+                "type": "UCOEXHASRELATEDWEAKNESS"
+            }
+        ]
+    }
+]
+UcoCWE: Common Weakness Enumeration - software weakness types and categories (e.g., CWE-79 for XSS)
+UcoexCAPEC: Common Attack Pattern Enumeration and Classification - attack patterns and techniques used by adversaries
+UCOEXHASRELATEDWEAKNESS: Attack pattern exploits specific weakness - connects CAPECs to CWEs
+
+
+
+
