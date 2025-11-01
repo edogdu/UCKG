@@ -288,9 +288,9 @@ if __name__ == "__main__":
     
     # List of node tuples to process (can be 1, 2, or 3 nodes)
     node_groups = [
-        # ("782755",)  # 1 node
+        ("2318",)  # 1 node
         # ("783339", "812"),  # 2 nodes
-        ("3778", "782755", "6501"),  # 3 nodes
+        # ("3778", "782755", "6501"),  # 3 nodes
     ]
     
     # Save results to JSON file

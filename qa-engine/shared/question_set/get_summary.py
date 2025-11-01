@@ -67,10 +67,14 @@ of the single provided node that explains:
 - Do not go into any of the links in order to explain about the node.
 - Just summarize what is presented with the given set of properties.
 
+## Terminology
 {schema}
 
-## Node Data
+---
+## Node data
 {node_data}
+
+---
 
 ## Summary:
 """
@@ -119,15 +123,17 @@ that explains:
 
 ## Guidelines
 - Be concise and informative (3-4 sentences)
-- Explain the relationship naturally without using technical relationship names literally
+- Explain the relationship naturally with the terminology of the relationship names (e.g., "UCOEXHASRELATEDWEAKNESS" -> "has a related weakness")
 - Focus on the practical meaning of the connection
 - DO NOT mention property names or internal field names
 - Make it readable and insightful
 - Do not go into any of the links in order to explain about the node.
 - Just summarize what is presented with the given set of properties.
 
+## Terminology
 {schema}
 
+---
 ## First Node
 {node1_data}
 
@@ -136,6 +142,8 @@ that explains:
 
 ## Relationship Between Node 1 and Node 2
 {relationships}
+
+---
 
 ## Summary:
 """
@@ -188,6 +196,7 @@ generate a professional 4-5 sentence summary that explains:
 
 ## Guidelines
 - Be concise but comprehensive (4-5 sentences)
+- Explain the relationship naturally with the terminology of the relationship names (e.g., "UCOEXHASRELATEDWEAKNESS" -> "has a related weakness")
 - Tell a coherent story that flows through all three nodes
 - Explain how the relationships create a meaningful pattern
 - Focus on the "why" and "so what" for cybersecurity
@@ -196,8 +205,10 @@ generate a professional 4-5 sentence summary that explains:
 - Do not go into any of the links in order to explain about the node.
 - Just summarize what is presented with the given set of properties.
 
+## Terminology
 {schema}
 
+---
 ## Node 1 (Start)
 {node1_data}
 
@@ -207,9 +218,7 @@ generate a professional 4-5 sentence summary that explains:
 ## Node 3 (End)
 {node3_data}
 
-## Relationship Between Node 1 and Node 2
-The relationship(s) connecting the first node to the second node:
-{relationships}
+---
 
 Note: The relationships data structure contains:
 - "node1_to_node2": List of relationship types from Node 1 to Node 2
