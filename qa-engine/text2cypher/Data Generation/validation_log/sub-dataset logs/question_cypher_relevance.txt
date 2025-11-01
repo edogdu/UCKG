@@ -1,16 +1,17 @@
-Entry #1: PASS (Similarity: 0.7784)
-Entry #2: PASS (Similarity: 0.6808)
-Entry #3: PASS (Similarity: 0.8525)
-Entry #4: PASS (Similarity: 0.7986)
-Entry #5: PASS (Similarity: 0.7715)
-Entry #6: PASS (Similarity: 0.6817)
-Entry #7: FAIL - Similarity: 0.5055 is below threshold of 0.6131
-  - NL Question: 'Find software that uses MITRE ATT&CK techniques mapped from 'CAPEC-100: SQL Injection'.'
-  - Gen Question: 'Show me software (s) that uses a technique (a) which, in turn, is related to the 'SQL Injection' attack pattern (c). Return the distinct software and technique descriptions.'
-Entry #8: PASS (Similarity: 0.8292)
-Entry #9: PASS (Similarity: 0.6701)
-Entry #10: FAIL - Similarity: 0.4397 is below threshold of 0.6131
-  - NL Question: 'Which software has known MITRE ATT&CK techniques associated with it?'
-  - Gen Question: 'Show me all the software in our database that has one or more hacking techniques (MITRE ATT&CK) linked to it. Return the distinct software description and URI.'
-Entry #11: PASS (Similarity: 0.6524)
-Entry #12: PASS (Similarity: 0.8136)
+Entry #1: PASS (Similarity: 0.8964)
+Entry #2: PASS (Similarity: 0.6732)
+Entry #3: PASS (Similarity: 0.8054)
+Entry #4: PASS (Similarity: 0.7533)
+Entry #5: PASS (Similarity: 0.7352)
+Entry #6: PASS (Similarity: 0.8625)
+Entry #7: PASS (Similarity: 0.7966)
+Entry #8: PASS (Similarity: 0.8383)
+Entry #9: PASS (Similarity: 0.8962)
+Entry #10: PASS (Similarity: 0.9792)
+Entry #11: PASS (Similarity: 0.8664)
+Entry #12: PASS (Similarity: 0.8418)
+Entry #13: PASS (Similarity: 0.6671)
+Entry #14: PASS (Similarity: 0.6771)
+Entry #15: PASS (Similarity: 0.9323)
+Entry #16: PASS (Similarity: 0.8702)
+Entry #17: PASS (Similarity: 0.8497)

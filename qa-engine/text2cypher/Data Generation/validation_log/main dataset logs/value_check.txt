@@ -307,11 +307,11 @@ Entry #306: PASS
 Entry #307: PASS
 Entry #308: PASS
 Entry #309: PASS
-Entry #310: PASS
-Entry #311: PASS
-Entry #312: PASS - No literal values to check.
+Entry #310: PASS - No literal values to check.
+Entry #311: PASS - No literal values to check.
+Entry #312: PASS
 Entry #313: PASS - No literal values to check.
-Entry #314: PASS
+Entry #314: PASS - No literal values to check.
 Entry #315: PASS - No literal values to check.
 Entry #316: PASS - No literal values to check.
 Entry #317: PASS - No literal values to check.
@@ -320,29 +320,29 @@ Entry #319: PASS - No literal values to check.
 Entry #320: PASS - No literal values to check.
 Entry #321: PASS - No literal values to check.
 Entry #322: PASS - No literal values to check.
-Entry #323: PASS - No literal values to check.
+Entry #323: PASS
 Entry #324: PASS - No literal values to check.
-Entry #325: PASS
-Entry #326: PASS - No literal values to check.
-Entry #327: PASS - No literal values to check.
-Entry #328: PASS
-Entry #329: FAIL - Values ['2', '3', '4'] from Cypher not in Question: 'Rank CWEs by 'Likelihood of Exploit' (High, Medium, Low).'
-Entry #330: PASS - No literal values to check.
+Entry #325: PASS - No literal values to check.
+Entry #326: PASS
+Entry #327: FAIL - Values ['2', '3', '4'] from Cypher not in Question: 'Rank CWEs by 'Likelihood of Exploit' (High, Medium, Low).'
+Entry #328: PASS - No literal values to check.
+Entry #329: PASS - No literal values to check.
+Entry #330: PASS
 Entry #331: PASS - No literal values to check.
 Entry #332: PASS
-Entry #333: PASS - No literal values to check.
+Entry #333: FAIL - Values ['2', '3', '4', '5'] from Cypher not in Question: 'Rank CVEs by severity (CRITICAL, HIGH, MEDIUM, LOW).'
 Entry #334: PASS
-Entry #335: FAIL - Values ['2', '3', '4', '5'] from Cypher not in Question: 'Rank CVEs by severity (CRITICAL, HIGH, MEDIUM, LOW).'
+Entry #335: PASS - No literal values to check.
 Entry #336: PASS
 Entry #337: PASS - No literal values to check.
 Entry #338: PASS
-Entry #339: PASS - No literal values to check.
-Entry #340: PASS
+Entry #339: PASS
+Entry #340: PASS - No literal values to check.
 Entry #341: PASS
-Entry #342: PASS - No literal values to check.
+Entry #342: PASS
 Entry #343: PASS
-Entry #344: PASS
-Entry #345: PASS
+Entry #344: PASS - No literal values to check.
+Entry #345: PASS - No literal values to check.
 Entry #346: PASS - No literal values to check.
 Entry #347: PASS - No literal values to check.
 Entry #348: PASS - No literal values to check.
@@ -374,19 +374,19 @@ Entry #373: PASS - No literal values to check.
 Entry #374: PASS - No literal values to check.
 Entry #375: PASS - No literal values to check.
 Entry #376: PASS - No literal values to check.
-Entry #377: PASS - No literal values to check.
-Entry #378: PASS - No literal values to check.
+Entry #377: PASS
+Entry #378: PASS
 Entry #379: PASS
 Entry #380: PASS
 Entry #381: PASS
 Entry #382: PASS
-Entry #383: PASS
-Entry #384: PASS
-Entry #385: PASS - No literal values to check.
-Entry #386: PASS - No literal values to check.
+Entry #383: PASS - No literal values to check.
+Entry #384: PASS - No literal values to check.
+Entry #385: PASS
+Entry #386: PASS
 Entry #387: PASS
-Entry #388: PASS
-Entry #389: PASS
+Entry #388: PASS - No literal values to check.
+Entry #389: PASS - No literal values to check.
 Entry #390: PASS - No literal values to check.
 Entry #391: PASS - No literal values to check.
 Entry #392: PASS - No literal values to check.
@@ -394,37 +394,52 @@ Entry #393: PASS - No literal values to check.
 Entry #394: PASS - No literal values to check.
 Entry #395: PASS - No literal values to check.
 Entry #396: PASS - No literal values to check.
-Entry #397: PASS - No literal values to check.
-Entry #398: PASS - No literal values to check.
-Entry #399: PASS
-Entry #400: PASS
+Entry #397: PASS
+Entry #398: PASS
+Entry #399: PASS - No literal values to check.
+Entry #400: PASS - No literal values to check.
 Entry #401: PASS - No literal values to check.
-Entry #402: PASS - No literal values to check.
-Entry #403: PASS - No literal values to check.
+Entry #402: PASS
+Entry #403: PASS
 Entry #404: PASS
-Entry #405: PASS
+Entry #405: PASS - No literal values to check.
 Entry #406: PASS
-Entry #407: PASS - No literal values to check.
+Entry #407: PASS
 Entry #408: PASS
 Entry #409: PASS
 Entry #410: PASS
 Entry #411: PASS
 Entry #412: PASS
-Entry #413: PASS
+Entry #413: PASS - No literal values to check.
 Entry #414: PASS
 Entry #415: PASS - No literal values to check.
-Entry #416: PASS
-Entry #417: PASS - No literal values to check.
-Entry #418: PASS - No literal values to check.
+Entry #416: PASS - No literal values to check.
+Entry #417: PASS
+Entry #418: PASS
 Entry #419: PASS
 Entry #420: PASS
 Entry #421: PASS
 Entry #422: PASS
 Entry #423: PASS
-Entry #424: PASS
-Entry #425: PASS
+Entry #424: PASS - No literal values to check.
+Entry #425: PASS - No literal values to check.
 Entry #426: PASS - No literal values to check.
 Entry #427: PASS - No literal values to check.
-Entry #428: PASS - No literal values to check.
-Entry #429: PASS - No literal values to check.
-Entry #430: PASS
+Entry #428: PASS
+Entry #429: PASS
+Entry #430: PASS - No literal values to check.
+Entry #431: PASS
+Entry #432: PASS
+Entry #433: PASS
+Entry #434: PASS
+Entry #435: PASS
+Entry #436: PASS
+Entry #437: PASS
+Entry #438: PASS - No literal values to check.
+Entry #439: PASS
+Entry #440: PASS
+Entry #441: PASS - No literal values to check.
+Entry #442: PASS
+Entry #443: PASS
+Entry #444: PASS
+Entry #445: PASS

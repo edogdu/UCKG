@@ -1,407 +1,202 @@
 [
     {
-        "question": "How could a SOAP Array Overflow arise from weaknesses in buffer length handling within related systems?",
-        "type": "<s,,o>",
-        "first_node": "CAPEC-256: SOAP Array Overflow",
-        "used_properties_of_first_node": ["label", "ucoexDescription"],
-        "relationship": "UCOEXHASRELATEDWEAKNESS",
-        "second_node": "Buffer Access with Incorrect Length Value",
-        "used_properties_of_second_node": ["ucocweName", "ucocweSummary"]
-    },
-    {
-        "question": "What core programming error enables this SOAP Array Overflow to connect with a buffer length misuse issue?",
-        "type": "<s,p,o>",
-        "first_node": "CAPEC-256: SOAP Array Overflow",
-        "used_properties_of_first_node": ["label", "ucoexDescription"],
-        "relationship": "UCOEXHASRELATEDWEAKNESS",
-        "second_node": "Buffer Access with Incorrect Length Value",
-        "used_properties_of_second_node": ["ucocweName", "ucocweExtendedSummary"]
-    },
-    {
-        "question": "How does the SOAP Array Overflow scenario illustrate the risks described in the related buffer misuse weakness?",
-        "type": "<s,,o>",
-        "first_node": "CAPEC-256: SOAP Array Overflow",
-        "used_properties_of_first_node": ["label", "ucoexDescription"],
-        "relationship": "UCOEXHASRELATEDWEAKNESS",
-        "second_node": "Buffer Access with Incorrect Length Value",
-        "used_properties_of_second_node": ["ucocweSummary"]
-    },
-    {
-        "question": "In which context could incorrect length validation make the SOAP Array Overflow more severe?",
-        "type": "<s,p,o>",
-        "first_node": "CAPEC-256: SOAP Array Overflow",
-        "used_properties_of_first_node": ["label", "ucoexDescription"],
-        "relationship": "UCOEXHASRELATEDWEAKNESS",
-        "second_node": "Buffer Access with Incorrect Length Value",
-        "used_properties_of_second_node": ["ucocweExtendedSummary"]
-    },
-    {
-        "question": "What insights from this SOAP Array Overflow help analysts understand its connection to the underlying weakness?",
+        "question": "How does SOAP Array Overflow exploit flaws in buffer length validation to achieve arbitrary memory access?",
         "type": "<s,p,*>",
         "first_node": "CAPEC-256: SOAP Array Overflow",
-        "used_properties_of_first_node": ["label", "ucoexDescription"],
         "relationship": "UCOEXHASRELATEDWEAKNESS",
         "second_node": null,
-        "used_properties_of_second_node": []
+        "context": "CAPEC-256, “SOAP Array Overflow,” describes an attack in which an adversary manipulates the declared size of an array in a SOAP request to trigger a buffer overflow on the target system. This attack pattern has a related weakness in CWE-805, “Buffer Access with Incorrect Length Value,” which involves software improperly handling buffer length calculations and accessing memory outside intended bounds. The relationship highlights that this type of SOAP-based overflow exploits a fundamental flaw in memory size validation. Understanding this connection enables defenders to trace attacks back to specific coding weaknesses and apply targeted mitigations such as strict input validation and memory safety checks."
     },
     {
-        "question": "How could relative path traversal enable attackers to access files outside the intended directory through web input manipulation?",
+        "question": "What connection exists between SOAP Array Overflow and software errors caused by incorrect buffer length handling?",
         "type": "<s,*,o>",
-        "first_node": "Relative Path Traversal",
-        "used_properties_of_first_node": ["ucocweSummary"],
+        "first_node": "CAPEC-256: SOAP Array Overflow",
+        "relationship": null,
+        "second_node": "CWE-805: Buffer Access with Incorrect Length Value",
+        "context": "CAPEC-256, “SOAP Array Overflow,” describes an attack in which an adversary manipulates the declared size of an array in a SOAP request to trigger a buffer overflow on the target system. This attack pattern has a related weakness in CWE-805, “Buffer Access with Incorrect Length Value,” which involves software improperly handling buffer length calculations and accessing memory outside intended bounds. The relationship highlights that this type of SOAP-based overflow exploits a fundamental flaw in memory size validation. Understanding this connection enables defenders to trace attacks back to specific coding weaknesses and apply targeted mitigations such as strict input validation and memory safety checks."
+    },
+    {
+        "question": "How does SOAP Array Overflow leverage the weakness of incorrect buffer length calculation to cause a memory overwrite?",
+        "type": "<s,p,o>",
+        "first_node": "CAPEC-256: SOAP Array Overflow",
+        "relationship": "UCOEXHASRELATEDWEAKNESS",
+        "second_node": "CWE-805: Buffer Access with Incorrect Length Value",
+        "context": "CAPEC-256, “SOAP Array Overflow,” describes an attack in which an adversary manipulates the declared size of an array in a SOAP request to trigger a buffer overflow on the target system. This attack pattern has a related weakness in CWE-805, “Buffer Access with Incorrect Length Value,” which involves software improperly handling buffer length calculations and accessing memory outside intended bounds. The relationship highlights that this type of SOAP-based overflow exploits a fundamental flaw in memory size validation. Understanding this connection enables defenders to trace attacks back to specific coding weaknesses and apply targeted mitigations such as strict input validation and memory safety checks."
+    },
+    {
+        "question": "What defensive measures can mitigate SOAP Array Overflow attacks arising from memory size miscalculations?",
+        "type": "<s,p,*>",
+        "first_node": "CAPEC-256: SOAP Array Overflow",
+        "relationship": "UCOEXHASRELATEDWEAKNESS",
+        "second_node": null,
+        "context": "CAPEC-256, “SOAP Array Overflow,” describes an attack in which an adversary manipulates the declared size of an array in a SOAP request to trigger a buffer overflow on the target system. This attack pattern has a related weakness in CWE-805, “Buffer Access with Incorrect Length Value,” which involves software improperly handling buffer length calculations and accessing memory outside intended bounds. The relationship highlights that this type of SOAP-based overflow exploits a fundamental flaw in memory size validation. Understanding this connection enables defenders to trace attacks back to specific coding weaknesses and apply targeted mitigations such as strict input validation and memory safety checks."
+    },
+    {
+        "question": "Which coding practices contribute to the exposure of SOAP Array Overflow vulnerabilities linked to buffer access errors?",
+        "type": "<s,p,*>",
+        "first_node": "CAPEC-256: SOAP Array Overflow",
+        "relationship": "UCOEXHASRELATEDWEAKNESS",
+        "second_node": null,
+        "context": "CAPEC-256, “SOAP Array Overflow,” describes an attack in which an adversary manipulates the declared size of an array in a SOAP request to trigger a buffer overflow on the target system. This attack pattern has a related weakness in CWE-805, “Buffer Access with Incorrect Length Value,” which involves software improperly handling buffer length calculations and accessing memory outside intended bounds. The relationship highlights that this type of SOAP-based overflow exploits a fundamental flaw in memory size validation. Understanding this connection enables defenders to trace attacks back to specific coding weaknesses and apply targeted mitigations such as strict input validation and memory safety checks."
+    },
+    {
+        "question": "How does improper input handling in Relative Path Traversal enable unauthorized file access through web-based interactions?",
+        "type": "<s,p,*>",
+        "first_node": "CWE-23: Relative Path Traversal",
+        "relationship": "UCOEXHASRELATEDWEAKNESS",
+        "second_node": null,
+        "context": "CWE-23, “Relative Path Traversal,” refers to a software weakness where external inputs are improperly handled, allowing attackers to navigate outside intended directories using path manipulation sequences. CAPEC-76, “Manipulating Web Input to File System Calls,” describes an attack in which adversaries exploit such weaknesses by altering web inputs that interact with file system functions. This attack pattern has a related weakness in relative path traversal, meaning it leverages directory traversal flaws to gain unauthorized access to sensitive files. Recognizing this relationship helps defenders identify how input validation errors translate into real-world attacks and reinforces the need for strict path sanitization and access controls."
+    },
+    {
+        "question": "What connection exists between Relative Path Traversal and manipulating web inputs that target file system calls?",
+        "type": "<s,*,o>",
+        "first_node": "CWE-23: Relative Path Traversal",
+        "relationship": null,
+        "second_node": "CAPEC-76: Manipulating Web Input to File System Calls",
+        "context": "CWE-23, “Relative Path Traversal,” refers to a software weakness where external inputs are improperly handled, allowing attackers to navigate outside intended directories using path manipulation sequences. CAPEC-76, “Manipulating Web Input to File System Calls,” describes an attack in which adversaries exploit such weaknesses by altering web inputs that interact with file system functions. This attack pattern has a related weakness in relative path traversal, meaning it leverages directory traversal flaws to gain unauthorized access to sensitive files. Recognizing this relationship helps defenders identify how input validation errors translate into real-world attacks and reinforces the need for strict path sanitization and access controls."
+    },
+    {
+        "question": "How does the attack that manipulates web input to file system calls exploit Relative Path Traversal to bypass directory restrictions?",
+        "type": "<s,p,o>",
+        "first_node": "CWE-23: Relative Path Traversal",
         "relationship": "UCOEXHASRELATEDWEAKNESS",
         "second_node": "CAPEC-76: Manipulating Web Input to File System Calls",
-        "used_properties_of_second_node": ["ucoexDescription"]
+        "context": "CWE-23, “Relative Path Traversal,” refers to a software weakness where external inputs are improperly handled, allowing attackers to navigate outside intended directories using path manipulation sequences. CAPEC-76, “Manipulating Web Input to File System Calls,” describes an attack in which adversaries exploit such weaknesses by altering web inputs that interact with file system functions. This attack pattern has a related weakness in relative path traversal, meaning it leverages directory traversal flaws to gain unauthorized access to sensitive files. Recognizing this relationship helps defenders identify how input validation errors translate into real-world attacks and reinforces the need for strict path sanitization and access controls."
     },
     {
-        "question": "What conditions allow unvalidated file paths to expose sensitive files when combined with user-controlled web inputs?",
-        "type": "<s,p,o>",
-        "first_node": "Relative Path Traversal",
-        "used_properties_of_first_node": ["ucocweSummary"],
-        "relationship": "UCOEXHASRELATEDWEAKNESS",
-        "second_node": "CAPEC-76: Manipulating Web Input to File System Calls",
-        "used_properties_of_second_node": ["ucoexDescription"]
-    },
-    {
-        "question": "Which safeguards can stop attackers from exploiting path traversal through file system calls?",
-        "type": "<s,p,o>",
-        "first_node": "Relative Path Traversal",
-        "used_properties_of_first_node": ["ucocweSummary"],
-        "relationship": "UCOEXHASRELATEDWEAKNESS",
-        "second_node": "CAPEC-76: Manipulating Web Input to File System Calls",
-        "used_properties_of_second_node": []
-    },
-    {
-        "question": "How does improper handling of relative paths lead to unauthorized file access in web applications?",
+        "question": "Which validation strategies can mitigate exploitation of Relative Path Traversal through manipulated web input parameters?",
         "type": "<s,p,*>",
-        "first_node": "Relative Path Traversal",
-        "used_properties_of_first_node": ["ucocweSummary"],
+        "first_node": "CWE-23: Relative Path Traversal",
         "relationship": "UCOEXHASRELATEDWEAKNESS",
-        "second_node": "CAPEC-76: Manipulating Web Input to File System Calls",
-        "used_properties_of_second_node": []
+        "second_node": null,
+        "context": "CWE-23, “Relative Path Traversal,” refers to a software weakness where external inputs are improperly handled, allowing attackers to navigate outside intended directories using path manipulation sequences. CAPEC-76, “Manipulating Web Input to File System Calls,” describes an attack in which adversaries exploit such weaknesses by altering web inputs that interact with file system functions. This attack pattern has a related weakness in relative path traversal, meaning it leverages directory traversal flaws to gain unauthorized access to sensitive files. Recognizing this relationship helps defenders identify how input validation errors translate into real-world attacks and reinforces the need for strict path sanitization and access controls."
     },
     {
-        "question": "Why might web input-based file operations result in directory traversal and unauthorized data exposure?",
+        "question": "What coding errors most commonly lead to Relative Path Traversal vulnerabilities exploited by manipulated web file system inputs?",
+        "type": "<s,p,*>",
+        "first_node": "CWE-23: Relative Path Traversal",
+        "relationship": "UCOEXHASRELATEDWEAKNESS",
+        "second_node": null,
+        "context": "CWE-23, “Relative Path Traversal,” refers to a software weakness where external inputs are improperly handled, allowing attackers to navigate outside intended directories using path manipulation sequences. CAPEC-76, “Manipulating Web Input to File System Calls,” describes an attack in which adversaries exploit such weaknesses by altering web inputs that interact with file system functions. This attack pattern has a related weakness in relative path traversal, meaning it leverages directory traversal flaws to gain unauthorized access to sensitive files. Recognizing this relationship helps defenders identify how input validation errors translate into real-world attacks and reinforces the need for strict path sanitization and access controls."
+    },
+    {
+        "question": "How could attackers modify registry run keys to establish stealthy persistence despite endpoint protections?",
+        "type": "<s,p,*>",
+        "first_node": "CWE-15: External Control of System or Configuration Setting",
+        "relationship": "UCOEXHASRELATEDWEAKNESS",
+        "second_node": null,
+        "context": "CWE-15, “External Control of System or Configuration Setting,” refers to a weakness where an application allows users or external entities to modify system or configuration parameters, potentially leading to unstable or malicious behavior. CAPEC-270, “Modification of Registry Run Keys,” describes an attack where adversaries exploit such weaknesses by altering Windows registry settings to automatically execute their code at user login. This attack pattern has a related weakness in external control of configuration settings, as it depends on the system’s failure to properly restrict modification of critical parameters. Understanding this relationship helps defenders recognize how improper access control over configuration data can enable persistent malware and highlights the importance of securing system registries and enforcing least-privilege policies."
+    },
+    {
+        "question": "What tools or techniques commonly link external configuration control to registry run-key modification during an intrusion?",
         "type": "<s,*,o>",
-        "first_node": "Relative Path Traversal",
-        "used_properties_of_first_node": ["ucocweSummary"],
-        "relationship": "UCOEXHASRELATEDWEAKNESS",
-        "second_node": "CAPEC-76: Manipulating Web Input to File System Calls",
-        "used_properties_of_second_node": ["ucoexDescription"]
+        "first_node": "CWE-15: External Control of System or Configuration Setting",
+        "relationship": null,
+        "second_node": "CAPEC-270: Modification of Registry Run Keys",
+        "context": "CWE-15, “External Control of System or Configuration Setting,” refers to a weakness where an application allows users or external entities to modify system or configuration parameters, potentially leading to unstable or malicious behavior. CAPEC-270, “Modification of Registry Run Keys,” describes an attack where adversaries exploit such weaknesses by altering Windows registry settings to automatically execute their code at user login. This attack pattern has a related weakness in external control of configuration settings, as it depends on the system’s failure to properly restrict modification of critical parameters. Understanding this relationship helps defenders recognize how improper access control over configuration data can enable persistent malware and highlights the importance of securing system registries and enforcing least-privilege policies."
     },
     {
-        "question": "How could externally controlled settings enable registry run-key persistence at user login?",
-        "type": "<s,,o>",
-        "first_node": "External Control of System or Configuration Setting",
-        "used_properties_of_first_node": ["ucocweExtendedSummary", "ucocweSummary"],
+        "question": "How does external control over configuration settings enable registry run-key modification to achieve persistence on user systems?",
+        "type": "<s,p,o>",
+        "first_node": "CWE-15: External Control of System or Configuration Setting",
         "relationship": "UCOEXHASRELATEDWEAKNESS",
         "second_node": "CAPEC-270: Modification of Registry Run Keys",
-        "used_properties_of_second_node": ["label", "ucoexDescription"]
+        "context": "CWE-15, “External Control of System or Configuration Setting,” refers to a weakness where an application allows users or external entities to modify system or configuration parameters, potentially leading to unstable or malicious behavior. CAPEC-270, “Modification of Registry Run Keys,” describes an attack where adversaries exploit such weaknesses by altering Windows registry settings to automatically execute their code at user login. This attack pattern has a related weakness in external control of configuration settings, as it depends on the system’s failure to properly restrict modification of critical parameters. Understanding this relationship helps defenders recognize how improper access control over configuration data can enable persistent malware and highlights the importance of securing system registries and enforcing least-privilege policies."
     },
     {
-        "question": "Which safeguards block untrusted configuration changes from enabling registry-based startup execution?",
-        "type": "<s,p,o>",
-        "first_node": "External Control of System or Configuration Setting",
-        "used_properties_of_first_node": ["ucocweExtendedSummary"],
-        "relationship": "UCOEXHASRELATEDWEAKNESS",
-        "second_node": "CAPEC-270: Modification of Registry Run Keys",
-        "used_properties_of_second_node": ["ucoexDescription"]
-    },
-    {
-        "question": "What signs indicate attackers abused externally changeable settings to add programs under run keys?",
-        "type": "<s,,o>",
-        "first_node": "External Control of System or Configuration Setting",
-        "used_properties_of_first_node": ["ucocweSummary"],
-        "relationship": "UCOEXHASRELATEDWEAKNESS",
-        "second_node": "CAPEC-270: Modification of Registry Run Keys",
-        "used_properties_of_second_node": ["ucoexDescription"]
-    },
-    {
-        "question": "How does restricting who can change system settings reduce run-key persistence risk?",
-        "type": "<s,p,o>",
-        "first_node": "External Control of System or Configuration Setting",
-        "used_properties_of_first_node": ["ucocweExtendedSummary"],
-        "relationship": "UCOEXHASRELATEDWEAKNESS",
-        "second_node": "CAPEC-270: Modification of Registry Run Keys",
-        "used_properties_of_second_node": ["label"]
-    },
-    {
-        "question": "Which processes are most impacted when users can change configuration that controls startup behavior?",
+        "question": "Which logging or telemetry signals most reliably indicate unauthorized startup registry changes tied to external configuration control?",
         "type": "<s,p,*>",
-        "first_node": "External Control of System or Configuration Setting",
-        "used_properties_of_first_node": ["ucocweSummary"],
+        "first_node": "CWE-15: External Control of System or Configuration Setting",
         "relationship": "UCOEXHASRELATEDWEAKNESS",
-        "second_node": "CAPEC-270: Modification of Registry Run Keys",
-        "used_properties_of_second_node": []
+        "second_node": null,
+        "context": "CWE-15, “External Control of System or Configuration Setting,” refers to a weakness where an application allows users or external entities to modify system or configuration parameters, potentially leading to unstable or malicious behavior. CAPEC-270, “Modification of Registry Run Keys,” describes an attack where adversaries exploit such weaknesses by altering Windows registry settings to automatically execute their code at user login. This attack pattern has a related weakness in external control of configuration settings, as it depends on the system’s failure to properly restrict modification of critical parameters. Understanding this relationship helps defenders recognize how improper access control over configuration data can enable persistent malware and highlights the importance of securing system registries and enforcing least-privilege policies."
     },
     {
-        "question": "How could improper handling of Windows shortcuts allow attackers to access or modify restricted files?",
+        "question": "What deployment practices reduce the risk of registry-based persistence stemming from externally modifiable configuration values?",
         "type": "<s,p,*>",
-        "first_node": "Windows Shortcut Following (.LNK)",
-        "used_properties_of_first_node": ["ucocweSummary", "ucocweExtendedSummary"],
+        "first_node": "CWE-15: External Control of System or Configuration Setting",
+        "relationship": "UCOEXHASRELATEDWEAKNESS",
+        "second_node": null,
+        "context": "CWE-15, “External Control of System or Configuration Setting,” refers to a weakness where an application allows users or external entities to modify system or configuration parameters, potentially leading to unstable or malicious behavior. CAPEC-270, “Modification of Registry Run Keys,” describes an attack where adversaries exploit such weaknesses by altering Windows registry settings to automatically execute their code at user login. This attack pattern has a related weakness in external control of configuration settings, as it depends on the system’s failure to properly restrict modification of critical parameters. Understanding this relationship helps defenders recognize how improper access control over configuration data can enable persistent malware and highlights the importance of securing system registries and enforcing least-privilege policies."
+    },
+    {
+        "question": "How could improper handling of Windows shortcut files enable execution of malicious code through disguised links?",
+        "type": "<s,p,*>",
+        "first_node": "CWE-64: Windows Shortcut Following (.LNK)",
         "relationship": "UCOHASOBSERVEDEXAMPLE",
-        "second_node": "Mail client bypassing warning with .lnk file",
-        "used_properties_of_second_node": []
+        "second_node": null,
+        "context": "CWE-64, “Windows Shortcut Following (.LNK),” describes a weakness where a program improperly handles Windows shortcut files, allowing attackers to manipulate file access beyond intended permissions. The connected observed example illustrates a real-world case in which a mail client bypassed security warnings by using a .lnk file that linked to executable attachments, enabling stealthy execution. This weakness has an observed example demonstrating how improper shortcut handling can lead to unauthorized code execution. Understanding this relationship helps analysts connect theoretical weaknesses to real exploitation scenarios, guiding vulnerability assessments and the development of stronger file-handling security controls."
     },
     {
-        "question": "Why might following a shortcut file lead an application to operate on unauthorized files or directories?",
-        "type": "<s,p,*>",
-        "first_node": "Windows Shortcut Following (.LNK)",
-        "used_properties_of_first_node": ["ucocweSummary"],
-        "relationship": "UCOHASOBSERVEDEXAMPLE",
-        "second_node": "Mail client bypassing warning with .lnk file",
-        "used_properties_of_second_node": []
-    },
-    {
-        "question": "How does exploiting shortcut behavior help attackers hide executable attachments from user warnings?",
+        "question": "What connection exists between improper shortcut handling and real-world email-based attacks using malicious .lnk files?",
         "type": "<s,*,o>",
-        "first_node": "Windows Shortcut Following (.LNK)",
-        "used_properties_of_first_node": ["ucocweExtendedSummary"],
-        "relationship": "UCOHASOBSERVEDEXAMPLE",
-        "second_node": "Mail client bypassing warning with .lnk file",
-        "used_properties_of_second_node": ["ucoexDESCRIPTION"]
+        "first_node": "CWE-64: Windows Shortcut Following (.LNK)",
+        "relationship": null,
+        "second_node": "Observed Example: Malicious .lnk in Email Client",
+        "context": "CWE-64, “Windows Shortcut Following (.LNK),” describes a weakness where a program improperly handles Windows shortcut files, allowing attackers to manipulate file access beyond intended permissions. The connected observed example illustrates a real-world case in which a mail client bypassed security warnings by using a .lnk file that linked to executable attachments, enabling stealthy execution. This weakness has an observed example demonstrating how improper shortcut handling can lead to unauthorized code execution. Understanding this relationship helps analysts connect theoretical weaknesses to real exploitation scenarios, guiding vulnerability assessments and the development of stronger file-handling security controls."
     },
     {
-        "question": "Which conditions allow malicious shortcut files to bypass attachment security prompts in mail clients?",
+        "question": "How does the real-world example of a mail client using malicious .lnk files demonstrate the impact of Windows shortcut mismanagement?",
         "type": "<s,p,o>",
-        "first_node": "Windows Shortcut Following (.LNK)",
-        "used_properties_of_first_node": ["ucocweSummary"],
+        "first_node": "CWE-64: Windows Shortcut Following (.LNK)",
         "relationship": "UCOHASOBSERVEDEXAMPLE",
-        "second_node": "Mail client bypassing warning with .lnk file",
-        "used_properties_of_second_node": ["ucoexDESCRIPTION"]
+        "second_node": "Observed Example: Malicious .lnk in Email Client",
+        "context": "CWE-64, “Windows Shortcut Following (.LNK),” describes a weakness where a program improperly handles Windows shortcut files, allowing attackers to manipulate file access beyond intended permissions. The connected observed example illustrates a real-world case in which a mail client bypassed security warnings by using a .lnk file that linked to executable attachments, enabling stealthy execution. This weakness has an observed example demonstrating how improper shortcut handling can lead to unauthorized code execution. Understanding this relationship helps analysts connect theoretical weaknesses to real exploitation scenarios, guiding vulnerability assessments and the development of stronger file-handling security controls."
     },
     {
-        "question": "What risks arise when a program follows shortcut files that reference external or sensitive targets?",
+        "question": "Which types of applications are most at risk from exploitation of Windows shortcut handling flaws?",
         "type": "<s,p,*>",
-        "first_node": "Windows Shortcut Following (.LNK)",
-        "used_properties_of_first_node": ["ucocweExtendedSummary"],
+        "first_node": "CWE-64: Windows Shortcut Following (.LNK)",
         "relationship": "UCOHASOBSERVEDEXAMPLE",
-        "second_node": "Mail client bypassing warning with .lnk file",
-        "used_properties_of_second_node": []
+        "second_node": null,
+        "context": "CWE-64, “Windows Shortcut Following (.LNK),” describes a weakness where a program improperly handles Windows shortcut files, allowing attackers to manipulate file access beyond intended permissions. The connected observed example illustrates a real-world case in which a mail client bypassed security warnings by using a .lnk file that linked to executable attachments, enabling stealthy execution. This weakness has an observed example demonstrating how improper shortcut handling can lead to unauthorized code execution. Understanding this relationship helps analysts connect theoretical weaknesses to real exploitation scenarios, guiding vulnerability assessments and the development of stronger file-handling security controls."
     },
     {
-        "question": "How can improper input validation lead to SQL-like injection through ORM frameworks?",
-        "type": "<s,*,o>",
-        "first_node": "CAPEC-109: Object Relational Mapping Injection",
-        "used_properties_of_first_node": ["ucoexDescription"],
-        "relationship": "UCOEXHASRELATEDWEAKNESS",
-        "second_node": "Improper Input Validation",
-        "used_properties_of_second_node": ["ucocweSummary"]
+        "question": "What mitigation strategies could prevent attacks leveraging .lnk files to bypass execution restrictions in email environments?",
+        "type": "<s,p,*>",
+        "first_node": "CWE-64: Windows Shortcut Following (.LNK)",
+        "relationship": "UCOHASOBSERVEDEXAMPLE",
+        "second_node": null,
+        "context": "CWE-64, “Windows Shortcut Following (.LNK),” describes a weakness where a program improperly handles Windows shortcut files, allowing attackers to manipulate file access beyond intended permissions. The connected observed example illustrates a real-world case in which a mail client bypassed security warnings by using a .lnk file that linked to executable attachments, enabling stealthy execution. This weakness has an observed example demonstrating how improper shortcut handling can lead to unauthorized code execution. Understanding this relationship helps analysts connect theoretical weaknesses to real exploitation scenarios, guiding vulnerability assessments and the development of stronger file-handling security controls."
     },
     {
-        "question": "Which validation flaws enable attackers to exploit ORM-generated data access layers for database manipulation?",
-        "type": "<s,p,o>",
-        "first_node": "CAPEC-109: Object Relational Mapping Injection",
-        "used_properties_of_first_node": ["ucoexDescription"],
-        "relationship": "UCOEXHASRELATEDWEAKNESS",
-        "second_node": "Improper Input Validation",
-        "used_properties_of_second_node": ["ucocweExtendedSummary"]
-    },
-    {
-        "question": "What coding practices cause ORM injection when developers mishandle user inputs?",
+        "question": "How can flaws in input validation enable ORM-based injection attacks that compromise database integrity?",
         "type": "<s,p,*>",
         "first_node": "CAPEC-109: Object Relational Mapping Injection",
-        "used_properties_of_first_node": ["ucoexDescription"],
         "relationship": "UCOEXHASRELATEDWEAKNESS",
-        "second_node": "Improper Input Validation",
-        "used_properties_of_second_node": []
+        "second_node": null,
+        "context": "CAPEC-109, “Object Relational Mapping Injection,” describes an attack where adversaries exploit weaknesses in ORM-generated database access layers or developer misuse of persistence frameworks to inject malicious SQL commands. This attack pattern has a related weakness in CWE-20, “Improper Input Validation,” which occurs when software fails to adequately verify user input before processing. The relationship highlights that insecure or missing input validation enables attackers to craft inputs that compromise database integrity through ORM mechanisms. Understanding this connection helps developers design safer data-handling logic and reinforces the importance of strict input validation even in frameworks that abstract database interactions."
     },
     {
-        "question": "How does weak validation in ORM layers increase the risk of command injection?",
-        "type": "<s,p,o>",
-        "first_node": "CAPEC-109: Object Relational Mapping Injection",
-        "used_properties_of_first_node": ["ucoexDescription"],
-        "relationship": "UCOEXHASRELATEDWEAKNESS",
-        "second_node": "Improper Input Validation",
-        "used_properties_of_second_node": ["ucocweSummary"]
-    },
-    {
-        "question": "Why does improper handling of structured inputs in ORM tools often result in injection vulnerabilities?",
+        "question": "What is the connection between improper input validation and ORM injection attacks in database-driven applications?",
         "type": "<s,*,o>",
         "first_node": "CAPEC-109: Object Relational Mapping Injection",
-        "used_properties_of_first_node": ["ucoexDescription"],
-        "relationship": "UCOEXHASRELATEDWEAKNESS",
-        "second_node": "Improper Input Validation",
-        "used_properties_of_second_node": ["ucocweExtendedSummary"]
-    },
-    {
-        "question": "How does Android activity hijacking exploit implicit intent handling to capture sensitive user data?",
-        "type": "<s,p,*>",
-        "first_node": "UcoexCAPEC",
-        "used_properties_of_first_node": ["ucoexCAPEC_name", "ucoexDescription"],
-        "relationship": "UCOEXHASRELATEDWEAKNESS",
-        "second_node": null,
-        "used_properties_of_second_node": []
-    },
-    {
-        "question": "What mitigation strategies prevent adversaries from launching counterfeit activities in Android applications?",
-        "type": "<s,p,*>",
-        "first_node": "UcoexCAPEC",
-        "used_properties_of_first_node": ["ucoexDescription", "ucoexMitigations"],
         "relationship": null,
-        "second_node": null,
-        "used_properties_of_second_node": []
+        "second_node": "CWE-20: Improper Input Validation",
+        "context": "CAPEC-109, “Object Relational Mapping Injection,” describes an attack where adversaries exploit weaknesses in ORM-generated database access layers or developer misuse of persistence frameworks to inject malicious SQL commands. This attack pattern has a related weakness in CWE-20, “Improper Input Validation,” which occurs when software fails to adequately verify user input before processing. The relationship highlights that insecure or missing input validation enables attackers to craft inputs that compromise database integrity through ORM mechanisms. Understanding this connection helps developers design safer data-handling logic and reinforces the importance of strict input validation even in frameworks that abstract database interactions."
     },
     {
-        "question": "Which communication channel weakness enables Android activity hijacking through implicit intents?",
-        "type": "<s,*,o>",
-        "first_node": "UcoexCAPEC",
-        "used_properties_of_first_node": ["ucoexCAPEC_name", "ucoexDescription"],
-        "relationship": null,
-        "second_node": "UcoCWE",
-        "used_properties_of_second_node": ["ucocweName"]
-    },
-    {
-        "question": "Does improper endpoint validation create the underlying weakness exploited by Android activity hijacking?",
+        "question": "How does Object Relational Mapping Injection exploit inadequate input checks to manipulate persistence frameworks and issue unauthorized queries?",
         "type": "<s,p,o>",
-        "first_node": "UcoexCAPEC",
-        "used_properties_of_first_node": ["ucoexCAPEC_name", "ucoexDescription"],
+        "first_node": "CAPEC-109: Object Relational Mapping Injection",
         "relationship": "UCOEXHASRELATEDWEAKNESS",
-        "second_node": "UcoCWE",
-        "used_properties_of_second_node": ["ucocweSummary", "ucocweExtendedSummary"]
+        "second_node": "CWE-20: Improper Input Validation",
+        "context": "CAPEC-109, “Object Relational Mapping Injection,” describes an attack where adversaries exploit weaknesses in ORM-generated database access layers or developer misuse of persistence frameworks to inject malicious SQL commands. This attack pattern has a related weakness in CWE-20, “Improper Input Validation,” which occurs when software fails to adequately verify user input before processing. The relationship highlights that insecure or missing input validation enables attackers to craft inputs that compromise database integrity through ORM mechanisms. Understanding this connection helps developers design safer data-handling logic and reinforces the importance of strict input validation even in frameworks that abstract database interactions."
     },
     {
-        "question": "What causes spoofing vulnerabilities when applications fail to restrict communication channels to intended endpoints?",
-        "type": "<s,*,o>",
-        "first_node": "UcoexCAPEC",
-        "used_properties_of_first_node": ["ucoexDescription", "ucoexMitigations"],
-        "relationship": null,
-        "second_node": "UcoCWE",
-        "used_properties_of_second_node": ["ucocweExtendedSummary", "ucodemonstrativeExamples"]
-    },
-    {
-        "question": "How does schema poisoning compromise application security by manipulating resource structure and content definitions?",
-        "type": "<s,*,*>",
-        "first_node": "UcoexCAPEC",
-        "used_properties_of_first_node": ["ucoexCAPEC_name", "ucoexDescription"],
-        "relationship": null,
-        "second_node": null,
-        "used_properties_of_second_node": []
-    },
-    {
-        "question": "What mitigation strategies prevent adversaries from corrupting schemas used by applications for resource validation?",
+        "question": "Which development practices increase exposure to ORM injection through improper input handling?",
         "type": "<s,p,*>",
-        "first_node": "UcoexCAPEC",
-        "used_properties_of_first_node": ["ucoexDescription", "ucoexMitigations"],
-        "relationship": null,
-        "second_node": null,
-        "used_properties_of_second_node": []
-    },
-    {
-        "question": "Which underlying weakness enables schema poisoning attacks to cause denial of service through modified content?",
-        "type": "<s,*,o>",
-        "first_node": "UcoexCAPEC",
-        "used_properties_of_first_node": ["ucoexCAPEC_name", "ucoexDescription"],
-        "relationship": null,
-        "second_node": "UcoCWE",
-        "used_properties_of_second_node": ["ucocweName"]
-    },
-    {
-        "question": "Does schema poisoning exploit external control of configuration settings to undermine application resource handling?",
-        "type": "<s,p,o>",
-        "first_node": "UcoexCAPEC",
-        "used_properties_of_first_node": ["ucoexCAPEC_name", "ucoexDescription"],
+        "first_node": "CAPEC-109: Object Relational Mapping Injection",
         "relationship": "UCOEXHASRELATEDWEAKNESS",
-        "second_node": "UcoCWE",
-        "used_properties_of_second_node": ["ucocweName", "ucocweSummary"]
-    },
-    {
-        "question": "How does allowing user-controlled system settings create opportunities for schema modification attacks?",
-        "type": "<s,*,o>",
-        "first_node": "UcoexCAPEC",
-        "used_properties_of_first_node": ["ucoexDescription"],
-        "relationship": null,
-        "second_node": "UcoCWE",
-        "used_properties_of_second_node": ["ucocweExtendedSummary", "ucocweSummary"]
-    },
-    {
-        "question": "How does scanning for vulnerable software enable attackers to identify exploitable network configurations and unpatched services?",
-        "type": "<s,*,*>",
-        "first_node": "UcoexCAPEC",
-        "used_properties_of_first_node": ["ucoexCAPEC_name", "ucoexDescription"],
-        "relationship": null,
         "second_node": null,
-        "used_properties_of_second_node": []
+        "context": "CAPEC-109, “Object Relational Mapping Injection,” describes an attack where adversaries exploit weaknesses in ORM-generated database access layers or developer misuse of persistence frameworks to inject malicious SQL commands. This attack pattern has a related weakness in CWE-20, “Improper Input Validation,” which occurs when software fails to adequately verify user input before processing. The relationship highlights that insecure or missing input validation enables attackers to craft inputs that compromise database integrity through ORM mechanisms. Understanding this connection helps developers design safer data-handling logic and reinforces the importance of strict input validation even in frameworks that abstract database interactions."
     },
     {
-        "question": "What information exposure weaknesses facilitate reconnaissance activities that target unpatched operating systems and network services?",
+        "question": "What safeguards can prevent ORM injection attempts that stem from poor input validation practices?",
         "type": "<s,p,*>",
-        "first_node": "UcoexCAPEC",
-        "used_properties_of_first_node": ["ucoexDescription"],
+        "first_node": "CAPEC-109: Object Relational Mapping Injection",
         "relationship": "UCOEXHASRELATEDWEAKNESS",
         "second_node": null,
-        "used_properties_of_second_node": []
-    },
-    {
-        "question": "Which underlying weakness allows attackers to probe DMZ systems and discover vulnerable software versions?",
-        "type": "<s,*,o>",
-        "first_node": "UcoexCAPEC",
-        "used_properties_of_first_node": ["ucoexCAPEC_name", "ucoexDescription"],
-        "relationship": null,
-        "second_node": "UcoCWE",
-        "used_properties_of_second_node": ["ucocweName"]
-    },
-    {
-        "question": "Does vulnerability scanning exploit unauthorized information exposure to identify misconfigured systems and open ports?",
-        "type": "<s,p,o>",
-        "first_node": "UcoexCAPEC",
-        "used_properties_of_first_node": ["ucoexCAPEC_name", "ucoexDescription"],
-        "relationship": "UCOEXHASRELATEDWEAKNESS",
-        "second_node": "UcoCWE",
-        "used_properties_of_second_node": ["ucocweName", "ucocweSummary"]
-    },
-    {
-        "question": "How does revealing system status and installed packages aid attackers in scanning for exploitable software?",
-        "type": "<s,*,o>",
-        "first_node": "UcoexCAPEC",
-        "used_properties_of_first_node": ["ucoexDescription"],
-        "relationship": null,
-        "second_node": "UcoCWE",
-        "used_properties_of_second_node": ["ucocweExtendedSummary", "ucocweSummary"]
-    },
-    {
-        "question": "How does inserting counterfeit hardware during assembly enable adversaries to bypass security controls in deployed systems?",
-        "type": "<s,*,*>",
-        "first_node": "UcoexCAPEC",
-        "used_properties_of_first_node": ["ucoexCAPEC_name", "ucoexDescription"],
-        "relationship": null,
-        "second_node": null,
-        "used_properties_of_second_node": []
-    },
-    {
-        "question": "What supply chain security measures prevent malicious components from being introduced during product assembly?",
-        "type": "<s,p,*>",
-        "first_node": "UcoexCAPEC",
-        "used_properties_of_first_node": ["ucoexDescription"],
-        "relationship": null,
-        "second_node": null,
-        "used_properties_of_second_node": []
-    },
-    {
-        "question": "Which adversarial technique leverages counterfeit hardware insertion to establish backdoors in consumer networks?",
-        "type": "<s,*,o>",
-        "first_node": "UcoexCAPEC",
-        "used_properties_of_first_node": ["ucoexCAPEC_name", "ucoexDescription"],
-        "relationship": null,
-        "second_node": "UcoexMITREATTACK",
-        "used_properties_of_second_node": ["ucoexNAME"]
-    },
-    {
-        "question": "Does counterfeit component insertion during assembly map to hardware supply chain compromise techniques?",
-        "type": "<s,p,o>",
-        "first_node": "UcoexCAPEC",
-        "used_properties_of_first_node": ["ucoexCAPEC_name", "ucoexDescription"],
-        "relationship": "UCOEXHASTAXONOMYMAPPING",
-        "second_node": "UcoexMITREATTACK",
-        "used_properties_of_second_node": ["ucoexNAME", "ucoexDESCRIPTION"]
-    },
-    {
-        "question": "How do backdoors inserted through firmware modification provide adversaries with persistent control over compromised systems?",
-        "type": "<s,*,o>",
-        "first_node": "UcoexCAPEC",
-        "used_properties_of_first_node": ["ucoexDescription"],
-        "relationship": null,
-        "second_node": "UcoexMITREATTACK",
-        "used_properties_of_second_node": ["ucoexDESCRIPTION"]
+        "context": "CAPEC-109, “Object Relational Mapping Injection,” describes an attack where adversaries exploit weaknesses in ORM-generated database access layers or developer misuse of persistence frameworks to inject malicious SQL commands. This attack pattern has a related weakness in CWE-20, “Improper Input Validation,” which occurs when software fails to adequately verify user input before processing. The relationship highlights that insecure or missing input validation enables attackers to craft inputs that compromise database integrity through ORM mechanisms. Understanding this connection helps developers design safer data-handling logic and reinforces the importance of strict input validation even in frameworks that abstract database interactions."
     }
 ]
