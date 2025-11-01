@@ -54,7 +54,7 @@ llm = ChatOllama(
 # - a CONTEXT subgraph (1 single node with all the important properties of the nodes such as Summary and Description but no incoming or outgoing relationship),
 
 # ## Goal
-# generate 3 concise, natural analyst-style questions that a human would realistically ask about the particular provided node.
+# generate 5 concise, natural analyst-style questions that a human would realistically ask about the particular provided node.
 
 # ## PolyG-style Categorization
 # Treat each question as a triple ⟨s, p, o⟩ but classify and ask only for the first node s:
@@ -69,21 +69,18 @@ llm = ChatOllama(
 # - You will receive a summary about one and only node that cotains one of the aspects of cybersecurity
 # - There will be thousands of cybersecurity related nodes.
 # - Ask in a way that a person will have to look through the thousand of nodes and find the most appropriate answer by matching the description of the question and detail in the summary.
-# - DO NOT mention property names (like “ucocweSummary” or “ucoexDescription”) in the question itself.
-# - Avoid raw IDs, URIs, or field names.
-# - Avoid visiting provided links and URLs in order to generate questions. In other words, don't get into the URLs.
+# - Avoid raw IDs or field names.
 # - Avoid yes/no questions and multi-part phrasing.
 # - Use cybersecurity reasoning naturally: exploitability, overflow, mitigation, validation, propagation, etc.
 
 # ## Output Format (STRICT JSON)
-# Return ONLY a JSON array of 3 objects.
+# Return ONLY a JSON array of 5 objects.
 
 # Each object must include:
 # {
 #     "question": "string",
 #     "type": "<s,*,*>",
 #     "first_node": "name/label of first node",
-#     "used_properties_of_first_node": ["list"],
 #     "context": "the context"
 # }
 
@@ -130,17 +127,15 @@ llm = ChatOllama(
 # Object (o): the second node.
 
 # ## Style & Constraints
-# - Focus on the FIRST node’s analytical meaning (its description and concept).
-# - Integrate the RELATIONSHIP and/or SECOND NODE’s context naturally.
+# - Focus on the FIRST element's analytical meaning mentioned in the context (e.g., CWE, CAPEC, CVE, etc.).
+# - Integrate the RELATIONSHIP and/or SECOND element's context naturally.
 # - Each question must be ≤ 25 words, fluent, and realistic.
-# - DO NOT mention property names (like “ucocweSummary” or “ucoexDescription”) in the question itself.
-# - Avoid raw IDs, URIs, or field names.
-# - Do not repeat node labels (e.g., don’t say “CWE weakness” or “CAPEC attack pattern”).
+# - Avoid raw IDs or field names.
+# - Do not repeat element labels (e.g., don’t say “CWE weakness” or “CAPEC attack pattern”).
 # - Prefer open analytical forms (“How could…?”, “What causes…?”, “Which factor connects…?”).
 # - Avoid yes/no questions and multi-part phrasing.
 # - Use cybersecurity reasoning naturally: exploitability, overflow, mitigation, validation, propagation, etc.
-# - Ensure diversity in question structure — mix of ⟨s,p,*⟩, ⟨s,*,o⟩, ⟨s,p,o⟩ but no <s,*,*> structure.
-# - Use node name and other properties for reasoning context.
+# - Ensure diversity in question structure — mix of ⟨s,p,*⟩, ⟨s,*,o⟩, ⟨s,p,o⟩.
 
 
 # ## Output Format (STRICT JSON)
@@ -151,10 +146,8 @@ llm = ChatOllama(
 #     "question": "string",
 #     "type": "<s,p,*>|<s,*,o>|<s,p,o>",
 #     "first_node": "name/label of first node",
-#     "used_properties_of_first_node": ["list"],
 #     "relationship": "relationship name or null",
 #     "second_node": "name/label of second node or null",
-#     "used_properties_of_second_node": ["list"],
 #     "context": "the context"
 # }
 
@@ -204,17 +197,16 @@ Treat each question as a triple ⟨s, p, o⟩ and classify by what is unknown:
 ---
 
 ## Style & Constraints
-- Focus primarily on the **first node’s analytical meaning** (its name, description and concept).
-- Use the **second node** and **third node** to enrich reasoning context.
+- Focus primarily on the **first element's analytical meaning** mentioned in the context (e.g., CWE, CAPEC, CVE, etc.).
+- Use the **third element** to enrich reasoning context.
 - Incorporate **both relationships** naturally — the question should imply traversal or causal linkage across the chain.
 - Each question must be ≤ 25 words, fluent, and realistic.
-- DO NOT mention property names (like “ucocweSummary” or “ucoexDescription”).
-- Avoid raw IDs, URIs, or field names.
-- Do not repeat node labels (e.g., don’t say “CWE weakness” or “CAPEC attack pattern”).
+- Avoid raw IDs or field names.
+- Do not repeat element labels (e.g., don’t say “CWE weakness” or “CAPEC attack pattern”).
 - Prefer open analytical forms (“How could…?”, “What causes…?”, “Which factor connects…?”).
 - Avoid yes/no and multi-part phrasing.
 - Use **only <s,*,o>** question structure. 
-- Every question must **require** understanding of the first and third nodes and both relationships — no single-hop reasoning.
+- Every question must **require** understanding of the first and third elements and both relationships — no single-hop reasoning.
 
 ---
 
@@ -225,14 +217,11 @@ Each object must include:
 {
     "question": "string",
     "type": "<s,p,*>|<s,*,o>|<s,p,o>",
-    "first_node": "name/label of first node",
-    "used_properties_of_first_node": ["list"],
+    "first_node": "name/label of first element",
     "relationship_1": "name of first relationship",
-    "second_node": "name/label of second node",
-    "used_properties_of_second_node": ["list"],
+    "second_node": "name/label of second element",
     "relationship_2": "name of second relationship",
-    "third_node": "name/label of third node",
-    "used_properties_of_third_node": ["list"],
+    "third_node": "name/label of third element",
     "context": "the context"
 }
 
