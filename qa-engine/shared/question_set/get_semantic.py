@@ -26,12 +26,19 @@ for item in json_data:
                     all_labels.add(label)
         
         # Extract relationship types
-        if key == 'relationships' and isinstance(value, dict):
-            for rel_key, rel_list in value.items():
-                if isinstance(rel_list, list):
-                    for rel in rel_list:
-                        if isinstance(rel, dict) and 'type' in rel:
-                            all_relationships.add(rel['type'])
+        if key == 'relationships':
+            if isinstance(value, list):
+                # Handle list format: [{"type": "REL_TYPE"}, ...]
+                for rel in value:
+                    if isinstance(rel, dict) and 'type' in rel:
+                        all_relationships.add(rel['type'])
+            elif isinstance(value, dict):
+                # Handle dict format: {"node1_to_node2": [...], "node2_to_node3": [...]}
+                for rel_key, rel_list in value.items():
+                    if isinstance(rel_list, list):
+                        for rel in rel_list:
+                            if isinstance(rel, dict) and 'type' in rel:
+                                all_relationships.add(rel['type'])
 
 # Convert sets to sorted lists for better readability
 unique_labels = sorted([label for label in all_labels if label != "Resource"])
