@@ -1,0 +1,152 @@
+[
+    {
+        "question": "How does the absence of custom error handling in ASP.NET applications increase the exposure of sensitive system details?",
+        "type": "<s,*,*>",
+        "first_node": "CWE-12: ASP.NET Misconfiguration - Missing Custom Error Page",
+        "context": "CWE-12, “ASP.NET Misconfiguration: Missing Custom Error Page,” refers to a security weakness where an ASP.NET application fails to implement custom error pages. Without these pages, attackers can gather sensitive information from default framework error responses, such as system details or file paths. In cybersecurity, this weakness is significant because it exposes internal application behavior, increasing the risk of targeted exploitation and information disclosure."
+    },
+    {
+        "question": "What risks arise when default ASP.NET error messages reveal internal application structures to unauthorized users?",
+        "type": "<s,*,*>",
+        "first_node": "CWE-12: ASP.NET Misconfiguration - Missing Custom Error Page",
+        "context": "CWE-12, “ASP.NET Misconfiguration: Missing Custom Error Page,” refers to a security weakness where an ASP.NET application fails to implement custom error pages. Without these pages, attackers can gather sensitive information from default framework error responses, such as system details or file paths. In cybersecurity, this weakness is significant because it exposes internal application behavior, increasing the risk of targeted exploitation and information disclosure."
+    },
+    {
+        "question": "Which mitigation strategies can prevent attackers from exploiting unhandled ASP.NET error responses for reconnaissance?",
+        "type": "<s,*,*>",
+        "first_node": "CWE-12: ASP.NET Misconfiguration - Missing Custom Error Page",
+        "context": "CWE-12, “ASP.NET Misconfiguration: Missing Custom Error Page,” refers to a security weakness where an ASP.NET application fails to implement custom error pages. Without these pages, attackers can gather sensitive information from default framework error responses, such as system details or file paths. In cybersecurity, this weakness is significant because it exposes internal application behavior, increasing the risk of targeted exploitation and information disclosure."
+    },
+    {
+        "question": "How could missing custom error pages aid an attacker in mapping an ASP.NET application's internal configuration?",
+        "type": "<s,*,*>",
+        "first_node": "CWE-12: ASP.NET Misconfiguration - Missing Custom Error Page",
+        "context": "CWE-12, “ASP.NET Misconfiguration: Missing Custom Error Page,” refers to a security weakness where an ASP.NET application fails to implement custom error pages. Without these pages, attackers can gather sensitive information from default framework error responses, such as system details or file paths. In cybersecurity, this weakness is significant because it exposes internal application behavior, increasing the risk of targeted exploitation and information disclosure."
+    },
+    {
+        "question": "What specific information can default ASP.NET error responses leak that may support targeted exploitation efforts?",
+        "type": "<s,*,*>",
+        "first_node": "CWE-12: ASP.NET Misconfiguration - Missing Custom Error Page",
+        "context": "CWE-12, “ASP.NET Misconfiguration: Missing Custom Error Page,” refers to a security weakness where an ASP.NET application fails to implement custom error pages. Without these pages, attackers can gather sensitive information from default framework error responses, such as system details or file paths. In cybersecurity, this weakness is significant because it exposes internal application behavior, increasing the risk of targeted exploitation and information disclosure."
+    },
+    {
+        "question": "How does improper field-level enforcement in web interfaces enable remote attackers to access restricted database information?",
+        "type": "<s,*,*>",
+        "first_node": "CVE-2000-0385: FileMaker Pro 5 Web Companion Vulnerability",
+        "context": "CVE-2000-0385 is a vulnerability in FileMaker Pro 5’s Web Companion feature that allows remote attackers to bypass field-level database security controls. By exploiting weaknesses in the XML publishing or email functionality, attackers can gain unauthorized access to restricted data fields. This vulnerability is significant because it undermines data confidentiality and demonstrates how poorly secured web interfaces can expose sensitive database information to external threats."
+    },
+    {
+        "question": "What factors within FileMaker Pro’s Web Companion make field-level security bypass possible for remote adversaries?",
+        "type": "<s,*,*>",
+        "first_node": "CVE-2000-0385: FileMaker Pro 5 Web Companion Vulnerability",
+        "context": "CVE-2000-0385 is a vulnerability in FileMaker Pro 5’s Web Companion feature that allows remote attackers to bypass field-level database security controls. By exploiting weaknesses in the XML publishing or email functionality, attackers can gain unauthorized access to restricted data fields. This vulnerability is significant because it undermines data confidentiality and demonstrates how poorly secured web interfaces can expose sensitive database information to external threats."
+    },
+    {
+        "question": "How might weaknesses in XML publishing or email functionality lead to unauthorized disclosure of database content?",
+        "type": "<s,*,*>",
+        "first_node": "CVE-2000-0385: FileMaker Pro 5 Web Companion Vulnerability",
+        "context": "CVE-2000-0385 is a vulnerability in FileMaker Pro 5’s Web Companion feature that allows remote attackers to bypass field-level database security controls. By exploiting weaknesses in the XML publishing or email functionality, attackers can gain unauthorized access to restricted data fields. This vulnerability is significant because it undermines data confidentiality and demonstrates how poorly secured web interfaces can expose sensitive database information to external threats."
+    },
+    {
+        "question": "What exploitation paths exist for attackers to leverage weak web publishing mechanisms and access sensitive data fields?",
+        "type": "<s,*,*>",
+        "first_node": "CVE-2000-0385: FileMaker Pro 5 Web Companion Vulnerability",
+        "context": "CVE-2000-0385 is a vulnerability in FileMaker Pro 5’s Web Companion feature that allows remote attackers to bypass field-level database security controls. By exploiting weaknesses in the XML publishing or email functionality, attackers can gain unauthorized access to restricted data fields. This vulnerability is significant because it undermines data confidentiality and demonstrates how poorly secured web interfaces can expose sensitive database information to external threats."
+    },
+    {
+        "question": "Which defensive strategies could mitigate data exposure risks caused by insecure XML or email components in database-driven applications?",
+        "type": "<s,*,*>",
+        "first_node": "CVE-2000-0385: FileMaker Pro 5 Web Companion Vulnerability",
+        "context": "CVE-2000-0385 is a vulnerability in FileMaker Pro 5’s Web Companion feature that allows remote attackers to bypass field-level database security controls. By exploiting weaknesses in the XML publishing or email functionality, attackers can gain unauthorized access to restricted data fields. This vulnerability is significant because it undermines data confidentiality and demonstrates how poorly secured web interfaces can expose sensitive database information to external threats."
+    },
+    {
+        "question": "How could manipulating design documentation during development lead to embedded vulnerabilities in deployed systems?",
+        "type": "<s,*,*>",
+        "first_node": "CAPEC-519: Documentation Alteration to Cause Errors in System Design",
+        "context": "CAPEC-519, “Documentation Alteration to Cause Errors in System Design,” describes an attack pattern where an adversary manipulates a manufacturer’s design or requirements documentation to introduce flaws during system development. By altering key design information, the attacker ensures that vulnerabilities are built into the final product. This attack is significant because it targets the integrity of the software supply chain, enabling long-term exploitation of compromised systems once they are deployed."
+    },
+    {
+        "question": "What impact does tampering with system design documentation have on the overall security of the software supply chain?",
+        "type": "<s,*,*>",
+        "first_node": "CAPEC-519: Documentation Alteration to Cause Errors in System Design",
+        "context": "CAPEC-519, “Documentation Alteration to Cause Errors in System Design,” describes an attack pattern where an adversary manipulates a manufacturer’s design or requirements documentation to introduce flaws during system development. By altering key design information, the attacker ensures that vulnerabilities are built into the final product. This attack is significant because it targets the integrity of the software supply chain, enabling long-term exploitation of compromised systems once they are deployed."
+    },
+    {
+        "question": "Which safeguards can prevent adversaries from introducing vulnerabilities by modifying critical design or requirements documents?",
+        "type": "<s,*,*>",
+        "first_node": "CAPEC-519: Documentation Alteration to Cause Errors in System Design",
+        "context": "CAPEC-519, “Documentation Alteration to Cause Errors in System Design,” describes an attack pattern where an adversary manipulates a manufacturer’s design or requirements documentation to introduce flaws during system development. By altering key design information, the attacker ensures that vulnerabilities are built into the final product. This attack is significant because it targets the integrity of the software supply chain, enabling long-term exploitation of compromised systems once they are deployed."
+    },
+    {
+        "question": "How might attackers exploit weak documentation control processes to compromise the integrity of system design artifacts?",
+        "type": "<s,*,*>",
+        "first_node": "CAPEC-519: Documentation Alteration to Cause Errors in System Design",
+        "context": "CAPEC-519, “Documentation Alteration to Cause Errors in System Design,” describes an attack pattern where an adversary manipulates a manufacturer’s design or requirements documentation to introduce flaws during system development. By altering key design information, the attacker ensures that vulnerabilities are built into the final product. This attack is significant because it targets the integrity of the software supply chain, enabling long-term exploitation of compromised systems once they are deployed."
+    },
+    {
+        "question": "What indicators could reveal that a system’s design documentation was maliciously altered to embed security weaknesses?",
+        "type": "<s,*,*>",
+        "first_node": "CAPEC-519: Documentation Alteration to Cause Errors in System Design",
+        "context": "CAPEC-519, “Documentation Alteration to Cause Errors in System Design,” describes an attack pattern where an adversary manipulates a manufacturer’s design or requirements documentation to introduce flaws during system development. By altering key design information, the attacker ensures that vulnerabilities are built into the final product. This attack is significant because it targets the integrity of the software supply chain, enabling long-term exploitation of compromised systems once they are deployed."
+    },
+    {
+        "question": "How can adding a space at the end of a file’s extension trick security systems?",
+        "type": "<s,*,*>",
+        "first_node": "CAPEC-649: Adding a Space to a File Extension",
+        "context": "CAPEC-649, “Adding a Space to a File Extension,” describes an attack pattern where an adversary appends an invisible space to the end of a file’s extension to bypass security mechanisms or mislead users. This manipulation can cause the operating system or application to misidentify the file type, potentially leading to unintended or malicious execution. In cybersecurity, this technique highlights how subtle input-handling flaws in file validation can be exploited for social engineering or code execution attacks."
+    },
+    {
+        "question": "What happens when a file’s type is misidentified because of a hidden space in its name?",
+        "type": "<s,*,*>",
+        "first_node": "CAPEC-649: Adding a Space to a File Extension",
+        "context": "CAPEC-649, “Adding a Space to a File Extension,” describes an attack pattern where an adversary appends an invisible space to the end of a file’s extension to bypass security mechanisms or mislead users. This manipulation can cause the operating system or application to misidentify the file type, potentially leading to unintended or malicious execution. In cybersecurity, this technique highlights how subtle input-handling flaws in file validation can be exploited for social engineering or code execution attacks."
+    },
+    {
+        "question": "Why might attackers use extra spaces in filenames to hide malicious files?",
+        "type": "<s,*,*>",
+        "first_node": "CAPEC-649: Adding a Space to a File Extension",
+        "context": "CAPEC-649, “Adding a Space to a File Extension,” describes an attack pattern where an adversary appends an invisible space to the end of a file’s extension to bypass security mechanisms or mislead users. This manipulation can cause the operating system or application to misidentify the file type, potentially leading to unintended or malicious execution. In cybersecurity, this technique highlights how subtle input-handling flaws in file validation can be exploited for social engineering or code execution attacks."
+    },
+    {
+        "question": "How do hidden characters in filenames affect file validation and execution?",
+        "type": "<s,*,*>",
+        "first_node": "CAPEC-649: Adding a Space to a File Extension",
+        "context": "CAPEC-649, “Adding a Space to a File Extension,” describes an attack pattern where an adversary appends an invisible space to the end of a file’s extension to bypass security mechanisms or mislead users. This manipulation can cause the operating system or application to misidentify the file type, potentially leading to unintended or malicious execution. In cybersecurity, this technique highlights how subtle input-handling flaws in file validation can be exploited for social engineering or code execution attacks."
+    },
+    {
+        "question": "What can developers do to stop attackers from using spaces in filenames to hide threats?",
+        "type": "<s,*,*>",
+        "first_node": "CAPEC-649: Adding a Space to a File Extension",
+        "context": "CAPEC-649, “Adding a Space to a File Extension,” describes an attack pattern where an adversary appends an invisible space to the end of a file’s extension to bypass security mechanisms or mislead users. This manipulation can cause the operating system or application to misidentify the file type, potentially leading to unintended or malicious execution. In cybersecurity, this technique highlights how subtle input-handling flaws in file validation can be exploited for social engineering or code execution attacks."
+    },
+    {
+        "question": "How can weak control of document type definitions expose XML-based systems to data leaks or denial-of-service attacks?",
+        "type": "<s,*,*>",
+        "first_node": "CWE-827: Improper Control of Document Type Definition",
+        "context": "CWE-827, “Improper Control of Document Type Definition,” refers to a weakness where software fails to properly restrict the use or inclusion of external Document Type Definitions (DTDs) during XML processing. This flaw can allow attackers to reference unauthorized files, exhaust system resources, or trigger arbitrary network requests. In cybersecurity, this weakness is significant because it can lead to data exposure or denial-of-service attacks, particularly in systems that process XML, such as web services or APIs."
+    },
+    {
+        "question": "What attack scenarios exploit poorly restricted document type definitions during XML parsing?",
+        "type": "<s,*,*>",
+        "first_node": "CWE-827: Improper Control of Document Type Definition",
+        "context": "CWE-827, “Improper Control of Document Type Definition,” refers to a weakness where software fails to properly restrict the use or inclusion of external Document Type Definitions (DTDs) during XML processing. This flaw can allow attackers to reference unauthorized files, exhaust system resources, or trigger arbitrary network requests. In cybersecurity, this weakness is significant because it can lead to data exposure or denial-of-service attacks, particularly in systems that process XML, such as web services or APIs."
+    },
+    {
+        "question": "Which preventive measures can mitigate risks from unrestricted document type definitions in XML processors?",
+        "type": "<s,*,*>",
+        "first_node": "CWE-827: Improper Control of Document Type Definition",
+        "context": "CWE-827, “Improper Control of Document Type Definition,” refers to a weakness where software fails to properly restrict the use or inclusion of external Document Type Definitions (DTDs) during XML processing. This flaw can allow attackers to reference unauthorized files, exhaust system resources, or trigger arbitrary network requests. In cybersecurity, this weakness is significant because it can lead to data exposure or denial-of-service attacks, particularly in systems that process XML, such as web services or APIs."
+    },
+    {
+        "question": "How might external document references in XML be abused to compromise confidentiality or system stability?",
+        "type": "<s,*,*>",
+        "first_node": "CWE-827: Improper Control of Document Type Definition",
+        "context": "CWE-827, “Improper Control of Document Type Definition,” refers to a weakness where software fails to properly restrict the use or inclusion of external Document Type Definitions (DTDs) during XML processing. This flaw can allow attackers to reference unauthorized files, exhaust system resources, or trigger arbitrary network requests. In cybersecurity, this weakness is significant because it can lead to data exposure or denial-of-service attacks, particularly in systems that process XML, such as web services or APIs."
+    },
+    {
+        "question": "What types of XML-handling systems are most at risk when document type definitions are not properly controlled?",
+        "type": "<s,*,*>",
+        "first_node": "CWE-827: Improper Control of Document Type Definition",
+        "context": "CWE-827, “Improper Control of Document Type Definition,” refers to a weakness where software fails to properly restrict the use or inclusion of external Document Type Definitions (DTDs) during XML processing. This flaw can allow attackers to reference unauthorized files, exhaust system resources, or trigger arbitrary network requests. In cybersecurity, this weakness is significant because it can lead to data exposure or denial-of-service attacks, particularly in systems that process XML, such as web services or APIs."
+    }
+]
