@@ -1,3 +1,5 @@
 UcoCWE: Common Weakness Enumeration - software weakness types and categories (e.g., CWE-79 for XSS)
 UcoexCAPEC: Common Attack Pattern Enumeration and Classification - attack patterns and techniques used by adversaries
+UcoexObservedExample: Real-world examples of vulnerabilities and attacks being observed
 UCOEXHASRELATEDWEAKNESS: Attack pattern exploits specific weakness - connects CAPECs to CWEs
+UCOHASOBSERVEDEXAMPLE: Weakness has real-world observed examples - connects CWEs to observed examples

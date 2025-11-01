@@ -1,4 +1,3 @@
-# get summary.py
 import json
 import os
 from dotenv import load_dotenv
@@ -15,13 +14,13 @@ OPENAI_MODEL = os.getenv("OPENAI_MODEL", "gpt-4")
 if not OPENAI_API_KEY:
     raise ValueError("OPENAI_API_KEY not found in .env file. Please add it.")
 
-# Load schema for context
+# Load semantic descriptions for context
 schema_cache = ""
 try:
-    with open('../schema_cache.txt', 'r', encoding='utf-8') as file:
+    with open('semantic_descriptions.txt', 'r', encoding='utf-8') as file:
         schema_cache = file.read()
 except FileNotFoundError:
-    print("⚠ Warning: schema_cache.txt not found. Proceeding without schema context.")
+    print("⚠ Warning: semantic_descriptions.txt not found. Proceeding without semantic context.")
 
 # Initialize LLM with OpenAI
 print(f"Initializing LLM: {OPENAI_MODEL}")
@@ -375,77 +374,19 @@ def process_node_groups(input_file, output_file, include_schema=True, output_for
     print(f"Saving results to: {output_file}")
     
     if output_format == 'txt':
-        # Save as formatted text file
+        # Save as formatted text file (summaries only)
         with open(output_file, 'w', encoding='utf-8') as f:
-            f.write("="*80 + "\n")
-            f.write("NODE SUMMARIES\n")
-            f.write("="*80 + "\n\n")
-            
-            for result in results:
-                item_num = result.get('item_number', '?')
-                result_type = result.get('type', result.get('status', 'unknown'))
-                
-                f.write(f"{'='*80}\n")
-                f.write(f"ITEM {item_num} - {result_type.upper().replace('_', ' ')}\n")
-                f.write(f"{'='*80}\n\n")
-                
-                # Write node information
-                if 'node' in result:
-                    node = result['node']
-                    f.write("NODE INFORMATION:\n")
-                    f.write(f"  Labels: {', '.join(node.get('labels', []))}\n")
-                    # Write key properties (excluding labels)
-                    for key, value in node.items():
-                        if key not in ['labels', 'uri']:
-                            f.write(f"  {key}: {value}\n")
-                    f.write("\n")
-                    
-                elif 'node1' in result:
-                    f.write("NODE 1:\n")
-                    node1 = result['node1']
-                    f.write(f"  Labels: {', '.join(node1.get('labels', []))}\n")
-                    for key, value in node1.items():
-                        if key not in ['labels', 'uri']:
-                            f.write(f"  {key}: {value}\n")
-                    f.write("\n")
-                    
-                    f.write("NODE 2:\n")
-                    node2 = result['node2']
-                    f.write(f"  Labels: {', '.join(node2.get('labels', []))}\n")
-                    for key, value in node2.items():
-                        if key not in ['labels', 'uri']:
-                            f.write(f"  {key}: {value}\n")
-                    f.write("\n")
-                    
-                    if 'node3' in result:
-                        f.write("NODE 3:\n")
-                        node3 = result['node3']
-                        f.write(f"  Labels: {', '.join(node3.get('labels', []))}\n")
-                        for key, value in node3.items():
-                            if key not in ['labels', 'uri']:
-                                f.write(f"  {key}: {value}\n")
-                        f.write("\n")
-                    
-                    if 'relationships' in result:
-                        f.write("RELATIONSHIPS:\n")
-                        rels = result['relationships']
-                        if isinstance(rels, list):
-                            for rel in rels:
-                                f.write(f"  - {rel.get('type', 'UNKNOWN')}\n")
-                        else:
-                            f.write(f"  {rels}\n")
-                        f.write("\n")
-                
-                # Write summary
+            for idx, result in enumerate(results, 1):
+                # Write summary only
                 if 'summary' in result and result['summary']:
-                    f.write("SUMMARY:\n")
-                    f.write("-" * 80 + "\n")
-                    f.write(result['summary'] + "\n")
-                    f.write("-" * 80 + "\n")
+                    f.write(result['summary'])
+                    # Add spacing between summaries if there are multiple items
+                    if idx < len(results):
+                        f.write("\n\n")
                 elif 'error' in result:
-                    f.write(f"ERROR: {result['error']}\n")
-                
-                f.write("\n\n")
+                    f.write(f"ERROR: {result['error']}")
+                    if idx < len(results):
+                        f.write("\n\n")
     else:
         # Save as JSON file
         with open(output_file, 'w', encoding='utf-8') as f:
@@ -508,4 +449,3 @@ if __name__ == "__main__":
         import traceback
         traceback.print_exc()
         exit(1)
-
