@@ -1,0 +1,281 @@
+[
+    {
+        "question": "What real-world authorization bypass scenarios demonstrate how forceful browsing exploits improper permission validation in web applications?",
+        "type": "<s,p,*>",
+        "first_node": "CAPEC-87: Forceful Browsing",
+        "relationship_1": "UCOEXHASRELATEDWEAKNESS",
+        "second_node": "CWE-285: Improper Authorization",
+        "relationship_2": "UCOHASOBSERVEDEXAMPLE",
+        "third_node": null,
+        "context": "CAPEC-87 is an attack technique where adversaries use direct URL entry to access restricted sections, exploiting CWE-285 Improper Authorization where systems incorrectly perform authorization checks. Real-world examples include ACL-based protection mechanisms misinterpreting negative access rights as positive, thereby bypassing intended restrictions."
+    },
+    {
+        "question": "How could direct URL manipulation exploit authorization flaws to bypass ACL-based restrictions that misinterpret access rights?",
+        "type": "<s,*,o>",
+        "first_node": "CAPEC-87: Forceful Browsing",
+        "relationship_1": "UCOEXHASRELATEDWEAKNESS",
+        "second_node": "CWE-285: Improper Authorization",
+        "relationship_2": "UCOHASOBSERVEDEXAMPLE",
+        "third_node": "ACL-based protection mechanism misinterpreting negative access rights as positive",
+        "context": "Forceful browsing uses direct URL entry to access restricted sections, exploiting improper authorization where systems incorrectly perform authorization checks. An observed example shows ACL-based protection mechanisms misinterpreting negative access rights as positive, bypassing intended restrictions."
+    },
+    {
+        "question": "Why does the ACL misinterpretation example underscore how authorization check failures amplify forceful browsing attack effectiveness?",
+        "type": "<s,p,o>",
+        "first_node": "CAPEC-87: Forceful Browsing",
+        "relationship_1": "UCOEXHASRELATEDWEAKNESS",
+        "second_node": "CWE-285: Improper Authorization",
+        "relationship_2": "UCOHASOBSERVEDEXAMPLE",
+        "third_node": "ACL-based protection mechanism misinterpreting negative access rights as positive",
+        "context": "The relationship between CAPEC-87 and CWE-285 identifies specific vulnerabilities that forceful browsing exploits. The observed ACL misinterpretation demonstrates how authorization check failures enable attackers to bypass restrictions through direct URL access, helping improve threat modeling and system defenses."
+    },
+
+
+
+    {
+        "question": "What real-world code injection scenarios demonstrate how external input manipulation enables syntax modification in CGI-based applications?",
+        "type": "<s,p,*>",
+        "first_node": "CWE-94: Improper Control of Generation of Code (Code Injection)",
+        "relationship_1": "UCOHASOBSERVEDEXAMPLE",
+        "second_node": "Perl code directly injected into CGI library file via parameters",
+        "relationship_2": "UCOEXEXAMPLEOBSERVEDIN",
+        "third_node": null,
+        "context": "CWE-94 occurs when products construct code segments influenced by external input, potentially causing modification of syntax or behavior. An observed example shows Perl code directly injected into a CGI library file due to parameters from another CGI program, linked to CVE-2002-0495 with high severity rating."
+    },
+    {
+        "question": "How could inadequate input validation in code generation enable attackers to inject Perl scripts leading to CVE-2002-0495?",
+        "type": "<s,*,o>",
+        "first_node": "CWE-94: Improper Control of Generation of Code (Code Injection)",
+        "relationship_1": "UCOHASOBSERVEDEXAMPLE",
+        "second_node": "Perl code directly injected into CGI library file via parameters",
+        "relationship_2": "UCOEXEXAMPLEOBSERVEDIN",
+        "third_node": "CVE-2002-0495",
+        "context": "Code injection weakness occurs when products construct code segments influenced by external input. The observed example of Perl code injection into a CGI library file through parameters demonstrates how the weakness manifests in CVE-2002-0495, a high-severity vulnerability."
+    },
+    {
+        "question": "Why does the CGI parameter injection example underscore how code construction weaknesses escalate into high-severity vulnerabilities like CVE-2002-0495?",
+        "type": "<s,p,o>",
+        "first_node": "CWE-94: Improper Control of Generation of Code (Code Injection)",
+        "relationship_1": "UCOHASOBSERVEDEXAMPLE",
+        "second_node": "Perl code directly injected into CGI library file via parameters",
+        "relationship_2": "UCOEXEXAMPLEOBSERVEDIN",
+        "third_node": "CVE-2002-0495",
+        "context": "The pattern demonstrates how code injection weakness manifests in real-world scenarios. The Perl injection example shows how external input control failures enable code behavior modification, escalating to CVE-2002-0495 with high severity, helping cybersecurity professionals predict and mitigate similar threats."
+    },
+
+
+
+
+
+
+    {
+        "question": "What real-world source code disclosure scenarios demonstrate how special character exploitation enables file system content exposure vulnerabilities?",
+        "type": "<s,p,*>",
+        "first_node": "CWE-41: Improper Resolution of Path Equivalence",
+        "relationship_1": "UCOHASOBSERVEDEXAMPLE",
+        "second_node": "Source code disclosure using trailing dot in path names",
+        "relationship_2": "UCOEXEXAMPLEOBSERVEDIN",
+        "third_node": null,
+        "context": "CWE-41 relates to vulnerabilities where file system contents disclosure occurs due to path equivalence, involving special characters in file and directory names generating multiple names for the same object. The observed example of source code disclosure using a trailing dot is found in CVE-2005-3293 with medium severity."
+    },
+    {
+        "question": "How could improper path name normalization enable attackers to disclose source code through trailing dot exploitation in CVE-2005-3293?",
+        "type": "<s,*,o>",
+        "first_node": "CWE-41: Improper Resolution of Path Equivalence",
+        "relationship_1": "UCOHASOBSERVEDEXAMPLE",
+        "second_node": "Source code disclosure using trailing dot in path names",
+        "relationship_2": "UCOEXEXAMPLEOBSERVEDIN",
+        "third_node": "CVE-2005-3293",
+        "context": "Path equivalence vulnerabilities allow file system contents disclosure through special characters generating multiple names for the same object. The trailing dot exploitation example demonstrates how path resolution weaknesses manifest in CVE-2005-3293, enabling source code disclosure."
+    },
+    {
+        "question": "Why does the trailing dot disclosure example underscore how path equivalence failures escalate into medium-severity vulnerabilities like CVE-2005-3293?",
+        "type": "<s,p,o>",
+        "first_node": "CWE-41: Improper Resolution of Path Equivalence",
+        "relationship_1": "UCOHASOBSERVEDEXAMPLE",
+        "second_node": "Source code disclosure using trailing dot in path names",
+        "relationship_2": "UCOEXEXAMPLEOBSERVEDIN",
+        "third_node": "CVE-2005-3293",
+        "context": "The relationship highlights potential risks of sensitive data exposure due to improper path equivalence resolution. The trailing dot example shows how special character handling failures enable source code disclosure in CVE-2005-3293, emphasizing the need for robust file name and path representation controls."
+    },
+
+
+
+
+    {
+        "question": "What real-world denial of service scenarios demonstrate how CSS injection exploits improper quote neutralization in database queries?",
+        "type": "<s,p,*>",
+        "first_node": "CAPEC-468: Generic Cross-Browser Cross-Domain Theft",
+        "relationship_1": "UCOEXHASRELATEDWEAKNESS",
+        "second_node": "CWE-149: Improper Neutralization of Quoting Syntax",
+        "relationship_2": "UCOHASOBSERVEDEXAMPLE",
+        "third_node": null,
+        "context": "CAPEC-468 uses CSS injection to steal data across domains, exploiting CSS loading standards. This attack pattern is associated with CWE-149 where injected quotes compromise systems. Real-world examples include database denial of service through MATCH AGAINST queries with unclosed double quotes."
+    },
+    {
+        "question": "How could CSS-based cross-domain data theft exploit quote injection weaknesses to enable database denial of service attacks?",
+        "type": "<s,*,o>",
+        "first_node": "CAPEC-468: Generic Cross-Browser Cross-Domain Theft",
+        "relationship_1": "UCOEXHASRELATEDWEAKNESS",
+        "second_node": "CWE-149: Improper Neutralization of Quoting Syntax",
+        "relationship_2": "UCOHASOBSERVEDEXAMPLE",
+        "third_node": "Database DoS via MATCH AGAINST query with unclosed double quote",
+        "context": "CSS injection attacks steal data across domains by exploiting CSS loading standards, leveraging improper neutralization of quoting syntax where injected quotes compromise systems. An observed example shows remote attackers causing database denial of service through MATCH AGAINST queries with unclosed double quotes."
+    },
+    {
+        "question": "Why does the database query exploitation example underscore how quote neutralization failures amplify cross-domain CSS injection effectiveness?",
+        "type": "<s,p,o>",
+        "first_node": "CAPEC-468: Generic Cross-Browser Cross-Domain Theft",
+        "relationship_1": "UCOEXHASRELATEDWEAKNESS",
+        "second_node": "CWE-149: Improper Neutralization of Quoting Syntax",
+        "relationship_2": "UCOHASOBSERVEDEXAMPLE",
+        "third_node": "Database DoS via MATCH AGAINST query with unclosed double quote",
+        "context": "The relationship between CAPEC-468 and CWE-149 identifies how CSS injection exploits quoting syntax weaknesses. The observed database DoS example demonstrates how quote neutralization failures enable severe consequences, highlighting the need for understanding and mitigating these vulnerabilities to enhance system security."
+    },
+
+
+  {
+        "question": "What real-world directory traversal scenarios demonstrate how backslash sequences bypass security checks in web administration interfaces?",
+        "type": "<s,p,*>",
+        "first_node": "CWE-31: Path Traversal: 'dir\\..\\..\\filename'",
+        "relationship_1": "UCOHASOBSERVEDEXAMPLE",
+        "second_node": "Access Control Server flaw enabling file reading via '..\\..' in URL to port 2002",
+        "relationship_2": "UCOEXEXAMPLEOBSERVEDIN",
+        "third_node": null,
+        "context": "CWE-31 allows attackers to traverse the file system and access files outside restricted directories, bypassing security checks. An observed example shows an Access Control Server administration function flaw enabling remote attackers to read files outside web root via '..\\..' sequences in URLs to port 2002, linked to CVE-2002-0160 with medium severity."
+    },
+    {
+        "question": "How could Windows-style directory traversal exploit restricted path validation to enable unauthorized file access in CVE-2002-0160?",
+        "type": "<s,*,o>",
+        "first_node": "CWE-31: Path Traversal: 'dir\\..\\..\\filename'",
+        "relationship_1": "UCOHASOBSERVEDEXAMPLE",
+        "second_node": "Access Control Server flaw enabling file reading via '..\\..' in URL to port 2002",
+        "relationship_2": "UCOEXEXAMPLEOBSERVEDIN",
+        "third_node": "CVE-2002-0160",
+        "context": "Path traversal vulnerabilities allow attackers to traverse file systems and access files outside restricted directories. The Access Control Server example shows how '..\\..' sequences in URLs enable remote attackers to read files outside web root, manifesting in CVE-2002-0160 with medium severity rating."
+    },
+    {
+        "question": "Why does the Access Control Server exploitation example underscore how path validation failures escalate into medium-severity vulnerabilities like CVE-2002-0160?",
+        "type": "<s,p,o>",
+        "first_node": "CWE-31: Path Traversal: 'dir\\..\\..\\filename'",
+        "relationship_1": "UCOHASOBSERVEDEXAMPLE",
+        "second_node": "Access Control Server flaw enabling file reading via '..\\..' in URL to port 2002",
+        "relationship_2": "UCOEXEXAMPLEOBSERVEDIN",
+        "third_node": "CVE-2002-0160",
+        "context": "The relationship pattern illustrates how the theoretical path traversal weakness manifests into real-world vulnerability CVE-2002-0160. The Access Control Server example demonstrates how backslash sequence handling failures enable attackers to bypass directory restrictions, emphasizing the importance of securing software against known weaknesses and serving as a case study for security professionals."
+    },
+
+
+
+
+
+
+    {
+        "question": "What real-world DNS cache poisoning scenarios demonstrate how traffic routing manipulation exploits endpoint verification failures?",
+        "type": "<s,p,*>",
+        "first_node": "CAPEC-481: Contradictory Destinations in Traffic Routing Schemes",
+        "relationship_1": "UCOEXHASRELATEDWEAKNESS",
+        "second_node": "CWE-923: Improper Restriction of Communication Channel to Intended Endpoints",
+        "relationship_2": "UCOHASOBSERVEDEXAMPLE",
+        "third_node": null,
+        "context": "CAPEC-481 involves adversaries manipulating network traffic routing by providing contradictory domain names, exploiting CWE-923 which addresses unauthorized endpoint spoofing. Real-world examples include DNS servers accepting updates from hosts they did not query, leading to cache poisoning, highlighting the need for robust endpoint verification."
+    },
+    {
+        "question": "How could contradictory domain name manipulation exploit communication channel restrictions to enable DNS server cache poisoning attacks?",
+        "type": "<s,*,o>",
+        "first_node": "CAPEC-481: Contradictory Destinations in Traffic Routing Schemes",
+        "relationship_1": "UCOEXHASRELATEDWEAKNESS",
+        "second_node": "CWE-923: Improper Restriction of Communication Channel to Intended Endpoints",
+        "relationship_2": "UCOHASOBSERVEDEXAMPLE",
+        "third_node": "DNS server accepting updates from unqueried hosts leading to cache poisoning",
+        "context": "Traffic routing manipulation provides contradictory domain names causing traffic redirection to unintended destinations, exploiting improper communication channel restrictions where endpoints can be spoofed. The DNS server example shows how accepting updates from unqueried hosts leads to cache poisoning through endpoint verification failures."
+    },
+    {
+        "question": "Why does the DNS cache poisoning example underscore how endpoint verification failures amplify contradictory routing attack effectiveness?",
+        "type": "<s,p,o>",
+        "first_node": "CAPEC-481: Contradictory Destinations in Traffic Routing Schemes",
+        "relationship_1": "UCOEXHASRELATEDWEAKNESS",
+        "second_node": "CWE-923: Improper Restriction of Communication Channel to Intended Endpoints",
+        "relationship_2": "UCOHASOBSERVEDEXAMPLE",
+        "third_node": "DNS server accepting updates from unqueried hosts leading to cache poisoning",
+        "context": "The relationship demonstrates how network failures to verify correct endpoints can be exploited to reroute traffic. The DNS cache poisoning example shows how endpoint spoofing enables adversaries to redirect traffic through contradictory routing, highlighting the critical need for robust endpoint verification to prevent spoofing attacks and security breaches."
+    },
+
+
+
+
+    {
+        "question": "What real-world password change scenarios demonstrate how recovery feature exploitation exposes insufficiently protected credentials in web applications?",
+        "type": "<s,p,*>",
+        "first_node": "CAPEC-50: Password Recovery Exploitation",
+        "relationship_1": "UCOEXHASRELATEDWEAKNESS",
+        "second_node": "CWE-522: Insufficiently Protected Credentials",
+        "relationship_2": "UCOHASOBSERVEDEXAMPLE",
+        "third_node": null,
+        "context": "CAPEC-50 exploits password recovery features to gain unauthorized access, related to CWE-522 where authentication credentials are transmitted or stored insecurely. Real-world examples include web applications with password change utilities that don't verify original passwords, potentially allowing unauthorized users to change passwords and gain system access."
+    },
+    {
+        "question": "How could weak password recovery mechanisms exploit credential protection failures to enable unauthorized password changes without verification?",
+        "type": "<s,*,o>",
+        "first_node": "CAPEC-50: Password Recovery Exploitation",
+        "relationship_1": "UCOEXHASRELATEDWEAKNESS",
+        "second_node": "CWE-522: Insufficiently Protected Credentials",
+        "relationship_2": "UCOHASOBSERVEDEXAMPLE",
+        "third_node": "Web application password change utility not verifying original password",
+        "context": "Password recovery exploitation attacks gain unauthorized access by exploiting recovery features, leveraging insufficiently protected credentials where authentication data is transmitted or stored insecurely. An observed example shows web applications with password change utilities lacking original password verification, enabling unauthorized password changes and system access."
+    },
+    {
+        "question": "Why does the unverified password change example underscore how credential protection failures amplify password recovery exploitation effectiveness?",
+        "type": "<s,p,o>",
+        "first_node": "CAPEC-50: Password Recovery Exploitation",
+        "relationship_1": "UCOEXHASRELATEDWEAKNESS",
+        "second_node": "CWE-522: Insufficiently Protected Credentials",
+        "relationship_2": "UCOHASOBSERVEDEXAMPLE",
+        "third_node": "Web application password change utility not verifying original password",
+        "context": "The relationship reveals how weak password recovery mechanisms lead to exposure of insufficiently protected credentials. The password change utility example demonstrates how lack of original password verification enables attackers to exploit recovery features, emphasizing the importance of implementing robust password recovery and credential protection systems to mitigate security threats."
+    },
+
+
+    {
+        "question": "What real-world cleartext transmission scenarios demonstrate how passive interception exploits missing encryption in device configuration protocols?",
+        "type": "<s,p,*>",
+        "first_node": "CAPEC-157: Sniffing Attacks",
+        "relationship_1": "UCOEXHASRELATEDWEAKNESS",
+        "second_node": "CWE-311: Missing Encryption of Sensitive Data",
+        "relationship_2": "UCOHASOBSERVEDEXAMPLE",
+        "third_node": null,
+        "context": "CAPEC-157 involves adversaries passively intercepting information transmitted between parties without altering content, exploiting CWE-311 where sensitive information isn't encrypted before storage or transmission. Real-world examples include printers sending configuration information, including administrative passwords, in cleartext, demonstrating practical implications and vulnerability to sniffing attacks."
+    },
+    {
+        "question": "How could passive network interception exploit unencrypted data transmission to capture administrative credentials sent by printer configuration utilities?",
+        "type": "<s,*,o>",
+        "first_node": "CAPEC-157: Sniffing Attacks",
+        "relationship_1": "UCOEXHASRELATEDWEAKNESS",
+        "second_node": "CWE-311: Missing Encryption of Sensitive Data",
+        "relationship_2": "UCOHASOBSERVEDEXAMPLE",
+        "third_node": "Printer sending configuration information including administrative password in cleartext",
+        "context": "Sniffing attacks passively intercept information transmitted between parties, leveraging missing encryption where sensitive data isn't protected before transmission. An observed example shows printers sending configuration information, including administrative passwords, in cleartext, revealing practical implications of the weakness and potential for passive interception."
+    },
+    {
+        "question": "Why does the printer cleartext password example underscore how encryption failures amplify passive eavesdropping attack effectiveness?",
+        "type": "<s,p,o>",
+        "first_node": "CAPEC-157: Sniffing Attacks",
+        "relationship_1": "UCOEXHASRELATEDWEAKNESS",
+        "second_node": "CWE-311: Missing Encryption of Sensitive Data",
+        "relationship_2": "UCOHASOBSERVEDEXAMPLE",
+        "third_node": "Printer sending configuration information including administrative password in cleartext",
+        "context": "The relationship pattern demonstrates how missing encryption enables passive interception tactics. The printer cleartext transmission example shows how encryption failures expose administrative credentials to sniffing attacks, underscoring the importance of data encryption in safeguarding sensitive information and serving as a cautionary tale for prioritizing encryption protocols."
+    },
+    {
+        "question": "What encryption protocol gaps enable sniffing attacks to intercept administrative credentials during printer configuration information exchanges?",
+        "type": "<s,p,*>",
+        "first_node": "CAPEC-157: Sniffing Attacks",
+        "relationship_1": "UCOEXHASRELATEDWEAKNESS",
+        "second_node": "CWE-311: Missing Encryption of Sensitive Data",
+        "relationship_2": "UCOHASOBSERVEDEXAMPLE",
+        "third_node": null,
+        "context": "Sniffing attacks passively intercept transmitted information, exploiting missing encryption of sensitive data before storage or transmission. The printer cleartext password example demonstrates how lack of encryption protocols makes configuration data vulnerable to eavesdropping, highlighting the need for developers and administrators to prioritize data encryption to mitigate such vulnerabilities."
+    }
+
+
+]

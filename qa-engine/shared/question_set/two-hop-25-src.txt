@@ -1,0 +1,446 @@
+MATCH (a)-[r]->(b)-[s]->(c) WHERE id(r) = 1275872 and id(s)= 5654 RETURN a,r,b,s,c
+
+[
+    {
+        "node1": {
+            "label": "CAPEC-87: Forceful Browsing",
+            "ucoexDescription": "An attacker employs forceful browsing (direct URL entry) to access portions of a website that are otherwise unreachable. Usually, a front controller or similar design pattern is employed to protect access to portions of a web application. Forceful browsing enables an attacker to access information, perform privileged operations and otherwise reach sections of the web application that have been improperly protected.",
+            "uri": "https://capec.mitre.org/data/definitions/87.html",
+            "labels": [
+                "Resource",
+                "UcoexCAPEC"
+            ]
+        },
+        "node2": {
+            "ucocweName": "Improper Authorization",
+            "uri": "http://purl.org/cyber/uco#CWE-285",
+            "ucocweExtendedSummary": "Assuming a user with a given identity, authorization is the process of determining whether that user can access a given resource, based on the user's privileges and any permissions or other access-control specifications that apply to the resource.\nWhen access control checks are not applied consistently - or not at all - users are able to access data or perform actions that they should not be allowed to perform. This can lead to a wide range of problems, including information exposures, denial of service, and arbitrary code execution.",
+            "ucocweSummary": "The product does not perform or incorrectly performs an authorization check when an actor attempts to access a resource or perform an action.",
+            "labels": [
+                "Resource",
+                "UcoCWE"
+            ]
+        },
+        "node3": {
+            "ucoexDESCRIPTION": "ACL-based protection mechanism treats negative access rights as if they are positive, allowing bypass of intended restrictions.",
+            "uri": "http://example.com/ucoex#CWE-285-CVE-2008-4577",
+            "labels": [
+                "UcoexObservedExample",
+                "Resource"
+            ]
+        },
+        "relationships": {
+            "node1_node2": [
+                {
+                    "type": "UCOEXHASRELATEDWEAKNESS"
+                }
+            ],
+            "node2_node3": [
+                {
+                    "type": "UCOHASOBSERVEDEXAMPLE"
+                }
+            ]
+        }
+    }
+]
+
+UcoCWE: Common Weakness Enumeration - software weakness types and categories (e.g., CWE-79 for XSS)
+UcoexCAPEC: Common Attack Pattern Enumeration and Classification - attack patterns and techniques used by adversaries
+UcoexObservedExample: Real-world examples of vulnerabilities and attacks being observed
+UCOEXHASRELATEDWEAKNESS: Attack pattern exploits specific weakness - connects CAPECs to CWEs
+UCOHASOBSERVEDEXAMPLE: Weakness has real-world observed examples - connects CWEs to observed examples
+
+
+
+
+
+
+MATCH (a)-[r]->(b)-[s]->(c) WHERE id(r) = 6753 and id(s)=889  RETURN a,r,b,s,c
+[
+    {
+        "node1": {
+            "ucocweName": "Improper Control of Generation of Code ('Code Injection')",
+            "uri": "http://purl.org/cyber/uco#CWE-94",
+            "ucocweSummary": "The product constructs all or part of a code segment using externally-influenced input from an upstream component, but it does not neutralize or incorrectly neutralizes special elements that could modify the syntax or behavior of the intended code segment.",
+            "labels": [
+                "Resource",
+                "UcoCWE"
+            ]
+        },
+        "node2": {
+            "ucoexDESCRIPTION": "Perl code directly injected into CGI library file from parameters to another CGI program.",
+            "uri": "http://example.com/ucoex#CWE-94-CVE-2002-0495",
+            "labels": [
+                "UcoexObservedExample",
+                "Resource"
+            ]
+        },
+        "node3": {
+            "ucobaseSeverity": "HIGH",
+            "label": "CVE-2002-0495",
+            "uri": "http://purl.org/cyber/uco#CVE-2002-0495",
+            "labels": [
+                "Resource",
+                "UcoCVE"
+            ]
+        },
+        "relationships": {
+            "node1_node2": [
+                {
+                    "type": "UCOHASOBSERVEDEXAMPLE"
+                }
+            ],
+            "node2_node3": [
+                {
+                    "type": "UCOEXEXAMPLEOBSERVEDIN"
+                }
+            ]
+        }
+    }
+]
+
+UcoCVE: Common Vulnerabilities and Exposures - security vulnerabilities with unique identifiers (e.g., CVE-2023-1234)
+UcoCWE: Common Weakness Enumeration - software weakness types and categories (e.g., CWE-79 for XSS)
+UcoexObservedExample: Real-world examples of vulnerabilities and attacks being observed
+UCOEXEXAMPLEOBSERVEDIN: Observed example is found in specific CVE - connects examples to CVEs
+UCOHASOBSERVEDEXAMPLE: Weakness has real-world observed examples - connects CWEs to observed examples
+
+
+
+
+
+
+
+
+MATCH (a)-[r]->(b)-[s]->(c) WHERE id(r) = 6131 and id(s)= 3577 RETURN a,r,b,s,c
+[
+    {
+        "node1": {
+            "ucocweName": "Improper Resolution of Path Equivalence",
+            "uri": "http://purl.org/cyber/uco#CWE-41",
+            "ucocweExtendedSummary": "Path equivalence is usually employed in order to circumvent access controls expressed using an incomplete set of file name or file path representations. This is different from path traversal, wherein the manipulations are performed to generate a name for a different object.",
+            "ucocweSummary": "The product is vulnerable to file system contents disclosure through path equivalence. Path equivalence involves the use of special characters in file and directory names. The associated manipulations are intended to generate multiple names for the same object.",
+            "labels": [
+                "UcoCWE",
+                "Resource"
+            ]
+        },
+        "node2": {
+            "ucoexDESCRIPTION": "Source code disclosure using trailing dot",
+            "uri": "http://example.com/ucoex#CWE-41-CVE-2005-3293",
+            "labels": [
+                "UcoexObservedExample",
+                "Resource"
+            ]
+        },
+        "node3": {
+            "ucobaseSeverity": "MEDIUM",
+            "label": "CVE-2005-3293",
+            "uri": "http://purl.org/cyber/uco#CVE-2005-3293",
+            "labels": [
+                "Resource",
+                "UcoCVE"
+            ]
+        },
+        "relationships": {
+            "node1_node2": [
+                {
+                    "type": "UCOHASOBSERVEDEXAMPLE"
+                }
+            ],
+            "node2_node3": [
+                {
+                    "type": "UCOEXEXAMPLEOBSERVEDIN"
+                }
+            ]
+        }
+    }
+]
+
+UcoCVE: Common Vulnerabilities and Exposures - security vulnerabilities with unique identifiers (e.g., CVE-2023-1234)
+UcoCWE: Common Weakness Enumeration - software weakness types and categories (e.g., CWE-79 for XSS)
+UcoexObservedExample: Real-world examples of vulnerabilities and attacks being observed
+UCOEXEXAMPLEOBSERVEDIN: Observed example is found in specific CVE - connects examples to CVEs
+UCOHASOBSERVEDEXAMPLE: Weakness has real-world observed examples - connects CWEs to observed examples
+
+
+
+
+MATCH (a)-[r]->(b)-[s]->(c) WHERE id(r) = 1275382 and id(s)= 4895 RETURN a,r,b,s,c
+
+[
+    {
+        "node1": {
+            "label": "CAPEC-468: Generic Cross-Browser Cross-Domain Theft",
+            "ucoexDescription": "An attacker makes use of Cascading Style Sheets (CSS) injection to steal data cross domain from the victim's browser. The attack works by abusing the standards relating to loading of CSS: 1. Send cookies on any load of CSS (including cross-domain) 2. When parsing returned CSS ignore all data that does not make sense before a valid CSS descriptor is found by the CSS parser.",
+            "uri": "https://capec.mitre.org/data/definitions/468.html",
+            "labels": [
+                "Resource",
+                "UcoexCAPEC"
+            ]
+        },
+        "node2": {
+            "ucocweName": "Improper Neutralization of Quoting Syntax",
+            "uri": "http://purl.org/cyber/uco#CWE-149",
+            "ucocweSummary": "Quotes injected into a product can be used to compromise a system. As data are parsed, an injected/absent/duplicate/malformed use of quotes may cause the process to take unexpected actions.",
+            "labels": [
+                "Resource",
+                "UcoCWE"
+            ]
+        },
+        "node3": {
+            "ucoexDESCRIPTION": "Database allows remote attackers to cause a denial of service (application crash) via a MATCH AGAINST query with an opening double quote but no closing double quote.",
+            "uri": "http://example.com/ucoex#CWE-149-CVE-2004-0956",
+            "labels": [
+                "Resource",
+                "UcoexObservedExample"
+            ]
+        },
+        "relationships": {
+            "node1_node2": [
+                {
+                    "type": "UCOEXHASRELATEDWEAKNESS"
+                }
+            ],
+            "node2_node3": [
+                {
+                    "type": "UCOHASOBSERVEDEXAMPLE"
+                }
+            ]
+        }
+    }
+]
+
+UcoCWE: Common Weakness Enumeration - software weakness types and categories (e.g., CWE-79 for XSS)
+UcoexCAPEC: Common Attack Pattern Enumeration and Classification - attack patterns and techniques used by adversaries
+UcoexObservedExample: Real-world examples of vulnerabilities and attacks being observed
+UCOEXHASRELATEDWEAKNESS: Attack pattern exploits specific weakness - connects CAPECs to CWEs
+UCOHASOBSERVEDEXAMPLE: Weakness has real-world observed examples - connects CWEs to observed examples
+
+
+
+
+
+
+
+MATCH (a)-[r]->(b)-[s]->(c) WHERE id(r) = 6206 and id(s)=2576 RETURN a,r,b,s,c
+[
+    {
+        "node1": {
+            "ucocweName": "Path Traversal: 'dir\\..\\..\\filename'",
+            "uri": "http://purl.org/cyber/uco#CWE-31",
+            "ucocweExtendedSummary": "This allows attackers to traverse the file system to access files or directories that are outside of the restricted directory.\nThe 'dir\\..\\..\\filename' manipulation is useful for bypassing some path traversal protection schemes. Sometimes a program only removes one \"..\\\" sequence, so multiple \"..\\\" can bypass that check. Alternately, this manipulation could be used to bypass a check for \"..\\\" at the beginning of the pathname, moving up more than one directory level.",
+            "ucocweSummary": "The product uses external input to construct a pathname that should be within a restricted directory, but it does not properly neutralize 'dir\\..\\..\\filename' (multiple internal backslash dot dot) sequences that can resolve to a location that is outside of that directory.",
+            "labels": [
+                "Resource",
+                "UcoCWE"
+            ]
+        },
+        "node2": {
+            "ucoexDESCRIPTION": "The administration function in Access Control Server allows remote attackers to read HTML, Java class, and image files outside the web root via a \"..\\..\" sequence in the URL to port 2002.",
+            "uri": "http://example.com/ucoex#CWE-31-CVE-2002-0160",
+            "labels": [
+                "Resource",
+                "UcoexObservedExample"
+            ]
+        },
+        "node3": {
+            "ucobaseSeverity": "MEDIUM",
+            "label": "CVE-2002-0160",
+            "uri": "http://purl.org/cyber/uco#CVE-2002-0160",
+            "labels": [
+                "Resource",
+                "UcoCVE"
+            ]
+        },
+        "relationships": {
+            "node1_node2": [
+                {
+                    "type": "UCOHASOBSERVEDEXAMPLE"
+                }
+            ],
+            "node2_node3": [
+                {
+                    "type": "UCOEXEXAMPLEOBSERVEDIN"
+                }
+            ]
+        }
+    }
+]
+
+
+UcoCVE: Common Vulnerabilities and Exposures - security vulnerabilities with unique identifiers (e.g., CVE-2023-1234)
+UcoCWE: Common Weakness Enumeration - software weakness types and categories (e.g., CWE-79 for XSS)
+UcoexObservedExample: Real-world examples of vulnerabilities and attacks being observed
+UCOEXEXAMPLEOBSERVEDIN: Observed example is found in specific CVE - connects examples to CVEs
+UCOHASOBSERVEDEXAMPLE: Weakness has real-world observed examples - connects CWEs to observed examples
+
+
+
+
+
+MATCH (a)-[r]->(b)-[s]->(c) WHERE id(r) = 1275441 and id(s) = 6942 RETURN a,r,b,s,c
+[
+    {
+        "node1": {
+            "label": "CAPEC-481: Contradictory Destinations in Traffic Routing Schemes",
+            "ucoexDescription": "Adversaries can provide contradictory destinations when sending messages. Traffic is routed in networks using the domain names in various headers available at different levels of the OSI model. In a Content Delivery Network (CDN) multiple domains might be available, and if there are contradictory domain names provided it is possible to route traffic to an inappropriate destination. The technique, called Domain Fronting, involves using different domain names in the SNI field of the TLS header and the Host field of the HTTP header. An alternative technique, called Domainless Fronting, is similar, but the SNI field is left blank.",
+            "uri": "https://capec.mitre.org/data/definitions/481.html",
+            "labels": [
+                "Resource",
+                "UcoexCAPEC"
+            ]
+        },
+        "node2": {
+            "ucocweName": "Improper Restriction of Communication Channel to Intended Endpoints",
+            "uri": "http://purl.org/cyber/uco#CWE-923",
+            "ucocweExtendedSummary": "Attackers might be able to spoof the intended endpoint from a different system or process, thus gaining the same level of access as the intended endpoint.\nWhile this issue frequently involves authentication between network-based clients and servers, other types of communication channels and endpoints can have this weakness.",
+            "ucocweSummary": "The product establishes a communication channel to (or from) an endpoint for privileged or protected operations, but it does not properly ensure that it is communicating with the correct endpoint.",
+            "labels": [
+                "Resource",
+                "UcoCWE"
+            ]
+        },
+        "node3": {
+            "ucoexDESCRIPTION": "DNS server can accept DNS updates from hosts that it did not query, leading to cache poisoning",
+            "uri": "http://example.com/ucoex#CWE-923-CVE-2000-1218",
+            "labels": [
+                "Resource",
+                "UcoexObservedExample"
+            ]
+        },
+        "relationships": {
+            "node1_node2": [
+                {
+                    "type": "UCOEXHASRELATEDWEAKNESS"
+                }
+            ],
+            "node2_node3": [
+                {
+                    "type": "UCOHASOBSERVEDEXAMPLE"
+                }
+            ]
+        }
+    }
+]
+
+
+UcoCWE: Common Weakness Enumeration - software weakness types and categories (e.g., CWE-79 for XSS)
+UcoexCAPEC: Common Attack Pattern Enumeration and Classification - attack patterns and techniques used by adversaries
+UcoexObservedExample: Real-world examples of vulnerabilities and attacks being observed
+UCOEXHASRELATEDWEAKNESS: Attack pattern exploits specific weakness - connects CAPECs to CWEs
+UCOHASOBSERVEDEXAMPLE: Weakness has real-world observed examples - connects CWEs to observed examples
+
+
+
+
+
+MATCH (a)-[r]->(b)-[s]->(c) WHERE id(r) = 1274528 and id(s) = 5416 RETURN a,r,b,s,c
+[
+    {
+        "node1": {
+            "label": "CAPEC-50: Password Recovery Exploitation",
+            "ucoexDescription": "An attacker may take advantage of the application feature to help users recover their forgotten passwords in order to gain access into the system with the same privileges as the original user. Generally password recovery schemes tend to be weak and insecure.",
+            "uri": "https://capec.mitre.org/data/definitions/50.html",
+            "labels": [
+                "Resource",
+                "UcoexCAPEC"
+            ]
+        },
+        "node2": {
+            "ucocweName": "Insufficiently Protected Credentials",
+            "uri": "http://purl.org/cyber/uco#CWE-522",
+            "ucocweSummary": "The product transmits or stores authentication credentials, but it uses an insecure method that is susceptible to unauthorized interception and/or retrieval.",
+            "labels": [
+                "UcoCWE",
+                "Resource"
+            ]
+        },
+        "node3": {
+            "ucoexDESCRIPTION": "Web application password change utility doesn't check the original password.",
+            "uri": "http://example.com/ucoex#CWE-522-CVE-2000-0944",
+            "labels": [
+                "Resource",
+                "UcoexObservedExample"
+            ]
+        },
+        "relationships": {
+            "node1_node2": [
+                {
+                    "type": "UCOEXHASRELATEDWEAKNESS"
+                }
+            ],
+            "node2_node3": [
+                {
+                    "type": "UCOHASOBSERVEDEXAMPLE"
+                }
+            ]
+        }
+    }
+]
+
+UcoCWE: Common Weakness Enumeration - software weakness types and categories (e.g., CWE-79 for XSS)
+UcoexCAPEC: Common Attack Pattern Enumeration and Classification - attack patterns and techniques used by adversaries
+UcoexObservedExample: Real-world examples of vulnerabilities and attacks being observed
+UCOEXHASRELATEDWEAKNESS: Attack pattern exploits specific weakness - connects CAPECs to CWEs
+UCOHASOBSERVEDEXAMPLE: Weakness has real-world observed examples - connects CWEs to observed examples
+
+
+
+
+MATCH (a)-[r]->(b)-[s]->(c) WHERE id(r) = 1275614 and id(s) = 5635 RETURN a,r,b,s,c
+[
+    {
+        "node1": {
+            "label": "CAPEC-157: Sniffing Attacks",
+            "ucoexDescription": "In this attack pattern, the adversary intercepts information transmitted between two third parties. The adversary must be able to observe, read, and/or hear the communication traffic, but not necessarily block the communication or change its content. Any transmission medium can theoretically be sniffed if the adversary can examine the contents between the sender and recipient. Sniffing Attacks are similar to Adversary-In-The-Middle attacks (CAPEC-94), but are entirely passive. AiTM attacks are predominantly active and often alter the content of the communications themselves.",
+            "uri": "https://capec.mitre.org/data/definitions/157.html",
+            "labels": [
+                "UcoexCAPEC",
+                "Resource"
+            ]
+        },
+        "node2": {
+            "ucocweName": "Missing Encryption of Sensitive Data",
+            "uri": "http://purl.org/cyber/uco#CWE-311",
+            "ucocweSummary": "The product does not encrypt sensitive or critical information before storage or transmission.",
+            "labels": [
+                "Resource",
+                "UcoCWE"
+            ]
+        },
+        "node3": {
+            "ucoexDESCRIPTION": "Printer sends configuration information, including administrative password, in cleartext.",
+            "uri": "http://example.com/ucoex#CWE-311-CVE-2008-0374",
+            "labels": [
+                "UcoexObservedExample",
+                "Resource"
+            ]
+        },
+        "relationships": {
+            "node1_node2": [
+                {
+                    "type": "UCOEXHASRELATEDWEAKNESS"
+                }
+            ],
+            "node2_node3": [
+                {
+                    "type": "UCOHASOBSERVEDEXAMPLE"
+                }
+            ]
+        }
+    }
+]
+
+
+UcoCWE: Common Weakness Enumeration - software weakness types and categories (e.g., CWE-79 for XSS)
+UcoexCAPEC: Common Attack Pattern Enumeration and Classification - attack patterns and techniques used by adversaries
+UcoexObservedExample: Real-world examples of vulnerabilities and attacks being observed
+UCOEXHASRELATEDWEAKNESS: Attack pattern exploits specific weakness - connects CAPECs to CWEs
+UCOHASOBSERVEDEXAMPLE: Weakness has real-world observed examples - connects CWEs to observed examples
+
+
+
+
+
+
