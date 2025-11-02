@@ -1,0 +1,99 @@
+node id = 773001
+
+[
+    {
+        "node": {
+            "label": "CAPEC-157: Sniffing Attacks",
+            "ucoexDescription": "In this attack pattern, the adversary intercepts information transmitted between two third parties. The adversary must be able to observe, read, and/or hear the communication traffic, but not necessarily block the communication or change its content. Any transmission medium can theoretically be sniffed if the adversary can examine the contents between the sender and recipient. Sniffing Attacks are similar to Adversary-In-The-Middle attacks (CAPEC-94), but are entirely passive. AiTM attacks are predominantly active and often alter the content of the communications themselves.",
+            "uri": "https://capec.mitre.org/data/definitions/157.html",
+            "labels": [
+                "Resource",
+                "UcoexCAPEC"
+            ]
+        }
+    }
+]
+
+UcoexCAPEC: Common Attack Pattern Enumeration and Classification - attack patterns and techniques used by adversaries
+
+
+
+node id = 6575
+
+[
+    {
+        "node": {
+            "ucocweName": "Missing Encryption of Sensitive Data",
+            "uri": "http://purl.org/cyber/uco#CWE-311",
+            "ucocweSummary": "The product does not encrypt sensitive or critical information before storage or transmission.",
+            "labels": [
+                "UcoCWE",
+                "Resource"
+            ]
+        }
+    }
+]
+
+UcoCWE: Common Weakness Enumeration - software weakness types and categories (e.g., CWE-79 for XSS)
+
+
+
+
+
+772994
+[
+    {
+        "node": {
+            "label": "CAPEC-50: Password Recovery Exploitation",
+            "ucoexDescription": "An attacker may take advantage of the application feature to help users recover their forgotten passwords in order to gain access into the system with the same privileges as the original user. Generally password recovery schemes tend to be weak and insecure.",
+            "uri": "https://capec.mitre.org/data/definitions/50.html",
+            "labels": [
+                "UcoexCAPEC",
+                "Resource"
+            ]
+        }
+    }
+]
+UcoexCAPEC: Common Attack Pattern Enumeration and Classification - attack patterns and techniques used by adversaries
+
+
+
+
+772998
+[
+    {
+        "node": {
+            "label": "CAPEC-481: Contradictory Destinations in Traffic Routing Schemes",
+            "ucoexDescription": "Adversaries can provide contradictory destinations when sending messages. Traffic is routed in networks using the domain names in various headers available at different levels of the OSI model. In a Content Delivery Network (CDN) multiple domains might be available, and if there are contradictory domain names provided it is possible to route traffic to an inappropriate destination. The technique, called Domain Fronting, involves using different domain names in the SNI field of the TLS header and the Host field of the HTTP header. An alternative technique, called Domainless Fronting, is similar, but the SNI field is left blank.",
+            "uri": "https://capec.mitre.org/data/definitions/481.html",
+            "labels": [
+                "Resource",
+                "UcoexCAPEC"
+            ]
+        }
+    }
+]
+UcoexCAPEC: Common Attack Pattern Enumeration and Classification - attack patterns and techniques used by adversaries
+
+
+1954
+
+[
+    {
+        "node": {
+            "ucocweName": "Improper Restriction of Communication Channel to Intended Endpoints",
+            "uri": "http://purl.org/cyber/uco#CWE-923",
+            "ucocweExtendedSummary": "Attackers might be able to spoof the intended endpoint from a different system or process, thus gaining the same level of access as the intended endpoint.\nWhile this issue frequently involves authentication between network-based clients and servers, other types of communication channels and endpoints can have this weakness.",
+            "ucocweSummary": "The product establishes a communication channel to (or from) an endpoint for privileged or protected operations, but it does not properly ensure that it is communicating with the correct endpoint.",
+            "labels": [
+                "Resource",
+                "UcoCWE"
+            ]
+        }
+    }
+]
+
+UcoCWE: Common Weakness Enumeration - software weakness types and categories (e.g., CWE-79 for XSS)
+
+
+

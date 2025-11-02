@@ -1,0 +1,156 @@
+[
+    {
+        "question": "How does passive interception of transmitted data enable adversaries to gather intelligence without alerting communicating parties?",
+        "type": "<s,*,*>",
+        "first_node": "CAPEC-157: Sniffing Attacks",
+        "context": "CAPEC-157: Sniffing Attacks is a type of cybersecurity attack pattern categorized under UcoexCAPEC. During this attack, the adversary intercepts and scrutinizes the information being shared between two parties without necessarily blocking the communication or altering its content. This method can be applied to any transmission medium, making it a significant threat in cybersecurity. It's important to note that while similar to Adversary-In-The-Middle attacks, Sniffing Attacks are passive and do not typically alter the content of communications."
+    },
+    {
+        "question": "What distinguishes passive observation techniques from active manipulation methods when adversaries intercept network communications?",
+        "type": "<s,*,*>",
+        "first_node": "CAPEC-157: Sniffing Attacks",
+        "context": "CAPEC-157: Sniffing Attacks is a type of cybersecurity attack pattern categorized under UcoexCAPEC. During this attack, the adversary intercepts and scrutinizes the information being shared between two parties without necessarily blocking the communication or altering its content. This method can be applied to any transmission medium, making it a significant threat in cybersecurity. It's important to note that while similar to Adversary-In-The-Middle attacks, Sniffing Attacks are passive and do not typically alter the content of communications."
+    },
+    {
+        "question": "Which transmission mediums are vulnerable to adversaries scrutinizing information exchanges without modifying communication content?",
+        "type": "<s,*,*>",
+        "first_node": "CAPEC-157: Sniffing Attacks",
+        "context": "CAPEC-157: Sniffing Attacks is a type of cybersecurity attack pattern categorized under UcoexCAPEC. During this attack, the adversary intercepts and scrutinizes the information being shared between two parties without necessarily blocking the communication or altering its content. This method can be applied to any transmission medium, making it a significant threat in cybersecurity. It's important to note that while similar to Adversary-In-The-Middle attacks, Sniffing Attacks are passive and do not typically alter the content of communications."
+    },
+    {
+        "question": "How does undetectable monitoring of data exchanges pose significant threats across various communication channels?",
+        "type": "<s,*,*>",
+        "first_node": "CAPEC-157: Sniffing Attacks",
+        "context": "CAPEC-157: Sniffing Attacks is a type of cybersecurity attack pattern categorized under UcoexCAPEC. During this attack, the adversary intercepts and scrutinizes the information being shared between two parties without necessarily blocking the communication or altering its content. This method can be applied to any transmission medium, making it a significant threat in cybersecurity. It's important to note that while similar to Adversary-In-The-Middle attacks, Sniffing Attacks are passive and do not typically alter the content of communications."
+    },
+    {
+        "question": "What reconnaissance advantages do adversaries gain from observing unencrypted information flows without disrupting communication?",
+        "type": "<s,*,*>",
+        "first_node": "CAPEC-157: Sniffing Attacks",
+        "context": "CAPEC-157: Sniffing Attacks is a type of cybersecurity attack pattern categorized under UcoexCAPEC. During this attack, the adversary intercepts and scrutinizes the information being shared between two parties without necessarily blocking the communication or altering its content. This method can be applied to any transmission medium, making it a significant threat in cybersecurity. It's important to note that while similar to Adversary-In-The-Middle attacks, Sniffing Attacks are passive and do not typically alter the content of communications."
+    },
+
+    {
+        "question": "How does failing to encrypt critical information before storage enable unauthorized access to sensitive data assets?",
+        "type": "<s,*,*>",
+        "first_node": "CWE-311: Missing Encryption of Sensitive Data",
+        "context": "Missing Encryption of Sensitive Data is a type of software weakness, also known as CWE-311. This weakness arises when a product fails to encrypt critical or sensitive information prior to storage or transmission. This is significant in the cybersecurity context as it can lead to unauthorized access to sensitive data, posing serious security risks."
+    },
+    {
+        "question": "What security risks emerge when products transmit sensitive information without applying cryptographic protection mechanisms?",
+        "type": "<s,*,*>",
+        "first_node": "CWE-311: Missing Encryption of Sensitive Data",
+        "context": "Missing Encryption of Sensitive Data is a type of software weakness, also known as CWE-311. This weakness arises when a product fails to encrypt critical or sensitive information prior to storage or transmission. This is significant in the cybersecurity context as it can lead to unauthorized access to sensitive data, posing serious security risks."
+    },
+    {
+        "question": "Which vulnerabilities arise from storing critical data without implementing encryption safeguards before persistence operations?",
+        "type": "<s,*,*>",
+        "first_node": "CWE-311: Missing Encryption of Sensitive Data",
+        "context": "Missing Encryption of Sensitive Data is a type of software weakness, also known as CWE-311. This weakness arises when a product fails to encrypt critical or sensitive information prior to storage or transmission. This is significant in the cybersecurity context as it can lead to unauthorized access to sensitive data, posing serious security risks."
+    },
+    {
+        "question": "How does the absence of cryptographic controls during data transmission increase exposure to interception attacks?",
+        "type": "<s,*,*>",
+        "first_node": "CWE-311: Missing Encryption of Sensitive Data",
+        "context": "Missing Encryption of Sensitive Data is a type of software weakness, also known as CWE-311. This weakness arises when a product fails to encrypt critical or sensitive information prior to storage or transmission. This is significant in the cybersecurity context as it can lead to unauthorized access to sensitive data, posing serious security risks."
+    },
+    {
+        "question": "What exploitation opportunities exist when applications handle sensitive information without encryption prior to storage or transmission?",
+        "type": "<s,*,*>",
+        "first_node": "CWE-311: Missing Encryption of Sensitive Data",
+        "context": "Missing Encryption of Sensitive Data is a type of software weakness, also known as CWE-311. This weakness arises when a product fails to encrypt critical or sensitive information prior to storage or transmission. This is significant in the cybersecurity context as it can lead to unauthorized access to sensitive data, posing serious security risks."
+    },
+
+    {
+        "question": "How does exploiting weak password recovery mechanisms enable attackers to gain privileges equivalent to legitimate account owners?",
+        "type": "<s,*,*>",
+        "first_node": "CAPEC-50: Password Recovery Exploitation",
+        "context": "CAPEC-50: Password Recovery Exploitation is an attack technique classified under the Common Attack Pattern Enumeration and Classification (CAPEC). This method involves an attacker exploiting the password recovery feature of an application, often weak and insecure, to gain unauthorized access with the same privileges as the original user. Its significance in cybersecurity lies in its potentially devastating impact, leading to unauthorized access and potential data breaches."
+    },
+    {
+        "question": "What devastating impacts arise when insecure password reset features allow unauthorized users to assume original account privileges?",
+        "type": "<s,*,*>",
+        "first_node": "CAPEC-50: Password Recovery Exploitation",
+        "context": "CAPEC-50: Password Recovery Exploitation is an attack technique classified under the Common Attack Pattern Enumeration and Classification (CAPEC). This method involves an attacker exploiting the password recovery feature of an application, often weak and insecure, to gain unauthorized access with the same privileges as the original user. Its significance in cybersecurity lies in its potentially devastating impact, leading to unauthorized access and potential data breaches."
+    },
+    {
+        "question": "Which vulnerabilities in application password recovery systems enable adversaries to bypass authentication and acquire user-level access?",
+        "type": "<s,*,*>",
+        "first_node": "CAPEC-50: Password Recovery Exploitation",
+        "context": "CAPEC-50: Password Recovery Exploitation is an attack technique classified under the Common Attack Pattern Enumeration and Classification (CAPEC). This method involves an attacker exploiting the password recovery feature of an application, often weak and insecure, to gain unauthorized access with the same privileges as the original user. Its significance in cybersecurity lies in its potentially devastating impact, leading to unauthorized access and potential data breaches."
+    },
+    {
+        "question": "How do weaknesses in credential reset mechanisms create pathways for unauthorized access leading to potential data breaches?",
+        "type": "<s,*,*>",
+        "first_node": "CAPEC-50: Password Recovery Exploitation",
+        "context": "CAPEC-50: Password Recovery Exploitation is an attack technique classified under the Common Attack Pattern Enumeration and Classification (CAPEC). This method involves an attacker exploiting the password recovery feature of an application, often weak and insecure, to gain unauthorized access with the same privileges as the original user. Its significance in cybersecurity lies in its potentially devastating impact, leading to unauthorized access and potential data breaches."
+    },
+    {
+        "question": "What attack vectors target insecure password restoration features to compromise accounts with full legitimate user privileges?",
+        "type": "<s,*,*>",
+        "first_node": "CAPEC-50: Password Recovery Exploitation",
+        "context": "CAPEC-50: Password Recovery Exploitation is an attack technique classified under the Common Attack Pattern Enumeration and Classification (CAPEC). This method involves an attacker exploiting the password recovery feature of an application, often weak and insecure, to gain unauthorized access with the same privileges as the original user. Its significance in cybersecurity lies in its potentially devastating impact, leading to unauthorized access and potential data breaches."
+    },
+
+    {
+        "question": "How does providing conflicting domain names in network headers enable adversaries to misdirect traffic to unauthorized destinations?",
+        "type": "<s,*,*>",
+        "first_node": "CAPEC-481: Contradictory Destinations in Traffic Routing Schemes",
+        "context": "The node, labeled \"CAPEC-481: Contradictory Destinations in Traffic Routing Schemes\", refers to a specific cybersecurity attack pattern. This method involves adversaries providing conflicting destinations while sending messages, which can misdirect network traffic to an undesired location. The technique, often referred to as \"Domain Fronting\" or \"Domainless Fronting\", exploits the use of different domain names or a blank field in network headers. This is significant in cybersecurity as it can be used to divert network traffic and potentially access or disrupt unauthorized areas."
+    },
+    {
+        "question": "What risks emerge when attackers exploit domain fronting techniques to divert network traffic toward unintended locations?",
+        "type": "<s,*,*>",
+        "first_node": "CAPEC-481: Contradictory Destinations in Traffic Routing Schemes",
+        "context": "The node, labeled \"CAPEC-481: Contradictory Destinations in Traffic Routing Schemes\", refers to a specific cybersecurity attack pattern. This method involves adversaries providing conflicting destinations while sending messages, which can misdirect network traffic to an undesired location. The technique, often referred to as \"Domain Fronting\" or \"Domainless Fronting\", exploits the use of different domain names or a blank field in network headers. This is significant in cybersecurity as it can be used to divert network traffic and potentially access or disrupt unauthorized areas."
+    },
+    {
+        "question": "Which network header manipulation methods allow adversaries to use blank fields or contradictory domains for traffic redirection?",
+        "type": "<s,*,*>",
+        "first_node": "CAPEC-481: Contradictory Destinations in Traffic Routing Schemes",
+        "context": "The node, labeled \"CAPEC-481: Contradictory Destinations in Traffic Routing Schemes\", refers to a specific cybersecurity attack pattern. This method involves adversaries providing conflicting destinations while sending messages, which can misdirect network traffic to an undesired location. The technique, often referred to as \"Domain Fronting\" or \"Domainless Fronting\", exploits the use of different domain names or a blank field in network headers. This is significant in cybersecurity as it can be used to divert network traffic and potentially access or disrupt unauthorized areas."
+    },
+    {
+        "question": "How does domainless fronting enable unauthorized access by exploiting routing schemes with contradictory destination specifications?",
+        "type": "<s,*,*>",
+        "first_node": "CAPEC-481: Contradictory Destinations in Traffic Routing Schemes",
+        "context": "The node, labeled \"CAPEC-481: Contradictory Destinations in Traffic Routing Schemes\", refers to a specific cybersecurity attack pattern. This method involves adversaries providing conflicting destinations while sending messages, which can misdirect network traffic to an undesired location. The technique, often referred to as \"Domain Fronting\" or \"Domainless Fronting\", exploits the use of different domain names or a blank field in network headers. This is significant in cybersecurity as it can be used to divert network traffic and potentially access or disrupt unauthorized areas."
+    },
+    {
+        "question": "What disruption capabilities arise from message routing attacks that use different domain names to mislead traffic destinations?",
+        "type": "<s,*,*>",
+        "first_node": "CAPEC-481: Contradictory Destinations in Traffic Routing Schemes",
+        "context": "The node, labeled \"CAPEC-481: Contradictory Destinations in Traffic Routing Schemes\", refers to a specific cybersecurity attack pattern. This method involves adversaries providing conflicting destinations while sending messages, which can misdirect network traffic to an undesired location. The technique, often referred to as \"Domain Fronting\" or \"Domainless Fronting\", exploits the use of different domain names or a blank field in network headers. This is significant in cybersecurity as it can be used to divert network traffic and potentially access or disrupt unauthorized areas."
+    },
+
+    {
+        "question": "How does failing to verify communication endpoints enable attackers to spoof legitimate systems and gain unauthorized access?",
+        "type": "<s,*,*>",
+        "first_node": "CWE-923: Improper Restriction of Communication Channel to Intended Endpoints",
+        "context": "The entity, identified as CWE-923, refers to the common weakness enumeration titled \"Improper Restriction of Communication Channel to Intended Endpoints\". This vulnerability arises when a product sets up a communication channel for protected operations but fails to confirm it is communicating with the correct endpoint. In the context of cybersecurity, this weakness is significant as it allows attackers to spoof the intended endpoint from a different system or process, thereby gaining the same level of access as the legitimate endpoint. This vulnerability is not limited to network-based client-server interactions, but can also affect other types of communication channels and endpoints."
+    },
+    {
+        "question": "What risks emerge when protected operations lack endpoint verification across network-based and non-network communication channels?",
+        "type": "<s,*,*>",
+        "first_node": "CWE-923: Improper Restriction of Communication Channel to Intended Endpoints",
+        "context": "The entity, identified as CWE-923, refers to the common weakness enumeration titled \"Improper Restriction of Communication Channel to Intended Endpoints\". This vulnerability arises when a product sets up a communication channel for protected operations but fails to confirm it is communicating with the correct endpoint. In the context of cybersecurity, this weakness is significant as it allows attackers to spoof the intended endpoint from a different system or process, thereby gaining the same level of access as the legitimate endpoint. This vulnerability is not limited to network-based client-server interactions, but can also affect other types of communication channels and endpoints."
+    },
+    {
+        "question": "Which endpoint spoofing techniques exploit communication channels that lack proper verification mechanisms for protected operations?",
+        "type": "<s,*,*>",
+        "first_node": "CWE-923: Improper Restriction of Communication Channel to Intended Endpoints",
+        "context": "The entity, identified as CWE-923, refers to the common weakness enumeration titled \"Improper Restriction of Communication Channel to Intended Endpoints\". This vulnerability arises when a product sets up a communication channel for protected operations but fails to confirm it is communicating with the correct endpoint. In the context of cybersecurity, this weakness is significant as it allows attackers to spoof the intended endpoint from a different system or process, thereby gaining the same level of access as the legitimate endpoint. This vulnerability is not limited to network-based client-server interactions, but can also affect other types of communication channels and endpoints."
+    },
+    {
+        "question": "How does inadequate endpoint confirmation allow adversaries to achieve access privileges equivalent to legitimate communication partners?",
+        "type": "<s,*,*>",
+        "first_node": "CWE-923: Improper Restriction of Communication Channel to Intended Endpoints",
+        "context": "The entity, identified as CWE-923, refers to the common weakness enumeration titled \"Improper Restriction of Communication Channel to Intended Endpoints\". This vulnerability arises when a product sets up a communication channel for protected operations but fails to confirm it is communicating with the correct endpoint. In the context of cybersecurity, this weakness is significant as it allows attackers to spoof the intended endpoint from a different system or process, thereby gaining the same level of access as the legitimate endpoint. This vulnerability is not limited to network-based client-server interactions, but can also affect other types of communication channels and endpoints."
+    },
+    {
+        "question": "What exploitation scenarios arise when products establish communication channels without validating the identity of connected endpoints?",
+        "type": "<s,*,*>",
+        "first_node": "CWE-923: Improper Restriction of Communication Channel to Intended Endpoints",
+        "context": "The entity, identified as CWE-923, refers to the common weakness enumeration titled \"Improper Restriction of Communication Channel to Intended Endpoints\". This vulnerability arises when a product sets up a communication channel for protected operations but fails to confirm it is communicating with the correct endpoint. In the context of cybersecurity, this weakness is significant as it allows attackers to spoof the intended endpoint from a different system or process, thereby gaining the same level of access as the legitimate endpoint. This vulnerability is not limited to network-based client-server interactions, but can also affect other types of communication channels and endpoints."
+    }
+]
