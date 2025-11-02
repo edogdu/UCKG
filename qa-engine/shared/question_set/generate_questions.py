@@ -42,63 +42,63 @@ llm = ChatOllama(
 )
 
 # Prompt for 0-hop questions
-prompt = PromptTemplate(
-    input_variables=['context', 'terminology', 'questions'],
-    template="""
-You are an experienced cybersecurity analyst generating high-quality, reasoning-based questions 
-from a knowledge graph.
+# prompt = PromptTemplate(
+#     input_variables=['context', 'terminology', 'questions'],
+#     template="""
+# You are an experienced cybersecurity analyst generating high-quality, reasoning-based questions 
+# from a knowledge graph.
 
-Given:
-- a graph TERMINOLOGY,
-- EXAMPLE QUESTIONS (style reference), and
-- a CONTEXT subgraph summary(1 single node with all the important properties of the nodes such as Summary and Description but no incoming or outgoing relationship),
+# Given:
+# - a graph TERMINOLOGY,
+# - EXAMPLE QUESTIONS (style reference), and
+# - a CONTEXT subgraph summary(1 single node with all the important properties of the nodes such as Summary and Description but no incoming or outgoing relationship),
 
-## Goal
-generate 5 concise, natural analyst-style questions that a human would realistically ask about the particular provided node.
+# ## Goal
+# generate 5 concise, natural analyst-style questions that a human would realistically ask about the particular provided node.
 
-## PolyG-style Categorization
-Treat each question as a triple ⟨s, p, o⟩ but classify and ask only for the first node s:
-- ⟨s,*,*⟩ — general exploration of the first and only node
+# ## PolyG-style Categorization
+# Treat each question as a triple ⟨s, p, o⟩ but classify and ask only for the first node s:
+# - ⟨s,*,*⟩ — general exploration of the first and only node
 
-Subject (s): always the FIRST node in the provided context.
-Predicate (p): a relationship type from the terminology, if used.
-Object (o): the second node.
+# Subject (s): always the FIRST node in the provided context.
+# Predicate (p): a relationship type from the terminology, if used.
+# Object (o): the second node.
 
-- Each question must be ≤ 25 words, fluent, and realistic.
-- Prefer open analytical forms (“How could…?”, “What causes…?”, “Which factor connects…?”).
-- You will receive a summary about one and only node that cotains one of the aspects of cybersecurity
-- There will be thousands of cybersecurity related nodes.
-- Ask in a way that a person will have to look through the thousand of nodes and find the most appropriate answer by matching the description of the question and detail in the summary.
-- Avoid raw IDs or field names.
-- Avoid yes/no questions and multi-part phrasing.
-- Use cybersecurity reasoning naturally: exploitability, overflow, mitigation, validation, propagation, etc.
+# - Each question must be ≤ 25 words, fluent, and realistic.
+# - Prefer open analytical forms (“How could…?”, “What causes…?”, “Which factor connects…?”).
+# - You will receive a summary about one and only node that cotains one of the aspects of cybersecurity
+# - There will be thousands of cybersecurity related nodes.
+# - Ask in a way that a person will have to look through the thousand of nodes and find the most appropriate answer by matching the description of the question and detail in the summary.
+# - Avoid raw IDs or field names.
+# - Avoid yes/no questions and multi-part phrasing.
+# - Use cybersecurity reasoning naturally: exploitability, overflow, mitigation, validation, propagation, etc.
 
-## Output Format (STRICT JSON)
-Return ONLY a JSON array of 5 objects.
+# ## Output Format (STRICT JSON)
+# Return ONLY a JSON array of 5 objects.
 
-Each object must include:
-{
-    "question": "string",
-    "type": "<s,*,*>",
-    "first_node": "name/label of first node",
-    "context": "{context}"
-}
+# Each object must include:
+# {
+#     "question": "string",
+#     "type": "<s,*,*>",
+#     "first_node": "name/label of first node",
+#     "context": "{context}"
+# }
 
----
+# ---
 
-## TERMINOLOGY
-{terminology}
+# ## TERMINOLOGY
+# {terminology}
 
----
+# ---
 
-## EXAMPLE QUESTIONS (style reference)
-{questions}
+# ## EXAMPLE QUESTIONS (style reference)
+# {questions}
 
----
+# ---
 
-## CONTEXT
-{context}
-""")
+# ## CONTEXT
+# {context}
+# """)
 
 
 # Prompt for 1-hop questions
@@ -167,7 +167,78 @@ Each object must include:
 # {context}
 # """)
 
-# Prompt for 2-hop questions
+# Prompt for 2-hop questions ⟨s,*,o⟩
+prompt = PromptTemplate(
+    input_variables=['context', 'terminology', 'questions'],
+    template="""
+You are an experienced cybersecurity analyst generating high-quality, reasoning-based questions 
+from a knowledge graph.
+
+Given:
+- a graph TERMINOLOGY,
+- EXAMPLE QUESTIONS (style reference), and
+- a CONTEXT subgraph summary (3 connected nodes with properties + 2 relationships),
+
+## Goal
+generate 5 concise, natural analyst-style questions that a human would realistically ask.
+
+---
+
+## PolyG-style Categorization
+Treat each question as a triple ⟨s, p, o⟩ and classify by what is unknown:
+- ⟨s,*,o⟩ — relation discovery between known nodes
+
+**Subject (s)**: always the FIRST node in the context.  
+**Predicate (*)**: unknown relationship types from the terminology, if used (Rel1, Rel2).  
+**Object (o)**: the FINAL node (node3).
+
+---
+
+## Style & Constraints
+- Focus primarily on the **first element's analytical meaning** mentioned in the context (e.g., CWE, CAPEC, CVE, etc.).
+- Use the **third element** to enrich reasoning context.
+- Incorporate **both relationships** naturally — the question should imply traversal or causal linkage across the chain.
+- Each question must be ≤ 25 words, fluent, and realistic.
+- Avoid raw IDs or field names.
+- Do not repeat element labels (e.g., don’t say “CWE weakness” or “CAPEC attack pattern”).
+- Prefer open analytical forms (“How could…?”, “What causes…?”, “Which factor connects…?”).
+- Avoid yes/no and multi-part phrasing.
+- Every question must **require** understanding of the first and third elements and both relationships — no single-hop reasoning.
+
+---
+
+## Output Format (STRICT JSON)
+Return ONLY a JSON array of 5 objects.
+
+Each object must include:
+{
+    "question": "string",
+    "type": "<s,p,*>|<s,*,o>|<s,p,o>",
+    "first_node": "name/label of first element",
+    "relationship_1": "name of first relationship",
+    "second_node": "name/label of second element",
+    "relationship_2": "name of second relationship",
+    "third_node": "name/label of third element",
+    "context": "{context}"
+}
+
+---
+
+## TERMINOLOGY
+{terminology}
+
+---
+
+## EXAMPLE QUESTIONS (style reference)
+{questions}
+
+---
+
+## CONTEXT
+{context}
+""")
+
+# Prompt for 2-hop questions ⟨s,p,*⟩
 # prompt = PromptTemplate(
 #     input_variables=['context', 'terminology', 'questions'],
 #     template="""
@@ -187,7 +258,75 @@ Each object must include:
 # ## PolyG-style Categorization
 # Treat each question as a triple ⟨s, p, o⟩ and classify by what is unknown:
 # - ⟨s,p,*⟩ — focus on a known predicate
-# - ⟨s,*,o⟩ — relation discovery between known nodes
+
+# **Subject (s)**: always the FIRST node in the context.  
+# **Predicate (p)**: known relationship types from the terminology, if used (Rel1, Rel2).  
+# **Object (*)**: unknown target — inferred through reasoning.
+
+# ---
+
+# ## Style & Constraints
+# - Focus primarily on the **first element's analytical meaning** mentioned in the context (e.g., CWE, CAPEC, CVE, etc.).
+# - Incorporate **both relationships** naturally — the question should imply traversal or causal linkage across the chain.
+# - Each question must be ≤ 25 words, fluent, and realistic.
+# - Avoid raw IDs or field names.
+# - Do not repeat element labels (e.g., don’t say “CWE weakness” or “CAPEC attack pattern”).
+# - Prefer open analytical forms (“How could…?”, “What causes…?”, “Which factor connects…?”).
+# - Avoid yes/no and multi-part phrasing.
+# - Every question must **require** understanding of the first and third elements and both relationships — no single-hop reasoning.
+
+# ---
+
+# ## Output Format (STRICT JSON)
+# Return ONLY a JSON array of 5 objects.
+
+# Each object must include:
+# {
+#     "question": "string",
+#     "type": "<s,p,*>",
+#     "first_node": "name/label of first element",
+#     "relationship_1": "name of first relationship",
+#     "second_node": "name/label of second element",
+#     "relationship_2": "name of second relationship",
+#     "third_node": "name/label of third element" or null,
+#     "context": "{context}"
+# }
+
+# ---
+
+# ## TERMINOLOGY
+# {terminology}
+
+# ---
+
+# ## EXAMPLE QUESTIONS (style reference)
+# {questions}
+
+# ---
+
+# ## CONTEXT
+# {context}
+# """)
+
+# Prompt for 2-hop questions ⟨s,p,o⟩
+# prompt = PromptTemplate(
+#     input_variables=['context', 'terminology', 'questions'],
+#     template="""
+# You are an experienced cybersecurity analyst generating high-quality, reasoning-based questions 
+# from a knowledge graph.
+
+# Given:
+# - a graph TERMINOLOGY,
+# - EXAMPLE QUESTIONS (style reference), and
+# - a CONTEXT subgraph summary (3 connected nodes with properties + 2 relationships),
+
+# ## Goal
+# generate 5 concise, natural analyst-style questions that a human would realistically ask.
+
+# ---
+
+# ## PolyG-style Categorization
+# Treat each question as a triple ⟨s, p, o⟩ and classify by what is unknown:
 # - ⟨s,p,o⟩ — verification of a known predicate between two nodes
 
 # **Subject (s)**: always the FIRST node in the context.  
@@ -205,7 +344,6 @@ Each object must include:
 # - Do not repeat element labels (e.g., don’t say “CWE weakness” or “CAPEC attack pattern”).
 # - Prefer open analytical forms (“How could…?”, “What causes…?”, “Which factor connects…?”).
 # - Avoid yes/no and multi-part phrasing.
-# - Use **only <s,*,o>** question structure. 
 # - Every question must **require** understanding of the first and third elements and both relationships — no single-hop reasoning.
 
 # ---
@@ -216,7 +354,7 @@ Each object must include:
 # Each object must include:
 # {
 #     "question": "string",
-#     "type": "<s,p,*>|<s,*,o>|<s,p,o>",
+#     "type": "<s,p,o>",
 #     "first_node": "name/label of first element",
 #     "relationship_1": "name of first relationship",
 #     "second_node": "name/label of second element",
