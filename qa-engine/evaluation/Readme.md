@@ -20,6 +20,13 @@ python multi-eval.py --id 1
 
 # Disable plots for faster evaluation
 python multi-eval.py --id 1 --no-plots
+
+# Evaluate ALL IDs in dataset and show a table (no plots)
+python multi-eval.py --all-ids --no-plots
+
+# Save results
+python multi-eval.py --all-ids --save-csv results.csv
+python multi-eval.py --all-ids --save-json results.json
 ```
 
 ## Usage
@@ -92,6 +99,9 @@ python multi-eval.py --source-file source.txt --summary-file summary.txt --no-pl
 ### Dataset Mode
 - `--id`: Sample ID from evaluation dataset (enables dataset mode)
 - `--dataset`: Path to evaluation dataset JSON file (default: `evaluation_dataset.json`)
+- `--all-ids`: Evaluate all samples in the dataset and print a table
+- `--save-csv`: Path to save CSV when using `--all-ids`
+- `--save-json`: Path to save JSON when using `--all-ids`
 
 ## Output
 
@@ -111,6 +121,9 @@ The tool prints:
 
 3. **Visualizations** (optional):
    - Bar charts for ROUGE, BLEU, and BERTScore metrics
+
+4. **All-IDs Table (when using `--all-ids`):**
+   - Tabular metrics per ID with columns: `rouge1_f1`, `rouge2_f1`, `rougeLsum_f1`, `bleu1..4`, `bertscore_p/r/f1`, `bertscore_precision_only`, and `qafacteval_score` (if available)
 
 ## Example Output
 

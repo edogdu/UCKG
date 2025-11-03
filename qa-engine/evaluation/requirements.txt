@@ -9,7 +9,10 @@ matplotlib>=3.6.0
 seaborn>=0.12.0
 
 # Optional - for QAFactEval factuality checking
-qafacteval>=0.1.0
+#qafacteval>=0.1.0
+
+# Optional - for DataFrame/tabular output in all-IDs evaluation
+pandas>=1.5.0
 
 # Additional setup required after installation:
 # 1. Download NLTK data (if missing):

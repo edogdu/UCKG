@@ -8,6 +8,7 @@ import sys
 import warnings
 import json
 import os
+from typing import List, Dict, Any
 
 # Optional plotting
 try:
@@ -22,6 +23,13 @@ try:
     from qafacteval import QAFactEval
 except Exception:
     QAFactEval = None
+
+# Optional DataFrame output
+try:
+    import pandas as pd
+    _PANDAS_AVAILABLE = True
+except Exception:
+    _PANDAS_AVAILABLE = False
 
 class SummaryEvaluator:
     def __init__(self):
@@ -224,6 +232,58 @@ def _load_evaluation_dataset(dataset_path: str) -> dict:
         sys.exit(1)
 
 
+def _normalize_metrics_for_row(metrics: Dict[str, Any]) -> Dict[str, Any]:
+    """Flatten metric dicts into scalar columns for table rows."""
+    row: Dict[str, Any] = {}
+    rouge = metrics.get('rouge', {}) or {}
+    if isinstance(rouge, dict) and 'rouge1' in rouge:
+        try:
+            row['rouge1_f1'] = float(rouge['rouge1']['f1'])
+            row['rouge2_f1'] = float(rouge['rouge2']['f1'])
+            row['rougeLsum_f1'] = float(rouge['rougeLsum']['f1'])
+        except Exception:
+            row['rouge1_f1'] = row['rouge2_f1'] = row['rougeLsum_f1'] = None
+
+    bleu = metrics.get('bleu', {}) or {}
+    if isinstance(bleu, dict) and 'bleu4' in bleu:
+        try:
+            row['bleu1'] = float(bleu['bleu1'])
+            row['bleu2'] = float(bleu['bleu2'])
+            row['bleu3'] = float(bleu['bleu3'])
+            row['bleu4'] = float(bleu['bleu4'])
+        except Exception:
+            row['bleu1'] = row['bleu2'] = row['bleu3'] = row['bleu4'] = None
+
+    berts = metrics.get('bertscore', {}) or {}
+    if isinstance(berts, dict) and 'f1' in berts:
+        try:
+            row['bertscore_p'] = float(berts['precision'])
+            row['bertscore_r'] = float(berts['recall'])
+            row['bertscore_f1'] = float(berts['f1'])
+        except Exception:
+            row['bertscore_p'] = row['bertscore_r'] = row['bertscore_f1'] = None
+
+    bp = metrics.get('bertscore_precision_only', {}) or {}
+    if isinstance(bp, dict) and 'precision_only' in bp:
+        try:
+            row['bertscore_precision_only'] = float(bp['precision_only'])
+        except Exception:
+            row['bertscore_precision_only'] = None
+
+    qafe = metrics.get('qafacteval', {}) or {}
+    if isinstance(qafe, dict):
+        row['qafacteval_available'] = bool(qafe.get('available', False))
+        # Scores schema may vary; if numeric scalar is present, store it; otherwise None
+        possible_scores = qafe.get('scores')
+        if isinstance(possible_scores, dict):
+            # Try to pick an aggregate if present
+            val = possible_scores.get('factuality') or possible_scores.get('score')
+            row['qafacteval_score'] = float(val) if isinstance(val, (int, float)) else None
+        else:
+            row['qafacteval_score'] = None
+    return row
+
+
 def _get_sample_by_id(dataset: dict, sample_id: int) -> dict:
     """Extract a specific sample by ID from the dataset."""
     samples = dataset.get('samples', [])
@@ -234,7 +294,7 @@ def _get_sample_by_id(dataset: dict, sample_id: int) -> dict:
     for sample in samples:
         if sample.get('id') == sample_id:
             # Validate required fields
-            required_fields = ['context', 'response']
+            required_fields = ['summary', 'response']
             missing = [f for f in required_fields if not sample.get(f)]
             if missing:
                 print(f"Warning: Sample {sample_id} missing fields: {missing}")
@@ -284,6 +344,12 @@ def main():
                         help='Path to evaluation dataset JSON file')
     parser.add_argument('--list-ids', action='store_true', 
                         help='List all available sample IDs from dataset')
+    parser.add_argument('--all-ids', action='store_true',
+                        help='Evaluate all samples in the dataset and print a table')
+    parser.add_argument('--save-csv', type=str, default=None,
+                        help='Optional path to save the all-IDs results as CSV')
+    parser.add_argument('--save-json', type=str, default=None,
+                        help='Optional path to save the all-IDs results as JSON')
 
     args = parser.parse_args()
 
@@ -326,7 +392,84 @@ def main():
             sys.exit(1)
     
     # Check if dataset mode is active
-    if args.id is not None:
+    if args.all_ids:
+        # Evaluate all samples in the dataset
+        dataset_path = args.dataset
+        if not os.path.isabs(dataset_path):
+            script_dir = os.path.dirname(os.path.abspath(__file__))
+            dataset_path = os.path.join(script_dir, dataset_path)
+
+        print(f"Loading dataset: {dataset_path}")
+        dataset = _load_evaluation_dataset(dataset_path)
+        samples = dataset.get('samples', [])
+        if not samples:
+            print("Error: Dataset contains no samples.")
+            sys.exit(1)
+
+        evaluator = SummaryEvaluator()
+        rows: List[Dict[str, Any]] = []
+
+        for sample in samples:
+            sid = sample.get('id')
+            source_text = sample.get('summary', '')
+            summary_text = sample.get('response', '')
+            if not source_text or not summary_text:
+                # Skip missing entries but record status
+                rows.append({'id': sid, 'error': 'missing source/response'})
+                continue
+
+            results = evaluator.evaluate_summary(source_text, summary_text)
+            metrics = results.get('metrics', {})
+            row = {'id': sid}
+            row.update(_normalize_metrics_for_row(metrics))
+            rows.append(row)
+
+        # Output table
+        print("\n" + "="*60)
+        print("ALL-IDS EVALUATION TABLE")
+        print("="*60)
+        if _PANDAS_AVAILABLE:
+            df = pd.DataFrame(rows)
+            # Sort by id if possible
+            if 'id' in df.columns:
+                try:
+                    df = df.sort_values('id')
+                except Exception:
+                    pass
+            # Print a compact table
+            with pd.option_context('display.max_rows', None, 'display.max_columns', None, 'display.width', 160):
+                print(df)
+            # Optional exports
+            if args.save_csv:
+                try:
+                    df.to_csv(args.save_csv, index=False)
+                    print(f"Saved CSV: {args.save_csv}")
+                except Exception as e:
+                    print(f"Failed to save CSV: {e}")
+            if args.save_json:
+                try:
+                    df.to_json(args.save_json, orient='records', force_ascii=False, indent=2)
+                    print(f"Saved JSON: {args.save_json}")
+                except Exception as e:
+                    print(f"Failed to save JSON: {e}")
+        else:
+            # Fallback pretty print without pandas
+            # Determine columns
+            all_keys = set()
+            for r in rows:
+                all_keys.update(r.keys())
+            columns = ['id', 'rouge1_f1', 'rouge2_f1', 'rougeLsum_f1', 'bleu1', 'bleu2', 'bleu3', 'bleu4', 'bertscore_p', 'bertscore_r', 'bertscore_f1', 'bertscore_precision_only', 'qafacteval_score', 'error']
+            columns = [c for c in columns if c in all_keys]
+
+            # Header
+            header = "\t".join(columns)
+            print(header)
+            for r in rows:
+                line = "\t".join(str(r.get(c, '')) for c in columns)
+                print(line)
+        # In all-ids mode, skip single-sample evaluation and plots
+        sys.exit(0)
+    elif args.id is not None:
         # Dataset mode: load from JSON
         dataset_path = args.dataset
         if not os.path.isabs(dataset_path):
@@ -343,7 +486,7 @@ def main():
         _print_metadata_info(sample)
         
         # Extract texts for evaluation
-        source_text = sample.get('context', '')
+        source_text = sample.get('summary', '')
         summary_text = sample.get('response', '')
         
         if not source_text or not summary_text:
