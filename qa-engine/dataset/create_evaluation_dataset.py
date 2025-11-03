@@ -2,7 +2,10 @@
 Dataset Generation Pipeline for Graph RAG Evaluation
 
 This script:
-1. Reads questions from questionSet/ folder JSON files
+1. Reads questions from shared/question_set/ folder JSON files
+   - questions_1node.json (0-hop questions)
+   - questions_1hop.json (1-hop questions)
+   - questions_2hop.json (2-hop questions)
 2. Runs each question through the MultiRAG pipeline
 3. Captures the exact context provided to the LLM
 4. Captures the final text response
@@ -19,12 +22,14 @@ Output Format:
         {
             "id": 1,
             "question": "...",
+            "summary": "...",  # Context from question file (background info)
             "context": "...",  # Exact context passed to LLM
             "response": "...",  # Final generated answer
             "metadata": {
                 "mode": "graphrag/hybrid",
                 "source_file": "...",
-                "difficulty": 1,
+                "hop_count": 0/1/2,
+                "question_type": "<s,*,*>" / "<s,p,o>" / "<s,*,o>",
                 "node_info": {...}
             }
         },
@@ -43,66 +48,105 @@ import sys
 # Add parent directory to path for imports
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from multiRAG import MultiRAG
+from graphrag import GraphRAGSimilarity
 
 def load_questions_from_file(filepath: str) -> List[Dict[str, Any]]:
     """Load questions from a single JSON file"""
     with open(filepath, 'r') as f:
         data = json.load(f)
-    
-    # Handle different key names (question vs questions)
-    questions = data.get('questions', data.get('question', []))
-    
+
+    # New format: files are direct arrays (no wrapper object)
+    # Old format: files have wrapper with 'questions' or 'question' key
+    if isinstance(data, list):
+        questions = data
+    else:
+        # Fallback for old format with wrapper
+        questions = data.get('questions', data.get('question', []))
+
     # Add source file info to each question
     filename = os.path.basename(filepath)
     for q in questions:
         q['source_file'] = filename
-    
+
     return questions
 
 def load_all_questions(testing_dir: str) -> List[Dict[str, Any]]:
-    """Load all questions from questionSet/ directory"""
+    """Load all questions from question_set/ directory"""
     all_questions = []
-    json_files = [f for f in os.listdir(testing_dir) if f.endswith('.json')]
-    
-    print(f"Found {len(json_files)} JSON files in {testing_dir}")
-    
-    for json_file in sorted(json_files):
+
+    # Load all question files (excluding nodes.json)
+    question_files = [
+        'questions_0hop.json',
+        'questions_0hop_bunny.json',
+        'questions_1hop.json',
+        'questions_1hop_bunny.json',
+        'questions_2hop.json',
+        'questions_2hop_bunny.json'
+    ]
+
+    print(f"Loading questions from {testing_dir}")
+
+    for json_file in question_files:
         filepath = os.path.join(testing_dir, json_file)
-        questions = load_questions_from_file(filepath)
-        all_questions.extend(questions)
-        print(f"  Loaded {len(questions)} questions from {json_file}")
-    
+        if os.path.exists(filepath):
+            questions = load_questions_from_file(filepath)
+            all_questions.extend(questions)
+            print(f"  Loaded {len(questions)} questions from {json_file}")
+        else:
+            print(f"  WARNING: {json_file} not found, skipping...")
+
     return all_questions
 
-def run_question_through_pipeline(rag_engine: MultiRAG, question: Dict[str, Any]) -> Dict[str, Any]:
+def run_question_through_pipeline(rag_engine: GraphRAGSimilarity, question: Dict[str, Any]) -> Dict[str, Any]:
     """
-    Run a single question through the MultiRAG pipeline and capture all relevant data
-    
+    Run a single question through the GraphRAG pipeline and capture all relevant data
+
     Returns:
         Dictionary with question, context, response, and metadata
     """
-    query_text = question['text']
-    
+    # Support both old format (key='text') and new format (key='question')
+    query_text = question.get('question', question.get('text', ''))
+
     print(f"  Processing: {query_text[:80]}...")
-    
+
+    # Determine hop count from question type
+    question_type = question.get("type", "")
+    if question_type == "<s,*,*>":
+        hop_count = 0  # 1-node question (no hops)
+    elif question.get("third_node") or question.get("relationship_2"):
+        hop_count = 2  # 2-hop question
+    elif question.get("second_node") or question.get("relationship"):
+        hop_count = 1  # 1-hop question
+    else:
+        hop_count = 0  # Default
+
     try:
         # Run the full pipeline
         result = rag_engine.run(query_text)
-        
+
         # Extract the key components
         sample = {
             "question": query_text,
+            "summary": question.get("context", ""),  # Background context from question file
             "context": result.get("context", ""),  # The exact formatted context passed to LLM
             "response": result.get("answer", ""),  # The final generated answer
             "metadata": {
                 "mode": result.get("mode", "unknown"),
                 "source_file": question.get("source_file", ""),
-                "difficulty": question.get("difficulty", 0),
+                "hop_count": hop_count,
+                "question_type": question_type,
                 "node_info": {
-                    "start_node": question.get("start_node", ""),
-                    "1-hop_node": question.get("1-hop_node", ""),
-                    "2-hop_node": question.get("2-hop_node", "")
+                    "type": question_type,
+                    "first_node": question.get("first_node", ""),
+                    "second_node": question.get("second_node", ""),
+                    "third_node": question.get("third_node", ""),
+                    "relationship_1": question.get("relationship", question.get("relationship_1", "")),
+                    "relationship_2": question.get("relationship_2", ""),
+                    "used_properties": {
+                        "first_node": question.get("used_properties", question.get("used_properties_of_first_node", [])),
+                        "second_node": question.get("used_properties_of_second_node", []),
+                        "third_node": question.get("used_properties_of_third_node", [])
+                    }
                 },
                 "retrieval_stats": {
                     "num_sources": len(result.get("sources", [])),
@@ -111,23 +155,26 @@ def run_question_through_pipeline(rag_engine: MultiRAG, question: Dict[str, Any]
                 }
             }
         }
-        
+
         return sample
-        
+
     except Exception as e:
         print(f"    ERROR: {str(e)}")
         return {
             "question": query_text,
+            "summary": question.get("context", ""),  # Background context from question file
             "context": "",
             "response": f"ERROR: {str(e)}",
             "metadata": {
                 "mode": "error",
                 "source_file": question.get("source_file", ""),
-                "difficulty": question.get("difficulty", 0),
+                "hop_count": hop_count,
+                "question_type": question_type,
                 "node_info": {
-                    "start_node": question.get("start_node", ""),
-                    "1-hop_node": question.get("1-hop_node", ""),
-                    "2-hop_node": question.get("2-hop_node", "")
+                    "type": question_type,
+                    "first_node": question.get("first_node", ""),
+                    "second_node": question.get("second_node", ""),
+                    "third_node": question.get("third_node", "")
                 },
                 "error": str(e)
             }
@@ -151,7 +198,7 @@ def create_evaluation_dataset(
     print("="*80)
     
     # Load all questions
-    print("\n[1/4] Loading questions from questionSet/ directory...")
+    print("\n[1/4] Loading questions from question_set/ directory...")
     all_questions = load_all_questions(testing_dir)
     print(f"Total questions loaded: {len(all_questions)}")
     
@@ -160,10 +207,10 @@ def create_evaluation_dataset(
         all_questions = all_questions[:limit]
         print(f"Limited to first {limit} questions")
     
-    # Initialize MultiRAG engine
-    print("\n[2/4] Initializing MultiRAG engine...")
-    rag_engine = MultiRAG()
-    print("MultiRAG engine initialized")
+    # Initialize GraphRAG engine
+    print("\n[2/4] Initializing GraphRAG engine...")
+    rag_engine = GraphRAGSimilarity()
+    print("GraphRAG engine initialized")
     
     # Process each question
     print(f"\n[3/4] Processing {len(all_questions)} questions through pipeline...")
@@ -184,7 +231,7 @@ def create_evaluation_dataset(
             "total_questions": len(samples),
             "generation_date": datetime.now().isoformat(),
             "source_files": list(set(q.get("source_file", "") for q in all_questions)),
-            "pipeline": "MultiRAG GraphRAG 4-Stage Pipeline",
+            "pipeline": "GraphRAG 4-Stage Pipeline",
             "description": "Dataset for Graph RAG evaluation containing questions, exact LLM context, and generated responses"
         },
         "samples": samples
@@ -205,16 +252,16 @@ def create_evaluation_dataset(
 def main():
     """Main entry point"""
     # Configuration
-    TESTING_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), "questionSet")
+    TESTING_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), "shared", "question_set")
     OUTPUT_FILE = os.path.join(os.path.dirname(__file__), "evaluation_dataset.json")
     
     # Optional: Limit number of questions for testing
     # Set to None to process all questions
     LIMIT = None  # Change to e.g., 10 for testing
     
-    # Verify questionSet directory exists
+    # Verify question_set directory exists
     if not os.path.exists(TESTING_DIR):
-        print(f"ERROR: questionSet directory not found at {TESTING_DIR}")
+        print(f"ERROR: question_set directory not found at {TESTING_DIR}")
         return
     
     # Create dataset
@@ -242,15 +289,16 @@ def main():
     for mode, count in modes.items():
         print(f"  {mode}: {count}")
     
-    # Difficulty distribution
-    difficulties = {}
+    # Hop count distribution
+    hop_counts = {}
     for sample in dataset['samples']:
-        diff = sample['metadata']['difficulty']
-        difficulties[diff] = difficulties.get(diff, 0) + 1
-    
-    print(f"\nDifficulty distribution:")
-    for diff, count in sorted(difficulties.items()):
-        print(f"  Level {diff}: {count}")
+        hops = sample['metadata']['hop_count']
+        hop_counts[hops] = hop_counts.get(hops, 0) + 1
+
+    print(f"\nHop count distribution:")
+    for hops, count in sorted(hop_counts.items()):
+        hop_label = {0: "0-hop (1-node)", 1: "1-hop", 2: "2-hop"}.get(hops, f"{hops}-hop")
+        print(f"  {hop_label}: {count}")
     
     print("\n" + "="*80)
 
