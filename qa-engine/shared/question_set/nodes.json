@@ -1,13 +1,42 @@
 [
     {
-        "node": {
-            "ucocweName": "Improper Control of Document Type Definition",
-            "uri": "http://purl.org/cyber/uco#CWE-827",
-            "ucocweExtendedSummary": "As DTDs are processed, they might try to read or include files on the machine performing the parsing. If an attacker is able to control the DTD, then the attacker might be able to specify sensitive resources or requests or provide malicious content.\nFor example, the SOAP specification prohibits SOAP messages from containing DTDs.",
-            "ucocweSummary": "The product does not restrict a reference to a Document Type Definition (DTD) to the intended control sphere. This might allow attackers to reference arbitrary DTDs, possibly causing the product to expose files, consume excessive system resources, or execute arbitrary http requests on behalf of the attacker.",
+        "node1": {
+            "uri": "https://capec.mitre.org/data/definitions/100.html",
+            "ucoexDescription": "Buffer Overflow attacks target improper or missing bounds checking on buffer operations, typically triggered by input injected by an adversary. As a consequence, an adversary is able to write past the boundaries of allocated buffer regions in memory, causing a program crash or potentially redirection of execution as per the adversaries' choice.",
+            "label": "CAPEC-100: Overflow Buffers",
+            "labels": [
+                "UcoexCAPEC",
+                "Resource"
+            ]
+        },
+        "node2": {
+            "ucocweName": "Buffer Access with Incorrect Length Value",
+            "uri": "http://purl.org/cyber/uco#CWE-805",
+            "ucocweExtendedSummary": "When the length value exceeds the size of the destination, a buffer overflow could occur.",
+            "ucocweSummary": "The product uses a sequential operation to read or write a buffer, but it uses an incorrect length value that causes it to access memory that is outside of the bounds of the buffer.",
             "labels": [
                 "UcoCWE",
                 "Resource"
+            ]
+        },
+        "node3": {
+            "ucoexDESCRIPTION": "Language interpreter API function doesn't validate length argument, leading to information exposure",
+            "uri": "http://example.com/ucoex#CWE-805-CVE-2010-4156",
+            "labels": [
+                "UcoexObservedExample",
+                "Resource"
+            ]
+        },
+        "relationships": {
+            "node1_node2": [
+                {
+                    "type": "UCOEXHASRELATEDWEAKNESS"
+                }
+            ],
+            "node2_node3": [
+                {
+                    "type": "UCOHASOBSERVEDEXAMPLE"
+                }
             ]
         }
     }
