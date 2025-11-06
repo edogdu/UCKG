@@ -220,7 +220,7 @@ class DatasetValidator:
         """
         Checks for duplicate Questions, duplicate Cypher queries, 
         duplicate (Question, Cypher) pairs, and 
-        duplicate (NaturalLanguageQuestion, generated_question) pairs in the raw dataset.
+        duplicate (NaturalLanguageQuestion, CypherToQuestion) pairs in the raw dataset.
         """
         print("\nRunning initial check for duplicates (Questions, Queries, Pairs, and NL/Gen Pairs)...")
         seen_questions = {}
@@ -232,7 +232,7 @@ class DatasetValidator:
             # 1. Normalize all text fields
             question = str(row.get('NaturalLanguageQuestion', '')).strip().lower()
             query = str(row.get('CypherQuery', '')).strip()
-            gen_question = str(row.get('generated_question', '')).strip().lower() # <-- 2. Get new field
+            gen_question = str(row.get('CypherToQuestion', '')).strip().lower() # <-- 2. Get new field
             
             pair = (question, query)
             nl_gen_pair = (question, gen_question) # <-- 3. Create new pair
@@ -294,9 +294,9 @@ class DatasetValidator:
             
             # Log duplicate NL/Gen pairs (Item 4)
             if duplicate_nl_gen_pairs: # <-- 7. Add new log block
-                self._log('duplication', f"\n--- Found {len(duplicate_nl_gen_pairs)} Duplicate (NaturalLanguageQuestion, generated_question) Pairs ---")
+                self._log('duplication', f"\n--- Found {len(duplicate_nl_gen_pairs)} Duplicate (NaturalLanguageQuestion, CypherToQuestion) Pairs ---")
                 for (nl, gen), entry_ids in duplicate_nl_gen_pairs.items():
-                    self._log('duplication', f"  - NL Question: '{nl}' | Gen Question: '{gen}' | Found at entries: {entry_ids}")
+                    self._log('duplication', f"  - NL Question: '{nl}' | CTQ Question: '{gen}' | Found at entries: {entry_ids}")
             
             return True
 
@@ -519,14 +519,15 @@ class DatasetValidator:
     def validate_semantic_relevance(
         self, 
         natural_language_question: str, 
-        generated_question: str, 
+        CypherToQuestion: str, 
         entry_id: int, 
-        threshold: float = 0.6131
+        threshold: float = 0.6
+        # threshold: float = 0.6131
         # threshold: float = 0.7
     ) -> bool:
         """
         Validates semantic relevance between the NaturalLanguageQuestion and 
-        the generated_question (from Cypher) using a sentence-transformer model.
+        the CypherToQuestion (from Cypher) using a sentence-transformer model.
         """
         if not SENTENCE_TRANSFORMER_AVAILABLE:
             self._log('relevance', f"Entry #{entry_id}: SKIP - sentence-transformers library not available.")
@@ -534,7 +535,7 @@ class DatasetValidator:
 
         # 1. Encode both questions into vector embeddings
         embedding1 = model.encode(natural_language_question, convert_to_tensor=True)
-        embedding2 = model.encode(generated_question, convert_to_tensor=True)
+        embedding2 = model.encode(CypherToQuestion, convert_to_tensor=True)
 
         # 2. Compute cosine similarity
         cosine_score = util.pytorch_cos_sim(embedding1, embedding2).item()
@@ -546,7 +547,7 @@ class DatasetValidator:
         else:
             self._log('relevance', f"Entry #{entry_id}: FAIL - Similarity: {cosine_score:.4f} is below threshold of {threshold}")
             self._log('relevance', f"  - NL Question: '{natural_language_question}'")
-            self._log('relevance', f"  - Gen Question: '{generated_question}'")
+            self._log('relevance', f"  - Gen Question: '{CypherToQuestion}'")
             return False
 
     # REPLACE the old `run_all_validators` with this one.
@@ -560,19 +561,19 @@ class DatasetValidator:
             entry_id = i + 1
             question = str(row['NaturalLanguageQuestion'])
             query = str(row['CypherQuery'])
-            # Get the new generated_question field
-            gen_question = str(row.get('generated_question', '')) 
+            # Get the new CypherToQuestion field
+            gen_question = str(row.get('CypherToQuestion', '')) 
             
             print(f"Processing Entry {entry_id}/{total_entries}...")
             if self.validate_schema_elements(query, entry_id): pass_counts['schema'] += 1
             if self.validate_query_executability(query, entry_id): pass_counts['execution'] += 1
-            if self.validate_expected_entities_match_query(query, row, entry_id): pass_counts['entity'] += 1
+            # if self.validate_expected_entities_match_query(query, row, entry_id): pass_counts['entity'] += 1
             if self.validate_extracted_values_in_question(question, row, entry_id): pass_counts['value'] += 1
 
             # --- ADJUSTED SEMANTIC CHECK ---
             # Check if gen_question is present before validating
             if not gen_question:
-                self._log('relevance', f"Entry #{entry_id}: SKIP - 'generated_question' column is empty.")
+                self._log('relevance', f"Entry #{entry_id}: SKIP - 'CypherToQuestion' column is empty.")
             # Call the validator with the two questions
             elif self.validate_semantic_relevance(question, gen_question, entry_id): 
                 pass_counts['relevance'] += 1

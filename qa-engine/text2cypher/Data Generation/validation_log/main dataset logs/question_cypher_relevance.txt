@@ -9,7 +9,7 @@ Entry #8: PASS (Similarity: 0.8278)
 Entry #9: PASS (Similarity: 0.9977)
 Entry #10: PASS (Similarity: 0.8677)
 Entry #11: PASS (Similarity: 0.8657)
-Entry #12: FAIL - Similarity: 0.5938 is below threshold of 0.6131
+Entry #12: FAIL - Similarity: 0.5938 is below threshold of 0.6
   - NL Question: 'What MITRE ATT&CK TTPs are associated with FIN7?'
   - Gen Question: 'What attack techniques does the 'FIN7' group use?'
 Entry #13: PASS (Similarity: 0.8819)
@@ -26,12 +26,12 @@ Entry #23: PASS (Similarity: 0.7839)
 Entry #24: PASS (Similarity: 0.8370)
 Entry #25: PASS (Similarity: 0.7075)
 Entry #26: PASS (Similarity: 0.8035)
-Entry #27: FAIL - Similarity: 0.5319 is below threshold of 0.6131
+Entry #27: FAIL - Similarity: 0.5319 is below threshold of 0.6
   - NL Question: 'Which threat actors have TTP overlap with the SolarWinds campaign?'
   - Gen Question: 'Which groups use the same attack techniques as the 'SolarWinds Orion Attack' campaign?'
 Entry #28: PASS (Similarity: 0.9522)
 Entry #29: PASS (Similarity: 0.7264)
-Entry #30: FAIL - Similarity: 0.5628 is below threshold of 0.6131
+Entry #30: FAIL - Similarity: 0.5628 is below threshold of 0.6
   - NL Question: 'Count the number of distinct TTPs linked to APT28.'
   - Gen Question: 'How many attack techniques are linked to 'APT28'?'
 Entry #31: PASS (Similarity: 0.8345)
@@ -57,24 +57,20 @@ Entry #50: PASS (Similarity: 0.7523)
 Entry #51: PASS (Similarity: 0.6520)
 Entry #52: PASS (Similarity: 0.9112)
 Entry #53: PASS (Similarity: 0.8341)
-Entry #54: FAIL - Similarity: 0.5487 is below threshold of 0.6131
+Entry #54: FAIL - Similarity: 0.5487 is below threshold of 0.6
   - NL Question: 'Give me the 2-hop neighborhood for CVE-2021-44228. What's directly connected to it?'
   - Gen Question: 'Find all nodes within 2 hops of 'CVE-2021-44228' and show their labels and names/IDs.'
 Entry #55: PASS (Similarity: 0.6402)
 Entry #56: PASS (Similarity: 0.8335)
-Entry #57: FAIL - Similarity: 0.6104 is below threshold of 0.6131
-  - NL Question: 'Map out all outbound connections from the WannaCry campaign, up to 4 hops deep.'
-  - Gen Question: 'Show all paths 1 to 4 hops long starting from the 'WannaCry Ransomware Attack'.'
+Entry #57: PASS (Similarity: 0.6104)
 Entry #58: PASS (Similarity: 0.7563)
 Entry #59: PASS (Similarity: 0.6853)
 Entry #60: PASS (Similarity: 0.6685)
-Entry #61: FAIL - Similarity: 0.5928 is below threshold of 0.6131
+Entry #61: FAIL - Similarity: 0.5928 is below threshold of 0.6
   - NL Question: 'What tools are shared between two or more threat groups? Show the tool and the groups.'
   - Gen Question: 'What software is used by at least two different groups? List the software and the groups.'
 Entry #62: PASS (Similarity: 0.8004)
-Entry #63: FAIL - Similarity: 0.6102 is below threshold of 0.6131
-  - NL Question: 'Show me 10 examples of campaigns that share TTPs. List both campaigns and the shared TTP.'
-  - Gen Question: 'Show me 10 examples of campaigns that share the same attack technique.'
+Entry #63: PASS (Similarity: 0.6102)
 Entry #64: PASS (Similarity: 0.6603)
 Entry #65: PASS (Similarity: 0.8923)
 Entry #66: PASS (Similarity: 0.7421)
@@ -84,7 +80,7 @@ Entry #69: PASS (Similarity: 0.8244)
 Entry #70: PASS (Similarity: 0.7979)
 Entry #71: PASS (Similarity: 0.8712)
 Entry #72: PASS (Similarity: 0.9950)
-Entry #73: FAIL - Similarity: 0.5174 is below threshold of 0.6131
+Entry #73: FAIL - Similarity: 0.5174 is below threshold of 0.6
   - NL Question: 'Show me all campaigns that use more than 3 distinct TTPs.'
   - Gen Question: 'Which campaigns use more than 3 attack techniques?'
 Entry #74: PASS (Similarity: 0.6653)
@@ -96,7 +92,7 @@ Entry #79: PASS (Similarity: 0.6378)
 Entry #80: PASS (Similarity: 0.7509)
 Entry #81: PASS (Similarity: 0.6902)
 Entry #82: PASS (Similarity: 0.6369)
-Entry #83: FAIL - Similarity: 0.4962 is below threshold of 0.6131
+Entry #83: FAIL - Similarity: 0.4962 is below threshold of 0.6
   - NL Question: 'Show me all TTPs that are missing a CAPEC mapping.'
   - Gen Question: 'Which attack techniques are not mapped to any CAPEC attack pattern?'
 Entry #84: PASS (Similarity: 0.7496)
@@ -120,7 +116,7 @@ Entry #101: PASS (Similarity: 0.7407)
 Entry #102: PASS (Similarity: 0.9206)
 Entry #103: PASS (Similarity: 0.9974)
 Entry #104: PASS (Similarity: 0.7152)
-Entry #105: FAIL - Similarity: 0.5649 is below threshold of 0.6131
+Entry #105: FAIL - Similarity: 0.5649 is below threshold of 0.6
   - NL Question: 'Find all CWEs marked as 'Incomplete'.'
   - Gen Question: 'Find all weaknesses marked as 'Incomplete'.'
 Entry #106: PASS (Similarity: 0.8018)
@@ -130,7 +126,7 @@ Entry #109: PASS (Similarity: 0.6909)
 Entry #110: PASS (Similarity: 0.7920)
 Entry #111: PASS (Similarity: 0.6317)
 Entry #112: PASS (Similarity: 0.9706)
-Entry #113: FAIL - Similarity: 0.5202 is below threshold of 0.6131
+Entry #113: FAIL - Similarity: 0.5202 is below threshold of 0.6
   - NL Question: 'Find all 'Base' abstraction CWEs that are 'Stable'.'
   - Gen Question: 'Which 'Base' level weaknesses are 'Stable'?'
 Entry #114: PASS (Similarity: 0.9058)
@@ -144,20 +140,20 @@ Entry #121: PASS (Similarity: 0.8742)
 Entry #122: PASS (Similarity: 0.8583)
 Entry #123: PASS (Similarity: 0.7334)
 Entry #124: PASS (Similarity: 0.6514)
-Entry #125: FAIL - Similarity: 0.5784 is below threshold of 0.6131
+Entry #125: FAIL - Similarity: 0.5784 is below threshold of 0.6
   - NL Question: 'Find 'Class' level CWEs that are 'Incomplete'.'
   - Gen Question: 'Which 'Class' level weaknesses are 'Incomplete'?'
 Entry #126: PASS (Similarity: 0.7152)
-Entry #127: FAIL - Similarity: 0.5477 is below threshold of 0.6131
+Entry #127: FAIL - Similarity: 0.5477 is below threshold of 0.6
   - NL Question: 'Find 'Compound' level CWEs that are 'Incomplete'.'
   - Gen Question: 'Which 'Compound' level weaknesses are 'Incomplete'?'
 Entry #128: PASS (Similarity: 0.7152)
 Entry #129: PASS (Similarity: 0.6758)
-Entry #130: FAIL - Similarity: 0.5052 is below threshold of 0.6131
+Entry #130: FAIL - Similarity: 0.5052 is below threshold of 0.6
   - NL Question: 'List all ATT&CK TTPs for the 'Mobile'.'
   - Gen Question: 'List the names of all 'Mobile' attack techniques.'
 Entry #131: PASS (Similarity: 0.7976)
-Entry #132: FAIL - Similarity: 0.5962 is below threshold of 0.6131
+Entry #132: FAIL - Similarity: 0.5962 is below threshold of 0.6
   - NL Question: 'Pull the intel on the 'Lazarus Group' threat group.'
   - Gen Question: 'Show me all data for the 'Lazarus Group'.'
 Entry #133: PASS (Similarity: 0.8492)
@@ -165,9 +161,7 @@ Entry #134: PASS (Similarity: 0.8090)
 Entry #135: PASS (Similarity: 0.9028)
 Entry #136: PASS (Similarity: 0.8363)
 Entry #137: PASS (Similarity: 0.9076)
-Entry #138: FAIL - Similarity: 0.5667 is below threshold of 0.6131
-  - NL Question: 'Show me all known CPEs recorded in the database.'
-  - Gen Question: 'Show me up to 50 unique product names (CPEs) that are linked to vulnerabilities.'
+Entry #138: PASS (Similarity: 0.7875)
 Entry #139: PASS (Similarity: 0.9797)
 Entry #140: PASS (Similarity: 0.9330)
 Entry #141: PASS (Similarity: 0.9536)
@@ -256,20 +250,18 @@ Entry #223: PASS (Similarity: 0.9317)
 Entry #224: PASS (Similarity: 0.8212)
 Entry #225: PASS (Similarity: 0.6397)
 Entry #226: PASS (Similarity: 0.7733)
-Entry #227: FAIL - Similarity: 0.4836 is below threshold of 0.6131
+Entry #227: FAIL - Similarity: 0.4836 is below threshold of 0.6
   - NL Question: 'Show me which groups use software that in turn employ specific ATT&CK techniques.'
   - Gen Question: 'Show group-to-software-to-TTP relationships.'
 Entry #228: PASS (Similarity: 0.7599)
-Entry #229: FAIL - Similarity: 0.6076 is below threshold of 0.6131
-  - NL Question: 'Show attack patterns (CAPEC), their related weaknesses (CWE), and the CVEs where those weaknesses were observed.'
-  - Gen Question: 'Connect CAPEC patterns to their related CWEs and the CVEs where they were observed.'
+Entry #229: PASS (Similarity: 0.6076)
 Entry #230: PASS (Similarity: 0.6842)
 Entry #231: PASS (Similarity: 0.8270)
 Entry #232: PASS (Similarity: 0.7179)
 Entry #233: PASS (Similarity: 0.9781)
 Entry #234: PASS (Similarity: 0.6986)
 Entry #235: PASS (Similarity: 0.8134)
-Entry #236: FAIL - Similarity: 0.3997 is below threshold of 0.6131
+Entry #236: FAIL - Similarity: 0.3997 is below threshold of 0.6
   - NL Question: 'Find groups using techniques for which there are no mitigations listed.'
   - Gen Question: 'Which threat groups are using TTPs with no documented mitigations?'
 Entry #237: PASS (Similarity: 0.7703)
@@ -298,12 +290,12 @@ Entry #259: PASS (Similarity: 0.8682)
 Entry #260: PASS (Similarity: 0.9278)
 Entry #261: PASS (Similarity: 0.9205)
 Entry #262: PASS (Similarity: 0.8545)
-Entry #263: FAIL - Similarity: 0.5591 is below threshold of 0.6131
+Entry #263: FAIL - Similarity: 0.5591 is below threshold of 0.6
   - NL Question: 'Find techniques used by both 'APT28' AND 'Lazarus Group' (Intersection).'
   - Gen Question: 'What TTPs are shared between APT28 and Lazarus Group?'
 Entry #264: PASS (Similarity: 0.6268)
 Entry #265: PASS (Similarity: 0.9203)
-Entry #266: FAIL - Similarity: 0.5891 is below threshold of 0.6131
+Entry #266: FAIL - Similarity: 0.5891 is below threshold of 0.6
   - NL Question: 'Find all 'Enterprise' ATT&CK techniques that are not used by any known group.'
   - Gen Question: 'List all 'Enterprise' TTPs that are not associated with any known threat group.'
 Entry #267: PASS (Similarity: 0.9492)
@@ -326,14 +318,10 @@ Entry #283: PASS (Similarity: 0.6276)
 Entry #284: PASS (Similarity: 0.8272)
 Entry #285: PASS (Similarity: 0.6911)
 Entry #286: PASS (Similarity: 0.9363)
-Entry #287: FAIL - Similarity: 0.6044 is below threshold of 0.6131
-  - NL Question: 'What is the total number of CAPEC entries in the graph?'
-  - Gen Question: 'What's the total number of attack patterns (CAPEC) in the database?'
+Entry #287: PASS (Similarity: 0.6044)
 Entry #288: PASS (Similarity: 0.9809)
 Entry #289: PASS (Similarity: 0.9712)
-Entry #290: FAIL - Similarity: 0.6097 is below threshold of 0.6131
-  - NL Question: 'List all ATT&CK techniques that are NOT in the 'Enterprise' domain.'
-  - Gen Question: 'List all attack techniques that are *not* for 'Enterprise' systems.'
+Entry #290: PASS (Similarity: 0.6097)
 Entry #291: PASS (Similarity: 0.9338)
 Entry #292: PASS (Similarity: 0.8597)
 Entry #293: PASS (Similarity: 0.8503)
@@ -353,12 +341,10 @@ Entry #306: PASS (Similarity: 0.9717)
 Entry #307: PASS (Similarity: 0.8117)
 Entry #308: PASS (Similarity: 1.0000)
 Entry #309: PASS (Similarity: 0.7740)
-Entry #310: FAIL - Similarity: 0.5557 is below threshold of 0.6131
+Entry #310: FAIL - Similarity: 0.5557 is below threshold of 0.6
   - NL Question: 'Show relationships (1-3 hops) between 'UcoexMITRED3FEND' nodes and 'UcoexGROUPS' nodes.'
   - Gen Question: 'Show me connections (1-3 hops) between D3FEND defenses and Threat Groups.'
-Entry #311: FAIL - Similarity: 0.6052 is below threshold of 0.6131
-  - NL Question: 'Find all paths from an 'UcoexObservedExample' to an 'UcoexMITREATTACK' (max 4 hops).'
-  - Gen Question: 'Find paths (max 4 hops) from a real-world example to an attack technique.'
+Entry #311: PASS (Similarity: 0.6052)
 Entry #312: PASS (Similarity: 0.7652)
 Entry #313: PASS (Similarity: 0.7111)
 Entry #314: PASS (Similarity: 0.6287)
@@ -391,181 +377,175 @@ Entry #340: PASS (Similarity: 0.8982)
 Entry #341: PASS (Similarity: 0.9450)
 Entry #342: PASS (Similarity: 0.7841)
 Entry #343: PASS (Similarity: 0.7799)
-Entry #344: FAIL - Similarity: 0.5497 is below threshold of 0.6131
+Entry #344: FAIL - Similarity: 0.4565 is below threshold of 0.6
   - NL Question: 'How many total CWE entries are in the database?'
-  - Gen Question: 'What is the total count of nodes with the UcoCWE label, returned as total_CWEs?'
-Entry #345: FAIL - Similarity: 0.4570 is below threshold of 0.6131
-  - NL Question: 'What is the count of CWEs grouped by their abstraction level (e.g., Variant, Class)?'
-  - Gen Question: 'Group UcoCWE nodes by their ucoabstraction property, count each group, and return the abstraction level and count, sorted descending by count.'
-Entry #346: FAIL - Similarity: 0.4284 is below threshold of 0.6131
-  - NL Question: 'What is the count of CWEs grouped by their completion status (e.g., Incomplete)?'
+  - Gen Question: 'What is the total count of nodes with the UcoCWE label?'
+Entry #345: PASS (Similarity: 0.6066)
+Entry #346: FAIL - Similarity: 0.5616 is below threshold of 0.6
+  - NL Question: 'What is the total count of CWEs grouped by their completion status (e.g., Incomplete), sort from highest count to lowest count?'
   - Gen Question: 'Group UcoCWE nodes by their ucostatus property, count each group, and return the status and count, sorted descending by count.'
-Entry #347: FAIL - Similarity: 0.3914 is below threshold of 0.6131
+Entry #347: FAIL - Similarity: 0.3914 is below threshold of 0.6
   - NL Question: 'How many CWEs were introduced each year?'
   - Gen Question: 'Find UcoCWE nodes with an introduction time, group by introduction year, count each group, and return the year and count, sorted descending by year.'
-Entry #348: FAIL - Similarity: 0.5039 is below threshold of 0.6131
+Entry #348: FAIL - Similarity: 0.5039 is below threshold of 0.6
   - NL Question: 'What is the count of CWEs grouped by their structure type (e.g., Simple)?'
   - Gen Question: 'Group UcoCWE nodes by their ucostructure property, count each group, and return the structure and count, sorted descending by count.'
-Entry #349: FAIL - Similarity: 0.5163 is below threshold of 0.6131
-  - NL Question: 'How many distinct CWE IDs are registered in the graph?'
-  - Gen Question: 'What is the count of all unique ucocweID properties found on UcoCWE nodes, returned as distinctCWEIDs?'
-Entry #350: FAIL - Similarity: 0.5680 is below threshold of 0.6131
-  - NL Question: 'How many distinct CWE names are registered in the graph?'
-  - Gen Question: 'What is the count of all unique ucocweName properties found on UcoCWE nodes, returned as distinctCWENames?'
-Entry #351: FAIL - Similarity: 0.4903 is below threshold of 0.6131
+Entry #349: PASS (Similarity: 0.8040)
+Entry #350: PASS (Similarity: 0.6332)
+Entry #351: FAIL - Similarity: 0.5452 is below threshold of 0.6
   - NL Question: 'How many CWEs are missing a description?'
-  - Gen Question: 'What is the total count of UcoCWE nodes where the ucodescription property is null, returned as missingDescriptionCount?'
-Entry #352: PASS (Similarity: 0.8325)
-Entry #353: PASS (Similarity: 0.8435)
-Entry #354: PASS (Similarity: 0.7705)
-Entry #355: PASS (Similarity: 0.8449)
-Entry #356: PASS (Similarity: 0.8952)
-Entry #357: PASS (Similarity: 0.6242)
-Entry #358: FAIL - Similarity: 0.4032 is below threshold of 0.6131
+  - Gen Question: 'What is the total count of UcoCWE nodes where the description is not exist?'
+Entry #352: PASS (Similarity: 0.8785)
+Entry #353: PASS (Similarity: 0.8942)
+Entry #354: PASS (Similarity: 0.8884)
+Entry #355: PASS (Similarity: 0.7394)
+Entry #356: PASS (Similarity: 0.9441)
+Entry #357: FAIL - Similarity: 0.4643 is below threshold of 0.6
+  - NL Question: 'Count the number of tactics for each domain.'
+  - Gen Question: 'Group UcoexTACTICS nodes by their ucoexDOMAIN property, count each group, and return the domain and count.'
+Entry #358: FAIL - Similarity: 0.3514 is below threshold of 0.6
   - NL Question: 'How many distinct domains are there for tactics?'
-  - Gen Question: 'What is the count of distinct ucoexDOMAIN properties found on UcoexTACTICS nodes, returned as distinctDomains?'
-Entry #359: FAIL - Similarity: 0.4557 is below threshold of 0.6131
+  - Gen Question: 'What is the count of distinct ucoexDOMAIN properties found on UcoexTACTICS nodes?'
+Entry #359: FAIL - Similarity: 0.4189 is below threshold of 0.6
   - NL Question: 'What is the total count of distinct tactic names?'
-  - Gen Question: 'What is the count of distinct ucoexNAME properties found on UcoexTACTICS nodes, returned as distinctTacticNames?'
-Entry #360: FAIL - Similarity: 0.4179 is below threshold of 0.6131
+  - Gen Question: 'What is the count of distinct ucoexNAME properties found on UcoexTACTICS nodes?'
+Entry #360: FAIL - Similarity: 0.0465 is below threshold of 0.6
   - NL Question: 'How many tactics have a description provided?'
-  - Gen Question: 'Find UcoexTACTICS nodes where the ucoexDESCRIPTION property is not null, and return the count of these nodes as tacticsWithDescription.'
-Entry #361: FAIL - Similarity: 0.4632 is below threshold of 0.6131
+  - Gen Question: 'Find UcoexTACTICS nodes where the ucoexDESCRIPTION is not null'
+Entry #361: FAIL - Similarity: 0.1638 is below threshold of 0.6
   - NL Question: 'How many tactics have a URL provided?'
-  - Gen Question: 'Find UcoexTACTICS nodes where the ucoexURL property is not null, and return the count of these nodes as tacticsWithUrl.'
-Entry #362: FAIL - Similarity: 0.6018 is below threshold of 0.6131
+  - Gen Question: 'Find UcoexTACTICS nodes where the ucoexURL property is not null'
+Entry #362: FAIL - Similarity: 0.5243 is below threshold of 0.6
   - NL Question: 'Count the number of MITRE D3FEND techniques grouped by their label.'
-  - Gen Question: 'Group UcoexMITRED3FEND nodes by their ucoexMITRED3FEND_LABEL property, count each group, and return the label and count (as techniqueCount).'
-Entry #363: PASS (Similarity: 0.6174)
-Entry #364: FAIL - Similarity: 0.3612 is below threshold of 0.6131
+  - Gen Question: 'Group UcoexMITRED3FEND nodes by their ucoexMITRED3FEND_LABEL property, count each group, and return the label and count.'
+Entry #363: PASS (Similarity: 0.8588)
+Entry #364: FAIL - Similarity: 0.2714 is below threshold of 0.6
   - NL Question: 'How many MITRE D3FEND techniques have a definition?'
-  - Gen Question: 'Find UcoexMITRED3FEND nodes where the ucoexMITRED3FEND_DEFINITION property is not null, and return the count of these nodes as techniquesWithDefinition.'
-Entry #365: FAIL - Similarity: 0.4137 is below threshold of 0.6131
+  - Gen Question: 'Find UcoexMITRED3FEND nodes where its Definition is not null.'
+Entry #365: FAIL - Similarity: 0.4388 is below threshold of 0.6
   - NL Question: 'Which 10 CWEs have the most observed examples linked to them?'
-  - Gen Question: 'Find UcoCWE nodes with a UCOHASOBSERVEDEXAMPLE relationship to UcoexObservedExample nodes. Return the CWE description and the example count, showing the top 10, ordered by the count descending.'
-Entry #366: FAIL - Similarity: 0.4292 is below threshold of 0.6131
+  - Gen Question: 'Find UcoCWE nodes with a UCOHASOBSERVEDEXAMPLE relationship to UcoexObservedExample nodes. Return the CWE description and the example count, showing the top 10 in descending order.'
+Entry #366: FAIL - Similarity: 0.4481 is below threshold of 0.6
   - NL Question: 'Which 10 CWEs have the *fewest* observed examples (but at least one)?'
-  - Gen Question: 'Find UcoCWE nodes with a UCOHASOBSERVEDEXAMPLE relationship to UcoexObservedExample nodes. Return the CWE description and the example count, showing the 10 with the *lowest* counts, ordered ascending.'
-Entry #367: FAIL - Similarity: 0.4690 is below threshold of 0.6131
+  - Gen Question: 'Find UcoCWE nodes with a UCOHASOBSERVEDEXAMPLE relationship to UcoexObservedExample nodes. Return the CWE description and the example count, showing the 10 with the *lowest* counts in descending order.'
+Entry #367: FAIL - Similarity: 0.4841 is below threshold of 0.6
   - NL Question: 'Which 10 CVEs are referenced by the most observed examples?'
-  - Gen Question: 'Find UcoexObservedExample nodes with a UCOEXEXAMPLEOBSERVEDIN relationship to UcoCVE nodes. Return the CVE's vector string and the count of examples, showing the top 10, ordered by count descending.'
-Entry #368: PASS (Similarity: 0.6163)
-Entry #369: FAIL - Similarity: 0.5236 is below threshold of 0.6131
+  - Gen Question: 'Find UcoexObservedExample nodes with a UCOEXEXAMPLEOBSERVEDIN relationship to UcoCVE nodes. Return the CVE's vector string and the count of examples, showing the top 10 in descending order.'
+Entry #368: PASS (Similarity: 0.6300)
+Entry #369: FAIL - Similarity: 0.5400 is below threshold of 0.6
   - NL Question: 'List tactic domains ranked by the number of tactics they contain, most to least.'
-  - Gen Question: 'Find UcoexTACTICS nodes that have a ucoexDOMAIN property. Return the domain and the count of tactics for that domain, ordered by the count descending.'
-Entry #370: FAIL - Similarity: 0.4801 is below threshold of 0.6131
+  - Gen Question: 'Find UcoexTACTICS nodes that have a ucoexDOMAIN property. Return the domain and the count of tactics for that domain in descending order.'
+Entry #370: FAIL - Similarity: 0.4844 is below threshold of 0.6
   - NL Question: 'What is the count of CWEs for each 'status' (e.g., 'Draft', 'Stable'), ranked from most common to least?'
-  - Gen Question: 'Find UcoCWE nodes that have a ucostatus property. Return the status and the count of CWEs for that status, ordered by the count descending.'
-Entry #371: FAIL - Similarity: 0.5741 is below threshold of 0.6131
+  - Gen Question: 'Find UcoCWE nodes that have a ucostatus property. Return the status and the count of CWEs for that status in descending order.'
+Entry #371: FAIL - Similarity: 0.5920 is below threshold of 0.6
   - NL Question: 'List the CWE 'abstraction' types by their frequency, highest first.'
-  - Gen Question: 'Find UcoCWE nodes that have a ucoabstraction property. Return the abstraction type and the count of CWEs for that type, ordered by the count descending.'
-Entry #372: FAIL - Similarity: 0.5524 is below threshold of 0.6131
+  - Gen Question: 'Find UcoCWE nodes that have a ucoabstraction property. Return the abstraction type and the count of CWEs for that type in descending order.'
+Entry #372: FAIL - Similarity: 0.5684 is below threshold of 0.6
   - NL Question: 'How many CWEs are there for each 'structure' type (e.g., 'Simple', 'Composite'), ranked most to least common?'
-  - Gen Question: 'Find UcoCWE nodes that have a ucostructure property. Return the structure type and the count of CWEs for that type, ordered by the count descending.'
-Entry #373: FAIL - Similarity: 0.4045 is below threshold of 0.6131
+  - Gen Question: 'Find UcoCWE nodes that have a ucostructure property. Return the structure type and the count of CWEs for that type in descending order.'
+Entry #373: FAIL - Similarity: 0.4094 is below threshold of 0.6
   - NL Question: 'What are the most common 'vulnStatus' values for CVEs, ranked by frequency?'
-  - Gen Question: 'Find UcoCVE nodes that have a ucovulnStatus property. Return the status and the count of CVEs for that status, ordered by the count descending.'
-Entry #374: FAIL - Similarity: 0.6068 is below threshold of 0.6131
-  - NL Question: 'Rank the 'timeOfIntroduction' phases by how many CWEs are associated with them.'
-  - Gen Question: 'Find UcoCWE nodes that have a ucotimeOfIntroduction property. Return the introduction phase and the count of CWEs for that phase, ordered by the count descending.'
-Entry #375: FAIL - Similarity: 0.4708 is below threshold of 0.6131
+  - Gen Question: 'Find UcoCVE nodes that have a ucovulnStatus property. Return the status and the count of CVEs for that status in descending order.'
+Entry #374: PASS (Similarity: 0.6219)
+Entry #375: FAIL - Similarity: 0.4708 is below threshold of 0.6
   - NL Question: 'Compare the total count of CVEs that require user interaction vs. those that do not.'
   - Gen Question: 'Find UcoCVE nodes where ucouserInteractionRequired is set. Group by this value (true/false) and return the value and the count of CVEs for it.'
-Entry #376: FAIL - Similarity: 0.5199 is below threshold of 0.6131
+Entry #376: FAIL - Similarity: 0.5199 is below threshold of 0.6
   - NL Question: 'Compare the total count of CVEs that grant all privileges vs. those that do not.'
   - Gen Question: 'Find UcoCVE nodes where ucoobtainAllPrivilege is set. Group by this value (true/false) and return the value and the count of CVEs for it.'
-Entry #377: FAIL - Similarity: 0.2985 is below threshold of 0.6131
+Entry #377: FAIL - Similarity: 0.2985 is below threshold of 0.6
   - NL Question: 'Find all CVEs that allow full privilege escalation AND do not require user interaction.'
   - Gen Question: 'Find all UcoCVE nodes where ucoobtainAllPrivilege is true AND ucouserInteractionRequired is false, then return their vector string and vuln status.'
-Entry #378: FAIL - Similarity: 0.4934 is below threshold of 0.6131
+Entry #378: FAIL - Similarity: 0.4934 is below threshold of 0.6
   - NL Question: 'Find all CVEs that require user interaction OR have a 'vulnStatus' of 'Analyzed'.'
   - Gen Question: 'Find all UcoCVE nodes where ucouserInteractionRequired is true OR the ucovulnStatus is 'Analyzed', then return their vector string and vuln status.'
-Entry #379: FAIL - Similarity: 0.3754 is below threshold of 0.6131
+Entry #379: FAIL - Similarity: 0.3754 is below threshold of 0.6
   - NL Question: 'Find CVEs that require user interaction AND have a defined evaluator solution.'
   - Gen Question: 'Find UcoCVE nodes where ucouserInteractionRequired is true AND the ucoevaluatorSolution property exists, then return the vector string and the evaluator solution.'
-Entry #380: FAIL - Similarity: 0.5763 is below threshold of 0.6131
+Entry #380: FAIL - Similarity: 0.5763 is below threshold of 0.6
   - NL Question: 'List all tactics that are in the 'Enterprise' domain AND have a description.'
   - Gen Question: 'Find UcoexTACTICS nodes where the ucoexDOMAIN is 'Enterprise' AND the ucoexDESCRIPTION property exists, then return the tactic's name and description.'
-Entry #381: FAIL - Similarity: 0.5824 is below threshold of 0.6131
+Entry #381: FAIL - Similarity: 0.5824 is below threshold of 0.6
   - NL Question: 'Show tactics that are in the 'Mobile' OR 'Cloud' domain.'
   - Gen Question: 'Find UcoexTACTICS nodes where the ucoexDOMAIN is either 'Mobile' OR 'Cloud', then return the tactic's name and domain.'
 Entry #382: PASS (Similarity: 0.6919)
-Entry #383: FAIL - Similarity: 0.5626 is below threshold of 0.6131
+Entry #383: FAIL - Similarity: 0.5626 is below threshold of 0.6
   - NL Question: 'Get all MITRE ATT&CK techniques that have both a URL AND a description.'
   - Gen Question: 'Find UcoexMITREATTACK nodes that have both a ucoexURL AND a ucoexDESCRIPTION, then return the description and URL.'
 Entry #384: PASS (Similarity: 0.6641)
 Entry #385: PASS (Similarity: 0.6188)
-Entry #386: FAIL - Similarity: 0.2731 is below threshold of 0.6131
+Entry #386: FAIL - Similarity: 0.2731 is below threshold of 0.6
   - NL Question: 'Find CVEs that grant all privileges AND require user interaction, but have NO evaluator solution.'
   - Gen Question: 'Find UcoCVE nodes where ucoobtainAllPrivilege is true, ucouserInteractionRequired is true, AND the ucoevaluatorSolution property is null, then return the vector string.'
-Entry #387: FAIL - Similarity: 0.5519 is below threshold of 0.6131
+Entry #387: FAIL - Similarity: 0.5519 is below threshold of 0.6
   - NL Question: 'Find all tactics that have 'Execution' in their name OR are in the 'Execution' domain.'
   - Gen Question: 'Find UcoexTACTICS nodes where the ucoexNAME property contains the string 'Execution' OR the ucoexDOMAIN is 'Execution', then return the name and domain.'
-Entry #388: FAIL - Similarity: 0.3776 is below threshold of 0.6131
+Entry #388: FAIL - Similarity: 0.3776 is below threshold of 0.6
   - NL Question: 'List MITRE ATT&CK techniques that have a URL but NO description.'
   - Gen Question: 'Find UcoexMITREATTACK nodes that have a ucoexURL property but do NOT have a ucoexDESCRIPTION property, then return the URL.'
-Entry #389: FAIL - Similarity: 0.4711 is below threshold of 0.6131
+Entry #389: FAIL - Similarity: 0.4711 is below threshold of 0.6
   - NL Question: 'Find all CWEs that have a description provided.'
   - Gen Question: 'Find all UcoCWE nodes that have a non-null ucodescription property, and return that description.'
-Entry #390: FAIL - Similarity: 0.4330 is below threshold of 0.6131
+Entry #390: FAIL - Similarity: 0.4330 is below threshold of 0.6
   - NL Question: 'List all CAPECs that specify the skills required.'
   - Gen Question: 'Find all UcoexCAPEC nodes where the ucoexSkills_Required property exists, and return the label and the skills required.'
-Entry #391: FAIL - Similarity: 0.5180 is below threshold of 0.6131
+Entry #391: FAIL - Similarity: 0.5180 is below threshold of 0.6
   - NL Question: 'Find all tactics that are missing a description.'
   - Gen Question: 'Find all UcoexTACTICS nodes where the ucoexDESCRIPTION property is null, and return the tactic's name.'
-Entry #392: FAIL - Similarity: 0.4051 is below threshold of 0.6131
+Entry #392: FAIL - Similarity: 0.4051 is below threshold of 0.6
   - NL Question: 'Show all CAPECs that have at least one related weakness (CWE).'
   - Gen Question: 'Find all UcoexCAPEC nodes that have an outgoing UCOEXHASRELATEDWEAKNESS relationship to any UcoCWE node, and return the CAPEC's label.'
-Entry #393: FAIL - Similarity: 0.4468 is below threshold of 0.6131
+Entry #393: FAIL - Similarity: 0.4468 is below threshold of 0.6
   - NL Question: 'List all CWEs that are not a related weakness for any CAPEC.'
   - Gen Question: 'Find all UcoCWE nodes that do NOT have an incoming UCOEXHASRELATEDWEAKNESS relationship from any UcoexCAPEC node, and return the CWE's description.'
-Entry #394: FAIL - Similarity: 0.4831 is below threshold of 0.6131
+Entry #394: FAIL - Similarity: 0.4831 is below threshold of 0.6
   - NL Question: 'Find all MITRE D3FEND techniques that are mapped to a MITRE ATT&CK technique.'
   - Gen Question: 'Find all UcoexMITRED3FEND nodes that have an outgoing UCOEXHASMITREATTACK relationship to any UcoexMITREATTACK node, and return the D3FEND node's uri.'
-Entry #395: FAIL - Similarity: 0.4468 is below threshold of 0.6131
+Entry #395: FAIL - Similarity: 0.4468 is below threshold of 0.6
   - NL Question: 'List all MITRE ATT&CK techniques that have no corresponding D3FEND mapping.'
   - Gen Question: 'Find all UcoexMITREATTACK nodes that do NOT have an incoming UCOEXHASMITREATTACK relationship from any UcoexMITRED3FEND node, and return the ATT&CK node's description.'
-Entry #396: FAIL - Similarity: 0.4241 is below threshold of 0.6131
+Entry #396: FAIL - Similarity: 0.4241 is below threshold of 0.6
   - NL Question: 'Get a combined list of all descriptions from Tactics and MITRE ATT&CK techniques.'
   - Gen Question: 'Get all non-null descriptions from UcoexTACTICS nodes, combine them with all non-null descriptions from UcoexMITREATTACK nodes, and return the combined list as 'description'.'
-Entry #397: FAIL - Similarity: 0.5368 is below threshold of 0.6131
+Entry #397: FAIL - Similarity: 0.5368 is below threshold of 0.6
   - NL Question: 'Find all CWEs that have a status of either 'Stable' or 'Draft'.'
   - Gen Question: 'Find all UcoCWE nodes where the ucostatus property is either 'Stable' or 'Draft', and return the description and status.'
-Entry #398: FAIL - Similarity: 0.2359 is below threshold of 0.6131
+Entry #398: FAIL - Similarity: 0.2359 is below threshold of 0.6
   - NL Question: 'List all CAPECs that are classified with 'High' severity.'
   - Gen Question: 'Find all UcoexCAPEC nodes where the ucoexSeverity property is 'High', and return the label and description.'
-Entry #399: FAIL - Similarity: 0.2910 is below threshold of 0.6131
+Entry #399: FAIL - Similarity: 0.2910 is below threshold of 0.6
   - NL Question: 'Show me MITRE ATT&CK techniques that are missing a URL.'
   - Gen Question: 'Find all UcoexMITREATTACK nodes where the ucoexURL property is null, and return the description.'
 Entry #400: PASS (Similarity: 0.6454)
-Entry #401: FAIL - Similarity: 0.2768 is below threshold of 0.6131
+Entry #401: FAIL - Similarity: 0.2768 is below threshold of 0.6
   - NL Question: 'List all CAPECs that have 'ExtendedDescription' but are missing 'Consequences'.'
   - Gen Question: 'Find all UcoexCAPEC nodes where ucoexExtendedDescription is not null AND ucoexConsequences is null, then return the label.'
 Entry #402: PASS (Similarity: 0.6463)
-Entry #403: FAIL - Similarity: 0.5522 is below threshold of 0.6131
+Entry #403: FAIL - Similarity: 0.5522 is below threshold of 0.6
   - NL Question: 'What techniques (TTPs) are used by both the 'APT28' and 'FIN7' groups?'
   - Gen Question: 'Find UcoexMITREATTACK nodes (a) that are used by *both* the 'APT28' group (g1) and the 'FIN7' group (g2). Return the name of the shared technique.'
 Entry #404: PASS (Similarity: 0.8961)
-Entry #405: FAIL - Similarity: 0.5990 is below threshold of 0.6131
+Entry #405: FAIL - Similarity: 0.5990 is below threshold of 0.6
   - NL Question: 'List all campaigns and the software they use.'
   - Gen Question: 'Find all pairs of campaigns (c) and software (s) where the campaign has a UCOEXCAMPAIGNUSESSOFTWARE relationship to the software. Return the names of both.'
-Entry #406: FAIL - Similarity: 0.4915 is below threshold of 0.6131
+Entry #406: FAIL - Similarity: 0.4915 is below threshold of 0.6
   - NL Question: 'Find the shortest path between a specific Exploit Target (by URI) and a specific CPE (by name).'
   - Gen Question: 'What is the most direct connection (in 3 steps or less) between the specific target 'http://example.com/target' and the software 'cpe:2.3:o:microsoft:windows_10'?'
 Entry #407: PASS (Similarity: 0.6372)
 Entry #408: PASS (Similarity: 0.6596)
 Entry #409: PASS (Similarity: 0.6362)
-Entry #410: FAIL - Similarity: 0.5009 is below threshold of 0.6131
+Entry #410: FAIL - Similarity: 0.5009 is below threshold of 0.6
   - NL Question: 'Show the shortest path (can be up to 6 hops) from a Mitigation (by description) to a Vulnerability (by published date '2023-01-01').'
   - Gen Question: 'What is the most direct connection (6 steps or less) between the mitigation 'Apply patches' and the vulnerability published on '2023-01-01'?'
-Entry #411: FAIL - Similarity: 0.5337 is below threshold of 0.6131
+Entry #411: FAIL - Similarity: 0.5337 is below threshold of 0.6
   - NL Question: 'Find all paths (up to 3 hops) connecting a specific CWE (by name) to any D3FEND technique.'
   - Gen Question: 'How does the weakness 'CWE-79' relate to any defensive D3FEND techniques? Show all connection paths (up to 3 steps) and the definition of the defense.'
-Entry #412: FAIL - Similarity: 0.5718 is below threshold of 0.6131
+Entry #412: FAIL - Similarity: 0.5718 is below threshold of 0.6
   - NL Question: 'Find all paths (up to 3 hops) from a specific CAPEC (by name) to any observed CVE.'
   - Gen Question: 'Show all the ways (in 3 steps or less) that the attack pattern 'CAPEC-100' leads to or is associated with any specific CVE vulnerability. Return the path and the CVE's vector string.'
 Entry #413: PASS (Similarity: 0.7939)
-Entry #414: FAIL - Similarity: 0.4465 is below threshold of 0.6131
+Entry #414: FAIL - Similarity: 0.4465 is below threshold of 0.6
   - NL Question: 'Find the shortest path from a specific CPE (by name) to any available mitigation.'
   - Gen Question: 'What is the most direct path (6 steps or less) from the 'microsoft:windows_10' software to *any* available mitigation? Show the path and the mitigation's description.'
 Entry #415: PASS (Similarity: 0.6620)
@@ -576,12 +556,12 @@ Entry #419: PASS (Similarity: 0.8525)
 Entry #420: PASS (Similarity: 0.7986)
 Entry #421: PASS (Similarity: 0.7715)
 Entry #422: PASS (Similarity: 0.6817)
-Entry #423: FAIL - Similarity: 0.5055 is below threshold of 0.6131
+Entry #423: FAIL - Similarity: 0.5055 is below threshold of 0.6
   - NL Question: 'Find software that uses MITRE ATT&CK techniques mapped from 'CAPEC-100: SQL Injection'.'
   - Gen Question: 'Show me software (s) that uses a technique (a) which, in turn, is related to the 'SQL Injection' attack pattern (c). Return the distinct software and technique descriptions.'
 Entry #424: PASS (Similarity: 0.8292)
 Entry #425: PASS (Similarity: 0.6701)
-Entry #426: FAIL - Similarity: 0.4397 is below threshold of 0.6131
+Entry #426: FAIL - Similarity: 0.4397 is below threshold of 0.6
   - NL Question: 'Which software has known MITRE ATT&CK techniques associated with it?'
   - Gen Question: 'Show me all the software in our database that has one or more hacking techniques (MITRE ATT&CK) linked to it. Return the distinct software description and URI.'
 Entry #427: PASS (Similarity: 0.6524)

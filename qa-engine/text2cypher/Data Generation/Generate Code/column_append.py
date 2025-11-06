@@ -19,20 +19,20 @@ input_text_file.write_text("\n".join(cleaned_lines), encoding="utf-8")
 print(f"✅ Step 1 done — cleaned file overwritten with {len(cleaned_lines)} questions at:")
 print(f"   {input_text_file}")
 
-# === STEP 2: Append missing 'generated_question' entries in target CSV ===
+# === STEP 2: Append missing 'CypherToQuestion' entries in target CSV ===
 with target_csv_file.open("r", encoding="utf-8", newline="") as csvfile:
     reader = list(csv.DictReader(csvfile))
     fieldnames = reader[0].keys()
 
 # Ensure column exists
-if "generated_question" not in fieldnames:
-    raise ValueError("❌ 'generated_question' column not found in target CSV!")
+if "CypherToQuestion" not in fieldnames:
+    raise ValueError("❌ 'CypherToQuestion' column not found in target CSV!")
 
 # Fill missing rows with questions (in order)
 clean_index = 0
 for row in reader:
-    if (not row["generated_question"]) and clean_index < len(cleaned_lines):
-        row["generated_question"] = cleaned_lines[clean_index]
+    if (not row["CypherToQuestion"]) and clean_index < len(cleaned_lines):
+        row["CypherToQuestion"] = cleaned_lines[clean_index]
         clean_index += 1
 
 # Write back to same CSV

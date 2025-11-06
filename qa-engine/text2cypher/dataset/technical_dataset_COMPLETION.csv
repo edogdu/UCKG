@@ -1,4 +1,4 @@
-Category,NaturalLanguageQuestion,CypherQuery,generated_question,ExpectedNodeLabels,ExpectedRelationshipTypes,ExpectedProperties,Hops,ExtractedPropertyValues
+Category,NaturalLanguageQuestion,CypherQuery,CypherToQuestion,ExpectedNodeLabels,ExpectedRelationshipTypes,ExpectedProperties,Hops,ExtractedPropertyValues
 Node Lookup Queries,Pull the record for CVE-2021-44228.,MATCH (c:UcoCVE {label: 'CVE-2021-44228'}) RETURN c,What are the full details for 'CVE-2021-44228'?,"[""UcoCVE""]",[],"[""label""]",0,"[""CVE-2021-44228""]"
 Node Lookup Queries,Get the name and description for CWE-89.,"MATCH (c:UcoCWE {ucocweID: 'CWE-89'}) RETURN c.ucocweName, c.ucodescription",What is the name and description for weakness 'CWE-89'?,"[""UcoCWE""]",[],"[""ucocweID"", ""ucocweName"", ""ucodescription""]",0,"[""CWE-89""]"
 Node Lookup Queries,Show me all data on the 'SolarWinds Orion' campaign.,MATCH (c:UcoexCAMPAIGNS {ucoexNAME: 'SolarWinds Orion'}) RETURN c,Show me all information on the 'SolarWinds Orion' campaign.,"[""UcoexCAMPAIGNS""]",[],"[""ucoexNAME""]",0,"[""SolarWinds Orion""]"

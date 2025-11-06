@@ -1,4 +1,4 @@
-"Category","NaturalLanguageQuestion","CypherQuery","generated_question"
+"Category","NaturalLanguageQuestion","CypherQuery","CypherToQuestion"
 "Node Lookup Queries","Find the Exploit Target with the URI 'http://example.com/target1'.","MATCH (n:UcoExploitTarget {uri: 'http://example.com/target1'}) RETURN n","Show me all the information for the specific exploit target with the URI 'http://example.com/target1'."
 "Node Lookup Queries","List all known Exploit Targets.","MATCH (n:UcoExploitTarget) RETURN n.uri","Get a list of all URIs for every exploit target in the database."
 "Node Lookup Queries","Find all Exploit Targets whose URI contains 'gov'.","MATCH (n:UcoExploitTarget) WHERE n.uri CONTAINS 'gov' RETURN n.uri","Which exploit target URIs have the text 'gov' in them?"

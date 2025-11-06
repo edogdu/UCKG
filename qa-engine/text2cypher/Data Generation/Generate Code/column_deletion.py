@@ -5,7 +5,7 @@ from pathlib import Path
 input_csv_file = Path(r"C:\Users\User\Downloads\UCKG\qa-engine\text2cypher\backend\Data Generation\Dataset Generation Process\technical dataset\technical_dataset_sample.csv")
 output_csv_file = Path(r"C:\Users\User\Downloads\UCKG\qa-engine\text2cypher\backend\Data Generation\Dataset Generation Process\technical dataset\technical_dataset_cleaned.csv")
 
-column_to_clear = "generated_question"  # column name to delete values from
+column_to_clear = "CypherToQuestion"  # column name to delete values from
 
 # === STEP 1: Read input CSV ===
 with input_csv_file.open("r", encoding="utf-8", newline="") as csvfile:

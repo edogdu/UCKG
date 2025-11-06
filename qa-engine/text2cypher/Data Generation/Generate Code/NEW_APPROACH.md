@@ -135,7 +135,7 @@ Closes all log files and the Neo4j driver connection.
 - Duplicate `NaturalLanguageQuestion`
 - Duplicate `CypherQuery`
 - Duplicate `(NaturalLanguageQuestion, CypherQuery)` pairs
-- Duplicate `(NaturalLanguageQuestion, generated_question)` pairs  
+- Duplicate `(NaturalLanguageQuestion, CypherToQuestion)` pairs  
 
 **If duplicates are found:** Logs issues and stops execution.
 
@@ -165,8 +165,8 @@ Closes all log files and the Neo4j driver connection.
 
 ---
 
-### `validate_semantic_relevance(self, natural_language_question, generated_question, entry_id, threshold)`
-**Purpose:** Checks if `generated_question` and `natural_language_question` are semantically aligned using embeddings from the `all-MiniLM-L6-v2` Sentence Transformer.  
+### `validate_semantic_relevance(self, natural_language_question, CypherToQuestion, entry_id, threshold)`
+**Purpose:** Checks if `CypherToQuestion` and `natural_language_question` are semantically aligned using embeddings from the `all-MiniLM-L6-v2` Sentence Transformer.  
 **Fails if:** Cosine similarity `< 0.7`.
 
 ---

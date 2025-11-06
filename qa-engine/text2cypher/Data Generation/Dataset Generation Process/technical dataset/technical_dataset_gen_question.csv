@@ -1,4 +1,4 @@
-Category,NaturalLanguageQuestion,CypherQuery,generated_question
+Category,NaturalLanguageQuestion,CypherQuery,CypherToQuestion
 Multi-hop Queries,What software is used in campaigns attributed to 'APT29'?,MATCH (g:UcoexGROUPS {ucoexNAME: 'APT29'})<-[:UCOEXATTRIBUTEDTO]-(c:UcoexCAMPAIGNS)-[:UCOEXCAMPAIGNUSESSOFTWARE]->(s:UcoexSOFTWARE) RETURN s.ucoexNAME,What software is used in campaigns run by 'APT29'?
 Multi-hop Queries,Find the CWE weakness associated with exploit targets vulnerable to 'CVE-2020-0601'.,"MATCH (c:UcoCVE {label: 'CVE-2020-0601'})<-[:UCOHASCVE_ID]-(v:UcoVulnerability)<-[:UCOHASVULNERABILITY]-(et:UcoExploitTarget)-[:UCOHASWEAKNESS]->(w:UcoCWE) RETURN w.ucocweID, w.ucocweName",What weakness (CWE) is linked to exploit targets for 'CVE-2020-0601'?
 Multi-hop Queries,What mitigations are suggested for techniques used by 'Lazarus Group'?,"MATCH (g:UcoexGROUPS {ucoexNAME: 'Lazarus Group'})-[:UCOEXGROUPUSESTECHNIQUE]->(t:UcoexMITREATTACK)<-[:UCOEXMITIGATES]-(m:UcoexMITIGATIONS) RETURN t.ucoexNAME, m.ucoexNAME",What mitigations stop the techniques used by 'Lazarus Group'?

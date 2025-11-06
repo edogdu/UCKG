@@ -1,4 +1,4 @@
-Category,NaturalLanguageQuestion,CypherQuery,generated_question,ExpectedNodeLabels,ExpectedRelationshipTypes,ExpectedProperties,Hops,ExtractedPropertyValues
+Category,NaturalLanguageQuestion,CypherQuery,CypherToQuestion,ExpectedNodeLabels,ExpectedRelationshipTypes,ExpectedProperties,Hops,ExtractedPropertyValues
 Node Lookup Queries,Can you look up the vulnerability 'CVE-2021-44228'?,MATCH (c:UcoCVE {label: 'CVE-2021-44228'}) RETURN c,What are the details for the vulnerability 'CVE-2021-44228'?,"[""UcoCVE""]",[],"[""label""]",0,"[""CVE-2021-44228""]"
 Node Lookup Queries,Tell me about the software weakness 'CWE-89'.,"MATCH (c:UcoCWE {ucocweID: 'CWE-89'}) RETURN c.ucocweName, c.ucodescription",What is the weakness 'CWE-89' and can you describe it?,"[""UcoCWE""]",[],"[""ucocweID"", ""ucocweName"", ""ucodescription""]",0,"[""CWE-89""]"
 Node Lookup Queries,What was the 'SolarWinds Orion' cyber attack?,MATCH (c:UcoexCAMPAIGNS {ucoexNAME: 'SolarWinds Orion'}) RETURN c,Tell me everything about the 'SolarWinds Orion' attack campaign.,"[""UcoexCAMPAIGNS""]",[],"[""ucoexNAME""]",0,"[""SolarWinds Orion""]"
