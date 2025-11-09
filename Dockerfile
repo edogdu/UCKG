@@ -21,6 +21,7 @@ RUN pip install pandas
 RUN pip install numpy
 RUN pip install openpyxl
 RUN pip install prometheus_client
+RUN pip install packaging
 
 # Copy your Python script and any other necessary files
 COPY . /app
