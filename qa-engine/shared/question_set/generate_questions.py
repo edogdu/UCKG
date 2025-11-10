@@ -9,20 +9,17 @@ from langchain.chains import LLMChain
 # Load environment variables
 load_dotenv()
 
-# Load semantic descriptions
-with open('semantic_descriptions.txt', 'r', encoding='utf-8') as file:
-    semantic_descriptions = file.read()
+
 
 # Load context summary
-with open('summary.txt', 'r', encoding='utf-8') as file:
-    summary = file.read()
+with open('subgraph_description.txt', 'r', encoding='utf-8') as file:
+    subgraph_description = file.read()
 
 # Load sample questions
 with open('questions.txt', 'r', encoding='utf-8') as file:
     sample_questions = file.read()
 
-terminology = semantic_descriptions
-context = summary
+context = subgraph_description
 questions = sample_questions
 
 # # API key for OpenAI
@@ -43,13 +40,12 @@ llm = ChatOllama(
 
 # Prompt for 0-hop questions
 # prompt = PromptTemplate(
-#     input_variables=['context', 'terminology', 'questions'],
+#     input_variables=['context', 'questions'],
 #     template="""
 # You are an experienced cybersecurity analyst generating high-quality, reasoning-based questions 
 # from a knowledge graph.
 
 # Given:
-# - a graph TERMINOLOGY,
 # - EXAMPLE QUESTIONS (style reference), and
 # - a CONTEXT subgraph summary(1 single node with all the important properties of the nodes such as Summary and Description but no incoming or outgoing relationship),
 
@@ -84,12 +80,7 @@ llm = ChatOllama(
 #     "context": "{context}"
 # }
 
-# ---
 
-# ## TERMINOLOGY
-# {terminology}
-
-# ---
 
 # ## EXAMPLE QUESTIONS (style reference)
 # {questions}
@@ -103,13 +94,12 @@ llm = ChatOllama(
 
 # Prompt for 1-hop questions
 # prompt = PromptTemplate(
-#     input_variables=['context', 'terminology', 'questions'],
+#     input_variables=['context', 'questions'],
 #     template="""
 # You are an experienced cybersecurity analyst generating high-quality, reasoning-based questions 
 # from a knowledge graph.
 
 # Given:
-# - a graph TERMINOLOGY,
 # - EXAMPLE QUESTIONS (style reference), and
 # - a CONTEXT subgraph summary (2 connected nodes with properties + relationships),
 
@@ -151,12 +141,6 @@ llm = ChatOllama(
 #     "context": "{context}"
 # }
 
-# ---
-
-# ## TERMINOLOGY
-# {terminology}
-
-# ---
 
 # ## EXAMPLE QUESTIONS (style reference)
 # {questions}
@@ -169,13 +153,12 @@ llm = ChatOllama(
 
 # Prompt for 2-hop questions ⟨s,*,o⟩
 prompt = PromptTemplate(
-    input_variables=['context', 'terminology', 'questions'],
+    input_variables=['context', 'questions'],
     template="""
 You are an experienced cybersecurity analyst generating high-quality, reasoning-based questions 
 from a knowledge graph.
 
 Given:
-- a graph TERMINOLOGY,
 - EXAMPLE QUESTIONS (style reference), and
 - a CONTEXT subgraph summary (3 connected nodes with properties + 2 relationships),
 
@@ -224,10 +207,6 @@ Each object must include:
 
 ---
 
-## TERMINOLOGY
-{terminology}
-
----
 
 ## EXAMPLE QUESTIONS (style reference)
 {questions}
@@ -240,13 +219,12 @@ Each object must include:
 
 # Prompt for 2-hop questions ⟨s,p,*⟩
 # prompt = PromptTemplate(
-#     input_variables=['context', 'terminology', 'questions'],
+#     input_variables=['context', 'questions'],
 #     template="""
 # You are an experienced cybersecurity analyst generating high-quality, reasoning-based questions 
 # from a knowledge graph.
 
 # Given:
-# - a graph TERMINOLOGY,
 # - EXAMPLE QUESTIONS (style reference), and
 # - a CONTEXT subgraph summary (3 connected nodes with properties + 2 relationships),
 
@@ -294,10 +272,6 @@ Each object must include:
 
 # ---
 
-# ## TERMINOLOGY
-# {terminology}
-
-# ---
 
 # ## EXAMPLE QUESTIONS (style reference)
 # {questions}
@@ -310,13 +284,12 @@ Each object must include:
 
 # Prompt for 2-hop questions ⟨s,p,o⟩
 # prompt = PromptTemplate(
-#     input_variables=['context', 'terminology', 'questions'],
+#     input_variables=['context', 'questions'],
 #     template="""
 # You are an experienced cybersecurity analyst generating high-quality, reasoning-based questions 
 # from a knowledge graph.
 
 # Given:
-# - a graph TERMINOLOGY,
 # - EXAMPLE QUESTIONS (style reference), and
 # - a CONTEXT subgraph summary (3 connected nodes with properties + 2 relationships),
 
@@ -365,9 +338,6 @@ Each object must include:
 
 # ---
 
-# ## TERMINOLOGY
-# {terminology}
-
 # ---
 
 # ## EXAMPLE QUESTIONS (style reference)
@@ -381,6 +351,6 @@ Each object must include:
 
 # Generate questions
 chain = LLMChain(llm = llm, prompt = prompt)
-responses = chain.invoke(context = context, terminology = terminology, questions = questions)
+responses = chain.invoke(context = context, questions = questions)
 
 print(responses)
