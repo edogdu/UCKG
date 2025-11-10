@@ -11,10 +11,10 @@ BACKEND_DIR = pathlib.Path(__file__).resolve().parent.parent
 if str(BACKEND_DIR) not in sys.path:
     sys.path.insert(0, str(BACKEND_DIR))
 
-from text2cypher import Text2Cypher
-from t2css_integration import create_enhanced_text2cypher
+from core.text2cypher import Text2Cypher
+from core.t2css_integration import create_enhanced_text2cypher
 from validation.noexec_validator import validate_cypher_noexec
-from llm import OllamaLLM
+from llm.ollama_llm import OllamaLLM
 
 # Use the attached technical dataset (COMPLETION)
 CSV_PATH = BACKEND_DIR / "dataset" / "technical_dataset_COMPLETION.csv"
@@ -233,8 +233,12 @@ def validate_cypher(driver, query: str) -> bool:
 
 # helper to catch generation errors
 def safe_generate(t2c: Text2Cypher, question: str) -> str:
+    """
+    Generate Cypher query WITHOUT validation.
+    This allows us to measure raw LLM quality via KG Valid Query Rate.
+    """
     try:
-        return t2c.text_to_cypher(question)
+        return t2c.text_to_cypher(question, skip_validation=True)
     except Exception as _:
         return ""
 
@@ -242,8 +246,19 @@ def safe_generate(t2c: Text2Cypher, question: str) -> str:
 # Output execution helpers
 ############################
 
-def run_and_fetch_set(driver, query: str) -> Optional[set]:
+def run_and_fetch_set(driver, query: str, timeout_seconds: int = 30) -> Optional[set]:
+    """Execute query with timeout protection"""
+    import signal
+    
+    def timeout_handler(signum, frame):
+        raise TimeoutError("Query execution exceeded timeout")
+    
     try:
+        # Set alarm for timeout (Unix only)
+        if hasattr(signal, 'SIGALRM'):
+            signal.signal(signal.SIGALRM, timeout_handler)
+            signal.alarm(timeout_seconds)
+        
         with driver.session() as sess:
             result = sess.run(query)
             rows = []
@@ -251,8 +266,17 @@ def run_and_fetch_set(driver, query: str) -> Optional[set]:
                 data = rec.data()
                 items = tuple(sorted((k, str(v)) for k, v in data.items()))
                 rows.append(items)
+                if len(rows) > 10000:  # Prevent memory issues
+                    break
+            
+            if hasattr(signal, 'SIGALRM'):
+                signal.alarm(0)  # Cancel alarm
+            
             return set(rows)
-    except Exception:
+    except (Exception, TimeoutError) as e:
+        if hasattr(signal, 'SIGALRM'):
+            signal.alarm(0)  # Cancel alarm
+        print(f"Query execution failed or timed out: {str(e)[:100]}")
         return None
 
 

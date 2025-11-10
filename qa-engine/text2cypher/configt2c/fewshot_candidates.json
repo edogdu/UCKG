@@ -1,0 +1,792 @@
+{
+  "Node Lookup Queries": [
+    {
+      "category": "Node Lookup Queries",
+      "nl": "Get the name and description for CWE-89.",
+      "cypher": "MATCH (c:UcoCWE {ucocweID: 'CWE-89'}) RETURN c.ucocweName, c.ucodescription",
+      "hops": 0,
+      "expected_labels": [
+        "UcoCWE"
+      ],
+      "expected_relationships": [],
+      "expected_properties": [
+        "ucocweID",
+        "ucocweName",
+        "ucodescription"
+      ]
+    },
+    {
+      "category": "Node Lookup Queries",
+      "nl": "What campaigns are attributed to the threat actor FIN7?",
+      "cypher": "MATCH (g:UcoexGROUPS {ucoexNAME: 'FIN7'})<-[:UCOEXATTRIBUTEDTO]-(c:UcoexCAMPAIGNS) RETURN c.ucoexNAME",
+      "hops": 1,
+      "expected_labels": [
+        "UcoexCAMPAIGNS",
+        "UcoexGROUPS"
+      ],
+      "expected_relationships": [
+        "UCOEXATTRIBUTEDTO"
+      ],
+      "expected_properties": [
+        "ucoexNAME"
+      ]
+    },
+    {
+      "category": "Node Lookup Queries",
+      "nl": "Pull the record for CVE-2021-44228.",
+      "cypher": "MATCH (c:UcoCVE {label: 'CVE-2021-44228'}) RETURN c",
+      "hops": 0,
+      "expected_labels": [
+        "UcoCVE"
+      ],
+      "expected_relationships": [],
+      "expected_properties": [
+        "label"
+      ]
+    },
+    {
+      "category": "Node Lookup Queries",
+      "nl": "Show me all data on the 'SolarWinds Orion' campaign.",
+      "cypher": "MATCH (c:UcoexCAMPAIGNS {ucoexNAME: 'SolarWinds Orion'}) RETURN c",
+      "hops": 0,
+      "expected_labels": [
+        "UcoexCAMPAIGNS"
+      ],
+      "expected_relationships": [],
+      "expected_properties": [
+        "ucoexNAME"
+      ]
+    },
+    {
+      "category": "Node Lookup Queries",
+      "nl": "Find the software record for 'Cobalt Strike'.",
+      "cypher": "MATCH (s:UcoexSOFTWARE {ucoexNAME: 'Cobalt Strike'}) RETURN s",
+      "hops": 0,
+      "expected_labels": [
+        "UcoexSOFTWARE"
+      ],
+      "expected_relationships": [],
+      "expected_properties": [
+        "ucoexNAME"
+      ]
+    }
+  ],
+  "Relationship Traversal Queries": [
+    {
+      "category": "Relationship Traversal Queries",
+      "nl": "List campaigns that use 'powershell'.",
+      "cypher": "MATCH (c:UcoexCAMPAIGNS)-[:UCOEXCAMPAIGNUSESSOFTWARE]->(s:UcoexSOFTWARE {ucoexNAME: 'powershell'}) RETURN c.ucoexNAME",
+      "hops": 1,
+      "expected_labels": [
+        "UcoexCAMPAIGNS",
+        "UcoexSOFTWARE"
+      ],
+      "expected_relationships": [
+        "UCOEXCAMPAIGNUSESSOFTWARE"
+      ],
+      "expected_properties": [
+        "ucoexNAME"
+      ]
+    },
+    {
+      "category": "Relationship Traversal Queries",
+      "nl": "Find software that uses MITRE ATT&CK techniques mapped from 'CAPEC-100: SQL Injection'.",
+      "cypher": "MATCH (s:UcoexSOFTWARE)-[:UCOEXSOFTWAREUSESTECHNIQUE]->(a:UcoexMITREATTACK)<-[:UCOEXHASTAXONOMYMAPPING]-(c:UcoexCAPEC {ucoexCAPEC_name: 'CAPEC-100: SQL Injection'}) RETURN DISTINCT s.ucoexDESCRIPTION, a.ucoexDESCRIPTION",
+      "hops": 2,
+      "expected_labels": [
+        "UcoexCAPEC",
+        "UcoexMITREATTACK",
+        "UcoexSOFTWARE"
+      ],
+      "expected_relationships": [
+        "UCOEXHASTAXONOMYMAPPING",
+        "UCOEXSOFTWAREUSESTECHNIQUE"
+      ],
+      "expected_properties": [
+        "ucoexCAPEC_name",
+        "ucoexDESCRIPTION"
+      ]
+    },
+    {
+      "category": "Relationship Traversal Queries",
+      "nl": "Show me CAPECs and Software that relate to the same MITRE ATT&CK technique.",
+      "cypher": "MATCH (c:UcoexCAPEC)-[:UCOEXHASTAXONOMYMAPPING]->(a:UcoexMITREATTACK)<-[:UCOEXSOFTWAREUSESTECHNIQUE]-(s:UcoexSOFTWARE) RETURN c.ucoexCAPEC_name AS capec, a.ucoexDESCRIPTION AS technique, s.ucoexDESCRIPTION AS software",
+      "hops": 2,
+      "expected_labels": [
+        "UcoexCAPEC",
+        "UcoexMITREATTACK",
+        "UcoexSOFTWARE"
+      ],
+      "expected_relationships": [
+        "UCOEXHASTAXONOMYMAPPING",
+        "UCOEXSOFTWAREUSESTECHNIQUE"
+      ],
+      "expected_properties": [
+        "ucoexCAPEC_name",
+        "ucoexDESCRIPTION"
+      ]
+    },
+    {
+      "category": "Relationship Traversal Queries",
+      "nl": "Show me campaigns linked to the Lazarus Group.",
+      "cypher": "MATCH (g:UcoexGROUPS {ucoexNAME: 'Lazarus Group'})<-[:UCOEXATTRIBUTEDTO]-(c:UcoexCAMPAIGNS) RETURN c.ucoexNAME",
+      "hops": 1,
+      "expected_labels": [
+        "UcoexCAMPAIGNS",
+        "UcoexGROUPS"
+      ],
+      "expected_relationships": [
+        "UCOEXATTRIBUTEDTO"
+      ],
+      "expected_properties": [
+        "ucoexNAME"
+      ]
+    },
+    {
+      "category": "Relationship Traversal Queries",
+      "nl": "Find groups that use 'netcat'.",
+      "cypher": "MATCH (g:UcoexGROUPS)-[:UCOEXGROUPUSESSOFTWARE]->(s:UcoexSOFTWARE {ucoexNAME: 'netcat'}) RETURN g.ucoexNAME",
+      "hops": 1,
+      "expected_labels": [
+        "UcoexGROUPS",
+        "UcoexSOFTWARE"
+      ],
+      "expected_relationships": [
+        "UCOEXGROUPUSESSOFTWARE"
+      ],
+      "expected_properties": [
+        "ucoexNAME"
+      ]
+    }
+  ],
+  "Multi-hop Queries": [
+    {
+      "category": "Multi-hop Queries",
+      "nl": "What CPEs (products) are affected by 'CVE-2017-0199'?",
+      "cypher": "MATCH (c:UcoCVE {label: 'CVE-2017-0199'})-[:UCOEXHASCPE]->(cpe:UcoexCPE) RETURN cpe.uri",
+      "hops": 1,
+      "expected_labels": [
+        "UcoCVE",
+        "UcoexCPE"
+      ],
+      "expected_relationships": [
+        "UCOEXHASCPE"
+      ],
+      "expected_properties": [
+        "label",
+        "uri"
+      ]
+    },
+    {
+      "category": "Multi-hop Queries",
+      "nl": "What techniques are used in campaigns attributed to 'APT29'?",
+      "cypher": "MATCH (g:UcoexGROUPS {ucoexNAME: 'APT29'})<-[:UCOEXATTRIBUTEDTO]-(c:UcoexCAMPAIGNS)-[:UCOEXCAMPAIGNUSESTECHNIQUE]->(t:UcoexMITREATTACK) RETURN c.ucoexNAME, t.ucoexNAME",
+      "hops": 2,
+      "expected_labels": [
+        "UcoexCAMPAIGNS",
+        "UcoexGROUPS",
+        "UcoexMITREATTACK"
+      ],
+      "expected_relationships": [
+        "UCOEXATTRIBUTEDTO",
+        "UCOEXCAMPAIGNUSESTECHNIQUE"
+      ],
+      "expected_properties": [
+        "ucoexNAME"
+      ]
+    },
+    {
+      "category": "Multi-hop Queries",
+      "nl": "What mitigations exist for the TTPs associated with FIN7's known toolset?",
+      "cypher": "MATCH (:UcoexGROUPS {ucoexNAME: 'FIN7'})-[:UCOEXGROUPUSESSOFTWARE]->(:UcoexSOFTWARE)-[:UCOEXSOFTWAREUSESTECHNIQUE]->(t:UcoexMITREATTACK)<-[:UCOEXMITIGATES]-(m:UcoexMITIGATIONS) RETURN m.ucoexNAME",
+      "hops": 3,
+      "expected_labels": [
+        "UcoexGROUPS",
+        "UcoexMITIGATIONS",
+        "UcoexMITREATTACK",
+        "UcoexSOFTWARE"
+      ],
+      "expected_relationships": [
+        "UCOEXGROUPUSESSOFTWARE",
+        "UCOEXMITIGATES",
+        "UCOEXSOFTWAREUSESTECHNIQUE"
+      ],
+      "expected_properties": [
+        "ucoexNAME"
+      ]
+    },
+    {
+      "category": "Multi-hop Queries",
+      "nl": "Find vulnerabilities that share the same weakness type (CWE) as CVE-2017-0144, based on observed incidents.",
+      "cypher": "MATCH (:UcoCVE {label: 'CVE-2017-0144'})<-[:UCOEXEXAMPLEOBSERVEDIN]-(:UcoexObservedExample)<-[:UCOHASOBSERVEDEXAMPLE]-(w:UcoCWE)<-[:UCOHASWEAKNESS]-(:UcoExploitTarget)-[:UCOHASVULNERABILITY]->(v:UcoVulnerability) RETURN v.ucosummary",
+      "hops": 4,
+      "expected_labels": [
+        "UcoCVE",
+        "UcoCWE",
+        "UcoExploitTarget",
+        "UcoVulnerability",
+        "UcoexObservedExample"
+      ],
+      "expected_relationships": [
+        "UCOEXEXAMPLEOBSERVEDIN",
+        "UCOHASOBSERVEDEXAMPLE",
+        "UCOHASVULNERABILITY",
+        "UCOHASWEAKNESS"
+      ],
+      "expected_properties": [
+        "label",
+        "ucosummary"
+      ]
+    },
+    {
+      "category": "Multi-hop Queries",
+      "nl": "Which CVEs were exploited during the WannaCry campaign?",
+      "cypher": "MATCH (:UcoexCAMPAIGNS {ucoexNAME: 'WannaCry Ransomware Attack'})-[:UCOEXCAMPAIGNUSESTECHNIQUE]->(t:UcoexMITREATTACK)<-[:UCOEXHASTAXONOMYMAPPING]-(:UcoexCAPEC)-[:UCOEXHASRELATEDWEAKNESS]->(:UcoCWE)<-[:UCOHASWEAKNESS]-(et:UcoExploitTarget)-[:UCOHASVULNERABILITY]->(v:UcoVulnerability)-[:UCOHASCVE_ID]->(cve:UcoCVE) RETURN cve.label",
+      "hops": 6,
+      "expected_labels": [
+        "UcoCVE",
+        "UcoCWE",
+        "UcoExploitTarget",
+        "UcoVulnerability",
+        "UcoexCAMPAIGNS",
+        "UcoexCAPEC",
+        "UcoexMITREATTACK"
+      ],
+      "expected_relationships": [
+        "UCOEXCAMPAIGNUSESTECHNIQUE",
+        "UCOEXHASRELATEDWEAKNESS",
+        "UCOEXHASTAXONOMYMAPPING",
+        "UCOHASCVE_ID",
+        "UCOHASVULNERABILITY",
+        "UCOHASWEAKNESS"
+      ],
+      "expected_properties": [
+        "label",
+        "ucoexNAME"
+      ]
+    }
+  ],
+  "Aggregation and Counting": [
+    {
+      "category": "Aggregation and Counting",
+      "nl": "What is the total count of distinct tactic names?",
+      "cypher": "MATCH (t:UcoexTACTICS) RETURN count(DISTINCT t.ucoexNAME) AS distinctTacticNames",
+      "hops": 0,
+      "expected_labels": [
+        "UcoexTACTICS"
+      ],
+      "expected_relationships": [],
+      "expected_properties": [
+        "ucoexNAME"
+      ]
+    },
+    {
+      "category": "Aggregation and Counting",
+      "nl": "How many observed examples are there for 'Pillar' abstraction CWEs?",
+      "cypher": "MATCH (w:UcoCWE {ucoabstraction: 'Pillar'})-[:UCOHASOBSERVEDEXAMPLE]->(o:UcoexObservedExample) RETURN count(o) AS exampleCount",
+      "hops": 1,
+      "expected_labels": [
+        "UcoCWE",
+        "UcoexObservedExample"
+      ],
+      "expected_relationships": [
+        "UCOHASOBSERVEDEXAMPLE"
+      ],
+      "expected_properties": [
+        "ucoabstraction"
+      ]
+    },
+    {
+      "category": "Aggregation and Counting",
+      "nl": "Count the number of distinct TTPs linked to APT28.",
+      "cypher": "MATCH (g:UcoexGROUPS {ucoexNAME: 'APT28'})-[:UCOEXGROUPUSESTECHNIQUE]->(t:UcoexMITREATTACK) RETURN count(t)",
+      "hops": 1,
+      "expected_labels": [
+        "UcoexGROUPS",
+        "UcoexMITREATTACK"
+      ],
+      "expected_relationships": [
+        "UCOEXGROUPUSESTECHNIQUE"
+      ],
+      "expected_properties": [
+        "ucoexNAME"
+      ]
+    },
+    {
+      "category": "Aggregation and Counting",
+      "nl": "How many related weaknesses (CWEs) does each 'High' severity CAPEC pattern have?",
+      "cypher": "MATCH (ca:UcoexCAPEC {ucoexSeverity: 'High'})-[:UCOEXHASRELATEDWEAKNESS]->(w:UcoCWE) RETURN ca.ucoexCAPEC_name, count(w) AS weaknessCount",
+      "hops": 1,
+      "expected_labels": [
+        "UcoCWE",
+        "UcoexCAPEC"
+      ],
+      "expected_relationships": [
+        "UCOEXHASRELATEDWEAKNESS"
+      ],
+      "expected_properties": [
+        "ucoexCAPEC_name",
+        "ucoexSeverity"
+      ]
+    },
+    {
+      "category": "Aggregation and Counting",
+      "nl": "How many threat groups have at least one campaign attributed to them?",
+      "cypher": "MATCH (g:UcoexGROUPS)<-[:UCOEXATTRIBUTEDTO]-(:UcoexCAMPAIGNS) RETURN count(DISTINCT g) AS groupsWithCampaigns",
+      "hops": 1,
+      "expected_labels": [
+        "UcoexCAMPAIGNS",
+        "UcoexGROUPS"
+      ],
+      "expected_relationships": [
+        "UCOEXATTRIBUTEDTO"
+      ],
+      "expected_properties": []
+    }
+  ],
+  "Conditional and Boolean Queries": [
+    {
+      "category": "Conditional and Boolean Queries",
+      "nl": "Show me high-impact (score > 5) CVEs that require no user interaction to exploit.",
+      "cypher": "MATCH (c:UcoCVE) WHERE toInteger(c.ucoimpactScore) > 5 AND c.ucouserInteractionRequired = 'false' RETURN c.label, c.ucoimpactScore",
+      "hops": 0,
+      "expected_labels": [
+        "UcoCVE"
+      ],
+      "expected_relationships": [],
+      "expected_properties": [
+        "label",
+        "ucoimpactScore",
+        "ucouserInteractionRequired"
+      ]
+    },
+    {
+      "category": "Conditional and Boolean Queries",
+      "nl": "What TTPs does Lazarus Group use, excluding 'Phishing'?",
+      "cypher": "MATCH (:UcoexGROUPS {ucoexNAME: 'Lazarus Group'})-[:UCOEXGROUPUSESTECHNIQUE]->(t:UcoexMITREATTACK) WHERE t.ucoexNAME <> 'Phishing' RETURN t.ucoexNAME",
+      "hops": 1,
+      "expected_labels": [
+        "UcoexGROUPS",
+        "UcoexMITREATTACK"
+      ],
+      "expected_relationships": [
+        "UCOEXGROUPUSESTECHNIQUE"
+      ],
+      "expected_properties": [
+        "ucoexNAME"
+      ]
+    },
+    {
+      "category": "Conditional and Boolean Queries",
+      "nl": "What software is used by 'Lazarus Group' AND was also used in the 'WannaCry' campaign?",
+      "cypher": "MATCH (g:UcoexGROUPS {ucoexNAME: 'Lazarus Group'})-[:UCOEXGROUPUSESSOFTWARE]->(s:UcoexSOFTWARE)<-[:UCOEXCAMPAIGNUSESSOFTWARE]-(c:UcoexCAMPAIGNS {ucoexNAME: 'WannaCry'}) RETURN s.ucoexNAME",
+      "hops": 2,
+      "expected_labels": [
+        "UcoexCAMPAIGNS",
+        "UcoexGROUPS",
+        "UcoexSOFTWARE"
+      ],
+      "expected_relationships": [
+        "UCOEXCAMPAIGNUSESSOFTWARE",
+        "UCOEXGROUPUSESSOFTWARE"
+      ],
+      "expected_properties": [
+        "ucoexNAME"
+      ]
+    },
+    {
+      "category": "Conditional and Boolean Queries",
+      "nl": "Find techniques used by 'Sandworm Team' for which mitigations exist.",
+      "cypher": "MATCH (g:UcoexGROUPS {ucoexNAME: 'Sandworm Team'})-[:UCOEXGROUPUSESTECHNIQUE]->(t:UcoexMITREATTACK)<-[:UCOEXMITIGATES]-(m:UcoexMITIGATIONS) RETURN DISTINCT t.ucoexNAME",
+      "hops": 2,
+      "expected_labels": [
+        "UcoexGROUPS",
+        "UcoexMITIGATIONS",
+        "UcoexMITREATTACK"
+      ],
+      "expected_relationships": [
+        "UCOEXGROUPUSESTECHNIQUE",
+        "UCOEXMITIGATES"
+      ],
+      "expected_properties": [
+        "ucoexNAME"
+      ]
+    },
+    {
+      "category": "Conditional and Boolean Queries",
+      "nl": "Find exploit targets with a known vulnerability BUT no known weakness.",
+      "cypher": "MATCH (et:UcoExploitTarget) WHERE (et)-[:UCOHASVULNERABILITY]->(:UcoVulnerability) AND NOT (et)-[:UCOHASWEAKNESS]->(:UcoCWE) RETURN et.uri",
+      "hops": 2,
+      "expected_labels": [
+        "UcoCWE",
+        "UcoExploitTarget",
+        "UcoVulnerability"
+      ],
+      "expected_relationships": [
+        "UCOHASVULNERABILITY",
+        "UCOHASWEAKNESS"
+      ],
+      "expected_properties": [
+        "uri"
+      ]
+    }
+  ],
+  "Path Queries (Variable-length)": [
+    {
+      "category": "Path Queries (Variable-length)",
+      "nl": "Find all paths (up to 3 hops) connecting a specific CWE (by name) to any D3FEND technique.",
+      "cypher": "MATCH p = (c:UcoCWE {ucocweName: 'CWE-79'})-[*..3]-(d:UcoexMITRED3FEND) RETURN p, d.ucoexMITRED3FEND_DEFINITION",
+      "hops": 1,
+      "expected_labels": [
+        "UcoCWE",
+        "UcoexMITRED3FEND"
+      ],
+      "expected_relationships": [],
+      "expected_properties": [
+        "ucocweName",
+        "ucoexMITRED3FEND_DEFINITION"
+      ]
+    },
+    {
+      "category": "Path Queries (Variable-length)",
+      "nl": "Is there any relationship at all between the SolarWinds campaign and Mimikatz?",
+      "cypher": "MATCH p = (:UcoexCAMPAIGNS {ucoexNAME: 'SolarWinds Orion Attack'})-[*]-(:UcoexSOFTWARE {ucoexNAME: 'Mimikatz'}) RETURN CASE WHEN length(p) > 0 THEN true ELSE false END AS connectionExists LIMIT 1",
+      "hops": 1,
+      "expected_labels": [
+        "UcoexCAMPAIGNS",
+        "UcoexSOFTWARE"
+      ],
+      "expected_relationships": [],
+      "expected_properties": [
+        "ucoexNAME"
+      ]
+    },
+    {
+      "category": "Path Queries (Variable-length)",
+      "nl": "Show relationships (1-3 hops) between 'UcoexMITRED3FEND' nodes and 'UcoexGROUPS' nodes.",
+      "cypher": "MATCH path = (d:UcoexMITRED3FEND)-[*1..3]-(g:UcoexGROUPS) RETURN path LIMIT 20",
+      "hops": 1,
+      "expected_labels": [
+        "UcoexGROUPS",
+        "UcoexMITRED3FEND"
+      ],
+      "expected_relationships": [],
+      "expected_properties": []
+    },
+    {
+      "category": "Path Queries (Variable-length)",
+      "nl": "Find all paths from an 'UcoexObservedExample' to an 'UcoexMITREATTACK' (max 4 hops).",
+      "cypher": "MATCH path = (o:UcoexObservedExample)-[*1..4]-(t:UcoexMITREATTACK) RETURN path LIMIT 20",
+      "hops": 1,
+      "expected_labels": [
+        "UcoexMITREATTACK",
+        "UcoexObservedExample"
+      ],
+      "expected_relationships": [],
+      "expected_properties": []
+    },
+    {
+      "category": "Path Queries (Variable-length)",
+      "nl": "What is the shortest path between 'Cobalt Strike' (Software) and 'APT29' (Group)?",
+      "cypher": "MATCH path = shortestPath((s:UcoexSOFTWARE {ucoexNAME: 'Cobalt Strike'})-[*1..3]-(g:UcoexGROUPS {ucoexNAME: 'APT29'})) RETURN path",
+      "hops": 1,
+      "expected_labels": [
+        "UcoexGROUPS",
+        "UcoexSOFTWARE"
+      ],
+      "expected_relationships": [],
+      "expected_properties": [
+        "ucoexNAME"
+      ]
+    }
+  ],
+  "Graph Pattern Matching": [
+    {
+      "category": "Graph Pattern Matching",
+      "nl": "List all [Actor, Tool] pairs, but exclude any entries where the tool is 'PowerShell'.",
+      "cypher": "MATCH (g:UcoexGROUPS)-[:UCOEXGROUPUSESSOFTWARE]->(s:UcoexSOFTWARE) WHERE s.ucoexNAME <> 'PowerShell' RETURN g.ucoexNAME, s.ucoexNAME",
+      "hops": 1,
+      "expected_labels": [
+        "UcoexGROUPS",
+        "UcoexSOFTWARE"
+      ],
+      "expected_relationships": [
+        "UCOEXGROUPUSESSOFTWARE"
+      ],
+      "expected_properties": [
+        "ucoexNAME"
+      ]
+    },
+    {
+      "category": "Graph Pattern Matching",
+      "nl": "Show me D3FEND defenses, the ATT&CK techniques they counter, and the groups that use those techniques.",
+      "cypher": "MATCH (d:UcoexMITRED3FEND)-[:UCOEXHASMITREATTACK]->(t:UcoexMITREATTACK)<-[:UCOEXGROUPUSESTECHNIQUE]-(g:UcoexGROUPS) RETURN d.ucoexMITRED3FEND_LABEL, t.ucoexNAME, g.ucoexNAME",
+      "hops": 2,
+      "expected_labels": [
+        "UcoexGROUPS",
+        "UcoexMITREATTACK",
+        "UcoexMITRED3FEND"
+      ],
+      "expected_relationships": [
+        "UCOEXGROUPUSESTECHNIQUE",
+        "UCOEXHASMITREATTACK"
+      ],
+      "expected_properties": [
+        "ucoexMITRED3FEND_LABEL",
+        "ucoexNAME"
+      ]
+    },
+    {
+      "category": "Graph Pattern Matching",
+      "nl": "Show attack patterns (CAPEC), their related weaknesses (CWE), and the CVEs where those weaknesses were observed.",
+      "cypher": "MATCH (ca:UcoexCAPEC)-[:UCOEXHASRELATEDWEAKNESS]->(w:UcoCWE)-[:UCOHASOBSERVEDEXAMPLE]->(o:UcoexObservedExample)-[:UCOEXEXAMPLEOBSERVEDIN]->(c:UcoCVE) RETURN ca.ucoexCAPEC_name, w.ucocweID, c.label",
+      "hops": 3,
+      "expected_labels": [
+        "UcoCVE",
+        "UcoCWE",
+        "UcoexCAPEC",
+        "UcoexObservedExample"
+      ],
+      "expected_relationships": [
+        "UCOEXEXAMPLEOBSERVEDIN",
+        "UCOEXHASRELATEDWEAKNESS",
+        "UCOHASOBSERVEDEXAMPLE"
+      ],
+      "expected_properties": [
+        "label",
+        "ucocweID",
+        "ucoexCAPEC_name"
+      ]
+    },
+    {
+      "category": "Graph Pattern Matching",
+      "nl": "Show me CVEs that affect known products (have a CPE) AND are linked to a weakness (CWE) that has been seen in the wild.",
+      "cypher": "MATCH (cve:UcoCVE)-[:UCOEXHASCPE]->(:UcoexCPE), (cve)<-[:UCOHASCVE_ID]-(:UcoVulnerability)<-[:UCOHASVULNERABILITY]-(:UcoExploitTarget)-[:UCOHASWEAKNESS]->(cwe:UcoCWE)-[:UCOHASOBSERVEDEXAMPLE]->(:UcoexObservedExample) RETURN DISTINCT cve.label",
+      "hops": 5,
+      "expected_labels": [
+        "UcoCVE",
+        "UcoCWE",
+        "UcoExploitTarget",
+        "UcoVulnerability",
+        "UcoexCPE",
+        "UcoexObservedExample"
+      ],
+      "expected_relationships": [
+        "UCOEXHASCPE",
+        "UCOHASCVE_ID",
+        "UCOHASOBSERVEDEXAMPLE",
+        "UCOHASVULNERABILITY",
+        "UCOHASWEAKNESS"
+      ],
+      "expected_properties": [
+        "label"
+      ]
+    },
+    {
+      "category": "Graph Pattern Matching",
+      "nl": "Which threat actors use TTPs that are linked (via CAPEC/CWE) to 'CRITICAL' severity CVEs?",
+      "cypher": "MATCH (g:UcoexGROUPS)-[:UCOEXGROUPUSESTECHNIQUE]->(:UcoexMITREATTACK)<-[:UCOEXHASTAXONOMYMAPPING]-(:UcoexCAPEC)-[:UCOEXHASRELATEDWEAKNESS]->(:UcoCWE)<-[:UCOHASWEAKNESS]-(:UcoExploitTarget)-[:UCOHASVULNERABILITY]->(:UcoVulnerability)-[:UCOHASCVE_ID]->(c:UcoCVE {ucobaseSeverity: 'CRITICAL'}) RETURN g.ucoexNAME",
+      "hops": 6,
+      "expected_labels": [
+        "UcoCVE",
+        "UcoCWE",
+        "UcoExploitTarget",
+        "UcoVulnerability",
+        "UcoexCAPEC",
+        "UcoexGROUPS",
+        "UcoexMITREATTACK"
+      ],
+      "expected_relationships": [
+        "UCOEXGROUPUSESTECHNIQUE",
+        "UCOEXHASRELATEDWEAKNESS",
+        "UCOEXHASTAXONOMYMAPPING",
+        "UCOHASCVE_ID",
+        "UCOHASVULNERABILITY",
+        "UCOHASWEAKNESS"
+      ],
+      "expected_properties": [
+        "ucobaseSeverity",
+        "ucoexNAME"
+      ]
+    }
+  ],
+  "Comparative and Ranking": [
+    {
+      "category": "Comparative and Ranking",
+      "nl": "Compare the total count of CVEs that require user interaction vs. those that do not.",
+      "cypher": "MATCH (c:UcoCVE) WHERE c.ucouserInteractionRequired IS NOT NULL RETURN c.ucouserInteractionRequired AS requiresInteraction, count(c) AS cveCount",
+      "hops": 0,
+      "expected_labels": [
+        "UcoCVE"
+      ],
+      "expected_relationships": [],
+      "expected_properties": [
+        "ucouserInteractionRequired"
+      ]
+    },
+    {
+      "category": "Comparative and Ranking",
+      "nl": "Compare the number of techniques used by 'APT28' vs 'APT29'.",
+      "cypher": "MATCH (g:UcoexGROUPS)-[:UCOEXGROUPUSESTECHNIQUE]->(t:UcoexMITREATTACK) WHERE g.ucoexNAME IN ['APT28', 'APT29'] RETURN g.ucoexNAME, count(t) AS techniqueCount",
+      "hops": 1,
+      "expected_labels": [
+        "UcoexGROUPS",
+        "UcoexMITREATTACK"
+      ],
+      "expected_relationships": [
+        "UCOEXGROUPUSESTECHNIQUE"
+      ],
+      "expected_properties": [
+        "ucoexNAME"
+      ]
+    },
+    {
+      "category": "Comparative and Ranking",
+      "nl": "List the top 5 least mitigated 'Enterprise' techniques used by 'APT29'.",
+      "cypher": "MATCH (g:UcoexGROUPS {ucoexNAME: 'APT29'})-[:UCOEXGROUPUSESTECHNIQUE]->(t:UcoexMITREATTACK {ucoexDOMAIN: 'Enterprise'}) OPTIONAL MATCH (m:UcoexMITIGATIONS)-[:UCOEXMITIGATES]->(t) RETURN t.ucoexNAME, count(m) AS mitigationCount ORDER BY mitigationCount ASC LIMIT 5",
+      "hops": 2,
+      "expected_labels": [
+        "UcoexGROUPS",
+        "UcoexMITIGATIONS",
+        "UcoexMITREATTACK"
+      ],
+      "expected_relationships": [
+        "UCOEXGROUPUSESTECHNIQUE",
+        "UCOEXMITIGATES"
+      ],
+      "expected_properties": [
+        "ucoexDOMAIN",
+        "ucoexNAME"
+      ]
+    },
+    {
+      "category": "Comparative and Ranking",
+      "nl": "Which threat actor is linked to the highest number of 'CRITICAL' CVEs?",
+      "cypher": "MATCH (g:UcoexGROUPS)-[:UCOEXGROUPUSESTECHNIQUE]->(:UcoexMITREATTACK)<-[:UCOEXHASTAXONOMYMAPPING]-(:UcoexCAPEC)-[:UCOEXHASRELATEDWEAKNESS]->(:UcoCWE)<-[:UCOHASWEAKNESS]-(:UcoExploitTarget)-[:UCOHASVULNERABILITY]->(:UcoVulnerability)-[:UCOHASCVE_ID]->(c:UcoCVE {ucobaseSeverity: 'CRITICAL'}) RETURN g.ucoexNAME, count(c) as criticalCVEs ORDER BY criticalCVEs DESC LIMIT 1",
+      "hops": 6,
+      "expected_labels": [
+        "UcoCVE",
+        "UcoCWE",
+        "UcoExploitTarget",
+        "UcoVulnerability",
+        "UcoexCAPEC",
+        "UcoexGROUPS",
+        "UcoexMITREATTACK"
+      ],
+      "expected_relationships": [
+        "UCOEXGROUPUSESTECHNIQUE",
+        "UCOEXHASRELATEDWEAKNESS",
+        "UCOEXHASTAXONOMYMAPPING",
+        "UCOHASCVE_ID",
+        "UCOHASVULNERABILITY",
+        "UCOHASWEAKNESS"
+      ],
+      "expected_properties": [
+        "ucobaseSeverity",
+        "ucoexNAME"
+      ]
+    },
+    {
+      "category": "Comparative and Ranking",
+      "nl": "Which 10 CWEs are linked to the highest number of *distinct* CVEs (via examples)?",
+      "cypher": "MATCH (w:UcoCWE)-[:UCOHASOBSERVEDEXAMPLE]->(o:UcoexObservedExample)-[:UCOEXEXAMPLEOBSERVEDIN]->(v:UcoCVE) RETURN w.ucodescription AS cweDescription, count(DISTINCT v) AS distinctCveCount ORDER BY distinctCveCount DESC LIMIT 10",
+      "hops": 2,
+      "expected_labels": [
+        "UcoCVE",
+        "UcoCWE",
+        "UcoexObservedExample"
+      ],
+      "expected_relationships": [
+        "UCOEXEXAMPLEOBSERVEDIN",
+        "UCOHASOBSERVEDEXAMPLE"
+      ],
+      "expected_properties": [
+        "ucodescription"
+      ]
+    }
+  ],
+  "Existence and Set Operations Queries": [
+    {
+      "category": "Existence and Set Operations Queries",
+      "nl": "Find all CWEs that have an 'ucoabstraction' property defined.",
+      "cypher": "MATCH (c:UcoCWE) WHERE c.ucoabstraction IS NOT NULL RETURN c.ucodescription, c.ucoabstraction",
+      "hops": 0,
+      "expected_labels": [
+        "UcoCWE"
+      ],
+      "expected_relationships": [],
+      "expected_properties": [
+        "ucoabstraction",
+        "ucodescription"
+      ]
+    },
+    {
+      "category": "Existence and Set Operations Queries",
+      "nl": "List all mitigations that do NOT mitigate any known technique.",
+      "cypher": "MATCH (m:UcoexMITIGATIONS) WHERE NOT EXISTS { (m)-[:UCOEXMITIGATES]->(:UcoexMITREATTACK) } RETURN m.ucoexNAME",
+      "hops": 1,
+      "expected_labels": [
+        "UcoexMITIGATIONS",
+        "UcoexMITREATTACK"
+      ],
+      "expected_relationships": [
+        "UCOEXMITIGATES"
+      ],
+      "expected_properties": [
+        "ucoexNAME"
+      ]
+    },
+    {
+      "category": "Existence and Set Operations Queries",
+      "nl": "Find software used by 'APT28' that was NOT used in the 'SolarWinds Orion' campaign.",
+      "cypher": "MATCH (g:UcoexGROUPS {ucoexNAME: 'APT28'})-[:UCOEXGROUPUSESSOFTWARE]->(s:UcoexSOFTWARE) WHERE NOT EXISTS { (c:UcoexCAMPAIGNS {ucoexNAME: 'SolarWinds Orion'})-[:UCOEXCAMPAIGNUSESSOFTWARE]->(s) } RETURN s.ucoexNAME",
+      "hops": 2,
+      "expected_labels": [
+        "UcoexCAMPAIGNS",
+        "UcoexGROUPS",
+        "UcoexSOFTWARE"
+      ],
+      "expected_relationships": [
+        "UCOEXCAMPAIGNUSESSOFTWARE",
+        "UCOEXGROUPUSESSOFTWARE"
+      ],
+      "expected_properties": [
+        "ucoexNAME"
+      ]
+    },
+    {
+      "category": "Existence and Set Operations Queries",
+      "nl": "(Intersection) Find software used by 'FIN7' AND 'Lazarus Group' AND 'APT28'.",
+      "cypher": "MATCH (g1:UcoexGROUPS {ucoexNAME: 'FIN7'})-[:UCOEXGROUPUSESSOFTWARE]->(s:UcoexSOFTWARE)<-[:UCOEXGROUPUSESSOFTWARE]-(g2:UcoexGROUPS {ucoexNAME: 'Lazarus Group'}) MATCH (g3:UcoexGROUPS {ucoexNAME: 'APT28'})-[:UCOEXGROUPUSESSOFTWARE]->(s) RETURN s.ucoexNAME",
+      "hops": 3,
+      "expected_labels": [
+        "UcoexGROUPS",
+        "UcoexSOFTWARE"
+      ],
+      "expected_relationships": [
+        "UCOEXGROUPUSESSOFTWARE"
+      ],
+      "expected_properties": [
+        "ucoexNAME"
+      ]
+    },
+    {
+      "category": "Existence and Set Operations Queries",
+      "nl": "List all exploit targets that have a vulnerability but NO associated weakness (CWE).",
+      "cypher": "MATCH (et:UcoExploitTarget) WHERE EXISTS { (et)-[:UCOHASVULNERABILITY]->(:UcoVulnerability) } AND NOT EXISTS { (et)-[:UCOHASWEAKNESS]->(:UcoCWE) } RETURN et.uri",
+      "hops": 2,
+      "expected_labels": [
+        "UcoCWE",
+        "UcoExploitTarget",
+        "UcoVulnerability"
+      ],
+      "expected_relationships": [
+        "UCOHASVULNERABILITY",
+        "UCOHASWEAKNESS"
+      ],
+      "expected_properties": [
+        "uri"
+      ]
+    }
+  ]
+}

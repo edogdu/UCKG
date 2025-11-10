@@ -2,16 +2,36 @@ from typing import List, Tuple, Dict, Any
 
 from neo4j.exceptions import CypherSyntaxError
 import regex as re
-from .utils.regex_patterns import (
-    get_node_pattern,
-    get_relationship_pattern,
-    get_node_variable_pattern,
-    get_relationship_variable_pattern,
-    get_property_pattern,
-    get_node_label_pattern,
-    get_relationship_type_pattern,
-    get_variable_operator_property_pattern,
-)
+
+# Use absolute imports to avoid relative import issues
+try:
+    from utils.regex_patterns import (
+        get_node_pattern,
+        get_relationship_pattern,
+        get_node_variable_pattern,
+        get_relationship_variable_pattern,
+        get_property_pattern,
+        get_node_label_pattern,
+        get_relationship_type_pattern,
+        get_variable_operator_property_pattern,
+    )
+except ImportError:
+    # Fallback for when validation module is in sys.path
+    import sys
+    from pathlib import Path
+    validation_dir = Path(__file__).parent
+    if str(validation_dir) not in sys.path:
+        sys.path.insert(0, str(validation_dir))
+    from utils.regex_patterns import (
+        get_node_pattern,
+        get_relationship_pattern,
+        get_node_variable_pattern,
+        get_relationship_variable_pattern,
+        get_property_pattern,
+        get_node_label_pattern,
+        get_relationship_type_pattern,
+        get_variable_operator_property_pattern,
+    )
 
 
 WRITE_CLAUSES = {

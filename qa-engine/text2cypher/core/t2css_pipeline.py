@@ -402,7 +402,9 @@ Generate the Cypher query:
                     'predicate': t.predicate,
                     'object': t.object,
                     'text': t.text,
-                    'semantic_description': t.semantic_description
+                    'semantic_description': t.semantic_description,
+                    # Persist parsed properties so they are available after reloads
+                    'properties': t.properties or []
                 }
                 for t in self.schema_triples
             ],
@@ -425,6 +427,8 @@ Generate the Cypher query:
                 object=t['object'],
                 text=t['text'],
                 semantic_description=t['semantic_description'],
+                # Restore properties if present (older files may not have them)
+                properties=t.get('properties', []),
                 embedding=None  # Will be set from embeddings array
             )
             for t in data['triples']

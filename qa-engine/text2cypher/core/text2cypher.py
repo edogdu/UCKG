@@ -3,13 +3,13 @@ import re
 import sys
 from typing import List
 from neo4j import GraphDatabase
-from cypher_validation import CypherGuardValidator
 import logging
 import time
 
-# Add shared module to path
-sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..', 'shared'))
+# Add parent directory to path for imports
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 
+from validation.noexec_validator import validate_cypher_noexec
 from config import (
     EXCLUDED_LABELS, 
     EXCLUDED_RELATIONSHIPS, 
@@ -30,9 +30,6 @@ class Text2Cypher:
     def __init__(self, neo4j_uri: str, neo4j_user: str, neo4j_password: str, llm, schema_path: str = "neo4j_graph_schema.txt"):
         self.driver = GraphDatabase.driver(neo4j_uri, auth=(neo4j_user, neo4j_password))
         self.llm = llm
-        
-        # Initialize Cypher Guard validator
-        self.cypher_validator = CypherGuardValidator(self.driver)
         
         # Use configuration constants from config module
         self.excluded_labels = EXCLUDED_LABELS
@@ -169,17 +166,13 @@ class Text2Cypher:
             node_props = self._fetch_node_properties()
             rel_props = self._fetch_relationship_properties()
             
-            # Get validation info
-            validation_info = self.cypher_validator.get_validation_info()
-            
             return {
                 "node_types": list(node_props.keys()),
                 "relationship_types": list(rel_props.keys()),
                 "node_properties": node_props,
                 "relationship_properties": rel_props,
-                "validation_info": validation_info,
                 "schema_status": "✅ Loaded",
-                "timestamp": "Current cybersecurity schema information with Cypher Guard validation"
+                "timestamp": "Current cybersecurity schema information"
             }
         except Exception as e:
             print(f"Error getting schema info: {e}")
@@ -234,18 +227,18 @@ class Text2Cypher:
         return relationships
 
     def validate_cypher(self, cypher: str, schema: str = None) -> tuple[bool, str]:
-        """Enhanced Cypher validation using Cypher Guard library"""
+        """
+        Enhanced Cypher validation using noexec_validator.
+        Checks syntax, schema (node labels, relationships), and properties.
+        """
         try:
-            # DISABLED: Skip Cypher Guard validation to show raw LLM output
-            # Uncomment below to re-enable strict validation
-            # is_valid, message, detailed_errors = self.cypher_validator.validate_cypher_query(cypher)
-            # if not is_valid:
-            #     return False, message
+            # Use strong validation from noexec_validator
+            is_valid, errors = validate_cypher_noexec(self.driver, cypher)
             
-            # Basic syntax check only
-            basic_valid, basic_msg = self._fallback_validation(cypher)
-            if not basic_valid:
-                return False, basic_msg
+            if not is_valid:
+                error_msg = "; ".join(errors) if errors else "Validation failed"
+                logger.warning(f"Cypher validation failed: {error_msg}")
+                return False, error_msg
             
             # Additional cybersecurity-specific checks (warnings only)
             additional_errors = self._check_cybersecurity_specific_rules(cypher)
@@ -255,7 +248,8 @@ class Text2Cypher:
             return True, "Valid Cypher query"
             
         except Exception as e:
-            # Fallback to basic validation if anything fails
+            logger.error(f"Validation error: {e}")
+            # If noexec validator fails, fall back to basic validation
             return self._fallback_validation(cypher)
     
     def _check_cybersecurity_specific_rules(self, cypher: str) -> List[str]:
@@ -300,7 +294,7 @@ class Text2Cypher:
         
         return True, "Valid Cypher query (fallback validation)"
 
-    def text_to_cypher(self, question: str, schema: str = None) -> str:
+    def text_to_cypher(self, question: str, schema: str = None, skip_validation: bool = False) -> str:
         # Prefer cached schema for speed; regenerate if missing
         shared_dir = os.path.join(os.path.dirname(__file__), '..', '..', 'shared')
         cache_path = os.path.join(shared_dir, SCHEMA_CACHE_FILENAME)
@@ -326,16 +320,39 @@ class Text2Cypher:
         
         prompt = self._build_prompt(question=question, schema_block=schema_block, examples=few_shot_examples)
         
+        # If skip_validation is True, return raw LLM output without validation (for evaluation)
+        if skip_validation:
+            llm_output = self.llm.invoke(prompt)
+            cypher = extract_cypher(llm_output)
+            logger.info(f"Generated Cypher (validation skipped): {cypher}")
+            return cypher
+        
+        # Normal path: validate and retry on failures
         max_retries = 3
+        last_error = None
+        
         for attempt in range(max_retries):
             try:
-                llm_output = self.llm.invoke(prompt)
+                # If this is a retry, add error feedback to prompt
+                if attempt > 0 and last_error:
+                    prompt_with_feedback = (
+                        prompt + 
+                        f"\n\n⚠️ PREVIOUS ATTEMPT FAILED:\n"
+                        f"Error: {last_error}\n"
+                        f"Please generate a corrected query that fixes these issues.\n"
+                        f"Cypher:"
+                    )
+                    llm_output = self.llm.invoke(prompt_with_feedback)
+                else:
+                    llm_output = self.llm.invoke(prompt)
+                
                 cypher = extract_cypher(llm_output)
                 
                 is_valid, error_msg = self.validate_cypher(cypher)
                 if not is_valid:
                     logger.warning(f"Attempt {attempt + 1}: Validation failed for generated query '{cypher}'. Reason: {error_msg}")
-                    # Re-raise to trigger retry
+                    last_error = error_msg
+                    # Re-raise to trigger retry with feedback
                     raise ValueError(f"Validation failed: {error_msg}")
                 
                 logger.info(f"Successfully generated and validated Cypher: {cypher}")

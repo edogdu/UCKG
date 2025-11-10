@@ -7,8 +7,8 @@ with the existing Text2Cypher system.
 
 import os
 from typing import Optional
-from t2css_pipeline import T2CSSPipeline
-from text2cypher import Text2Cypher
+from core.t2css_pipeline import T2CSSPipeline
+from core.text2cypher import Text2Cypher
 
 
 class T2CypherWithT2CSS(Text2Cypher):
