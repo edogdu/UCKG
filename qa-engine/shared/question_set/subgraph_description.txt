@@ -1,0 +1,63 @@
+"UcoCWE": { "ucoabstraction": "string", "ucoapplicablePlatform": "string", "ucocommonConsequences": "string", "ucocweExtendedSummary": "string", "ucocweID": "string", "ucocweName": "string", "ucocweSummary": "string", "ucodemonstrativeExamples": "string", "ucodescription": "string", "ucodetectionMethods": "string", "ucolikelihoodOfExploit": "string", "ucomappingNotes": "string", "ucomodesOfIntroduction": "string", "ucopotentialMitigations": "string", "ucoreferences": "string", "ucorelatedAttackPatterns": "string", "ucostatus": "string", "ucostructure": "string", "ucotimeOfIntroduction": "unknown", "uri": "string" }
+"UcoexCAPEC": { "label": "string", "ucoexAbstraction": "string", "ucoexCAPEC_id": "string", "ucoexCAPEC_name": "string", "ucoexConsequences": "list<string>", "ucoexDescription": "string", "ucoexExample": "list<string>", "ucoexExecutionFlowTechnique": "list<string>", "ucoexExtendedDescription": "list<string>", "ucoexLikelihood": "string", "ucoexMitigations": "list<string>", "ucoexPrerequisites": "list<string>", "ucoexRelatedAttPattern": "list<string>", "ucoexRelatedWeaknesses": "list<string>", "ucoexResources_Required": "list<string>", "ucoexSeverity": "string", "ucoexSkills_Required": "list<string>", "ucoexTaxonomyMappingATTACK": "list<string>", "uri": "string" }
+"UcoexObservedExample": { "ucoexDESCRIPTION": "string", "uri": "string" }
+
+"UcoCWE": {
+    "UcoCWE": " is a software weakness type defined in the Common Weakness Enumeration (CWE) catalog."
+    "ucocweName": ", named <value>,"
+    "ucocweID": " It is identified by the ID <value>"
+    "ucocweSummary": " It is summarized as <value>"
+    "ucocweExtendedSummary": " with an extended explanation stating that <value>"
+    "ucodescription": " It is described as <value>"
+    "ucabstraction": " It is categorized under the abstraction level <value>"
+    "ucostructure": " It follows the structural classification of <value>"
+    "ucapplicablePlatform": " It is applicable to platforms such as <value>"
+    "ucocommonConsequences": " It leads to common consequences like <value>"
+    "ucopotentialMitigations": " It can be mitigated through measures such as <value>"
+    "ucodetectionMethods": " It is detectable by methods such as <value>"
+    "ucolikelihoodOfExploit": " It has a likelihood of exploitation rated as <value>"
+    "ucodemonstrativeExamples": " It is illustrated by examples such as <value>"
+    "ucomodesOfIntroduction": " It is typically introduced during phases like <value>"
+    "ucotimeOfIntroduction": " It generally occurs at <value>"
+    "ucomappingNotes": " It has mapping notes stating <value>"
+    "ucorelatedAttackPatterns": " It is related to attack patterns such as <value>"
+    "ucoreferences": " It is referenced in materials like <value>"
+    "ucostatus": " It currently has the status <value>"
+}
+"UcoexCAPEC": {
+    "UcoexCAPEC": " is a common attack pattern from the MITRE CAPEC framework."
+    "ucoexCAPEC_name": ", named <value>,"
+    "ucoexCAPEC_id": " It is identified by the ID <value>"
+    "ucoexAbstraction": " It is categorized under the abstraction level <value>"
+    "ucoexDescription": ", described as <value>"
+    "ucoexExtendedDescription": " It has further explanation stating that <value>"
+    "ucoexSeverity": " It has a severity level of <value>"
+    "ucoexLikelihood": " It has a likelihood rated as <value>"
+    "ucoexMitigations": " It can be mitigated by measures such as <value>"
+    "ucoexRelatedAttPattern": " It is related to other attack patterns such as <value>"
+    "ucoexRelatedWeaknesses": " It is associated with weaknesses like <value>"
+    "ucoexSkills_Required": " It requires skills such as <value>"
+    "ucoexResources_Required": " It needs resources like <value>"
+    "ucoexPrerequisites": " It assumes conditions such as <value>"
+    "ucoexConsequences": " It can lead to consequences like <value>"
+    "ucoexExecutionFlowTechnique": " It is typically carried out using techniques such as <value>"
+    "ucoexExample": " It is illustrated by examples like <value>"
+    "ucoexTaxonomyMappingATTACK": " It is mapped to MITRE ATT&CK techniques such as <value>"
+    "label": ", labeled as <value>,"
+}
+"UcoexObservedExample": {
+    "UcoexObservedExample": " is an observed real-world example/instance of a cybersecurity event."
+    "ucoexDESCRIPTION": ", described as <value>"
+}
+
+(:UcoexCAPEC) -[:UCOEXHASRELATEDWEAKNESS]-> (:UcoCWE)
+UCOEXHASRELATEDWEAKNESS: <s> has related weakness <o>.
+(:UcoCWE) -[:UCOHASOBSERVEDEXAMPLE]-> (:UcoexObservedExample)
+UCOHASOBSERVEDEXAMPLE: <s> has real-world observed examples <o>.
+
+
+node1, labeled as CAPEC-100: Overflow Buffers, is a common attack pattern from the MITRE CAPEC framework., described as Buffer Overflow attacks target improper or missing bounds checking on buffer operations, typically triggered by input injected by an adversary. As a consequence, an adversary is able to write past the boundaries of allocated buffer regions in memory, causing a program crash or potentially redirection of execution as per the adversaries' choice.
+node1 (UcoexCAPEC (CAPEC-100: Overflow Buffers)) has related weakness node2 (UcoCWE (Buffer Access with Incorrect Length Value)).
+node2, labeled as Buffer Access with Incorrect Length Value, is a software weakness type defined in the Common Weakness Enumeration (CWE) catalog. It is summarized as The product uses a sequential operation to read or write a buffer, but it uses an incorrect length value that causes it to access memory that is outside of the bounds of the buffer. with an extended explanation stating that When the length value exceeds the size of the destination, a buffer overflow could occur.
+node2 (UcoCWE (Buffer Access with Incorrect Length Value)) has real-world observed examples node3 (UcoexObservedExample).
+node3 is an observed real-world example/instance of a cybersecurity event., described as Language interpreter API function doesn't validate length argument, leading to information exposure.
