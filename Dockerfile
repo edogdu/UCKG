@@ -1,5 +1,5 @@
 # Create a Python environment
-FROM python:3.11-slim-bookworm AS python-builder
+FROM python:3.13.9-slim-bookworm AS python-builder
 
 # Set the working directory
 WORKDIR /app
