@@ -40,17 +40,18 @@ llm = ChatOllama(
 
 # Prompt for 0-hop questions
 # prompt = PromptTemplate(
-#     input_variables=['context', 'questions'],
+#     input_variables=['context', 'terminology', 'questions'],
 #     template="""
 # You are an experienced cybersecurity analyst generating high-quality, reasoning-based questions 
 # from a knowledge graph.
 
 # Given:
+# - a graph TERMINOLOGY,
 # - EXAMPLE QUESTIONS (style reference), and
 # - a CONTEXT subgraph summary(1 single node with all the important properties of the nodes such as Summary and Description but no incoming or outgoing relationship),
 
 # ## Goal
-# generate 5 concise, natural analyst-style questions that a human would realistically ask about the particular provided node.
+# generate 3 concise, natural analyst-style questions that a human would realistically ask about the particular provided node.
 
 # ## PolyG-style Categorization
 # Treat each question as a triple ⟨s, p, o⟩ but classify and ask only for the first node s:
@@ -59,18 +60,25 @@ llm = ChatOllama(
 # Subject (s): always the FIRST node in the provided context.
 # Predicate (p): a relationship type from the terminology, if used.
 # Object (o): the second node.
+# you can disregard the p and o here because we only have one node.
 
 # - Each question must be ≤ 25 words, fluent, and realistic.
 # - Prefer open analytical forms (“How could…?”, “What causes…?”, “Which factor connects…?”).
+# - I would like to prefer you to generate questions that contains the name of the node but do not include their numberd ID tho like CWE xxx or CAPEC-xxx
+# - I would recommend to choose only the name and if the name contains some non-understandable words like "/xx..field/", you can disregard them in the question.
 # - You will receive a summary about one and only node that cotains one of the aspects of cybersecurity
 # - There will be thousands of cybersecurity related nodes.
-# - Ask in a way that a person will have to look through the thousand of nodes and find the most appropriate answer by matching the description of the question and detail in the summary.
-# - Avoid raw IDs or field names.
+# - Ask in a way that a person will have to look through the thousand of nodes and find the most appropriate answer by matching the name in the question.
+# - Avoid raw IDs tho.
 # - Avoid yes/no questions and multi-part phrasing.
 # - Use cybersecurity reasoning naturally: exploitability, overflow, mitigation, validation, propagation, etc.
+# - The context in the output is the same as the context in the input.
+# - Avoid visiting any links in the context. We don't want to put any source from the link.
+# - Just disregard the links if you see any.
+
 
 # ## Output Format (STRICT JSON)
-# Return ONLY a JSON array of 5 objects.
+# Return ONLY a JSON array of 3 objects.
 
 # Each object must include:
 # {
@@ -80,17 +88,20 @@ llm = ChatOllama(
 #     "context": "{context}"
 # }
 
+# ---
 
+# ## TERMINOLOGY
+# UcoCWE: Common Weakness Enumeration - software weakness types and categories (e.g., CWE-79 for XSS)
+
+# ---
 
 # ## EXAMPLE QUESTIONS (style reference)
 # {questions}
-
 # ---
 
 # ## CONTEXT
 # {context}
 # """)
-
 
 # Prompt for 1-hop questions
 # prompt = PromptTemplate(

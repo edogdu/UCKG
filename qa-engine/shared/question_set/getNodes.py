@@ -31,17 +31,15 @@ LABEL_PROPERTIES_MAP = {
     "Vulnerability": ["ucosummary", "uri"],
     "CPE": ["cpeName", "titles", "uri"],
     "CAPEC": ["label", "ucoexDescription", "uri"],
-    "ATT&CK": ["uri"],
-    "Softwares": ["ucoexDESCRIPTION", "ucoexDOMAIN", "uri"],
-    "Groups": ["ucoexDESCRIPTION", "ucoexDOMAIN", "uri"],
-    "CAMPAIGNS": ["ucoexDESCRIPTION", "ucoexDOMAIN", "uri"],
-    "MITIGATIONS": ["ucoexDESCRIPTION", "ucoexDOMAIN", "ucoexName", "uri"],
-    "MITREATTACK": ["ucoexDESCRIPTION", "ucoexDOMAIN", "ucoexName", "uri"],
+    "SOFTWARE": ["ucoexNAME", "ucoexDESCRIPTION", "ucoexDOMAIN", "uri"],
+    "GROUPS": ["ucoexNAME","ucoexDESCRIPTION", "ucoexDOMAIN", "uri"],
+    "CAMPAIGNS": ["ucoexNAME", "ucoexDESCRIPTION", "ucoexDOMAIN", "uri"],
+    "MITIGATIONS": ["ucoexDESCRIPTION", "ucoexDOMAIN", "ucoexNAME", "uri"],
+    "MITREATTACK": ["ucoexDESCRIPTION", "ucoexDOMAIN", "ucoexNAME", "uri"],
     "ObservedExample": ["ucoexDESCRIPTION", "uri"],
     "TACTICS": ["ucoexDESCRIPTION", "ucoexDOMAIN", "uri"],
     "D3FEND": ["ucoexMITRED3FEND_DEFINITION", "ucoexMITRED3FEND_LABEL", "uri"]
 }
-
 
 def normalize_whitespace(text):
     
