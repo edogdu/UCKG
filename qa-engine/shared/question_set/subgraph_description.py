@@ -26,6 +26,7 @@ NODE_PROPERTY_TYPES = {
         "ucouserInteractionRequired": " It indicates that user interaction is <value>",
         "ucovectorString": " It is represented by the vector string <value>",
         "ucovulnStatus": " It is currently marked with the vulnerability status <value>",
+        "uri": "It is identified by the URI <value>",
     },
     "UcoCWE": {
         "UcoCWE": " is a software weakness type defined in the Common Weakness Enumeration (CWE) catalog.",
@@ -48,16 +49,18 @@ NODE_PROPERTY_TYPES = {
         "ucorelatedAttackPatterns": " It is related to attack patterns such as <value>",
         "ucoreferences": " It is referenced in materials like <value>",
         "ucostatus": " It currently has the status <value>",
+        "uri": "It is identified by the URI <value>",
     },
     "UcoExploitTarget": {
         "UcoExploitTarget": " is an exploit target resource/object.",
-        "uri": ", identified by the URI <value>",
+        "uri": "It is identified by the URI <value>",
     },
     "UcoVulnerability": {
         "UcoVulnerability": " is a documented security flaw/weakness.",
         "ucosummary": ", described as <value>",
         "ucopublishedDateTime": " It was first published on <value>",
         "ucolastModifiedDateTime": " And it was last modified on <value>",
+        "uri": "It is identified by the URI <value>",
     },
     "UcoexCAMPAIGNS": {
         "UcoexCAMPAIGNS": " is a cybersecurity campaign/operation.",
@@ -65,6 +68,7 @@ NODE_PROPERTY_TYPES = {
         "ucoexDESCRIPTION": "It is described as \"<value>\".",
         "ucoexDOMAIN": " It is associated with the domain <value>",
         "ucoexURL": " It is referenced at the URL <value>",
+        "uri": "It is identified by the URI <value>",
     },
     "UcoexCAPEC": {
         "UcoexCAPEC": " is a common attack pattern from the MITRE CAPEC framework.",
@@ -86,6 +90,7 @@ NODE_PROPERTY_TYPES = {
         "ucoexExample": " It is illustrated by examples like <value>",
         "ucoexTaxonomyMappingATTACK": " It is mapped to MITRE ATT&CK techniques such as <value>",
         "label": ", labeled as <value>,",
+        "uri": "It is identified by the URI <value>",
     },
     "UcoexCPE": {
         "UcoexCPE": " is a software/hardware product configuration entry from the CPE dictionary.",
@@ -94,6 +99,7 @@ NODE_PROPERTY_TYPES = {
         "titles": " It is also titled <value>",
         "dictionary_found": " It has a dictionary entry found: <value>",
         "lastModified": " It was last modified on <value>",
+        "uri": "It is identified by the URI <value>",
     },
     "UcoexGROUPS": {
         "UcoexGROUPS": " is a threat group/adversary organization.",
@@ -101,6 +107,7 @@ NODE_PROPERTY_TYPES = {
         "ucoexDESCRIPTION": "It is described as \"<value>\".",
         "ucoexDOMAIN": " It is operating within the domain <value>",
         "ucoexURL": " It is referenced at the URL <value>",
+        "uri": "It is identified by the URI <value>",
     },
     "UcoexMITIGATIONS": {
         "UcoexMITIGATIONS": " is a defensive measure/security mitigation technique.",
@@ -108,6 +115,7 @@ NODE_PROPERTY_TYPES = {
         "ucoexDESCRIPTION": "It is described as \"<value>\".",
         "ucoexDOMAIN": " It is applicable within the domain <value>.",
         "ucoexURL": " It is referenced at the URL <value>",
+        "uri": "It is identified by the URI <value>",
     },
     "UcoexMITREATTACK": {
         "UcoexMITREATTACK": " is a MITRE ATT&CK technique or technique group.",
@@ -115,15 +123,18 @@ NODE_PROPERTY_TYPES = {
         "ucoexDESCRIPTION": "It is described as \"<value>\".",
         "ucoexDOMAIN": " It is applicable within the domain <value>.",
         "ucoexURL": " It is referenced at the URL <value>",
+        "uri": "It is identified by the URI <value>",
     },
     "UcoexMITRED3FEND": {
         "UcoexMITRED3FEND": " is a defensive cybersecurity technique from the MITRE D3FEND framework.",
         "ucoexMITRED3FEND_LABEL": ", labeled as <value>,",
         "ucoexMITRED3FEND_DEFINITION": ", defined as <value>",
+        "uri": "It is identified by the URI <value>",
     },
     "UcoexObservedExample": {
         "UcoexObservedExample": " is an observed real-world example/instance of a cybersecurity event.",
         "ucoexDESCRIPTION": "It is described as \"<value>\".",
+        "uri": "It is identified by the URI <value>",
     },
     "UcoexSOFTWARE": {
         "UcoexSOFTWARE": " is a software tool or application relevant to cybersecurity analysis.",
@@ -131,6 +142,7 @@ NODE_PROPERTY_TYPES = {
         "ucoexDESCRIPTION": "It is described as \"<value>\".",
         "ucoexDOMAIN": " It is associated with the domain <value>",
         "ucoexURL": " It is referenced at the URL <value>",
+        "uri": "It is identified by the URI <value>",
     },
     "UcoexTACTICS": {
         "UcoexTACTICS": " is an adversarial tactic from the MITRE ATT&CK framework.",
@@ -138,6 +150,7 @@ NODE_PROPERTY_TYPES = {
         "ucoexDESCRIPTION": ", described as <value>",
         "ucoexDOMAIN": " It is used within the domain <value>",
         "ucoexURL": " It is referenced at the URL <value>",
+        "uri": "It is identified by the URI <value>",
     }
 }
 RELATIONSHIPS_TYPES = {
