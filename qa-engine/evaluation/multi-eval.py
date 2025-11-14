@@ -1,4 +1,3 @@
-import numpy as np
 from nltk.tokenize import word_tokenize
 from nltk.translate.bleu_score import sentence_bleu, SmoothingFunction
 from rouge_score import rouge_scorer
@@ -31,15 +30,40 @@ try:
 except Exception:
     _PANDAS_AVAILABLE = False
 
+# Optional progress bar with hacker green color
+try:
+    from tqdm import tqdm
+    _TQDM_AVAILABLE = True
+except Exception:
+    _TQDM_AVAILABLE = False
+    # Fallback: simple progress wrapper with hacker green color
+    HACKER_GREEN = '\033[92m'  # Bright green (classic hacker green)
+    RESET = '\033[0m'
+    
+    def tqdm(iterable, desc=None, unit="", total=None, **kwargs):
+        if total is None:
+            try:
+                total = len(iterable)
+            except TypeError:
+                total = None
+        
+        current = 0
+        for item in iterable:
+            current += 1
+            if total:
+                percent = (current / total) * 100
+                bar_width = 30
+                filled = int(bar_width * current / total)
+                bar = '▒' * filled + '░' * (bar_width - filled)
+                print(f"\r{HACKER_GREEN}{desc or 'Processing'}: [{bar}] {current}/{total} ({percent:.1f}%){RESET}", end='', flush=True)
+            yield item
+        if total:
+            print()
+
 class SummaryEvaluator:
     def __init__(self):
-        # No heavy model init needed for the selected metrics
-        self._qa_evaluator = None  # Lazy initialization for QAFactEval
+        self._qa_evaluator = None
         
-    # =============================================================================
-    # MAIN METRICS
-    # =============================================================================
-
     def compute_rouge(self, source_text, summary_text):
         """Compute ROUGE-1/2/Lsum using rouge-score.
         Note: Ideally compare hypothesis to a reference summary; here, source is used as reference.
@@ -56,18 +80,17 @@ class SummaryEvaluator:
             return {'error': str(e)}
 
     def compute_bleu(self, source_text, summary_text):
-        """Compute sentence-level BLEU with smoothing.
-        Note: Ideally compare hypothesis to a reference summary; here, source is used as reference.
-        """
+        """Compute sentence-level BLEU-1/2/3/4 with smoothing."""
         try:
             reference_tokens = [word_tokenize(source_text.lower())]
             hypothesis_tokens = word_tokenize(summary_text.lower())
             smoothie = SmoothingFunction().method3
-            bleu4 = sentence_bleu(reference_tokens, hypothesis_tokens, smoothing_function=smoothie)
-            bleu1 = sentence_bleu(reference_tokens, hypothesis_tokens, weights=(1, 0, 0, 0), smoothing_function=smoothie)
-            bleu2 = sentence_bleu(reference_tokens, hypothesis_tokens, weights=(0.5, 0.5, 0, 0), smoothing_function=smoothie)
-            bleu3 = sentence_bleu(reference_tokens, hypothesis_tokens, weights=(1/3, 1/3, 1/3, 0), smoothing_function=smoothie)
-            return {'bleu1': bleu1, 'bleu2': bleu2, 'bleu3': bleu3, 'bleu4': bleu4}
+            return {
+                'bleu1': sentence_bleu(reference_tokens, hypothesis_tokens, weights=(1, 0, 0, 0), smoothing_function=smoothie),
+                'bleu2': sentence_bleu(reference_tokens, hypothesis_tokens, weights=(0.5, 0.5, 0, 0), smoothing_function=smoothie),
+                'bleu3': sentence_bleu(reference_tokens, hypothesis_tokens, weights=(1/3, 1/3, 1/3, 0), smoothing_function=smoothie),
+                'bleu4': sentence_bleu(reference_tokens, hypothesis_tokens, smoothing_function=smoothie)
+            }
         except Exception as e:
             return {'error': str(e)}
 
@@ -113,25 +136,26 @@ class SummaryEvaluator:
             return {'available': True, 'scores': scores[0] if isinstance(scores, list) else scores}
         except Exception as e:
             return {'available': False, 'error': str(e)}
-    # =============================================================================
-    # EVALUATION ENTRYPOINT (ONLY MAIN METRICS)
-    # =============================================================================
 
-    def evaluate_summary(self, source_text, summary_text):
-        print("Evaluating summary (main metrics only)...")
-
-        results = {
-            'metrics': {}
+    def evaluate_summary(self, source_text, summary_text, verbose=True):
+        """Evaluate summary using all available metrics.
+        
+        Args:
+            source_text: Source text to compare against
+            summary_text: Summary text to evaluate
+            verbose: If False, suppress print statements (useful for batch processing)
+        """
+        if verbose:
+            print("Evaluating summary (main metrics only)...")
+        return {
+            'metrics': {
+                'rouge': self.compute_rouge(source_text, summary_text),
+                'bleu': self.compute_bleu(source_text, summary_text),
+                'bertscore': self.compute_bertscore(source_text, summary_text),
+                'bertscore_precision_only': self.compute_bertscore_precision_only(source_text, summary_text),
+                'qafacteval': self.qafacteval_score(source_text, summary_text)
+            }
         }
-
-        # Compute requested metrics
-        results['metrics']['rouge'] = self.compute_rouge(source_text, summary_text)
-        results['metrics']['bleu'] = self.compute_bleu(source_text, summary_text)
-        results['metrics']['bertscore'] = self.compute_bertscore(source_text, summary_text)
-        results['metrics']['bertscore_precision_only'] = self.compute_bertscore_precision_only(source_text, summary_text)
-        results['metrics']['qafacteval'] = self.qafacteval_score(source_text, summary_text)
-
-        return results
 
 def _print_scores(results):
     metrics = results.get('metrics', {})
@@ -149,6 +173,8 @@ def _print_scores(results):
     bleu = metrics.get('bleu', {})
     if bleu and 'bleu4' in bleu:
         print(f"BLEU -> 1: {bleu['bleu1']:.3f}  2: {bleu['bleu2']:.3f}  3: {bleu['bleu3']:.3f}  4: {bleu['bleu4']:.3f}")
+    elif bleu and 'error' in bleu:
+        print(f"BLEU: Error - {bleu['error']}")
     berts = metrics.get('bertscore', {})
     if berts and 'f1' in berts:
         print(f"BERTScore -> P: {berts['precision']:.3f}  R: {berts['recall']:.3f}  F1: {berts['f1']:.3f}")
@@ -218,6 +244,13 @@ def _read_text_from_arg_or_file(arg_text: str, arg_file: str, label: str) -> str
     sys.exit(2)
 
 
+def _resolve_dataset_path(dataset_path: str) -> str:
+    """Resolve dataset path to absolute path if relative."""
+    if os.path.isabs(dataset_path):
+        return dataset_path
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    return os.path.join(script_dir, dataset_path)
+
 def _load_evaluation_dataset(dataset_path: str) -> dict:
     """Load the evaluation dataset JSON file."""
     try:
@@ -232,55 +265,52 @@ def _load_evaluation_dataset(dataset_path: str) -> dict:
         sys.exit(1)
 
 
+def _safe_float(value, default=None):
+    """Safely convert value to float, returning default on error."""
+    try:
+        return float(value) if value is not None else default
+    except (ValueError, TypeError):
+        return default
+
 def _normalize_metrics_for_row(metrics: Dict[str, Any]) -> Dict[str, Any]:
     """Flatten metric dicts into scalar columns for table rows."""
     row: Dict[str, Any] = {}
+    
+    # ROUGE metrics
     rouge = metrics.get('rouge', {}) or {}
     if isinstance(rouge, dict) and 'rouge1' in rouge:
-        try:
-            row['rouge1_f1'] = float(rouge['rouge1']['f1'])
-            row['rouge2_f1'] = float(rouge['rouge2']['f1'])
-            row['rougeLsum_f1'] = float(rouge['rougeLsum']['f1'])
-        except Exception:
-            row['rouge1_f1'] = row['rouge2_f1'] = row['rougeLsum_f1'] = None
-
+        row['rouge1_f1'] = _safe_float(rouge.get('rouge1', {}).get('f1'))
+        row['rouge2_f1'] = _safe_float(rouge.get('rouge2', {}).get('f1'))
+        row['rougeLsum_f1'] = _safe_float(rouge.get('rougeLsum', {}).get('f1'))
+    
+    # BLEU metrics
     bleu = metrics.get('bleu', {}) or {}
     if isinstance(bleu, dict) and 'bleu4' in bleu:
-        try:
-            row['bleu1'] = float(bleu['bleu1'])
-            row['bleu2'] = float(bleu['bleu2'])
-            row['bleu3'] = float(bleu['bleu3'])
-            row['bleu4'] = float(bleu['bleu4'])
-        except Exception:
-            row['bleu1'] = row['bleu2'] = row['bleu3'] = row['bleu4'] = None
-
+        row['bleu1'] = _safe_float(bleu.get('bleu1'))
+        row['bleu2'] = _safe_float(bleu.get('bleu2'))
+        row['bleu3'] = _safe_float(bleu.get('bleu3'))
+        row['bleu4'] = _safe_float(bleu.get('bleu4'))
+    
+    # BERTScore metrics
     berts = metrics.get('bertscore', {}) or {}
     if isinstance(berts, dict) and 'f1' in berts:
-        try:
-            row['bertscore_p'] = float(berts['precision'])
-            row['bertscore_r'] = float(berts['recall'])
-            row['bertscore_f1'] = float(berts['f1'])
-        except Exception:
-            row['bertscore_p'] = row['bertscore_r'] = row['bertscore_f1'] = None
-
+        row['bertscore_p'] = _safe_float(berts.get('precision'))
+        row['bertscore_r'] = _safe_float(berts.get('recall'))
+        row['bertscore_f1'] = _safe_float(berts.get('f1'))
+    
     bp = metrics.get('bertscore_precision_only', {}) or {}
     if isinstance(bp, dict) and 'precision_only' in bp:
-        try:
-            row['bertscore_precision_only'] = float(bp['precision_only'])
-        except Exception:
-            row['bertscore_precision_only'] = None
-
+        row['bertscore_precision_only'] = _safe_float(bp.get('precision_only'))
+    
+    # QAFactEval metrics
     qafe = metrics.get('qafacteval', {}) or {}
     if isinstance(qafe, dict):
         row['qafacteval_available'] = bool(qafe.get('available', False))
-        # Scores schema may vary; if numeric scalar is present, store it; otherwise None
-        possible_scores = qafe.get('scores')
+        possible_scores = qafe.get('scores', {})
         if isinstance(possible_scores, dict):
-            # Try to pick an aggregate if present
             val = possible_scores.get('factuality') or possible_scores.get('score')
-            row['qafacteval_score'] = float(val) if isinstance(val, (int, float)) else None
-        else:
-            row['qafacteval_score'] = None
+            row['qafacteval_score'] = _safe_float(val)
+    
     return row
 
 
@@ -316,13 +346,11 @@ def _print_metadata_info(sample: dict):
     node_info = metadata.get('node_info', {})
     
     print(f"Question ID: {sample.get('id')}")
-    # Extract hop count from node_info
-    hop_count = metadata.get('hop_count', {0})
+    hop_count = metadata.get('hop_count', 'N/A')
     question_type = metadata.get('question_type', 'N/A')
     print(f"Question Type: {question_type}")
     print(f"Hop Count: {hop_count}")
-    first_node = node_info.get('first_node', 'N/A')
-    print(f"First Node: {first_node}")
+    print(f"First Node: {node_info.get('first_node', 'N/A')}")
 
     print("\nQuestion:")
     print(f"  {sample.get('question', 'N/A')[:200]}...")
@@ -353,25 +381,19 @@ def main():
 
     args = parser.parse_args()
 
-    # NLTK data safety check
+    # Ensure NLTK tokenizer is available
     try:
-        _ = word_tokenize("test")
+        word_tokenize("test")
     except Exception:
         import nltk
         try:
-            print("Downloading NLTK 'punkt' tokenizer (first run only)...")
-            nltk.download('punkt', quiet=True)
-            print("✓ NLTK data ready.")
+            nltk.download('punkt_tab', quiet=True)
         except Exception as e:
             print(f"⚠ Warning: NLTK data download failed: {e}")
 
     # Handle --list-ids option
     if args.list_ids:
-        dataset_path = args.dataset
-        if not os.path.isabs(dataset_path):
-            script_dir = os.path.dirname(os.path.abspath(__file__))
-            dataset_path = os.path.join(script_dir, dataset_path)
-        
+        dataset_path = _resolve_dataset_path(args.dataset)
         try:
             dataset = _load_evaluation_dataset(dataset_path)
             samples = dataset.get('samples', [])
@@ -393,12 +415,7 @@ def main():
     
     # Check if dataset mode is active
     if args.all_ids:
-        # Evaluate all samples in the dataset
-        dataset_path = args.dataset
-        if not os.path.isabs(dataset_path):
-            script_dir = os.path.dirname(os.path.abspath(__file__))
-            dataset_path = os.path.join(script_dir, dataset_path)
-
+        dataset_path = _resolve_dataset_path(args.dataset)
         print(f"Loading dataset: {dataset_path}")
         dataset = _load_evaluation_dataset(dataset_path)
         samples = dataset.get('samples', [])
@@ -408,37 +425,33 @@ def main():
 
         evaluator = SummaryEvaluator()
         rows: List[Dict[str, Any]] = []
+        
+        total_samples = len(samples)
+        print(f"\nEvaluating {total_samples} samples...\n")
 
-        for sample in samples:
+        # Progress bar with hacker green color
+        for sample in tqdm(samples, desc="Evaluating", unit="sample", total=total_samples, colour='green' if _TQDM_AVAILABLE else None):
             sid = sample.get('id')
             source_text = sample.get('summary', '')
             summary_text = sample.get('response', '')
             if not source_text or not summary_text:
-                # Skip missing entries but record status
                 rows.append({'id': sid, 'error': 'missing source/response'})
                 continue
 
-            results = evaluator.evaluate_summary(source_text, summary_text)
+            results = evaluator.evaluate_summary(source_text, summary_text, verbose=False)
             metrics = results.get('metrics', {})
             row = {'id': sid}
             row.update(_normalize_metrics_for_row(metrics))
             rows.append(row)
-
+        
         # Output table
-        print("\n" + "="*60)
-        print("ALL-IDS EVALUATION TABLE")
-        print("="*60)
+        # print("\n" + "="*60)
+        # print("ALL-IDS EVALUATION TABLE")
+        # print("="*60)
         if _PANDAS_AVAILABLE:
             df = pd.DataFrame(rows)
-            # Sort by id if possible
             if 'id' in df.columns:
-                try:
-                    df = df.sort_values('id')
-                except Exception:
-                    pass
-            # Print a compact table
-            with pd.option_context('display.max_rows', None, 'display.max_columns', None, 'display.width', 160):
-                print(df)
+                df = df.sort_values('id', ignore_index=True)
             # Optional exports
             if args.save_csv:
                 try:
@@ -453,48 +466,32 @@ def main():
                 except Exception as e:
                     print(f"Failed to save JSON: {e}")
         else:
-            # Fallback pretty print without pandas
-            # Determine columns
-            all_keys = set()
+            # Fallback: tab-separated output without pandas
+            all_keys = set().union(*(r.keys() for r in rows))
+            columns = [c for c in ['id', 'rouge1_f1', 'rouge2_f1', 'rougeLsum_f1', 'bleu1', 'bleu2', 'bleu3', 'bleu4', 
+                                  'bertscore_p', 'bertscore_r', 'bertscore_f1', 'bertscore_precision_only', 
+                                  'qafacteval_score', 'error'] if c in all_keys]
+            print("\t".join(columns))
             for r in rows:
-                all_keys.update(r.keys())
-            columns = ['id', 'rouge1_f1', 'rouge2_f1', 'rougeLsum_f1', 'bleu1', 'bleu2', 'bleu3', 'bleu4', 'bertscore_p', 'bertscore_r', 'bertscore_f1', 'bertscore_precision_only', 'qafacteval_score', 'error']
-            columns = [c for c in columns if c in all_keys]
-
-            # Header
-            header = "\t".join(columns)
-            print(header)
-            for r in rows:
-                line = "\t".join(str(r.get(c, '')) for c in columns)
-                print(line)
-        # In all-ids mode, skip single-sample evaluation and plots
-        sys.exit(0)
-    elif args.id is not None:
-        # Dataset mode: load from JSON
-        dataset_path = args.dataset
-        if not os.path.isabs(dataset_path):
-            # Try relative to current script directory
-            script_dir = os.path.dirname(os.path.abspath(__file__))
-            dataset_path = os.path.join(script_dir, dataset_path)
+                print("\t".join(str(r.get(c, '')) for c in columns))
         
+        sys.exit(0)
+ 
+    elif args.id is not None:
+        dataset_path = _resolve_dataset_path(args.dataset)
         print(f"Loading dataset: {dataset_path}")
         dataset = _load_evaluation_dataset(dataset_path)
         
         sample = _get_sample_by_id(dataset, args.id)
-        
-        # Display metadata
         _print_metadata_info(sample)
         
-        # Extract texts for evaluation
         source_text = sample.get('summary', '')
         summary_text = sample.get('response', '')
-        
         if not source_text or not summary_text:
             print("Error: Missing context or response in sample.")
             sys.exit(1)
         
-        # Update title to include sample info
-        if not args.title or args.title == 'Evaluation':
+        if args.title == 'Evaluation':
             args.title = f"Sample ID {args.id}"
     else:
         # Standard mode: read from args/files
@@ -505,8 +502,8 @@ def main():
     results = evaluator.evaluate_summary(source_text, summary_text)
     _print_scores(results)
 
-    if not args.no_plots:
-        _display_plots(results, title_prefix=args.title)
+    #if not args.no_plots:
+     #   _display_plots(results, title_prefix=args.title)
 
 
 if __name__ == "__main__":
