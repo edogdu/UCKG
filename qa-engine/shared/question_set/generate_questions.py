@@ -351,12 +351,9 @@ Each object must include:
 #     "second_node": "URI of the second node starting with http",
 #     "relationship_2": "name of second relationship",
 #     "third_node": "URI of the third node starting with http",
-#     "context": "{context}"
+#     "context": "the description in the context without the schema definitions, semantic descriptions, relationship definitions"
 # }
 
-# ---
-
-# ---
 
 # ## EXAMPLE QUESTIONS (style reference)
 # {questions}

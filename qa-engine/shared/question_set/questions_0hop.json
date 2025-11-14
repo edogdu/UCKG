@@ -1,152 +1,152 @@
 [
     {
-        "question": "How does the absence of custom error handling in ASP.NET applications increase the exposure of sensitive system details?",
+        "question": "How could Improper Handling of Windows Device Names lead to unintended information exposure?",
         "type": "<s,*,*>",
-        "first_node": "CWE-12: ASP.NET Misconfiguration - Missing Custom Error Page",
-        "context": "CWE-12, “ASP.NET Misconfiguration: Missing Custom Error Page,” refers to a security weakness where an ASP.NET application fails to implement custom error pages. Without these pages, attackers can gather sensitive information from default framework error responses, such as system details or file paths. In cybersecurity, this weakness is significant because it exposes internal application behavior, increasing the risk of targeted exploitation and information disclosure."
+        "first_node": "http://purl.org/cyber/uco#CWE-67",
+        "context": "node, labeled as Improper Handling of Windows Device Names, is a software weakness type defined in the Common Weakness Enumeration (CWE) catalog. It is summarized as The product constructs pathnames from user input, but it does not handle or incorrectly handles a pathname containing a Windows device name such as AUX or CON. This typically leads to denial of service or an information exposure when the application attempts to process the pathname as a regular file. It has an extended explanation stating that Not properly handling virtual filenames (e.g. AUX, CON, PRN, COM1, LPT1) can result in different types of vulnerabilities. In some cases an attacker can request a device via injection of a virtual filename in a URL, which may cause an error that leads to a denial of service or an error page that reveals sensitive information. A product that allows device names to bypass filtering runs the risk of an attacker injecting malicious code in a file with the name of a device.It is identified by the URI http://purl.org/cyber/uco#CWE-67."
     },
     {
-        "question": "What risks arise when default ASP.NET error messages reveal internal application structures to unauthorized users?",
+        "question": "What causes Improper Handling of Windows Device Names to escalate into denial-of-service conditions?",
         "type": "<s,*,*>",
-        "first_node": "CWE-12: ASP.NET Misconfiguration - Missing Custom Error Page",
-        "context": "CWE-12, “ASP.NET Misconfiguration: Missing Custom Error Page,” refers to a security weakness where an ASP.NET application fails to implement custom error pages. Without these pages, attackers can gather sensitive information from default framework error responses, such as system details or file paths. In cybersecurity, this weakness is significant because it exposes internal application behavior, increasing the risk of targeted exploitation and information disclosure."
+        "first_node": "http://purl.org/cyber/uco#CWE-67",
+        "context": "node, labeled as Improper Handling of Windows Device Names, is a software weakness type defined in the Common Weakness Enumeration (CWE) catalog. It is summarized as The product constructs pathnames from user input, but it does not handle or incorrectly handles a pathname containing a Windows device name such as AUX or CON. This typically leads to denial of service or an information exposure when the application attempts to process the pathname as a regular file. It has an extended explanation stating that Not properly handling virtual filenames (e.g. AUX, CON, PRN, COM1, LPT1) can result in different types of vulnerabilities. In some cases an attacker can request a device via injection of a virtual filename in a URL, which may cause an error that leads to a denial of service or an error page that reveals sensitive information. A product that allows device names to bypass filtering runs the risk of an attacker injecting malicious code in a file with the name of a device.It is identified by the URI http://purl.org/cyber/uco#CWE-67."
     },
     {
-        "question": "Which mitigation strategies can prevent attackers from exploiting unhandled ASP.NET error responses for reconnaissance?",
+        "question": "How could attackers exploit Improper Handling of Windows Device Names through injected paths?",
         "type": "<s,*,*>",
-        "first_node": "CWE-12: ASP.NET Misconfiguration - Missing Custom Error Page",
-        "context": "CWE-12, “ASP.NET Misconfiguration: Missing Custom Error Page,” refers to a security weakness where an ASP.NET application fails to implement custom error pages. Without these pages, attackers can gather sensitive information from default framework error responses, such as system details or file paths. In cybersecurity, this weakness is significant because it exposes internal application behavior, increasing the risk of targeted exploitation and information disclosure."
+        "first_node": "http://purl.org/cyber/uco#CWE-67",
+        "context": "node, labeled as Improper Handling of Windows Device Names, is a software weakness type defined in the Common Weakness Enumeration (CWE) catalog. It is summarized as The product constructs pathnames from user input, but it does not handle or incorrectly handles a pathname containing a Windows device name such as AUX or CON. This typically leads to denial of service or an information exposure when the application attempts to process the pathname as a regular file. It has an extended explanation stating that Not properly handling virtual filenames (e.g. AUX, CON, PRN, COM1, LPT1) can result in different types of vulnerabilities. In some cases an attacker can request a device via injection of a virtual filename in a URL, which may cause an error that leads to a denial of service or an error page that reveals sensitive information. A product that allows device names to bypass filtering runs the risk of an attacker injecting malicious code in a file with the name of a device.It is identified by the URI http://purl.org/cyber/uco#CWE-67."
     },
     {
-        "question": "How could missing custom error pages aid an attacker in mapping an ASP.NET application's internal configuration?",
+        "question": "Which factors make Improper Handling of Windows Device Names difficult to detect early?",
         "type": "<s,*,*>",
-        "first_node": "CWE-12: ASP.NET Misconfiguration - Missing Custom Error Page",
-        "context": "CWE-12, “ASP.NET Misconfiguration: Missing Custom Error Page,” refers to a security weakness where an ASP.NET application fails to implement custom error pages. Without these pages, attackers can gather sensitive information from default framework error responses, such as system details or file paths. In cybersecurity, this weakness is significant because it exposes internal application behavior, increasing the risk of targeted exploitation and information disclosure."
+        "first_node": "http://purl.org/cyber/uco#CWE-67",
+        "context": "node, labeled as Improper Handling of Windows Device Names, is a software weakness type defined in the Common Weakness Enumeration (CWE) catalog. It is summarized as The product constructs pathnames from user input, but it does not handle or incorrectly handles a pathname containing a Windows device name such as AUX or CON. This typically leads to denial of service or an information exposure when the application attempts to process the pathname as a regular file. It has an extended explanation stating that Not properly handling virtual filenames (e.g. AUX, CON, PRN, COM1, LPT1) can result in different types of vulnerabilities. In some cases an attacker can request a device via injection of a virtual filename in a URL, which may cause an error that leads to a denial of service or an error page that reveals sensitive information. A product that allows device names to bypass filtering runs the risk of an attacker injecting malicious code in a file with the name of a device.It is identified by the URI http://purl.org/cyber/uco#CWE-67."
     },
     {
-        "question": "What specific information can default ASP.NET error responses leak that may support targeted exploitation efforts?",
+        "question": "How might Improper Handling of Windows Device Names enable unexpected code injection paths?",
         "type": "<s,*,*>",
-        "first_node": "CWE-12: ASP.NET Misconfiguration - Missing Custom Error Page",
-        "context": "CWE-12, “ASP.NET Misconfiguration: Missing Custom Error Page,” refers to a security weakness where an ASP.NET application fails to implement custom error pages. Without these pages, attackers can gather sensitive information from default framework error responses, such as system details or file paths. In cybersecurity, this weakness is significant because it exposes internal application behavior, increasing the risk of targeted exploitation and information disclosure."
+        "first_node": "http://purl.org/cyber/uco#CWE-67",
+        "context": "node, labeled as Improper Handling of Windows Device Names, is a software weakness type defined in the Common Weakness Enumeration (CWE) catalog. It is summarized as The product constructs pathnames from user input, but it does not handle or incorrectly handles a pathname containing a Windows device name such as AUX or CON. This typically leads to denial of service or an information exposure when the application attempts to process the pathname as a regular file. It has an extended explanation stating that Not properly handling virtual filenames (e.g. AUX, CON, PRN, COM1, LPT1) can result in different types of vulnerabilities. In some cases an attacker can request a device via injection of a virtual filename in a URL, which may cause an error that leads to a denial of service or an error page that reveals sensitive information. A product that allows device names to bypass filtering runs the risk of an attacker injecting malicious code in a file with the name of a device.It is identified by the URI http://purl.org/cyber/uco#CWE-67."
     },
     {
-        "question": "How does improper field-level enforcement in web interfaces enable remote attackers to access restricted database information?",
+        "question": "How could Timestamp Request help an adversary undermine time-based authentication systems?",
         "type": "<s,*,*>",
-        "first_node": "CVE-2000-0385: FileMaker Pro 5 Web Companion Vulnerability",
-        "context": "CVE-2000-0385 is a vulnerability in FileMaker Pro 5’s Web Companion feature that allows remote attackers to bypass field-level database security controls. By exploiting weaknesses in the XML publishing or email functionality, attackers can gain unauthorized access to restricted data fields. This vulnerability is significant because it undermines data confidentiality and demonstrates how poorly secured web interfaces can expose sensitive database information to external threats."
+        "first_node": "https://capec.mitre.org/data/definitions/295.html",
+        "context": "node, labeled as CAPEC-295: Timestamp Request, is a common attack pattern from the MITRE CAPEC framework.It is described as \"This pattern of attack leverages standard requests to learn the exact time associated with a target system. An adversary may be able to use the timestamp returned from the target to attack time-based security algorithms, such as random number generators, or time-based authentication mechanisms.\".It is identified by the URI https://capec.mitre.org/data/definitions/295.html."
     },
     {
-        "question": "What factors within FileMaker Pro’s Web Companion make field-level security bypass possible for remote adversaries?",
+        "question": "What causes Timestamp Request to expose weaknesses in time-dependent randomization?",
         "type": "<s,*,*>",
-        "first_node": "CVE-2000-0385: FileMaker Pro 5 Web Companion Vulnerability",
-        "context": "CVE-2000-0385 is a vulnerability in FileMaker Pro 5’s Web Companion feature that allows remote attackers to bypass field-level database security controls. By exploiting weaknesses in the XML publishing or email functionality, attackers can gain unauthorized access to restricted data fields. This vulnerability is significant because it undermines data confidentiality and demonstrates how poorly secured web interfaces can expose sensitive database information to external threats."
+        "first_node": "https://capec.mitre.org/data/definitions/295.html",
+        "context": "node, labeled as CAPEC-295: Timestamp Request, is a common attack pattern from the MITRE CAPEC framework.It is described as \"This pattern of attack leverages standard requests to learn the exact time associated with a target system. An adversary may be able to use the timestamp returned from the target to attack time-based security algorithms, such as random number generators, or time-based authentication mechanisms.\".It is identified by the URI https://capec.mitre.org/data/definitions/295.html."
     },
     {
-        "question": "How might weaknesses in XML publishing or email functionality lead to unauthorized disclosure of database content?",
+        "question": "How might Timestamp Request support broader reconnaissance of time-sensitive defenses?",
         "type": "<s,*,*>",
-        "first_node": "CVE-2000-0385: FileMaker Pro 5 Web Companion Vulnerability",
-        "context": "CVE-2000-0385 is a vulnerability in FileMaker Pro 5’s Web Companion feature that allows remote attackers to bypass field-level database security controls. By exploiting weaknesses in the XML publishing or email functionality, attackers can gain unauthorized access to restricted data fields. This vulnerability is significant because it undermines data confidentiality and demonstrates how poorly secured web interfaces can expose sensitive database information to external threats."
+        "first_node": "https://capec.mitre.org/data/definitions/295.html",
+        "context": "node, labeled as CAPEC-295: Timestamp Request, is a common attack pattern from the MITRE CAPEC framework.It is described as \"This pattern of attack leverages standard requests to learn the exact time associated with a target system. An adversary may be able to use the timestamp returned from the target to attack time-based security algorithms, such as random number generators, or time-based authentication mechanisms.\".It is identified by the URI https://capec.mitre.org/data/definitions/295.html."
     },
     {
-        "question": "What exploitation paths exist for attackers to leverage weak web publishing mechanisms and access sensitive data fields?",
+        "question": "Which factors make Timestamp Request effective for probing system timing behavior?",
         "type": "<s,*,*>",
-        "first_node": "CVE-2000-0385: FileMaker Pro 5 Web Companion Vulnerability",
-        "context": "CVE-2000-0385 is a vulnerability in FileMaker Pro 5’s Web Companion feature that allows remote attackers to bypass field-level database security controls. By exploiting weaknesses in the XML publishing or email functionality, attackers can gain unauthorized access to restricted data fields. This vulnerability is significant because it undermines data confidentiality and demonstrates how poorly secured web interfaces can expose sensitive database information to external threats."
+        "first_node": "https://capec.mitre.org/data/definitions/295.html",
+        "context": "node, labeled as CAPEC-295: Timestamp Request, is a common attack pattern from the MITRE CAPEC framework.It is described as \"This pattern of attack leverages standard requests to learn the exact time associated with a target system. An adversary may be able to use the timestamp returned from the target to attack time-based security algorithms, such as random number generators, or time-based authentication mechanisms.\".It is identified by the URI https://capec.mitre.org/data/definitions/295.html."
     },
     {
-        "question": "Which defensive strategies could mitigate data exposure risks caused by insecure XML or email components in database-driven applications?",
+        "question": "How could Timestamp Request be combined with other techniques to bypass timing controls?",
         "type": "<s,*,*>",
-        "first_node": "CVE-2000-0385: FileMaker Pro 5 Web Companion Vulnerability",
-        "context": "CVE-2000-0385 is a vulnerability in FileMaker Pro 5’s Web Companion feature that allows remote attackers to bypass field-level database security controls. By exploiting weaknesses in the XML publishing or email functionality, attackers can gain unauthorized access to restricted data fields. This vulnerability is significant because it undermines data confidentiality and demonstrates how poorly secured web interfaces can expose sensitive database information to external threats."
+        "first_node": "https://capec.mitre.org/data/definitions/295.html",
+        "context": "node, labeled as CAPEC-295: Timestamp Request, is a common attack pattern from the MITRE CAPEC framework.It is described as \"This pattern of attack leverages standard requests to learn the exact time associated with a target system. An adversary may be able to use the timestamp returned from the target to attack time-based security algorithms, such as random number generators, or time-based authentication mechanisms.\".It is identified by the URI https://capec.mitre.org/data/definitions/295.html."
     },
     {
-        "question": "How could manipulating design documentation during development lead to embedded vulnerabilities in deployed systems?",
+        "question": "How could SocGholish enable broader intrusion through its drive-by download behavior?",
         "type": "<s,*,*>",
-        "first_node": "CAPEC-519: Documentation Alteration to Cause Errors in System Design",
-        "context": "CAPEC-519, “Documentation Alteration to Cause Errors in System Design,” describes an attack pattern where an adversary manipulates a manufacturer’s design or requirements documentation to introduce flaws during system development. By altering key design information, the attacker ensures that vulnerabilities are built into the final product. This attack is significant because it targets the integrity of the software supply chain, enabling long-term exploitation of compromised systems once they are deployed."
+        "first_node": "http://example.com/ucoex#S1124",
+        "context": "node, labeled as SocGholish, is a software tool or application relevant to cybersecurity analysis.It is described as \"[SocGholish](https://attack.mitre.org/software/S1124) is a JavaScript-based loader malware that has been used since at least 2017. It has been observed in use against multiple sectors globally for initial access, primarily through drive-by-downloads masquerading as software updates. SocGholish is operated by [Mustard Tempest](https://attack.mitre.org/groups/G1020) and its access has been sold to groups including [Indrik Spider](https://attack.mitre.org/groups/G0119) for downloading secondary RAT and ransomware payloads.(Citation: SentinelOne SocGholish Infrastructure November 2022)(Citation: SocGholish-update)(Citation: Red Canary SocGholish March 2024)(Citation: Secureworks Gold Prelude Profile)\". It is associated with the domain enterprise-attackIt is identified by the URI http://example.com/ucoex#S1124."
     },
     {
-        "question": "What impact does tampering with system design documentation have on the overall security of the software supply chain?",
+        "question": "What causes SocGholish to be effective for initial access across multiple sectors?",
         "type": "<s,*,*>",
-        "first_node": "CAPEC-519: Documentation Alteration to Cause Errors in System Design",
-        "context": "CAPEC-519, “Documentation Alteration to Cause Errors in System Design,” describes an attack pattern where an adversary manipulates a manufacturer’s design or requirements documentation to introduce flaws during system development. By altering key design information, the attacker ensures that vulnerabilities are built into the final product. This attack is significant because it targets the integrity of the software supply chain, enabling long-term exploitation of compromised systems once they are deployed."
+        "first_node": "http://example.com/ucoex#S1124",
+        "context": "node, labeled as SocGholish, is a software tool or application relevant to cybersecurity analysis.It is described as \"[SocGholish](https://attack.mitre.org/software/S1124) is a JavaScript-based loader malware that has been used since at least 2017. It has been observed in use against multiple sectors globally for initial access, primarily through drive-by-downloads masquerading as software updates. SocGholish is operated by [Mustard Tempest](https://attack.mitre.org/groups/G1020) and its access has been sold to groups including [Indrik Spider](https://attack.mitre.org/groups/G0119) for downloading secondary RAT and ransomware payloads.(Citation: SentinelOne SocGholish Infrastructure November 2022)(Citation: SocGholish-update)(Citation: Red Canary SocGholish March 2024)(Citation: Secureworks Gold Prelude Profile)\". It is associated with the domain enterprise-attackIt is identified by the URI http://example.com/ucoex#S1124."
     },
     {
-        "question": "Which safeguards can prevent adversaries from introducing vulnerabilities by modifying critical design or requirements documents?",
+        "question": "How might SocGholish facilitate deployment of secondary ransomware payloads?",
         "type": "<s,*,*>",
-        "first_node": "CAPEC-519: Documentation Alteration to Cause Errors in System Design",
-        "context": "CAPEC-519, “Documentation Alteration to Cause Errors in System Design,” describes an attack pattern where an adversary manipulates a manufacturer’s design or requirements documentation to introduce flaws during system development. By altering key design information, the attacker ensures that vulnerabilities are built into the final product. This attack is significant because it targets the integrity of the software supply chain, enabling long-term exploitation of compromised systems once they are deployed."
+        "first_node": "http://example.com/ucoex#S1124",
+        "context": "node, labeled as SocGholish, is a software tool or application relevant to cybersecurity analysis.It is described as \"[SocGholish](https://attack.mitre.org/software/S1124) is a JavaScript-based loader malware that has been used since at least 2017. It has been observed in use against multiple sectors globally for initial access, primarily through drive-by-downloads masquerading as software updates. SocGholish is operated by [Mustard Tempest](https://attack.mitre.org/groups/G1020) and its access has been sold to groups including [Indrik Spider](https://attack.mitre.org/groups/G0119) for downloading secondary RAT and ransomware payloads.(Citation: SentinelOne SocGholish Infrastructure November 2022)(Citation: SocGholish-update)(Citation: Red Canary SocGholish March 2024)(Citation: Secureworks Gold Prelude Profile)\". It is associated with the domain enterprise-attackIt is identified by the URI http://example.com/ucoex#S1124."
     },
     {
-        "question": "How might attackers exploit weak documentation control processes to compromise the integrity of system design artifacts?",
+        "question": "Which factors make SocGholish attractive for groups purchasing access?",
         "type": "<s,*,*>",
-        "first_node": "CAPEC-519: Documentation Alteration to Cause Errors in System Design",
-        "context": "CAPEC-519, “Documentation Alteration to Cause Errors in System Design,” describes an attack pattern where an adversary manipulates a manufacturer’s design or requirements documentation to introduce flaws during system development. By altering key design information, the attacker ensures that vulnerabilities are built into the final product. This attack is significant because it targets the integrity of the software supply chain, enabling long-term exploitation of compromised systems once they are deployed."
+        "first_node": "http://example.com/ucoex#S1124",
+        "context": "node, labeled as SocGholish, is a software tool or application relevant to cybersecurity analysis.It is described as \"[SocGholish](https://attack.mitre.org/software/S1124) is a JavaScript-based loader malware that has been used since at least 2017. It has been observed in use against multiple sectors globally for initial access, primarily through drive-by-downloads masquerading as software updates. SocGholish is operated by [Mustard Tempest](https://attack.mitre.org/groups/G1020) and its access has been sold to groups including [Indrik Spider](https://attack.mitre.org/groups/G0119) for downloading secondary RAT and ransomware payloads.(Citation: SentinelOne SocGholish Infrastructure November 2022)(Citation: SocGholish-update)(Citation: Red Canary SocGholish March 2024)(Citation: Secureworks Gold Prelude Profile)\". It is associated with the domain enterprise-attackIt is identified by the URI http://example.com/ucoex#S1124."
     },
     {
-        "question": "What indicators could reveal that a system’s design documentation was maliciously altered to embed security weaknesses?",
+        "question": "How could SocGholish’s masqueraded updates expand an adversary’s infection reach?",
         "type": "<s,*,*>",
-        "first_node": "CAPEC-519: Documentation Alteration to Cause Errors in System Design",
-        "context": "CAPEC-519, “Documentation Alteration to Cause Errors in System Design,” describes an attack pattern where an adversary manipulates a manufacturer’s design or requirements documentation to introduce flaws during system development. By altering key design information, the attacker ensures that vulnerabilities are built into the final product. This attack is significant because it targets the integrity of the software supply chain, enabling long-term exploitation of compromised systems once they are deployed."
-    },
-    {
-        "question": "How can adding a space at the end of a file’s extension trick security systems?",
-        "type": "<s,*,*>",
-        "first_node": "CAPEC-649: Adding a Space to a File Extension",
-        "context": "CAPEC-649, “Adding a Space to a File Extension,” describes an attack pattern where an adversary appends an invisible space to the end of a file’s extension to bypass security mechanisms or mislead users. This manipulation can cause the operating system or application to misidentify the file type, potentially leading to unintended or malicious execution. In cybersecurity, this technique highlights how subtle input-handling flaws in file validation can be exploited for social engineering or code execution attacks."
-    },
-    {
-        "question": "What happens when a file’s type is misidentified because of a hidden space in its name?",
-        "type": "<s,*,*>",
-        "first_node": "CAPEC-649: Adding a Space to a File Extension",
-        "context": "CAPEC-649, “Adding a Space to a File Extension,” describes an attack pattern where an adversary appends an invisible space to the end of a file’s extension to bypass security mechanisms or mislead users. This manipulation can cause the operating system or application to misidentify the file type, potentially leading to unintended or malicious execution. In cybersecurity, this technique highlights how subtle input-handling flaws in file validation can be exploited for social engineering or code execution attacks."
-    },
-    {
-        "question": "Why might attackers use extra spaces in filenames to hide malicious files?",
-        "type": "<s,*,*>",
-        "first_node": "CAPEC-649: Adding a Space to a File Extension",
-        "context": "CAPEC-649, “Adding a Space to a File Extension,” describes an attack pattern where an adversary appends an invisible space to the end of a file’s extension to bypass security mechanisms or mislead users. This manipulation can cause the operating system or application to misidentify the file type, potentially leading to unintended or malicious execution. In cybersecurity, this technique highlights how subtle input-handling flaws in file validation can be exploited for social engineering or code execution attacks."
-    },
-    {
-        "question": "How do hidden characters in filenames affect file validation and execution?",
-        "type": "<s,*,*>",
-        "first_node": "CAPEC-649: Adding a Space to a File Extension",
-        "context": "CAPEC-649, “Adding a Space to a File Extension,” describes an attack pattern where an adversary appends an invisible space to the end of a file’s extension to bypass security mechanisms or mislead users. This manipulation can cause the operating system or application to misidentify the file type, potentially leading to unintended or malicious execution. In cybersecurity, this technique highlights how subtle input-handling flaws in file validation can be exploited for social engineering or code execution attacks."
-    },
-    {
-        "question": "What can developers do to stop attackers from using spaces in filenames to hide threats?",
-        "type": "<s,*,*>",
-        "first_node": "CAPEC-649: Adding a Space to a File Extension",
-        "context": "CAPEC-649, “Adding a Space to a File Extension,” describes an attack pattern where an adversary appends an invisible space to the end of a file’s extension to bypass security mechanisms or mislead users. This manipulation can cause the operating system or application to misidentify the file type, potentially leading to unintended or malicious execution. In cybersecurity, this technique highlights how subtle input-handling flaws in file validation can be exploited for social engineering or code execution attacks."
-    },
-    {
-        "question": "How can weak control of document type definitions expose XML-based systems to data leaks or denial-of-service attacks?",
-        "type": "<s,*,*>",
-        "first_node": "CWE-827: Improper Control of Document Type Definition",
-        "context": "CWE-827, “Improper Control of Document Type Definition,” refers to a weakness where software fails to properly restrict the use or inclusion of external Document Type Definitions (DTDs) during XML processing. This flaw can allow attackers to reference unauthorized files, exhaust system resources, or trigger arbitrary network requests. In cybersecurity, this weakness is significant because it can lead to data exposure or denial-of-service attacks, particularly in systems that process XML, such as web services or APIs."
-    },
-    {
-        "question": "What attack scenarios exploit poorly restricted document type definitions during XML parsing?",
-        "type": "<s,*,*>",
-        "first_node": "CWE-827: Improper Control of Document Type Definition",
-        "context": "CWE-827, “Improper Control of Document Type Definition,” refers to a weakness where software fails to properly restrict the use or inclusion of external Document Type Definitions (DTDs) during XML processing. This flaw can allow attackers to reference unauthorized files, exhaust system resources, or trigger arbitrary network requests. In cybersecurity, this weakness is significant because it can lead to data exposure or denial-of-service attacks, particularly in systems that process XML, such as web services or APIs."
-    },
-    {
-        "question": "Which preventive measures can mitigate risks from unrestricted document type definitions in XML processors?",
-        "type": "<s,*,*>",
-        "first_node": "CWE-827: Improper Control of Document Type Definition",
-        "context": "CWE-827, “Improper Control of Document Type Definition,” refers to a weakness where software fails to properly restrict the use or inclusion of external Document Type Definitions (DTDs) during XML processing. This flaw can allow attackers to reference unauthorized files, exhaust system resources, or trigger arbitrary network requests. In cybersecurity, this weakness is significant because it can lead to data exposure or denial-of-service attacks, particularly in systems that process XML, such as web services or APIs."
-    },
-    {
-        "question": "How might external document references in XML be abused to compromise confidentiality or system stability?",
-        "type": "<s,*,*>",
-        "first_node": "CWE-827: Improper Control of Document Type Definition",
-        "context": "CWE-827, “Improper Control of Document Type Definition,” refers to a weakness where software fails to properly restrict the use or inclusion of external Document Type Definitions (DTDs) during XML processing. This flaw can allow attackers to reference unauthorized files, exhaust system resources, or trigger arbitrary network requests. In cybersecurity, this weakness is significant because it can lead to data exposure or denial-of-service attacks, particularly in systems that process XML, such as web services or APIs."
-    },
-    {
-        "question": "What types of XML-handling systems are most at risk when document type definitions are not properly controlled?",
-        "type": "<s,*,*>",
-        "first_node": "CWE-827: Improper Control of Document Type Definition",
-        "context": "CWE-827, “Improper Control of Document Type Definition,” refers to a weakness where software fails to properly restrict the use or inclusion of external Document Type Definitions (DTDs) during XML processing. This flaw can allow attackers to reference unauthorized files, exhaust system resources, or trigger arbitrary network requests. In cybersecurity, this weakness is significant because it can lead to data exposure or denial-of-service attacks, particularly in systems that process XML, such as web services or APIs."
-    }
+        "first_node": "http://example.com/ucoex#S1124",
+        "context": "node, labeled as SocGholish, is a software tool or application relevant to cybersecurity analysis.It is described as \"[SocGholish](https://attack.mitre.org/software/S1124) is a JavaScript-based loader malware that has been used since at least 2017. It has been observed in use against multiple sectors globally for initial access, primarily through drive-by-downloads masquerading as software updates. SocGholish is operated by [Mustard Tempest](https://attack.mitre.org/groups/G1020) and its access has been sold to groups including [Indrik Spider](https://attack.mitre.org/groups/G0119) for downloading secondary RAT and ransomware payloads.(Citation: SentinelOne SocGholish Infrastructure November 2022)(Citation: SocGholish-update)(Citation: Red Canary SocGholish March 2024)(Citation: Secureworks Gold Prelude Profile)\". It is associated with the domain enterprise-attackIt is identified by the URI http://example.com/ucoex#S1124."
+        },
+        {
+            "question": "How could APT39 expand its surveillance reach across targeted global industries?",
+            "type": "<s,*,*>",
+            "first_node": "http://example.com/ucoex#G0087",
+            "context": "node, labeled as APT39, is a threat group/adversary organization.It is described as \"[APT39](https://attack.mitre.org/groups/G0087) is one of several names for cyber espionage activity conducted by the Iranian Ministry of Intelligence and Security (MOIS) through the front company Rana Intelligence Computing since at least 2014. [APT39](https://attack.mitre.org/groups/G0087) has primarily targeted the travel, hospitality, academic, and telecommunications industries in Iran and across Asia, Africa, Europe, and North America to track individuals and entities considered to be a threat by the MOIS.(Citation: FireEye APT39 Jan 2019)(Citation: Symantec Chafer Dec 2015)(Citation: FBI FLASH APT39 September 2020)(Citation: Dept. of Treasury Iran Sanctions September 2020)(Citation: DOJ Iran Indictments September 2020)\". It is operating within the domain enterprise-attackIt is identified by the URI http://example.com/ucoex#G0087."
+        },
+        {
+            "question": "What causes APT39 to focus heavily on travel and telecommunications sectors?",
+            "type": "<s,*,*>",
+            "first_node": "http://example.com/ucoex#G0087",
+            "context": "node, labeled as APT39, is a threat group/adversary organization.It is described as \"[APT39](https://attack.mitre.org/groups/G0087) is one of several names for cyber espionage activity conducted by the Iranian Ministry of Intelligence and Security (MOIS) through the front company Rana Intelligence Computing since at least 2014. [APT39](https://attack.mitre.org/groups/G0087) has primarily targeted the travel, hospitality, academic, and telecommunications industries in Iran and across Asia, Africa, Europe, and North America to track individuals and entities considered to be a threat by the MOIS.(Citation: FireEye APT39 Jan 2019)(Citation: Symantec Chafer Dec 2015)(Citation: FBI FLASH APT39 September 2020)(Citation: Dept. of Treasury Iran Sanctions September 2020)(Citation: DOJ Iran Indictments September 2020)\". It is operating within the domain enterprise-attackIt is identified by the URI http://example.com/ucoex#G0087."
+        },
+        {
+            "question": "How might APT39 leverage industry data to track high-value individuals?",
+            "type": "<s,*,*>",
+            "first_node": "http://example.com/ucoex#G0087",
+            "context": "node, labeled as APT39, is a threat group/adversary organization.It is described as \"[APT39](https://attack.mitre.org/groups/G0087) is one of several names for cyber espionage activity conducted by the Iranian Ministry of Intelligence and Security (MOIS) through the front company Rana Intelligence Computing since at least 2014. [APT39](https://attack.mitre.org/groups/G0087) has primarily targeted the travel, hospitality, academic, and telecommunications industries in Iran and across Asia, Africa, Europe, and North America to track individuals and entities considered to be a threat by the MOIS.(Citation: FireEye APT39 Jan 2019)(Citation: Symantec Chafer Dec 2015)(Citation: FBI FLASH APT39 September 2020)(Citation: Dept. of Treasury Iran Sanctions September 2020)(Citation: DOJ Iran Indictments September 2020)\". It is operating within the domain enterprise-attackIt is identified by the URI http://example.com/ucoex#G0087."
+        },
+        {
+            "question": "Which factors make APT39 persistent across diverse geographic regions?",
+            "type": "<s,*,*>",
+            "first_node": "http://example.com/ucoex#G0087",
+            "context": "node, labeled as APT39, is a threat group/adversary organization.It is described as \"[APT39](https://attack.mitre.org/groups/G0087) is one of several names for cyber espionage activity conducted by the Iranian Ministry of Intelligence and Security (MOIS) through the front company Rana Intelligence Computing since at least 2014. [APT39](https://attack.mitre.org/groups/G0087) has primarily targeted the travel, hospitality, academic, and telecommunications industries in Iran and across Asia, Africa, Europe, and North America to track individuals and entities considered to be a threat by the MOIS.(Citation: FireEye APT39 Jan 2019)(Citation: Symantec Chafer Dec 2015)(Citation: FBI FLASH APT39 September 2020)(Citation: Dept. of Treasury Iran Sanctions September 2020)(Citation: DOJ Iran Indictments September 2020)\". It is operating within the domain enterprise-attackIt is identified by the URI http://example.com/ucoex#G0087."
+        },
+        {
+            "question": "How could APT39’s long-term operations influence regional espionage ecosystems?",
+            "type": "<s,*,*>",
+            "first_node": "http://example.com/ucoex#G0087",
+            "context": "node, labeled as APT39, is a threat group/adversary organization.It is described as \"[APT39](https://attack.mitre.org/groups/G0087) is one of several names for cyber espionage activity conducted by the Iranian Ministry of Intelligence and Security (MOIS) through the front company Rana Intelligence Computing since at least 2014. [APT39](https://attack.mitre.org/groups/G0087) has primarily targeted the travel, hospitality, academic, and telecommunications industries in Iran and across Asia, Africa, Europe, and North America to track individuals and entities considered to be a threat by the MOIS.(Citation: FireEye APT39 Jan 2019)(Citation: Symantec Chafer Dec 2015)(Citation: FBI FLASH APT39 September 2020)(Citation: Dept. of Treasury Iran Sanctions September 2020)(Citation: DOJ Iran Indictments September 2020)\". It is operating within the domain enterprise-attackIt is identified by the URI http://example.com/ucoex#G0087."
+        },
+        {
+            "question": "How could Audio Capture help adversaries intercept sensitive conversations?",
+            "type": "<s,*,*>",
+            "first_node": "http://example.com/ucoex#T1123",
+            "context": "node, labeled as Audio Capture, is a MITRE ATT&CK technique or technique group.It is described as \"An adversary can leverage a computer's peripheral devices (e.g., microphones and webcams) or applications (e.g., voice and video call services) to capture audio recordings for the purpose of listening into sensitive conversations to gather information.(Citation: ESET Attor Oct 2019)\nMalware or scripts may be used to interact with the devices through an available API provided by the operating system or an application to capture audio. Audio files may be written to disk and exfiltrated later.\". It is applicable within the domain enterprise-attack.It is identified by the URI http://example.com/ucoex#T1123."
+        },
+        {
+            "question": "What causes Audio Capture to be especially effective on compromised endpoints?",
+            "type": "<s,*,*>",
+            "first_node": "http://example.com/ucoex#T1123",
+            "context": "node, labeled as Audio Capture, is a MITRE ATT&CK technique or technique group.It is described as \"An adversary can leverage a computer's peripheral devices (e.g., microphones and webcams) or applications (e.g., voice and video call services) to capture audio recordings for the purpose of listening into sensitive conversations to gather information.(Citation: ESET Attor Oct 2019)\nMalware or scripts may be used to interact with the devices through an available API provided by the operating system or an application to capture audio. Audio files may be written to disk and exfiltrated later.\". It is applicable within the domain enterprise-attack.It is identified by the URI http://example.com/ucoex#T1123."
+        },
+        {
+            "question": "How might Audio Capture be combined with other techniques for deeper surveillance?",
+            "type": "<s,*,*>",
+            "first_node": "http://example.com/ucoex#T1123",
+            "context": "node, labeled as Audio Capture, is a MITRE ATT&CK technique or technique group.It is described as \"An adversary can leverage a computer's peripheral devices (e.g., microphones and webcams) or applications (e.g., voice and video call services) to capture audio recordings for the purpose of listening into sensitive conversations to gather information.(Citation: ESET Attor Oct 2019)\nMalware or scripts may be used to interact with the devices through an available API provided by the operating system or an application to capture audio. Audio files may be written to disk and exfiltrated later.\". It is applicable within the domain enterprise-attack.It is identified by the URI http://example.com/ucoex#T1123."
+        },
+        {
+            "question": "Which factors influence how stealthy an Audio Capture operation can be?",
+            "type": "<s,*,*>",
+            "first_node": "http://example.com/ucoex#T1123",
+            "context": "node, labeled as Audio Capture, is a MITRE ATT&CK technique or technique group.It is described as \"An adversary can leverage a computer's peripheral devices (e.g., microphones and webcams) or applications (e.g., voice and video call services) to capture audio recordings for the purpose of listening into sensitive conversations to gather information.(Citation: ESET Attor Oct 2019)\nMalware or scripts may be used to interact with the devices through an available API provided by the operating system or an application to capture audio. Audio files may be written to disk and exfiltrated later.\". It is applicable within the domain enterprise-attack.It is identified by the URI http://example.com/ucoex#T1123."
+        },
+        {
+            "question": "How could Audio Capture support long-term monitoring of targeted individuals?",
+            "type": "<s,*,*>",
+            "first_node": "http://example.com/ucoex#T1123",
+            "context": "node, labeled as Audio Capture, is a MITRE ATT&CK technique or technique group.It is described as \"An adversary can leverage a computer's peripheral devices (e.g., microphones and webcams) or applications (e.g., voice and video call services) to capture audio recordings for the purpose of listening into sensitive conversations to gather information.(Citation: ESET Attor Oct 2019)\nMalware or scripts may be used to interact with the devices through an available API provided by the operating system or an application to capture audio. Audio files may be written to disk and exfiltrated later.\". It is applicable within the domain enterprise-attack.It is identified by the URI http://example.com/ucoex#T1123."
+        }
 ]
