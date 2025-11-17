@@ -248,5 +248,266 @@
         "relationship_2": "UCOHASOBSERVEDEXAMPLE",
         "third_node": "http://example.com/ucoex#CWE-284-CVE-2022-23607",
         "context": "node1, labeled as CAPEC-503: WebView Exposure, is a common attack pattern from the MITRE CAPEC framework.It is described as \"An adversary, through a malicious web page, accesses application specific functionality by leveraging interfaces registered through WebView's addJavascriptInterface API. Once an interface is registered to WebView through addJavascriptInterface, it becomes global and all pages loaded in the WebView can call this interface.\".It is identified by the URI https://capec.mitre.org/data/definitions/503.html. node1 (UcoexCAPEC (CAPEC-503: WebView Exposure)) has related weakness node2 (UcoCWE (Improper Access Control)). node2, labeled as Improper Access Control, is a software weakness type defined in the Common Weakness Enumeration (CWE) catalog. It is summarized as The product does not restrict or incorrectly restricts access to a resource from an unauthorized actor, with detailed explanation of authentication, authorization, and accountability failures. It is identified by the URI http://purl.org/cyber/uco#CWE-284. node2 (UcoCWE (Improper Access Control)) has real-world observed examples node3 (UcoexObservedExample). node3 is an observed real-world example/instance of a cybersecurity event.It is described as \"Python-based HTTP library did not scope cookies to a particular domain such that 'supercookies' could be sent to any domain on redirect\".It is identified by the URI http://example.com/ucoex#CWE-284-CVE-2022-23607."
+    },
+
+    {
+        "question": "How could BlueSmacking attacks lead to file descriptor exhaustion vulnerabilities?",
+        "type": "<s,*,o>",
+        "first_node": "https://capec.mitre.org/data/definitions/666.html",
+        "relationship_1": "UCOEXHASRELATEDWEAKNESS",
+        "second_node": "http://purl.org/cyber/uco#CWE-404",
+        "relationship_2": "UCOHASOBSERVEDEXAMPLE",
+        "third_node": "http://example.com/ucoex#CWE-404-CVE-2002-1372",
+        "context": "CAPEC-666 (BlueSmacking) exploits CWE-404 (Improper Resource Shutdown or Release) through Bluetooth L2CAP flooding that creates denial of service by overwhelming devices with large packets. This same weakness manifests when file/socket operations return values go unchecked, allowing resultant consumption of file descriptors, demonstrating how improper resource management enables both wireless DoS and system resource exhaustion attacks."
+    },
+    {
+        "question": "What resource management failures connect Bluetooth flooding to descriptor exhaustion?",
+        "type": "<s,p,*>",
+        "first_node": "https://capec.mitre.org/data/definitions/666.html",
+        "relationship_1": "UCOEXHASRELATEDWEAKNESS",
+        "second_node": "http://purl.org/cyber/uco#CWE-404",
+        "relationship_2": "UCOHASOBSERVEDEXAMPLE",
+        "third_node": "http://example.com/ucoex#CWE-404-CVE-2002-1372",
+        "context": "BlueSmacking attacks exploit improper resource shutdown when Bluetooth devices fail to properly release resources after L2CAP packet flooding. Similar resource management failures appear in systems that don't check file/socket operation return values, leading to file descriptor consumption and demonstrating how inadequate resource accounting creates denial of service across different attack vectors."
+    },
+    {
+        "question": "How does Bluetooth DoS relate to unchecked file operation vulnerabilities?",
+        "type": "<s,p,o>",
+        "first_node": "https://capec.mitre.org/data/definitions/666.html",
+        "relationship_1": "UCOEXHASRELATEDWEAKNESS",
+        "second_node": "http://purl.org/cyber/uco#CWE-404",
+        "relationship_2": "UCOHASOBSERVEDEXAMPLE",
+        "third_node": "http://example.com/ucoex#CWE-404-CVE-2002-1372",
+        "context": "CAPEC-666's BlueSmacking and unchecked file/socket operations both stem from CWE-404—improper resource shutdown or release. Whether flooding Bluetooth devices with L2CAP packets or failing to validate file operation returns, both scenarios result in resource exhaustion DoS when developers don't properly account for resource expiration, invalidation, or release paths."
+    },
+
+
+    {
+        "question": "How could BlueSmacking attacks relate to named pipe connection failures?",
+        "type": "<s,*,o>",
+        "first_node": "https://capec.mitre.org/data/definitions/666.html",
+        "relationship_1": "UCOEXHASRELATEDWEAKNESS",
+        "second_node": "http://purl.org/cyber/uco#CWE-404",
+        "relationship_2": "UCOHASOBSERVEDEXAMPLE",
+        "third_node": "http://example.com/ucoex#CWE-404-CVE-1999-1127",
+        "context": "CAPEC-666 (BlueSmacking) exploits CWE-404 (Improper Resource Shutdown or Release) through Bluetooth L2CAP flooding that overwhelms devices by preventing proper resource cleanup. This same weakness appears in systems that fail to shut down named pipe connections when receiving malformed data, demonstrating how improper resource release enables denial of service across both wireless and inter-process communication channels."
+    },
+    {
+        "question": "What resource release failures connect Bluetooth flooding to pipe vulnerabilities?",
+        "type": "<s,p,*>",
+        "first_node": "https://capec.mitre.org/data/definitions/666.html",
+        "relationship_1": "UCOEXHASRELATEDWEAKNESS",
+        "second_node": "http://purl.org/cyber/uco#CWE-404",
+        "relationship_2": "UCOHASOBSERVEDEXAMPLE",
+        "third_node": "http://example.com/ucoex#CWE-404-CVE-1999-1127",
+        "context": "BlueSmacking attacks exploit improper resource shutdown when Bluetooth devices can't properly release resources under L2CAP packet flooding. Similar failures occur with named pipes that don't shut down connections after receiving malformed data, showing how developers failing to account for resource expiration paths creates DoS vulnerabilities across different communication protocols."
+    },
+    {
+        "question": "How does Bluetooth DoS relate to malformed data pipe failures?",
+        "type": "<s,p,o>",
+        "first_node": "https://capec.mitre.org/data/definitions/666.html",
+        "relationship_1": "UCOEXHASRELATEDWEAKNESS",
+        "second_node": "http://purl.org/cyber/uco#CWE-404",
+        "relationship_2": "UCOHASOBSERVEDEXAMPLE",
+        "third_node": "http://example.com/ucoex#CWE-404-CVE-1999-1127",
+        "context": "CAPEC-666's BlueSmacking and named pipe connection failures both stem from CWE-404—improper resource shutdown or release. Whether flooding Bluetooth L2CAP connections or sending malformed data to named pipes, both scenarios cause denial of service when systems fail to properly release resources before making them available for re-use, exhausting available connections."
+    },
+
+    {
+        "question": "How could BlueSmacking attacks relate to socket exhaustion vulnerabilities?",
+        "type": "<s,*,o>",
+        "first_node": "https://capec.mitre.org/data/definitions/666.html",
+        "relationship_1": "UCOEXHASRELATEDWEAKNESS",
+        "second_node": "http://purl.org/cyber/uco#CWE-404",
+        "relationship_2": "UCOHASOBSERVEDEXAMPLE",
+        "third_node": "http://example.com/ucoex#CWE-404-CVE-2001-0830",
+        "context": "CAPEC-666 (BlueSmacking) exploits CWE-404 (Improper Resource Shutdown or Release) through Bluetooth L2CAP flooding that prevents proper resource cleanup during denial of service attacks. This same weakness appears when servers fail to properly close sockets after attackers repeatedly connect and disconnect, demonstrating how improper resource release enables exhaustion attacks across both wireless and network socket communication channels."
+    },
+    {
+        "question": "What resource cleanup failures connect Bluetooth flooding to socket vulnerabilities?",
+        "type": "<s,p,*>",
+        "first_node": "https://capec.mitre.org/data/definitions/666.html",
+        "relationship_1": "UCOEXHASRELATEDWEAKNESS",
+        "second_node": "http://purl.org/cyber/uco#CWE-404",
+        "relationship_2": "UCOHASOBSERVEDEXAMPLE",
+        "third_node": "http://example.com/ucoex#CWE-404-CVE-2001-0830",
+        "context": "BlueSmacking attacks exploit improper resource shutdown when Bluetooth devices can't properly release resources under L2CAP packet flooding. Similar failures occur when servers don't close sockets after repeated connect-disconnect cycles, showing how developers failing to account for resource expiration and invalidation paths creates denial of service through connection exhaustion."
+    },
+    {
+        "question": "How does Bluetooth DoS relate to repeated connection socket failures?",
+        "type": "<s,p,o>",
+        "first_node": "https://capec.mitre.org/data/definitions/666.html",
+        "relationship_1": "UCOEXHASRELATEDWEAKNESS",
+        "second_node": "http://purl.org/cyber/uco#CWE-404",
+        "relationship_2": "UCOHASOBSERVEDEXAMPLE",
+        "third_node": "http://example.com/ucoex#CWE-404-CVE-2001-0830",
+        "context": "CAPEC-666's BlueSmacking and improperly closed sockets both stem from CWE-404—improper resource shutdown or release. Whether flooding Bluetooth L2CAP connections or repeatedly connecting and disconnecting from servers, both scenarios cause denial of service when systems fail to properly release resources before making them available for re-use, exhausting available connections."
+    },
+
+
+    {
+        "question": "How could error page XSS exploitation enable targeted parameter attacks?",
+        "type": "<s,*,o>",
+        "first_node": "https://capec.mitre.org/data/definitions/198.html",
+        "relationship_1": "UCOEXHASRELATEDWEAKNESS",
+        "second_node": "http://purl.org/cyber/uco#CWE-81",
+        "relationship_2": "UCOHASOBSERVEDEXAMPLE",
+        "third_node": "http://example.com/ucoex#CWE-81-CVE-2002-1700",
+        "context": "CAPEC-198 (XSS Targeting Error Pages) exploits CWE-81 (Improper Neutralization of Script in an Error Message Web Page) by distributing malformed requests with embedded exploit code to third-party web servers. This same weakness manifests in targeted parameter attacks where XSS executes through error pages, demonstrating how failure to neutralize script syntax in 403/404 error pages enables cross-site scripting attacks."
+    },
+    {
+        "question": "What script neutralization failures enable XSS through malformed error requests?",
+        "type": "<s,p,*>",
+        "first_node": "https://capec.mitre.org/data/definitions/198.html",
+        "relationship_1": "UCOEXHASRELATEDWEAKNESS",
+        "second_node": "http://purl.org/cyber/uco#CWE-81",
+        "relationship_2": "UCOHASOBSERVEDEXAMPLE",
+        "third_node": "http://example.com/ucoex#CWE-81-CVE-2002-1700",
+        "context": "Error page XSS attacks exploit improper neutralization when servers receive malformed input containing script syntax and reflect it in error messages without sanitization. Real-world examples show targeted parameters triggering XSS in customized error pages, demonstrating how failure to neutralize web-scripting elements in error responses creates persistent attack vectors across different implementations."
+    },
+    {
+        "question": "How does malformed request XSS connect to targeted parameter vulnerabilities?",
+        "type": "<s,p,o>",
+        "first_node": "https://capec.mitre.org/data/definitions/198.html",
+        "relationship_1": "UCOEXHASRELATEDWEAKNESS",
+        "second_node": "http://purl.org/cyber/uco#CWE-81",
+        "relationship_2": "UCOHASOBSERVEDEXAMPLE",
+        "third_node": "http://example.com/ucoex#CWE-81-CVE-2002-1700",
+        "context": "CAPEC-198's error page targeting and parameter-based XSS both stem from CWE-81—improper neutralization of script in error messages. Whether distributing malformed links with exploit code or targeting specific parameters, both scenarios enable cross-site scripting when error pages like 403/404 reflect attacker input without properly neutralizing special characters interpretable as web-scripting elements."
+    },
+
+    {
+        "question": "How could error page XSS exploitation enable Host header attacks?",
+        "type": "<s,*,o>",
+        "first_node": "https://capec.mitre.org/data/definitions/198.html",
+        "relationship_1": "UCOEXHASRELATEDWEAKNESS",
+        "second_node": "http://purl.org/cyber/uco#CWE-81",
+        "relationship_2": "UCOHASOBSERVEDEXAMPLE",
+        "third_node": "http://example.com/ucoex#CWE-81-CVE-2002-0840",
+        "context": "CAPEC-198 (XSS Targeting Error Pages) exploits CWE-81 (Improper Neutralization of Script in an Error Message Web Page) by distributing malformed requests with embedded exploit code to third-party web servers. This same weakness manifests in Host header XSS attacks through default error pages, demonstrating how failure to neutralize script syntax in error responses enables cross-site scripting when special characters from HTTP headers are reflected without sanitization."
+    },
+    {
+        "question": "What script neutralization failures enable XSS through malformed header requests?",
+        "type": "<s,p,*>",
+        "first_node": "https://capec.mitre.org/data/definitions/198.html",
+        "relationship_1": "UCOEXHASRELATEDWEAKNESS",
+        "second_node": "http://purl.org/cyber/uco#CWE-81",
+        "relationship_2": "UCOHASOBSERVEDEXAMPLE",
+        "third_node": "http://example.com/ucoex#CWE-81-CVE-2002-0840",
+        "context": "Error page XSS attacks exploit improper neutralization when servers receive input containing script syntax from upstream components and reflect it in error messages without sanitization. Real-world examples show Host headers triggering XSS in default error pages, demonstrating how failure to neutralize web-scripting elements in 403/404 responses creates attack vectors across different HTTP header injection points."
+    },
+    {
+        "question": "How does malformed request XSS connect to Host header vulnerabilities?",
+        "type": "<s,p,o>",
+        "first_node": "https://capec.mitre.org/data/definitions/198.html",
+        "relationship_1": "UCOEXHASRELATEDWEAKNESS",
+        "second_node": "http://purl.org/cyber/uco#CWE-81",
+        "relationship_2": "UCOHASOBSERVEDEXAMPLE",
+        "third_node": "http://example.com/ucoex#CWE-81-CVE-2002-0840",
+        "context": "CAPEC-198's error page targeting and Host header XSS both stem from CWE-81—improper neutralization of script in error messages. Whether distributing malformed links with exploit code or injecting malicious content through HTTP Host headers, both scenarios enable cross-site scripting when default error pages reflect attacker input without properly neutralizing special characters interpretable as web-scripting elements."
+    },
+
+    {
+        "question": "How could error page XSS exploitation manifest in error messages?",
+        "type": "<s,*,o>",
+        "first_node": "https://capec.mitre.org/data/definitions/198.html",
+        "relationship_1": "UCOEXHASRELATEDWEAKNESS",
+        "second_node": "http://purl.org/cyber/uco#CWE-81",
+        "relationship_2": "UCOHASOBSERVEDEXAMPLE",
+        "third_node": "http://example.com/ucoex#CWE-81-CVE-2002-1053",
+        "context": "CAPEC-198 (XSS Targeting Error Pages) exploits CWE-81 (Improper Neutralization of Script in an Error Message Web Page) by distributing malformed requests with embedded exploit code to third-party web servers. This same weakness manifests directly in error messages containing XSS, demonstrating how failure to neutralize script syntax when sending attacker input to error pages enables cross-site scripting attacks across various error handling implementations."
+    },
+    {
+        "question": "What script neutralization failures enable XSS through malformed error responses?",
+        "type": "<s,p,*>",
+        "first_node": "https://capec.mitre.org/data/definitions/198.html",
+        "relationship_1": "UCOEXHASRELATEDWEAKNESS",
+        "second_node": "http://purl.org/cyber/uco#CWE-81",
+        "relationship_2": "UCOHASOBSERVEDEXAMPLE",
+        "third_node": "http://example.com/ucoex#CWE-81-CVE-2002-1053",
+        "context": "Error page XSS attacks exploit improper neutralization when servers receive input containing script syntax and reflect it in error messages without sanitization. Real-world examples show XSS executing directly through error messages, demonstrating how failure to neutralize web-scripting elements in 403/404 and other error responses creates attack vectors when special characters from upstream components are incorrectly handled."
+    },
+    {
+        "question": "How does malformed request XSS connect to error message vulnerabilities?",
+        "type": "<s,p,o>",
+        "first_node": "https://capec.mitre.org/data/definitions/198.html",
+        "relationship_1": "UCOEXHASRELATEDWEAKNESS",
+        "second_node": "http://purl.org/cyber/uco#CWE-81",
+        "relationship_2": "UCOHASOBSERVEDEXAMPLE",
+        "third_node": "http://example.com/ucoex#CWE-81-CVE-2002-1053",
+        "context": "CAPEC-198's error page targeting and error message XSS both stem from CWE-81—improper neutralization of script in error messages. Whether distributing malformed links with exploit code or triggering errors containing script syntax, both scenarios enable cross-site scripting when error pages reflect attacker input without properly neutralizing special characters interpretable as web-scripting elements."
+    },
+
+    {
+        "question": "How could file extension space manipulation lead to source disclosure?",
+        "type": "<s,*,o>",
+        "first_node": "https://capec.mitre.org/data/definitions/649.html",
+        "relationship_1": "UCOEXHASRELATEDWEAKNESS",
+        "second_node": "http://purl.org/cyber/uco#CWE-46",
+        "relationship_2": "UCOHASOBSERVEDEXAMPLE",
+        "third_node": "http://example.com/ucoex#CWE-46-CVE-2005-0622",
+        "context": "CAPEC-649 (Adding a Space to a File Extension) exploits CWE-46 (Path Equivalence: 'filename ' Trailing Space) by adding trailing space characters to file extensions that applications fail to neutralize. This same weakness manifests in source disclosure attacks using trailing encoded space characters, demonstrating how improper validation of path input with trailing spaces enables file system traversal and arbitrary file access through ambiguous path resolution."
+    },
+    {
+        "question": "What path validation failures enable trailing space exploitation attacks?",
+        "type": "<s,p,*>",
+        "first_node": "https://capec.mitre.org/data/definitions/649.html",
+        "relationship_1": "UCOEXHASRELATEDWEAKNESS",
+        "second_node": "http://purl.org/cyber/uco#CWE-46",
+        "relationship_2": "UCOHASOBSERVEDEXAMPLE",
+        "third_node": "http://example.com/ucoex#CWE-46-CVE-2005-0622",
+        "context": "File extension space manipulation exploits improper neutralization when applications accept path input with trailing spaces without validation. Real-world examples show trailing encoded spaces enabling source disclosure, demonstrating how failure to validate trailing special elements creates ambiguous path resolution allowing attackers to traverse file systems, control execution, and access unintended file locations."
+    },
+    {
+        "question": "How does file extension manipulation connect to encoded space vulnerabilities?",
+        "type": "<s,p,o>",
+        "first_node": "https://capec.mitre.org/data/definitions/649.html",
+        "relationship_1": "UCOEXHASRELATEDWEAKNESS",
+        "second_node": "http://purl.org/cyber/uco#CWE-46",
+        "relationship_2": "UCOHASOBSERVEDEXAMPLE",
+        "third_node": "http://example.com/ucoex#CWE-46-CVE-2005-0622",
+        "context": "CAPEC-649's trailing space technique and encoded space source disclosure both stem from CWE-46—path equivalence with trailing spaces. Whether adding hard-to-notice space characters to file extensions or using encoded %20 spaces, both scenarios enable unauthorized file access when applications fail to properly validate and neutralize trailing special elements, leading to ambiguous path resolution and arbitrary file disclosure."
+    },
+
+    {
+        "question": "How could file extension space manipulation lead to source disclosure?",
+        "type": "<s,*,o>",
+        "first_node": "https://capec.mitre.org/data/definitions/649.html",
+        "relationship_1": "UCOEXHASRELATEDWEAKNESS",
+        "second_node": "http://purl.org/cyber/uco#CWE-46",
+        "relationship_2": "UCOHASOBSERVEDEXAMPLE",
+        "third_node": "http://example.com/ucoex#CWE-46-CVE-2002-1451",
+        "context": "CAPEC-649 (Adding a Space to a File Extension) exploits CWE-46 (Path Equivalence: 'filename ' Trailing Space) by adding hard-to-notice trailing space characters to file extensions that applications fail to neutralize. This same weakness manifests in query string trailing spaces (represented as '+') leading to source code disclosure, demonstrating how improper validation of path input with trailing spaces enables ambiguous path resolution and arbitrary file access."
+    },
+    {
+        "question": "What path validation failures enable query string source disclosure?",
+        "type": "<s,p,*>",
+        "first_node": "https://capec.mitre.org/data/definitions/649.html",
+        "relationship_1": "UCOEXHASRELATEDWEAKNESS",
+        "second_node": "http://purl.org/cyber/uco#CWE-46",
+        "relationship_2": "UCOHASOBSERVEDEXAMPLE",
+        "third_node": "http://example.com/ucoex#CWE-46-CVE-2002-1451",
+        "context": "File extension space manipulation exploits improper neutralization when applications accept path input with trailing spaces without validation. Real-world examples show trailing spaces in query strings ('+' encoding) enabling source code disclosure, demonstrating how failure to validate trailing special elements creates ambiguous path resolution allowing attackers to traverse file systems, control execution, and access source code."
+    },
+    {
+        "question": "How does file extension manipulation connect to query string vulnerabilities?",
+        "type": "<s,p,o>",
+        "first_node": "https://capec.mitre.org/data/definitions/649.html",
+        "relationship_1": "UCOEXHASRELATEDWEAKNESS",
+        "second_node": "http://purl.org/cyber/uco#CWE-46",
+        "relationship_2": "UCOHASOBSERVEDEXAMPLE",
+        "third_node": "http://example.com/ucoex#CWE-46-CVE-2002-1451",
+        "context": "CAPEC-649's trailing space technique and query string source disclosure both stem from CWE-46—path equivalence with trailing spaces. Whether adding space characters to file extensions or exploiting trailing spaces ('+') in query strings, both scenarios enable unauthorized file access when applications fail to properly validate and neutralize trailing special elements, leading to ambiguous path resolution and source code exposure."
+    },
+    {
+        "question": "What enables source code exposure through trailing space path manipulation?",
+        "type": "<s,p,*>",
+        "first_node": "https://capec.mitre.org/data/definitions/649.html",
+        "relationship_1": "UCOEXHASRELATEDWEAKNESS",
+        "second_node": "http://purl.org/cyber/uco#CWE-46",
+        "relationship_2": "UCOHASOBSERVEDEXAMPLE",
+        "third_node": "http://example.com/ucoex#CWE-46-CVE-2002-1451",
+        "context": "This attack pattern exploits path equivalence weaknesses where trailing spaces in file paths—whether in extensions or query strings—bypass validation mechanisms. The observed example demonstrates how '+' characters representing spaces in query strings trigger source code disclosure by causing ambiguous path resolution, allowing attackers to access unintended file locations and retrieve sensitive application source code."
     }
+
 ]

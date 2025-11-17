@@ -208,5 +208,229 @@
         "relationship_2": "UCOEXMITIGATES",
         "third_node": "http://example.com/ucoex#M1053",
         "context": "node1, labeled as KV Botnet Activity, is a cybersecurity campaign/operation.It is described as \"[KV Botnet Activity](https://attack.mitre.org/campaigns/C0035) consisted of exploitation of primarily “end-of-life” small office-home office (SOHO) equipment from manufacturers such as Cisco, NETGEAR, and DrayTek. [KV Botnet Activity](https://attack.mitre.org/campaigns/C0035) was used by [Volt Typhoon](https://attack.mitre.org/groups/G1017) to obfuscate connectivity to victims in multiple critical infrastructure segments, including energy and telecommunication companies and entities based on the US territory of Guam. While the KV Botnet is the most prominent element of this campaign, it overlaps with another botnet cluster referred to as the JDY cluster.(Citation: Lumen KVBotnet 2023) This botnet was disrupted by US law enforcement entities in early 2024 after periods of activity from October 2022 through January 2024.(Citation: DOJ KVBotnet 2024)\". It is associated with the domain enterprise-attackIt is identified by the URI http://example.com/ucoex#C0035. node1 (UcoexCAMPAIGNS (KV Botnet Activity)) uses technique node2 (UcoexMITREATTACK (Ingress Tool Transfer)). node2, labeled as Ingress Tool Transfer, is a MITRE ATT&CK technique or technique group.It is described as \"Adversaries may transfer tools or other files from an external system into a compromised environment. Tools or files may be copied from an external adversary-controlled system to the victim network through the command and control channel or through alternate protocols such as [ftp](https://attack.mitre.org/software/S0095). Once present, adversaries may also transfer/spread tools between victim devices within a compromised environment (i.e. [Lateral Tool Transfer](https://attack.mitre.org/techniques/T1570)). On Windows, adversaries may use various utilities to download tools, such as copy, finger, [certutil](https://attack.mitre.org/software/S0160), and [PowerShell](https://attack.mitre.org/techniques/T1059/001) commands such as <code>IEX(New-Object Net.WebClient).downloadString()</code> and <code>Invoke-WebRequest</code>. On Linux and macOS systems, a variety of utilities also exist, such as curl, scp, sftp, tftp, rsync, finger, and wget.(Citation: t1105_lolbas) A number of these tools, such as wget, curl, and scp, also exist on ESXi. After downloading a file, a threat actor may attempt to verify its integrity by checking its hash value (e.g., via certutil -hashfile).(Citation: Google Cloud Threat Intelligence COSCMICENERGY 2023) Adversaries may also abuse installers and package managers, such as yum or winget, to download tools to victim hosts. Adversaries have also abused file application features, such as the Windows search-ms protocol handler, to deliver malicious files to victims through remote file searches invoked by [User Execution](https://attack.mitre.org/techniques/T1204) (typically after interacting with [Phishing](https://attack.mitre.org/techniques/T1566) lures).(Citation: T1105: Trellix_search-ms) Files can also be transferred using various [Web Service](https://attack.mitre.org/techniques/T1102)s as well as native or otherwise present tools on the victim system.(Citation: PTSecurity Cobalt Dec 2016) In some cases, adversaries may be able to leverage services that sync between a web-based and an on-premises client, such as Dropbox or OneDrive, to transfer files onto victim systems. For example, by compromising a cloud account and logging into the service's web portal, an adversary may be able to trigger an automatic syncing process that transfers the file onto the victim's machine.(Citation: Dropbox Malware Sync)\". It is applicable within the domain enterprise-attack.It is identified by the URI http://example.com/ucoex#T1105."
+    },
+
+
+    {
+        "question": "How does Domain Fronting map to enterprise attack techniques?",
+        "type": "<s,*,o>",
+        "first_node": "https://capec.mitre.org/data/definitions/481.html",
+        "relationship": "UCOEXHASTAXONOMYMAPPING",
+        "second_node": "http://example.com/ucoex#T1090.004",
+        "context": "CAPEC-481 (Contradictory Destinations in Traffic Routing Schemes) maps to MITRE ATT&CK's Proxy: Domain Fronting technique, showing how the same attack vector is documented across different cybersecurity frameworks. This mapping helps analysts correlate CAPEC patterns with ATT&CK TTPs for comprehensive threat detection."
+    },
+    {
+        "question": "Which ATT&CK techniques relate to contradictory destination routing attacks?",
+        "type": "<s,p,*>",
+        "first_node": "https://capec.mitre.org/data/definitions/481.html",
+        "relationship": "UCOEXHASTAXONOMYMAPPING",
+        "second_node": "http://example.com/ucoex#T1090.004",
+        "context": "CAPEC-481 maps to the Proxy: Domain Fronting technique in the enterprise-attack domain. This taxonomy mapping enables defenders to leverage both CAPEC's attack pattern descriptions and ATT&CK's operational context for identifying CDN-based traffic obfuscation."
+    },
+    {
+        "question": "Why does traffic routing manipulation map to proxy techniques?",
+        "type": "<s,p,o>",
+        "first_node": "https://capec.mitre.org/data/definitions/481.html",
+        "relationship": "UCOEXHASTAXONOMYMAPPING",
+        "second_node": "http://example.com/ucoex#T1090.004",
+        "context": "The taxonomy mapping between CAPEC-481 and ATT&CK's Proxy: Domain Fronting technique reflects how SNI-Host header manipulation achieves traffic obfuscation through CDN routing, bridging CAPEC's attack pattern methodology with ATT&CK's adversary behavior modeling."
+    },
+
+
+    {
+        "question": "How can forgotten password features become system entry points?",
+        "type": "<s,*,o>",
+        "first_node": "https://capec.mitre.org/data/definitions/50.html",
+        "relationship": "UCOEXHASRELATEDWEAKNESS",
+        "second_node": "http://purl.org/cyber/uco#CWE-640",
+        "context": "CAPEC-50 demonstrates how attackers exploit CWE-640 by manipulating recovery mechanisms to redirect reset emails, answer predictable security questions found via social media, or overwhelm systems without rate limiting to achieve unauthorized account access."
+    },
+    {
+        "question": "Which authentication weakness do password recovery attacks primarily exploit?",
+        "type": "<s,p,*>",
+        "first_node": "https://capec.mitre.org/data/definitions/50.html",
+        "relationship": "UCOEXHASRELATEDWEAKNESS",
+        "second_node": null,
+        "context": "This attack pattern exploits CWE-640, targeting implementation flaws such as sending original passwords instead of temporary ones, using easily guessable security questions, or lacking throttling controls—transforming recovery features into attack vectors."
+    },
+    {
+        "question": "What makes security questions vulnerable in password reset processes?",
+        "type": "<s,p,o>",
+        "first_node": "https://capec.mitre.org/data/definitions/50.html",
+        "relationship": "UCOEXHASRELATEDWEAKNESS",
+        "second_node": "http://purl.org/cyber/uco#CWE-640",
+        "context": "CAPEC-50 leverages CWE-640 by exploiting overly common security questions or answers discoverable through social engineering and social media, enabling attackers to circumvent authentication as legitimate users."
+    },
+    {
+        "question": "How does email redirection exploit weak password recovery implementations?",
+        "type": "<s,*,o>",
+        "first_node": "https://capec.mitre.org/data/definitions/50.html",
+        "relationship": "UCOEXHASRELATEDWEAKNESS",
+        "second_node": "http://purl.org/cyber/uco#CWE-640",
+        "context": "The CAPEC-50 to CWE-640 relationship highlights how implementation weaknesses allow attackers to trick systems into sending reset credentials to attacker-controlled email addresses, bypassing intended security controls."
+    },
+    {
+        "question": "What weaknesses enable denial of service through password reset flooding?",
+        "type": "<s,p,*>",
+        "first_node": "https://capec.mitre.org/data/definitions/50.html",
+        "relationship": "UCOEXHASRELATEDWEAKNESS",
+        "second_node": null,
+        "context": "CAPEC-50 exploits CWE-640's lack of rate limiting on password resets, allowing attackers to rapidly trigger recovery processes and deny legitimate users access to their accounts through reset exhaustion attacks."
+    },
+
+
+    {
+        "question": "How does password recovery exploitation target insecurely stored credentials?",
+        "type": "<s,*,o>",
+        "first_node": "https://capec.mitre.org/data/definitions/50.html",
+        "relationship": "UCOEXHASRELATEDWEAKNESS",
+        "second_node": "http://purl.org/cyber/uco#CWE-522",
+        "context": "CAPEC-50 (Password Recovery Exploitation) exploits CWE-522 (Insufficiently Protected Credentials) when recovery processes transmit or store authentication credentials using insecure methods susceptible to unauthorized interception, allowing attackers to gain access with original user privileges."
+    },
+    {
+        "question": "What credential protection weakness enables password recovery attacks?",
+        "type": "<s,p,*>",
+        "first_node": "https://capec.mitre.org/data/definitions/50.html",
+        "relationship": "UCOEXHASRELATEDWEAKNESS",
+        "second_node": null,
+        "context": "CAPEC-50 targets CWE-522, exploiting vulnerabilities where authentication credentials are transmitted or stored without adequate protection during recovery operations, making them susceptible to interception by unauthorized parties."
+    },
+    {
+        "question": "Why do insecure credential transmissions expose password recovery processes?",
+        "type": "<s,p,o>",
+        "first_node": "https://capec.mitre.org/data/definitions/50.html",
+        "relationship": "UCOEXHASRELATEDWEAKNESS",
+        "second_node": "http://purl.org/cyber/uco#CWE-522",
+        "context": "The relationship between CAPEC-50 and CWE-522 reveals how attackers intercept credentials during recovery workflows when systems use insecure transmission methods, such as unencrypted channels or inadequate storage protection."
+    },
+
+    {
+        "question": "How does cache data lifting exploit improper register clearing mechanisms?",
+        "type": "<s,*,o>",
+        "first_node": "https://capec.mitre.org/data/definitions/204.html",
+        "relationship": "UCOEXHASRELATEDWEAKNESS",
+        "second_node": "http://purl.org/cyber/uco#CWE-1239",
+        "context": "CAPEC-204 (Lifting Sensitive Data Embedded in Cache) exploits CWE-1239 (Improper Zeroization of Hardware Register) when sensitive information like passwords or encryption keys remain in hardware registers after user context changes, allowing subsequent users to extract previous users' data from uncleared buffers."
+    },
+    {
+        "question": "What hardware weakness enables sensitive data extraction from cached registers?",
+        "type": "<s,p,*>",
+        "first_node": "https://capec.mitre.org/data/definitions/204.html",
+        "relationship": "UCOEXHASRELATEDWEAKNESS",
+        "second_node": null,
+        "context": "CAPEC-204 targets CWE-1239 by exploiting hardware blocks that fail to implement proper zeroization of registers when operating modes change or different entities gain access, leaving sensitive cryptographic material and authentication data vulnerable to extraction."
+    },
+    {
+        "question": "Why does incomplete register zeroization expose cached sensitive information?",
+        "type": "<s,p,o>",
+        "first_node": "https://capec.mitre.org/data/definitions/204.html",
+        "relationship": "UCOEXHASRELATEDWEAKNESS",
+        "second_node": "http://purl.org/cyber/uco#CWE-1239",
+        "context": "The relationship between CAPEC-204 and CWE-1239 reveals how adversaries retrieve sensitive data from application caches when hardware registers storing intermediate values or cryptographic keys are not properly cleared between user sessions or mode transitions."
+    },
+
+
+    {
+        "question": "How does cache data lifting map to local system collection?",
+        "type": "<s,*,o>",
+        "first_node": "https://capec.mitre.org/data/definitions/204.html",
+        "relationship": "UCOEXHASTAXONOMYMAPPING",
+        "second_node": "http://example.com/ucoex#T1005",
+        "context": "CAPEC-204 (Lifting Sensitive Data Embedded in Cache) maps to ATT&CK's Data from Local System technique, demonstrating how adversaries examine application and browser caches as local data sources to retrieve sensitive information before exfiltration, using the same tactical approach documented across both frameworks."
+    },
+    {
+        "question": "Which ATT&CK technique corresponds to sensitive cache examination attacks?",
+        "type": "<s,p,*>",
+        "first_node": "https://capec.mitre.org/data/definitions/204.html",
+        "relationship": "UCOEXHASTAXONOMYMAPPING",
+        "second_node": null,
+        "context": "CAPEC-204 maps to the Data from Local System technique (T1005) in the enterprise-attack domain, showing how cache browsing aligns with adversary collection behaviors that search file systems, configuration files, and local databases for sensitive data prior to exfiltration."
+    },
+    {
+        "question": "Why does cache exploitation align with local data collection techniques?",
+        "type": "<s,p,o>",
+        "first_node": "https://capec.mitre.org/data/definitions/204.html",
+        "relationship": "UCOEXHASTAXONOMYMAPPING",
+        "second_node": "http://example.com/ucoex#T1005",
+        "context": "The taxonomy mapping between CAPEC-204 and ATT&CK T1005 reveals how examining application caches for sensitive information represents a specific instance of adversaries searching local system sources, bridging attack pattern methodology with operational adversary behavior."
+    },
+
+    {
+        "question": "How does Keydnap malware use launch agents for persistence?",
+        "type": "<s,*,o>",
+        "first_node": "http://example.com/ucoex#S0276",
+        "relationship": "UCOEXSOFTWAREUSESTECHNIQUE",
+        "second_node": "http://example.com/ucoex#T1543.001",
+        "context": "Keydnap malware uses the Create or Modify System Process: Launch Agent technique to maintain a permanent backdoor while stealing keychain content. This demonstrates how malware leverages launch agents by placing .plist files in appropriate folders with RunAtLoad or KeepAlive keys set to true, executing malicious payloads repeatedly at user login for persistence in the enterprise-attack domain."
+    },
+    {
+        "question": "Which persistence technique does Keydnap malware employ for backdoor maintenance?",
+        "type": "<s,p,*>",
+        "first_node": "http://example.com/ucoex#S0276",
+        "relationship": "UCOEXSOFTWAREUSESTECHNIQUE",
+        "second_node": null,
+        "context": "Keydnap uses the Create or Modify System Process: Launch Agent technique, installing launch agents that execute at login by modifying property list files in system directories. This allows the malware to repeatedly execute while maintaining persistence and stealing keychain credentials with user-level permissions."
+    },
+    {
+        "question": "Why do keychain-stealing tools leverage launch agent modification techniques?",
+        "type": "<s,p,o>",
+        "first_node": "http://example.com/ucoex#S0276",
+        "relationship": "UCOEXSOFTWAREUSESTECHNIQUE",
+        "second_node": "http://example.com/ucoex#T1543.001",
+        "context": "The relationship between Keydnap and launch agent techniques reveals how adversaries maintain permanent backdoors while exfiltrating sensitive keychain data. By creating launch agents with RunAtLoad keys in user directories, the malware ensures persistent execution across login sessions without requiring elevated privileges."
+    },
+
+
+    {
+        "question": "How does Orangeworm use web protocols to avoid detection?",
+        "type": "<s,*,o>",
+        "first_node": "http://example.com/ucoex#G0071",
+        "relationship": "UCOEXGROUPUSESTECHNIQUE",
+        "second_node": "http://example.com/ucoex#T1071.001",
+        "context": "Orangeworm, a threat group targeting healthcare organizations in the United States, Europe, and Asia since 2015 for corporate espionage, uses Application Layer Protocol: Web Protocols technique. This allows the group to communicate by embedding commands within HTTP/S and WebSocket traffic, blending with normal web traffic to avoid detection and network filtering while maintaining control over compromised systems in the enterprise-attack domain."
+    },
+    {
+        "question": "Which communication technique does Orangeworm employ for command and control?",
+        "type": "<s,p,*>",
+        "first_node": "http://example.com/ucoex#G0071",
+        "relationship": "UCOEXGROUPUSESTECHNIQUE",
+        "second_node": null,
+        "context": "Orangeworm uses the Application Layer Protocol: Web Protocols technique to communicate with compromised healthcare systems. By abusing HTTP/S and WebSocket protocols' numerous fields and headers, the group conceals commands and results within legitimate-looking web traffic, mimicking normal network behavior to evade detection during their espionage operations."
+    },
+    {
+        "question": "Why do healthcare-targeting threat groups leverage web protocol abuse?",
+        "type": "<s,p,o>",
+        "first_node": "http://example.com/ucoex#G0071",
+        "relationship": "UCOEXGROUPUSESTECHNIQUE",
+        "second_node": "http://example.com/ucoex#T1071.001",
+        "context": "The relationship between Orangeworm and web protocol techniques reveals how threat groups conducting corporate espionage in healthcare environments exploit the prevalence of HTTP/S and WebSocket traffic. By embedding commands in protocol fields and headers, they blend malicious communications with expected traffic patterns to avoid network filtering and maintain persistent control."
+    },
+
+
+
+
+    {
+        "question": "How does KV Botnet Activity use non-application protocols for communication?",
+        "type": "<s,*,o>",
+        "first_node": "http://example.com/ucoex#C0035",
+        "relationship": "UCOEXCAMPAIGNUSESTECHNIQUE",
+        "second_node": "http://example.com/ucoex#T1095",
+        "context": "KV Botnet Activity, which exploited end-of-life SOHO equipment from Cisco, NETGEAR, and DrayTek to obfuscate connectivity to critical infrastructure victims including energy and telecommunication companies in Guam, uses Non-Application Layer Protocol technique. This allows the campaign to communicate using protocols like ICMP, UDP, and SOCKS that are less commonly monitored than TCP, helping conceal command and control traffic during operations from October 2022 through January 2024 in the enterprise-attack domain."
+    },
+    {
+        "question": "Which communication technique does KV Botnet employ for infrastructure obfuscation?",
+        "type": "<s,p,*>",
+        "first_node": "http://example.com/ucoex#C0035",
+        "relationship": "UCOEXCAMPAIGNUSESTECHNIQUE",
+        "second_node": null,
+        "context": "KV Botnet Activity uses the Non-Application Layer Protocol technique to leverage network, transport, and session layer protocols for communication. By using protocols like ICMP, UDP, and SOCKS that are not as commonly monitored as standard Internet protocols, the botnet hides communications while targeting critical infrastructure segments, making detection more difficult for defenders."
+    },
+    {
+        "question": "Why do critical infrastructure botnets leverage less-monitored network protocols?",
+        "type": "<s,p,o>",
+        "first_node": "http://example.com/ucoex#C0035",
+        "relationship": "UCOEXCAMPAIGNUSESTECHNIQUE",
+        "second_node": "http://example.com/ucoex#T1095",
+        "context": "The relationship between KV Botnet Activity and non-application layer protocols reveals how campaigns targeting energy and telecommunication infrastructure use ICMP and other OSI non-application protocols to hide command and control communications. These protocols, while required for IP compatibility, receive less monitoring than TCP or UDP, enabling stealthy operations through compromised SOHO devices."
     }
 ]
