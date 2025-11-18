@@ -5,7 +5,8 @@ volumes:
     driver: local
   airflow_logs:
     driver: local
- 
+  ollama_models:
+    driver: local
 networks:
   monitoring:
     driver: bridge
@@ -64,14 +65,34 @@ services:
       - prometheus
     networks:
       - monitoring
-  
-    # deploy:
-    #   resources:
-    #     reservations:
-    #       devices:
-    #         - driver: nvidia
-    #           count: all
-    #           capabilities: [gpu]
+  ollama:
+    build:
+      context: .
+      dockerfile: Dockerfile.ollama
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_models:/root/.ollama
+    networks:
+      - monitoring
+    environment:
+      - OLLAMA_LOG_LEVEL=ERROR
+      - LLAMA_LOG_DISABLE=1
+      - GIN_MODE=release
+      - NVIDIA_VISIBLE_DEVICES=all
+      - NVIDIA_DRIVER_CAPABILITIES=compute,utility
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
   uckg-scripts:
     build: .
     environment:
@@ -79,9 +100,9 @@ services:
       NEO4J_USER: neo4j
       NEO4J_PASSWORD: abcd90909090
       VOL_PATH: /vol/data
-      OLLAMA_URL: http://host.docker.internal:11434
+      OLLAMA_URL: http://ollama:11434
       EMBEDDING_MODEL: nomic-embed-text:latest
-      EMBED_ENV: "false"
+      EMBED_ENV: "true"
       LOG_LEVEL: "INFO"
       EMBEDDING_BATCH_SIZE: "1500"
     volumes:
@@ -93,6 +114,7 @@ services:
       - "8000:8000"
     depends_on:
       - neo4j
+      - ollama
   statsd: # This service is required if we want to scrape metrics from Airflow and disaply them in Prometheus
     image: prom/statsd-exporter
     ports:

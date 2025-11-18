@@ -28,3 +28,6 @@ tenacity>=8.2.0
 # Optional: For better performance and debugging
 python-multipart>=0.0.6
 python-json-logger>=2.0.0
+
+# Text processing and validation
+regex>=2023.0.0

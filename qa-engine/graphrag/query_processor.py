@@ -12,7 +12,7 @@ import os
 from typing import Tuple, Optional, List, Dict, Any
 from dataclasses import dataclass
 from pydantic import BaseModel, Field
-from langchain.prompts import PromptTemplate
+from langchain_core.prompts import PromptTemplate
 from langchain_core.output_parsers import PydanticOutputParser
 from langchain_ollama import ChatOllama
 

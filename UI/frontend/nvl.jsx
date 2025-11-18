@@ -498,7 +498,7 @@ export default function Nvl({ initialNodes = [], initialRels = [], minimal = fal
     }
     
     setChatHistory(prev => [...prev, { type: 'user', text: cypher, queryKey }]);
-    setChatHistory(prev => [...prev, { type: 'answer', text: 'answer' }]);
+    // setChatHistory(prev => [...prev, { type: 'answer', text: 'answer' }]);
   };
 
   // Handle clicking on chat history (user message click)

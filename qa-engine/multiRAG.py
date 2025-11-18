@@ -11,7 +11,7 @@ from neo4j import GraphDatabase
 from neo4j_graphrag.retrievers import VectorCypherRetriever
 from neo4j_graphrag.generation import RagTemplate
 from neo4j_graphrag.embeddings import OllamaEmbeddings
-from langchain.prompts import PromptTemplate
+from langchain_core.prompts import PromptTemplate
 from langchain_ollama import ChatOllama
 from langchain_core.output_parsers import PydanticOutputParser
 

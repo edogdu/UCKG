@@ -14,8 +14,8 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 # Import our Q&A engines
 from graphrag import GraphRAGSimilarity
 
-from text2cypher.backend.text2cypher import Text2Cypher
-from text2cypher.backend.ollama_llm import OllamaLLM
+from text2cypher.core.text2cypher import Text2Cypher
+from text2cypher.llm.ollama_llm import OllamaLLM
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
