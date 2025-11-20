@@ -50,6 +50,36 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from graphrag import GraphRAGSimilarity
 
+def extract_key_entities(sources: List[Dict]) -> List[str]:
+    """Extract unique visited node URIs"""
+    uri_set = set()
+    
+    for source in sources:
+        if isinstance(source, dict) and 'metadata' in source:
+            metadata = source.get("metadata", {})
+            
+            # Primary node
+            primary = metadata.get("primarySource", {})
+            primary_uri = primary.get("allProperties", {}).get("uri")
+            if primary_uri:
+                uri_set.add(primary_uri)
+            
+            # All neighbors (1-hop and 2-hop)
+            neighbors = metadata.get("firstHopNeighbors", [])
+            for neighbor in neighbors:
+                # 1-hop
+                neighbor_uri = neighbor.get("primaryNode", {}).get("allProperties", {}).get("uri")
+                if neighbor_uri:
+                    uri_set.add(neighbor_uri)
+                
+                # 2-hop
+                for second_node in neighbor.get("secondHopNeighbors", []):
+                    second_uri = second_node.get("relatedNode", {}).get("allProperties", {}).get("uri")
+                    if second_uri:
+                        uri_set.add(second_uri)
+    
+    return list(uri_set)
+
 def load_questions_from_file(filepath: str) -> List[Dict[str, Any]]:
     """Load questions from a single JSON file"""
     with open(filepath, 'r') as f:
@@ -130,6 +160,7 @@ def run_question_through_pipeline(rag_engine: GraphRAGSimilarity, question: Dict
             "summary": question.get("context", ""),  # Background context from question file
             "context": result.get("context", ""),  # The exact formatted context passed to LLM
             "response": result.get("answer", ""),  # The final generated answer
+            "key_entities": extract_key_entities(result.get("sources", [])),  # Unique URIs of all visited nodes
             "metadata": {
                 "mode": result.get("mode", "unknown"),
                 "source_file": question.get("source_file", ""),
@@ -142,14 +173,15 @@ def run_question_through_pipeline(rag_engine: GraphRAGSimilarity, question: Dict
                     "third_node": question.get("third_node", ""),
                     "relationship_1": question.get("relationship", question.get("relationship_1", "")),
                     "relationship_2": question.get("relationship_2", ""),
-                    "used_properties": {
-                        "first_node": question.get("used_properties", question.get("used_properties_of_first_node", [])),
-                        "second_node": question.get("used_properties_of_second_node", []),
-                        "third_node": question.get("used_properties_of_third_node", [])
-                    }
+                    # "used_properties": {
+                    #     "first_node": question.get("used_properties", question.get("used_properties_of_first_node", [])),
+                    #     "second_node": question.get("used_properties_of_second_node", []),
+                    #     "third_node": question.get("used_properties_of_third_node", [])
+                    # }
                 },
                 "retrieval_stats": {
                     "num_sources": len(result.get("sources", [])),
+                    "num_key_entities": len(extract_key_entities(result.get("sources", []))),
                     "node_types": result.get("enhanced_metadata", {}).get("node_types", []),
                     "relationship_types": result.get("enhanced_metadata", {}).get("relationship_types", [])
                 }
@@ -165,6 +197,7 @@ def run_question_through_pipeline(rag_engine: GraphRAGSimilarity, question: Dict
             "summary": question.get("context", ""),  # Background context from question file
             "context": "",
             "response": f"ERROR: {str(e)}",
+            "key_entities": [],  # Empty key entities on error
             "metadata": {
                 "mode": "error",
                 "source_file": question.get("source_file", ""),
