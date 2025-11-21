@@ -82,7 +82,7 @@ def extract_key_entities(sources: List[Dict]) -> List[str]:
 
 def load_questions_from_file(filepath: str) -> List[Dict[str, Any]]:
     """Load questions from a single JSON file"""
-    with open(filepath, 'r') as f:
+    with open(filepath, 'r', encoding='utf-8') as f:
         data = json.load(f)
 
     # New format: files are direct arrays (no wrapper object)
@@ -107,11 +107,11 @@ def load_all_questions(testing_dir: str) -> List[Dict[str, Any]]:
     # Load all question files (excluding nodes.json)
     question_files = [
         'questions_0hop.json',
-        'questions_0hop_bunny.json',
+        # 'questions_0hop_bunny.json',
         'questions_1hop.json',
-        'questions_1hop_bunny.json',
-        'questions_2hop.json',
-        'questions_2hop_bunny.json'
+        # 'questions_1hop_bunny.json',
+        'questions_2hop.json'
+        # 'questions_2hop_bunny.json'
     ]
 
     print(f"Loading questions from {testing_dir}")
@@ -272,8 +272,8 @@ def create_evaluation_dataset(
     
     # Save to file
     print(f"Saving dataset to {output_file}...")
-    with open(output_file, 'w') as f:
-        json.dump(dataset, f, indent=2)
+    with open(output_file, 'w', encoding='utf-8') as f:
+        json.dump(dataset, f, indent=2, ensure_ascii=False)
     
     print(f"\n✓ Dataset saved successfully!")
     print(f"  Total samples: {len(samples)}")
