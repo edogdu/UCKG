@@ -1,26 +1,38 @@
+# ============================================================================
 # Core dependencies for multi-eval.py
+# ============================================================================
 numpy>=1.21.0
 nltk>=3.7
 rouge-score>=0.1.2
 bert-score>=0.3.11
 
-# Plotting (optional but recommended for graphs)
-matplotlib>=3.6.0
-seaborn>=0.12.0
-
-# Optional - for QAFactEval factuality checking
-#qafacteval>=0.1.0
-
-# Optional - for DataFrame/tabular output in all-IDs evaluation
+# ============================================================================
+# Required for metric_chart.ipynb (visualization)
+# ============================================================================
 pandas>=1.5.0
+matplotlib>=3.6.0
 
-# Optional - for progress bars during batch evaluation
+# ============================================================================
+# Recommended for multi-eval.py (enhanced functionality)
+# ============================================================================
+# pandas - Required for CSV/JSON export in batch evaluation (--all-ids)
+# tqdm - Enhanced progress bar during batch evaluation
 tqdm>=4.64.0
 
-# Additional setup required after installation:
-# 1. Download NLTK data (if missing):
-#    import nltk
-#    nltk.download('punkt')
+# ============================================================================
+# Optional dependencies
+# ============================================================================
+# seaborn>=0.12.0  # Optional: Enhanced plotting styles (not required)
+# qafacteval>=0.1.0  # Optional: QA-based factual consistency evaluation
+
+# ============================================================================
+# Post-installation setup notes:
+# ============================================================================
+# 1. NLTK data: The script automatically downloads 'punkt_tab' tokenizer on first run
+#    If manual download needed: python -c "import nltk; nltk.download('punkt_tab')"
 #
-# 2. BERTScore downloads model on first run: microsoft/deberta-xlarge-mnli
-# 3. QAFactEval downloads: deepset/roberta-base-squad2 and entailment model above
+# 2. BERTScore: Downloads microsoft/deberta-xlarge-mnli model on first run (~1.5GB)
+#
+# 3. QAFactEval (if enabled): Downloads additional models (~2GB)
+#    - deepset/roberta-base-squad2
+#    - ynie/roberta-large-snli_mnli_fever_anli_R1_R2_R3-nli

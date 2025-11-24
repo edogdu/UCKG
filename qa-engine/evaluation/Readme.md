@@ -1,8 +1,8 @@
-# Multi-Evaluation Tool
+# Multi-Evaluation Toolkit
 
-A comprehensive evaluation tool that assesses summaries against source text using multiple metrics: **ROUGE**, **BLEU**, **BERTScore**, and **QAFactEval**.
+Evaluate summaries against their sources with **ROUGE**, **BLEU**, **BERTScore**, and optional **QAFactEval** factual checks. Batch mode flattens the metrics into CSV/JSON so downstream tooling (like the metric chart notebook) can pick them up immediately.
 
-## Installation
+## Install
 
 ```bash
 cd qa-engine/evaluation
@@ -12,77 +12,58 @@ pip install -r requirements.txt
 ## Quick Start
 
 ```bash
-# List available sample IDs in the dataset
+# 1. Inspect dataset coverage
 python multi-eval.py --list-ids
 
-# Evaluate a specific sample by ID
+# 2. Inspect a single sample (default dataset)
 python multi-eval.py --id 1
 
-# Evaluate ALL samples and save to CSV (with progress bar)
-python multi-eval.py --all-ids --save-csv results.csv
-
-# Evaluate ALL samples and save to JSON
+# 3. Evaluate every sample and save metrics
+python multi-eval.py --all-ids --save-csv new_result.csv
+# (optional) Also emit JSON
 python multi-eval.py --all-ids --save-json results.json
 
-# Manual evaluation with text files
+# 4. Manually score ad-hoc text files
 python multi-eval.py --source-file source.txt --summary-file summary.txt
 ```
 
-## Usage
+## Usage Patterns
 
-### Method 1: Explore Dataset
-
-List all available samples in the dataset:
+### 1. Explore datasets
 
 ```bash
-# List IDs from default dataset
 python multi-eval.py --list-ids
-
-# List IDs from custom dataset
 python multi-eval.py --list-ids --dataset path/to/dataset.json
 ```
 
-This displays:
-- Total number of questions
-- Generation date and pipeline info
-- All available sample IDs
-- ID range (min-max)
+You will see overall dataset metadata, available IDs, and ID ranges.
 
-### Method 2: Evaluate from Dataset (Recommended)  
-
-Evaluate a specific sample from the evaluation dataset by ID:
+### 2. Evaluate dataset samples (recommended)
 
 ```bash
-# Use default dataset (evaluation_dataset.json in same directory)
+# Default dataset in this directory
 python multi-eval.py --id 1
 
-# Specify custom dataset path
-python multi-eval.py --id 5 --dataset path/to/evaluation_dataset.json
-
-# Disable plots
-python multi-eval.py --id 1 --no-plots
-
-# Custom title for plots
-python multi-eval.py --id 1 --title "Evaluation Results"
+# Custom dataset path
+python multi-eval.py --id 42 --dataset path/to/evaluation_dataset.json
 ```
 
-This mode automatically extracts:
-- **Question**: The question being asked
-- **Summary**: The source/reference text (from `summary` field)
-- **Response**: The generated response (from `response` field)
-- **Metadata**: ID, question type, hop count, node information, etc.
+This prints the question metadata plus all metric scores for the requested sample.
 
-### Method 3: Manual Text/Files
+### 3. Batch mode for dashboards/analysis
 
 ```bash
-# Using text arguments
+python multi-eval.py --all-ids --save-csv new_result.csv
+python multi-eval.py --all-ids --save-json results.json  # optional
+```
+
+Batch mode runs through the entire dataset with a progress bar and writes flattened metrics. The resulting `new_result.csv` is what `metric_chart.ipynb` expects by default.
+
+### 4. Manual (non-dataset) evaluation
+
+```bash
 python multi-eval.py --source-text "..." --summary-text "..."
-
-# Using files
 python multi-eval.py --source-file source.txt --summary-file summary.txt
-
-# Disable plots
-python multi-eval.py --source-file source.txt --summary-file summary.txt --no-plots
 ```
 
 ## Arguments
@@ -92,18 +73,16 @@ python multi-eval.py --source-file source.txt --summary-file summary.txt --no-pl
 - `--summary-text`: Summary text as string
 - `--source-file`: Path to source text file
 - `--summary-file`: Path to summary text file
-- `--no-plots`: Disable visualization plots
-- `--title`: Custom title for plots (default: "Evaluation")
 
 ### Dataset Mode
-- `--id`: Sample ID from evaluation dataset (enables dataset mode)
-- `--dataset`: Path to evaluation dataset JSON file (default: `evaluation_dataset.json`)
-- `--list-ids`: List all available sample IDs in the dataset
-- `--all-ids`: Evaluate all samples in the dataset (with progress bar)
-- `--save-csv`: Path to save CSV results when using `--all-ids`
-- `--save-json`: Path to save JSON results when using `--all-ids`
+- `--id`: Sample ID from evaluation dataset
+- `--dataset`: Path to evaluation dataset JSON file (default `evaluation_dataset.json`)
+- `--list-ids`: List all available sample IDs
+- `--all-ids`: Evaluate every sample in the dataset
+- `--save-csv`: Path to save CSV results in `--all-ids` mode
+- `--save-json`: Path to save JSON results in `--all-ids` mode
 
-## Output
+## Outputs
 
 ### Single Sample Evaluation (--id or manual mode)
 
@@ -176,6 +155,27 @@ Evaluating: 100%|████████████████| 1000/1000 [05
 Saved CSV: results.csv
 ```
 
+## Metric Chart Notebook
+
+Once `new_result.csv` exists you can produce metric breakdown visuals without touching the Python script.
+
+1. Make sure `new_result.csv` (or another CSV produced by `--all-ids`) lives beside the notebook.  
+   ```bash
+   python multi-eval.py --all-ids --save-csv new_result.csv
+   ```
+2. Install the visualization extras if they are not already present:
+   ```bash
+   pip install pandas matplotlib seaborn numpy
+   ```
+3. Launch Jupyter (or VS Code / Cursor notebook support) and open `metric_chart.ipynb`.
+4. The first cell defines `RESULT_CSV`—point it to another file if needed, then run the notebook sequentially. It will:
+   - Load and validate the CSV
+   - Tag samples into Types 0/1/2 (IDs 1–50/51–100/101–150 by default)
+   - Compute mean ROUGE/BLEU/BERTScore per type
+   - Render horizontal bar charts plus a combined comparison chart
+
+The notebook saves no artifacts today, but you can adapt the plotting cells to export PNGs if required.
+
 ## Features
 
 ### Metrics Supported
@@ -213,8 +213,8 @@ Saved CSV: results.csv
 ### Optional Dependencies
 - `pandas>=1.5.0` (for CSV/JSON export)
 - `tqdm>=4.64.0` (for enhanced progress bar)
-- `matplotlib>=3.6.0` and `seaborn>=0.12.0` (for plots, currently disabled)
 - `qafacteval>=0.1.0` (for factual consistency evaluation)
+- Visualization stack (`matplotlib`, `seaborn`, `numpy`) for `metric_chart.ipynb`
 
 ## Notes
 
@@ -223,3 +223,4 @@ Saved CSV: results.csv
 - QAFactEval downloads additional models (~2GB) if enabled
 - Batch evaluation results are saved to CSV/JSON without printing large tables to console
 - Progress bar uses ANSI color codes for terminal compatibility (works on Windows, Linux, macOS)
+- Visualization now lives solely in `metric_chart.ipynb`, keeping the CLI script fast and dependency-light

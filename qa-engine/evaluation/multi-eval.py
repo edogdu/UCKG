@@ -4,18 +4,9 @@ from rouge_score import rouge_scorer
 from bert_score import score as bert_score
 import argparse
 import sys
-import warnings
 import json
 import os
 from typing import List, Dict, Any
-
-# Optional plotting
-try:
-    import matplotlib.pyplot as plt
-    import seaborn as sns
-    _PLOTTING_AVAILABLE = True
-except Exception:
-    _PLOTTING_AVAILABLE = False
 
 # Optional QA factuality
 try:
@@ -189,47 +180,6 @@ def _print_scores(results):
             print("QAFactEval:", qafe.get('error', 'Unavailable'))
 
 
-def _display_plots(results, title_prefix="Evaluation"):
-    if not _PLOTTING_AVAILABLE:
-        warnings.warn("Plotting libraries are not available. Install matplotlib and seaborn to enable plots.")
-        return
-    metrics = results.get('metrics', {})
-
-    # Bar charts for ROUGE and BLEU and BERTScore
-    rouge = metrics.get('rouge', {})
-    if isinstance(rouge, dict) and 'rouge1' in rouge:
-        plt.figure(figsize=(6, 4))
-        vals = [rouge['rouge1']['f1'], rouge['rouge2']['f1'], rouge['rougeLsum']['f1']]
-        sns.barplot(x=['ROUGE-1', 'ROUGE-2', 'ROUGE-Lsum'], y=vals)
-        plt.ylim(0, 1)
-        plt.title(f"{title_prefix}: ROUGE F1")
-        plt.tight_layout()
-
-    bleu = metrics.get('bleu', {})
-    if isinstance(bleu, dict) and 'bleu4' in bleu:
-        plt.figure(figsize=(6, 4))
-        vals = [bleu['bleu1'], bleu['bleu2'], bleu['bleu3'], bleu['bleu4']]
-        sns.barplot(x=['BLEU-1', 'BLEU-2', 'BLEU-3', 'BLEU-4'], y=vals)
-        plt.ylim(0, 1)
-        plt.title(f"{title_prefix}: BLEU Scores")
-        plt.tight_layout()
-
-    berts = metrics.get('bertscore', {})
-    if isinstance(berts, dict) and 'f1' in berts:
-        plt.figure(figsize=(6, 4))
-        vals = [berts['precision'], berts['recall'], berts['f1']]
-        sns.barplot(x=['Precision', 'Recall', 'F1'], y=vals)
-        plt.ylim(0, 1)
-        plt.title(f"{title_prefix}: BERTScore")
-        plt.tight_layout()
-
-    try:
-        plt.show(block=False)  # Non-blocking for headless environments
-    except Exception:
-        plt.savefig('evaluation_plots.png', dpi=150, bbox_inches='tight')
-        print("Note: Plots saved to evaluation_plots.png (use --no-plots to disable)")
-
-
 def _read_text_from_arg_or_file(arg_text: str, arg_file: str, label: str) -> str:
     if arg_text:
         return arg_text
@@ -363,9 +313,6 @@ def main():
     parser.add_argument('--summary-text', type=str, default=None, help='Summary text string')
     parser.add_argument('--source-file', type=str, default=None, help='Path to a file containing the source text')
     parser.add_argument('--summary-file', type=str, default=None, help='Path to a file containing the summary text')
-    parser.add_argument('--no-plots', action='store_true', help='Disable plots even if libraries are available')
-    parser.add_argument('--title', type=str, default='Evaluation', help='Title prefix for plots')
-    
     # Dataset mode arguments
     parser.add_argument('--id', type=int, default=None, help='Sample ID from evaluation dataset')
     parser.add_argument('--dataset', type=str, default='evaluation_dataset.json', 
@@ -491,8 +438,6 @@ def main():
             print("Error: Missing context or response in sample.")
             sys.exit(1)
         
-        if args.title == 'Evaluation':
-            args.title = f"Sample ID {args.id}"
     else:
         # Standard mode: read from args/files
         source_text = _read_text_from_arg_or_file(args.source_text, args.source_file, 'source-text')
@@ -501,10 +446,6 @@ def main():
     evaluator = SummaryEvaluator()
     results = evaluator.evaluate_summary(source_text, summary_text)
     _print_scores(results)
-
-    #if not args.no_plots:
-     #   _display_plots(results, title_prefix=args.title)
-
 
 if __name__ == "__main__":
     main()
