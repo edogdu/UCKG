@@ -27,6 +27,95 @@ This guide covers setting up and running the complete UCKG Q&A system including:
                     └─────────────────────────┘
 ```
 
+##  File Structure
+
+```
+qa-engine/
+├── main.py                          # FastAPI server - unified entry point
+├── multiRAG.py                      # Alternative multi-mode RAG system
+├── requirements.txt                 # Python dependencies
+├── README.md                        # This file
+│
+├── graphrag/                        # GraphRAG Pipeline
+│   ├── __init__.py                 # Clean exports
+│   ├── pipeline.py                 # Main orchestrator - 4-stage pipeline
+│   ├── query_processor.py          # Stage 0: Hop selection, relationship prediction
+│   ├── retrieval.py                # Stage 1-2: Semantic search + graph traversal
+│   ├── reranking.py                # Stage 3: Neighbor-aware scoring
+│   ├── generation.py               # Stage 4: Context formatting + LLM generation
+│   ├── utils.py                    # Configuration, enums, helper functions
+│   └── README.md                   # GraphRAG documentation
+│
+├── text2cypher/                     # Text-to-Cypher System
+│   ├── main.py                     # T2C FastAPI server
+│   ├── config.py                   # Configuration and semantics
+│   ├── requirements.txt            # T2C-specific dependencies
+│   ├── README.md                   # T2C documentation
+│   │
+│   ├── core/                       # Core T2C pipelines
+│   │   ├── text2cypher.py         # Full schema pipeline
+│   │   ├── t2css_pipeline.py      # Semantic schema filtering (T2CSS)
+│   │   ├── t2css_integration.py   # Integration wrapper
+│   │   └── dynamic_rules.py       # Dynamic rule generation
+│   │
+│   ├── llm/                        # LLM integrations
+│   │   ├── ollama_llm.py          # Ollama interface
+│   │   └── gemma_llm.py           # Gemma model support
+│   │
+│   ├── validation/                 # Cypher query validation
+│   │   ├── noexec_validator.py    # Pre-execution validation
+│   │   └── utils/                 # Validation utilities
+│   │
+│   ├── memory/                     # Conversation memory
+│   │   ├── chat_memory.py         # Chat history storage
+│   │   └── chat_types.py          # Type definitions
+│   │
+│   ├── evaluation/                 # Evaluation framework
+│   │   ├── evaluate_models.py     # Multi-metric evaluation
+│   │   └── results_analysis.ipynb # Results visualization
+│   │
+│   ├── dataset/                    # Evaluation datasets
+│   │   └── technical_dataset_COMPLETION.csv  # 388 questions
+│   │
+│   └── configt2c/                  # T2C configuration
+│       ├── fewshot_candidates.json
+│       └── semantic_schema_uckg.json
+│
+├── dataset/                         # Dataset Generation
+│   ├── create_evaluation_dataset.py # Generate eval datasets from pipeline
+│   ├── evaluate_coverage.py        # Coverage analysis
+│   ├── evaluation_dataset.json     # Generated evaluation data
+│   └── README.md                   # Dataset documentation
+│
+├── evaluation/                      # Evaluation Framework
+│   ├── multi-eval.py               # Multi-metric evaluation script
+│   ├── metric_chart.ipynb          # Visualization notebook
+│   ├── requirements.txt            # Evaluation dependencies
+│   ├── new_result.csv              # Evaluation results
+│   └── README.md                   # Evaluation documentation
+│
+└── shared/                          # Shared Utilities
+    ├── schema_extract.py           # Neo4j schema extraction
+    ├── run_schema_extraction.py    # Schema extraction runner
+    ├── schema_cache.txt            # Cached schema (used by T2C)
+    ├── README.md                   # Shared module documentation
+    └── question_set/               # Question datasets
+        ├── questions_0hop.json     # 0-hop questions (9)
+        ├── questions_1hop.json     # 1-hop questions (25)
+        └── questions_2hop.json     # 2-hop questions (25)
+```
+
+### Component Overview
+
+| Component | Purpose | Key Files |
+|-----------|---------|-----------|
+| **main.py** | FastAPI server exposing GraphRAG and Text2Cypher APIs | `main.py` |
+| **graphrag/** | Semantic search + graph traversal + LLM generation | `pipeline.py`, `retrieval.py` |
+| **text2cypher/** | Natural language → Cypher query generation | `core/text2cypher.py`, `core/t2css_pipeline.py` |
+| **dataset/** | Evaluation dataset generation from GraphRAG pipeline | `create_evaluation_dataset.py` |
+| **evaluation/** | Multi-metric evaluation (ROUGE, BLEU, BERTScore) | `multi-eval.py`, `metric_chart.ipynb` |
+| **shared/** | Schema extraction and question datasets | `schema_extract.py`, `question_set/` |
+
 ##  Prerequisites
 
 ### Required Software

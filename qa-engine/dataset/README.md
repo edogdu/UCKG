@@ -10,6 +10,72 @@ Processes questions through the complete 4-stage GraphRAG pipeline and captures:
 - **Response**: Generated natural language answer
 - **Metadata**: Mode, hop count, question type, node types, relationships, used properties, retrieval statistics
 
+## File Structure
+
+```
+qa-engine/
+├── dataset/                              # Dataset Generation Module
+│   ├── README.md                        # This file
+│   ├── create_evaluation_dataset.py     # Main dataset generator script
+│   ├── evaluate_coverage.py             # Coverage analysis tool
+│   ├── evaluation_dataset.json          # Generated output (129 samples)
+│   └── evaluation_dataset.json.txt      # Text backup
+│
+└── shared/                               # Input Question Files
+    └── question_set/                    # Question datasets by hop type
+        ├── README.md                    # Question set documentation
+        ├── questions_0hop.json          # 9 single-node questions
+        ├── questions_1hop.json          # 25 one-hop questions
+        ├── questions_2hop.json          # 25 two-hop questions
+        ├── questions_0hop_bunny.json    # Alternative 0-hop set
+        ├── questions_1hop_bunny.json    # Alternative 1-hop set
+        ├── questions_2hop_bunny.json    # Alternative 2-hop set
+        ├── getNodes.py                  # Node extraction utility
+        ├── nodes.json                   # Extracted node data
+        ├── generate_questions.py        # Question generation script
+        ├── subgraph_description.py      # Subgraph analysis
+        ├── subgraph_description.txt     # Generated descriptions
+        └── semantic_descriptions.txt    # Semantic metadata
+```
+
+### Key Files
+
+| File | Purpose | Input/Output |
+|------|---------|--------------|
+| `create_evaluation_dataset.py` | Main script - processes questions through GraphRAG pipeline | Input: `questions_*.json` → Output: `evaluation_dataset.json` |
+| `evaluate_coverage.py` | Analyzes dataset coverage and statistics | Input: `evaluation_dataset.json` → Output: Coverage report |
+| `evaluation_dataset.json` | Generated dataset with questions, contexts, and responses | 129 samples (9 + 25 + 25 from 0/1/2-hop questions) |
+| `shared/question_set/questions_0hop.json` | Single-node questions (no graph traversal) | 9 questions answerable from one node |
+| `shared/question_set/questions_1hop.json` | One-hop questions (one relationship) | 25 questions requiring 1 graph traversal |
+| `shared/question_set/questions_2hop.json` | Two-hop questions (two relationships) | 25 questions requiring 2 graph traversals |
+
+### Data Flow
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                    Dataset Generation Pipeline                  │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                 │
+│  shared/question_set/                                           │
+│  ├── questions_0hop.json  ──┐                                   │
+│  ├── questions_1hop.json  ──┼──► create_evaluation_dataset.py   │
+│  └── questions_2hop.json  ──┘            │                      │
+│                                          │                      │
+│                              ┌───────────▼──────────┐           │
+│                              │  GraphRAG Pipeline   │           │
+│                              │  (4-stage processing)│           │
+│                              └───────────┬──────────┘           │
+│                                          │                      │
+│                              ┌───────────▼──────────┐           │
+│                              │ evaluation_dataset.  │           │
+│                              │        json          │           │
+│                              │  (129 samples with   │           │
+│                              │  context + responses)│           │
+│                              └──────────────────────┘           │
+│                                                                 │
+└─────────────────────────────────────────────────────────────────┘
+```
+
 ## Quick Start
 
 ```bash
