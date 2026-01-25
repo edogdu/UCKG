@@ -18,11 +18,13 @@ from typing import List, Dict, Tuple, Optional
 from dataclasses import dataclass
 from pathlib import Path
 
-# Import unified embeddings
-from embeddings import OllamaEmbeddings, batch_cosine_similarity
-
-# Import dynamic rule selection
-from dynamic_rules import select_rules_for_intent, GLOBAL_RULES
+# Import unified embeddings (support package + direct script usage)
+try:
+    from .embeddings import OllamaEmbeddings, batch_cosine_similarity
+    from .dynamic_rules import select_rules_for_intent, GLOBAL_RULES
+except ImportError:
+    from embeddings import OllamaEmbeddings, batch_cosine_similarity
+    from dynamic_rules import select_rules_for_intent, GLOBAL_RULES
 
 
 # --- Data Classes ---
@@ -34,12 +36,165 @@ class FewShotExample:
     cypher: str
 
 
+# --- Embedding Corpus Builder / Rendering ---
+
+def _safe_join(items: List[str], sep: str = "|") -> str:
+    return sep.join([str(x) for x in items if x is not None and str(x).strip()])
+
+
+def build_embedding_corpus(semantic_schema: Dict) -> List[str]:
+    """
+    Build a high-signal embedding corpus from the semantic schema structure.
+
+    Why:
+      - Retrieval is ONLY run over `embedding_corpus` strings.
+      - Descriptions/definitions are only useful if they affect retrieval OR are rendered for retrieved items.
+
+    Strategy:
+      - Emit structured, single-line "facts" that include BOTH:
+        (a) semantic meaning (natural language) and
+        (b) physical Neo4j tokens (labels/relationship types/properties) that must be copied verbatim.
+    """
+    corpus: List[str] = []
+
+    # Classes (node types)
+    for c in semantic_schema.get("classes", []):
+        sem = c.get("semantic")
+        phys = c.get("physical_labels", []) or []
+        desc = c.get("description", "")
+        corpus.append(
+            f"CLS|{sem}|labels={_safe_join(phys)}|{desc}".strip()
+        )
+
+    # Relationships (object properties)
+    for p in semantic_schema.get("object_properties", []):
+        sem = p.get("semantic")
+        dom = p.get("domain")
+        rng = p.get("range")
+        phys = p.get("physical_rel")
+        desc = p.get("description", "")
+        corpus.append(
+            f"REL|{sem}|{dom}->{rng}|type={phys}|{desc}".strip()
+        )
+
+    # Properties (data properties)
+    # We expect entries like: "cveId: label — CVE identifier string ..."
+    data_props = semantic_schema.get("data_properties", {}) or {}
+    for sem_class, prop_lines in data_props.items():
+        for line in (prop_lines or []):
+            # Split only on the first ":" to capture "key: rest..."
+            key = None
+            rest = str(line).strip()
+            if ":" in rest:
+                key, rest = rest.split(":", 1)
+                key = key.strip()
+                rest = rest.strip()
+            # Try to extract physical token(s) before a dash if present
+            corpus.append(
+                f"PROP|{sem_class}|{key or 'property'}|{rest}".strip()
+            )
+
+    # A few generic "pattern hints" that tend to align with question phrasing
+    corpus.extend([
+        "PATTERN|aggregation|count/how many/number of -> RETURN count(...) AS ...",
+        "PATTERN|ranking|top/most/least/highest/lowest -> ORDER BY ... DESC LIMIT N",
+        "PATTERN|filtering|severity/date/score/name/id -> WHERE with correct property + toFloat() if needed",
+        "PATTERN|traversal|uses/mitigates/attributed to/related -> MATCH (a)-[:REL]->(b)",
+        "PATTERN|paths|shortest path/connected/hops -> shortestPath((a)-[:REL*..]-(b))",
+        "PATTERN|hardest-to-exploit/most exploitable|use CVE.ucoexploitabilityScore (ORDER BY ASC/DESC)",
+        "PATTERN|impact score|use CVE.ucoimpactScore with toFloat() comparisons",
+        "PATTERN|severity|use CVE.ucobaseSeverity or Vulnerability.ucobaseSeverity",
+        "PATTERN|ttp/technique|use Technique (UcoexMITREATTACK) with ucoexNAME",
+        "PATTERN|cve id|use CVE (UcoCVE) with label property"
+    ])
+
+    # Preserve any manually curated corpus lines (if present), but de-dup
+    manual = semantic_schema.get("embedding_corpus", []) or []
+    # Put manual lines last so they can complement the structured ones
+    combined = corpus + [str(x) for x in manual]
+    seen = set()
+    deduped: List[str] = []
+    for s in combined:
+        s2 = str(s).strip()
+        if not s2 or s2 in seen:
+            continue
+        seen.add(s2)
+        deduped.append(s2)
+    return deduped
+
+
+def render_schema_line(line: str, label_map: Dict, rel_map: Dict) -> str:
+    """
+    Render a corpus line for the prompt.
+    Supports structured prefixes (CLS|, REL|, PROP|, PATTERN|) and falls back
+    to the older bilingual rendering for legacy corpus lines.
+    """
+    s = (line or "").strip()
+    if s.startswith("CLS|"):
+        # CLS|CVE|labels=UcoCVE|desc...
+        parts = s.split("|", 3)
+        sem = parts[1] if len(parts) > 1 else "Class"
+        labels = ""
+        desc = ""
+        if len(parts) > 2 and parts[2].startswith("labels="):
+            labels = parts[2].replace("labels=", "", 1)
+        if len(parts) > 3:
+            desc = parts[3].strip()
+        sem_fmt = format_labels(sem, label_map)
+        base = f"{sem_fmt}"
+        if desc:
+            base += f" — {desc}"
+        if labels:
+            base += f" [labels: {labels}]"
+        return base
+
+    if s.startswith("REL|"):
+        # REL|hasCPE|CVE->CPE|type=UCOEXHASCPE|desc...
+        parts = s.split("|", 4)
+        sem = parts[1] if len(parts) > 1 else "rel"
+        dom_rng = parts[2] if len(parts) > 2 else ""
+        typ = parts[3].replace("type=", "", 1) if len(parts) > 3 else rel_map.get(sem, sem)
+        desc = parts[4].strip() if len(parts) > 4 else ""
+        dom = dom_rng.split("->")[0] if "->" in dom_rng else ""
+        rng = dom_rng.split("->")[1] if "->" in dom_rng else ""
+        dom_fmt = format_labels(dom, label_map) if dom else dom
+        rng_fmt = format_labels(rng, label_map) if rng else rng
+        base = f"{dom_fmt} -[:{typ}]-> {rng_fmt}"
+        if desc:
+            base += f" — {desc}"
+        return base
+
+    if s.startswith("PROP|"):
+        # PROP|CVE|cveId|label — ...
+        parts = s.split("|", 3)
+        sem_class = parts[1] if len(parts) > 1 else "Class"
+        prop_key = parts[2] if len(parts) > 2 else "property"
+        rest = parts[3].strip() if len(parts) > 3 else ""
+        sem_fmt = format_labels(sem_class, label_map)
+        # Try to map the semantic prop to physical tokens using PROP_MAP if possible
+        physical_props = PROP_MAP.get(sem_class, {}).get(prop_key, [])
+        phys_str = f" [{', '.join(physical_props)}]" if physical_props else ""
+        if rest:
+            return f"{sem_fmt} has property {prop_key}{phys_str} — {rest}"
+        return f"{sem_fmt} has property {prop_key}{phys_str}"
+
+    if s.startswith("PATTERN|"):
+        # Keep pattern hints short
+        return s.replace("PATTERN|", "Hint: ", 1)
+
+    # Legacy corpus format fallback
+    return bilingualize_line(s, label_map, rel_map)
+
+
 # --- Load Semantic Schema ---
 
 def load_semantic_schema(path: str = None) -> Dict:
     """Load semantic schema JSON configuration"""
     if path is None:
-        path = Path(__file__).parent.parent / 'configt2c' / 'semantic_schema_uckg.json'
+        # Prefer the richer high-level semantic schema (v2) if present.
+        # This file is designed to mirror `qa-engine/shared/schema_cache.txt` while adding
+        # human-friendly descriptions and a stronger embedding corpus.
+        path = Path(__file__).parent.parent / 'configt2c' / 'semantic_schema_uckg_v2.json'
     
     with open(path, "r") as f:
         return json.load(f)
@@ -245,31 +400,93 @@ def retrieve_semantic_slice(
 
 # Property mapping (semantic → physical)
 PROP_MAP = {
-    "Vulnerability": {
-        "cveId": ["label", "cveId"],
+    # Note: PROP_MAP is used only for bilingual property rendering. It is intentionally
+    # a pragmatic mapping to common property names seen in questions/prompts.
+    "CVE": {
+        "cveId": ["label"],
         "baseSeverity": ["ucobaseSeverity"],
         "exploitabilityScore": ["ucoexploitabilityScore"],
         "impactScore": ["ucoimpactScore"],
+        "vectorString": ["ucovectorString"],
+        "vulnStatus": ["ucovulnStatus"],
+        "uri": ["uri"]
+    },
+    "Vulnerability": {
         "publishedDate": ["ucopublishedDateTime"],
         "lastModifiedDate": ["ucolastModifiedDateTime"],
-        "vulnStatus": ["ucovulnStatus"]
+        "summary": ["ucosummary"],
+        "uri": ["uri"]
     },
     "Weakness": {
         "cweId": ["ucocweID"],
-        "cweName": ["ucocweName"]
+        "cweName": ["ucocweName"],
+        "summary": ["ucocweSummary"],
+        "description": ["ucodescription"],
+        "likelihoodOfExploit": ["ucolikelihoodOfExploit"],
+        "status": ["ucostatus"],
+        "uri": ["uri"]
     },
     "AttackPattern": {
         "capecId": ["ucoexCAPEC_id"],
-        "capecName": ["ucoexCAPEC_name"]
+        "capecName": ["ucoexCAPEC_name"],
+        "severity": ["ucoexSeverity"],
+        "likelihood": ["ucoexLikelihood"],
+        "uri": ["uri"]
     },
     "Technique": {
+        "name": ["ucoexNAME"],
+        "description": ["ucoexDESCRIPTION"],
+        "domain": ["ucoexDOMAIN"],
+        "url": ["ucoexURL"],
+        "uri": ["uri"],
+        # Back-compat aliases (older prompts)
         "techniqueId": ["ucoexNAME"],
         "techniqueName": ["ucoexNAME"]
     },
-    "Campaign": {"name": ["ucoexNAME"]},
-    "Group": {"name": ["ucoexNAME"]},
-    "Software": {"name": ["ucoexNAME"]},
-    "CPE": {"cpeName": ["cpeName"]}
+    "Campaign": {
+        "name": ["ucoexNAME"],
+        "description": ["ucoexDESCRIPTION"],
+        "domain": ["ucoexDOMAIN"],
+        "url": ["ucoexURL"],
+        "uri": ["uri"]
+    },
+    "Group": {
+        "name": ["ucoexNAME"],
+        "description": ["ucoexDESCRIPTION"],
+        "domain": ["ucoexDOMAIN"],
+        "url": ["ucoexURL"],
+        "uri": ["uri"]
+    },
+    "Software": {
+        "name": ["ucoexNAME"],
+        "description": ["ucoexDESCRIPTION"],
+        "domain": ["ucoexDOMAIN"],
+        "url": ["ucoexURL"],
+        "uri": ["uri"]
+    },
+    "Mitigation": {
+        "name": ["ucoexNAME"],
+        "description": ["ucoexDESCRIPTION"],
+        "domain": ["ucoexDOMAIN"],
+        "url": ["ucoexURL"],
+        "uri": ["uri"]
+    },
+    "D3FENDControl": {
+        "label": ["ucoexMITRED3FEND_LABEL"],
+        "definition": ["ucoexMITRED3FEND_DEFINITION"],
+        "uri": ["uri"]
+    },
+    "ObservedExample": {
+        "description": ["ucoexDESCRIPTION"],
+        "uri": ["uri"]
+    },
+    "CPE": {
+        "cpeName": ["cpeName"],
+        "cpeNameId": ["cpeNameId"],
+        "lastModified": ["lastModified"],
+        "titles": ["titles"],
+        "uri": ["uri"]
+    }
 }
 
 
@@ -537,7 +754,10 @@ class EnhancedT2CSSPipeline:
         self.fewshot_k = fewshot_k
         
         # Pre-compute schema embeddings
-        self.corpus_lines = self.semantic_schema["embedding_corpus"]
+        # IMPORTANT: retrieval is run ONLY over these strings, so we auto-build a
+        # structured corpus from the schema (classes/rels/props/descriptions) and
+        # merge it with any manually curated entries.
+        self.corpus_lines = build_embedding_corpus(self.semantic_schema)
         self.corpus_embeddings = self.embedder.encode(
             self.corpus_lines,
             normalize_embeddings=True
@@ -629,11 +849,10 @@ class EnhancedT2CSSPipeline:
         )
         
         # Step 5: Bilingualize schema
-        bilingual_schema = bilingualize_slice(
-            relevant_schema,
-            self.label_map,
-            self.rel_map
-        )
+        bilingual_schema = [
+            render_schema_line(line, self.label_map, self.rel_map)
+            for line in relevant_schema
+        ]
         
         # Step 6: Get clause scaffold (same intent used for rules)
         scaffold = clause_scaffold(intent)

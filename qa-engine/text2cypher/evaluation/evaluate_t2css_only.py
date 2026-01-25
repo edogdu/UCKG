@@ -39,7 +39,7 @@ from noexec_validator import validate_cypher_noexec
 # ========== CONFIGURATION ==========
 
 # Dataset path - UPDATE THIS if using a different dataset
-CSV_PATH = Path(__file__).resolve().parent.parent / "dataset" / "technical_dataset_Second_COMPLETION.csv"
+CSV_PATH = Path(__file__).resolve().parent.parent / "dataset" / "technical_dataset_COMPLETION_clean.csv"
 
 # Output path - results will be saved here
 OUTPUT_CSV = Path(__file__).resolve().parent / "results_t2css_enhanced.csv"
@@ -51,7 +51,7 @@ NEO4J_USER = "neo4j"
 NEO4J_PASS = "abcd90909090"
 
 # Model configuration
-MODEL_NAME = "llama3:instruct"  # Ollama model to use
+MODEL_NAME = "llama3.1:70b"  # Ollama model to use
 TOP_K_SCHEMA = 10  # Number of schema elements to retrieve
 FEWSHOT_K = 5  # Number of few-shot examples
 

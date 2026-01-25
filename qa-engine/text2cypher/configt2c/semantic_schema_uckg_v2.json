@@ -1,0 +1,330 @@
+{
+  "version": "v2",
+  "source_physical_schema": "qa-engine/shared/schema_cache.txt",
+  "notes": "High-level semantic schema for UCKG used by Enhanced T2CSS. Includes richer descriptions and expanded embedding corpus while preserving semantic→physical mappings.",
+  "classes": [
+    {
+      "semantic": "CVE",
+      "physical_labels": ["UcoCVE"],
+      "description": "A Common Vulnerabilities and Exposures (CVE) entry representing a specific disclosed vulnerability identifier and associated scoring/status metadata."
+    },
+    {
+      "semantic": "Vulnerability",
+      "physical_labels": ["UcoVulnerability"],
+      "description": "A vulnerability concept node (may link to a CVE identifier node). Often carries dates/summary and connects to exploit targets."
+    },
+    {
+      "semantic": "Weakness",
+      "physical_labels": ["UcoCWE"],
+      "description": "A Common Weakness Enumeration (CWE) entry describing a weakness class with rich descriptive fields and references."
+    },
+    {
+      "semantic": "ExploitTarget",
+      "physical_labels": ["UcoExploitTarget"],
+      "description": "An exploit target abstraction used to connect weaknesses (CWE) and vulnerabilities (UcoVulnerability)."
+    },
+    {
+      "semantic": "Campaign",
+      "physical_labels": ["UcoexCAMPAIGNS"],
+      "description": "A threat campaign (MITRE ATT&CK). Describes coordinated malicious activity and can be attributed to groups and linked to techniques/software."
+    },
+    {
+      "semantic": "Group",
+      "physical_labels": ["UcoexGROUPS"],
+      "description": "A threat actor group (MITRE ATT&CK) that can be attributed campaigns and can use techniques and software."
+    },
+    {
+      "semantic": "Technique",
+      "physical_labels": ["UcoexMITREATTACK"],
+      "description": "A MITRE ATT&CK technique node (Txxxx / sub-techniques) describing adversary behaviors."
+    },
+    {
+      "semantic": "Tactic",
+      "physical_labels": ["UcoexTACTICS"],
+      "description": "A MITRE ATT&CK tactic node describing the adversary objective/phase."
+    },
+    {
+      "semantic": "Software",
+      "physical_labels": ["UcoexSOFTWARE"],
+      "description": "Software used by threat groups/campaigns (tools, malware). Can be linked to techniques it uses."
+    },
+    {
+      "semantic": "Mitigation",
+      "physical_labels": ["UcoexMITIGATIONS"],
+      "description": "A mitigation/control (MITRE ATT&CK) that mitigates techniques."
+    },
+    {
+      "semantic": "AttackPattern",
+      "physical_labels": ["UcoexCAPEC"],
+      "description": "A CAPEC attack pattern describing common attack patterns and mapping to weaknesses and ATT&CK techniques."
+    },
+    {
+      "semantic": "D3FENDControl",
+      "physical_labels": ["UcoexMITRED3FEND"],
+      "description": "A MITRE D3FEND defensive technique/control mapped to ATT&CK techniques."
+    },
+    {
+      "semantic": "ObservedExample",
+      "physical_labels": ["UcoexObservedExample"],
+      "description": "An observed example (evidence snippet) that can be linked to a CVE where it was observed."
+    },
+    {
+      "semantic": "CPE",
+      "physical_labels": ["UcoexCPE"],
+      "description": "A CPE product/platform identifier node (Common Platform Enumeration) linked to CVEs."
+    }
+  ],
+  "object_properties": [
+    {
+      "semantic": "hasCPE",
+      "domain": "CVE",
+      "range": "CPE",
+      "physical_rel": "UCOEXHASCPE",
+      "description": "Links a CVE to an affected platform/product (CPE)."
+    },
+    {
+      "semantic": "hasObservedExample",
+      "domain": "Weakness",
+      "range": "ObservedExample",
+      "physical_rel": "UCOHASOBSERVEDEXAMPLE",
+      "description": "Links a weakness (CWE) to observed examples."
+    },
+    {
+      "semantic": "hasVulnerability",
+      "domain": "ExploitTarget",
+      "range": "Vulnerability",
+      "physical_rel": "UCOHASVULNERABILITY",
+      "description": "Links an exploit target to a vulnerability concept."
+    },
+    {
+      "semantic": "hasWeakness",
+      "domain": "ExploitTarget",
+      "range": "Weakness",
+      "physical_rel": "UCOHASWEAKNESS",
+      "description": "Links an exploit target to a weakness (CWE)."
+    },
+    {
+      "semantic": "hasCVE",
+      "domain": "Vulnerability",
+      "range": "CVE",
+      "physical_rel": "UCOHASCVE_ID",
+      "description": "Links a vulnerability concept node to its CVE identifier node."
+    },
+    {
+      "semantic": "attributedTo",
+      "domain": "Campaign",
+      "range": "Group",
+      "physical_rel": "UCOEXATTRIBUTEDTO",
+      "description": "Indicates a campaign is attributed to a threat group."
+    },
+    {
+      "semantic": "campaignUsesSoftware",
+      "domain": "Campaign",
+      "range": "Software",
+      "physical_rel": "UCOEXCAMPAIGNUSESSOFTWARE",
+      "description": "Indicates software used as part of a campaign."
+    },
+    {
+      "semantic": "campaignUsesTechnique",
+      "domain": "Campaign",
+      "range": "Technique",
+      "physical_rel": "UCOEXCAMPAIGNUSESTECHNIQUE",
+      "description": "Indicates techniques used as part of a campaign."
+    },
+    {
+      "semantic": "hasRelatedWeakness",
+      "domain": "AttackPattern",
+      "range": "Weakness",
+      "physical_rel": "UCOEXHASRELATEDWEAKNESS",
+      "description": "Maps a CAPEC attack pattern to related CWE weaknesses."
+    },
+    {
+      "semantic": "mapsToTechnique",
+      "domain": "AttackPattern",
+      "range": "Technique",
+      "physical_rel": "UCOEXHASTAXONOMYMAPPING",
+      "description": "Maps a CAPEC attack pattern to ATT&CK techniques."
+    },
+    {
+      "semantic": "groupUsesSoftware",
+      "domain": "Group",
+      "range": "Software",
+      "physical_rel": "UCOEXGROUPUSESSOFTWARE",
+      "description": "Indicates software used by a threat group."
+    },
+    {
+      "semantic": "groupUsesTechnique",
+      "domain": "Group",
+      "range": "Technique",
+      "physical_rel": "UCOEXGROUPUSESTECHNIQUE",
+      "description": "Indicates techniques used by a threat group."
+    },
+    {
+      "semantic": "mitigates",
+      "domain": "Mitigation",
+      "range": "Technique",
+      "physical_rel": "UCOEXMITIGATES",
+      "description": "Indicates a mitigation mitigates a technique."
+    },
+    {
+      "semantic": "d3fendCoversTechnique",
+      "domain": "D3FENDControl",
+      "range": "Technique",
+      "physical_rel": "UCOEXHASMITREATTACK",
+      "description": "Maps a D3FEND control to the technique it covers."
+    },
+    {
+      "semantic": "exampleObservedIn",
+      "domain": "ObservedExample",
+      "range": "CVE",
+      "physical_rel": "UCOEXEXAMPLEOBSERVEDIN",
+      "description": "Links an observed example to the CVE where it was observed."
+    },
+    {
+      "semantic": "softwareUsesTechnique",
+      "domain": "Software",
+      "range": "Technique",
+      "physical_rel": "UCOEXSOFTWAREUSESTECHNIQUE",
+      "description": "Indicates techniques used by a software/tool/malware."
+    }
+  ],
+  "data_properties": {
+    "CVE": [
+      "cveId: label — CVE identifier string (e.g., CVE-2021-44228).",
+      "baseSeverity: ucobaseSeverity — Base severity rating.",
+      "exploitabilityScore: ucoexploitabilityScore — Exploitability subscore.",
+      "impactScore: ucoimpactScore — Impact subscore.",
+      "vectorString: ucovectorString — CVSS vector string.",
+      "vulnStatus: ucovulnStatus — Status (e.g., analyzed).",
+      "uri: uri — Canonical URI."
+    ],
+    "Vulnerability": [
+      "publishedDate: ucopublishedDateTime — Publication timestamp.",
+      "lastModifiedDate: ucolastModifiedDateTime — Last modification timestamp.",
+      "summary: ucosummary — Free-text summary.",
+      "uri: uri — Canonical URI."
+    ],
+    "Weakness": [
+      "cweId: ucocweID — CWE identifier string (e.g., CWE-79).",
+      "cweName: ucocweName — Weakness name.",
+      "summary: ucocweSummary — Short summary.",
+      "description: ucodescription — Detailed description.",
+      "likelihoodOfExploit: ucolikelihoodOfExploit — Likelihood of exploit.",
+      "status: ucostatus — Status.",
+      "uri: uri — Canonical URI."
+    ],
+    "Campaign": [
+      "name: ucoexNAME — Campaign name.",
+      "description: ucoexDESCRIPTION — Campaign description.",
+      "domain: ucoexDOMAIN — Domain (e.g., enterprise).",
+      "url: ucoexURL — Reference URL.",
+      "uri: uri — Canonical URI."
+    ],
+    "Group": [
+      "name: ucoexNAME — Group name.",
+      "description: ucoexDESCRIPTION — Group description.",
+      "domain: ucoexDOMAIN — Domain (e.g., enterprise).",
+      "url: ucoexURL — Reference URL.",
+      "uri: uri — Canonical URI."
+    ],
+    "Technique": [
+      "name: ucoexNAME — Technique name (often contains the technique ID in text form depending on ingest).",
+      "description: ucoexDESCRIPTION — Technique description.",
+      "domain: ucoexDOMAIN — Domain (e.g., enterprise).",
+      "url: ucoexURL — Reference URL.",
+      "uri: uri — Canonical URI."
+    ],
+    "Tactic": [
+      "name: ucoexNAME — Tactic name.",
+      "description: ucoexDESCRIPTION — Tactic description.",
+      "domain: ucoexDOMAIN — Domain.",
+      "url: ucoexURL — Reference URL.",
+      "uri: uri — Canonical URI."
+    ],
+    "Software": [
+      "name: ucoexNAME — Software name.",
+      "description: ucoexDESCRIPTION — Software description.",
+      "domain: ucoexDOMAIN — Domain.",
+      "url: ucoexURL — Reference URL.",
+      "uri: uri — Canonical URI."
+    ],
+    "Mitigation": [
+      "name: ucoexNAME — Mitigation name.",
+      "description: ucoexDESCRIPTION — Mitigation description.",
+      "domain: ucoexDOMAIN — Domain.",
+      "url: ucoexURL — Reference URL.",
+      "uri: uri — Canonical URI."
+    ],
+    "D3FENDControl": [
+      "label: ucoexMITRED3FEND_LABEL — Control label/name.",
+      "definition: ucoexMITRED3FEND_DEFINITION — Control definition.",
+      "uri: uri — Canonical URI."
+    ],
+    "ObservedExample": [
+      "description: ucoexDESCRIPTION — Observed example description.",
+      "uri: uri — Canonical URI."
+    ],
+    "AttackPattern": [
+      "capecId: ucoexCAPEC_id — CAPEC identifier.",
+      "capecName: ucoexCAPEC_name — CAPEC name.",
+      "description: ucoexDescription — Description.",
+      "severity: ucoexSeverity — Severity.",
+      "likelihood: ucoexLikelihood — Likelihood.",
+      "uri: uri — Canonical URI."
+    ],
+    "CPE": [
+      "cpeName: cpeName — CPE URI/name string.",
+      "lastModified: lastModified — Last modification timestamp.",
+      "titles: titles — Titles/labels.",
+      "uri: uri — Canonical URI."
+    ]
+  },
+  "embedding_corpus": [
+    "CVE hasCPE CPE",
+    "Vulnerability hasCVE CVE",
+    "ExploitTarget hasVulnerability Vulnerability",
+    "ExploitTarget hasWeakness Weakness",
+    "Weakness hasObservedExample ObservedExample",
+    "ObservedExample exampleObservedIn CVE",
+    "Campaign attributedTo Group",
+    "Campaign campaignUsesTechnique Technique",
+    "Campaign campaignUsesSoftware Software",
+    "Group groupUsesTechnique Technique",
+    "Group groupUsesSoftware Software",
+    "Software softwareUsesTechnique Technique",
+    "AttackPattern mapsToTechnique Technique",
+    "AttackPattern hasRelatedWeakness Weakness",
+    "Mitigation mitigates Technique",
+    "D3FENDControl d3fendCoversTechnique Technique",
+    "CVE has cveId",
+    "CVE has baseSeverity",
+    "CVE has exploitabilityScore",
+    "CVE has impactScore",
+    "CVE has vectorString",
+    "CVE has vulnStatus",
+    "Vulnerability has publishedDate",
+    "Vulnerability has lastModifiedDate",
+    "Vulnerability has summary",
+    "Weakness has cweId",
+    "Weakness has cweName",
+    "Weakness has description",
+    "Campaign has name",
+    "Campaign has description",
+    "Group has name",
+    "Technique has name",
+    "Technique has description",
+    "Software has name",
+    "Mitigation has name",
+    "AttackPattern has capecId",
+    "AttackPattern has capecName",
+    "CPE has cpeName",
+    "DESC: CVE is a disclosed vulnerability identifier with severity scores and status (label/ucobaseSeverity/ucoexploitabilityScore/ucoimpactScore/ucovulnStatus).",
+    "DESC: Vulnerability nodes carry publication/last-modified timestamps and summary, and link to CVE IDs.",
+    "DESC: Weakness (CWE) nodes describe weakness classes and include rich text fields (name, summary, description, mitigations, references).",
+    "DESC: Campaign/Group/Technique/Software/Mitigation nodes model MITRE ATT&CK entities and their usage/attribution links.",
+    "DESC: CAPEC AttackPattern nodes map to ATT&CK techniques and related CWE weaknesses.",
+    "DESC: D3FENDControl nodes map defensive controls to covered ATT&CK techniques.",
+    "Bridge: Campaign→Technique, Campaign→Software, Campaign→Group, Group→Technique, Group→Software, Software→Technique, CAPEC→Technique, CAPEC→Weakness, ExploitTarget→Weakness/Vulnerability→CVE→CPE"
+  ]
+}
+
