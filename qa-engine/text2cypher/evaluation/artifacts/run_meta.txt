@@ -1,0 +1,8 @@
+Model: llama3.1:70b
+Dataset: technical_dataset_COMPLETION_clean.csv
+Count: 280
+T2CSS_TOP_K=15
+T2CSS_FEWSHOT_K=3
+DISABLE_AUTO_LIMIT=1
+OLLAMA_STOP=
+OLLAMA_NUM_PREDICT=400
