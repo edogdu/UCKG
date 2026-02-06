@@ -1,0 +1,6 @@
+Experiment,Recall,Precision,F1,Avg Entities,0-hop F1,1-hop F1,2-hop F1
+nomic_baseline,47.79,6.98,11.58,12.3,7.67,11.73,15.0
+nomic_hybrid_cross_encoder,57.4,5.96,10.19,20.01,7.71,8.53,13.83
+nomic_cross_encoder,43.16,3.97,6.89,17.81,5.78,6.14,8.52
+gemma_ollama_cross_encoder,5.08,0.82,1.39,7.03,1.98,0.62,1.49
+gemma_ollama_baseline,0.44,0.09,0.16,6.07,0.0,0.0,0.43
