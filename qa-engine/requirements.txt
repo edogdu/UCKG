@@ -31,3 +31,11 @@ python-json-logger>=2.0.0
 
 # Text processing and validation
 regex>=2023.0.0
+
+# BM25 keyword search (for hybrid retrieval)
+rank-bm25>=0.2.2
+
+# Data analysis and visualization (for evaluation notebooks)
+pandas>=2.0.0
+matplotlib>=3.7.0
+seaborn>=0.12.0
