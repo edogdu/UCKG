@@ -1,0 +1,37 @@
+global_params:
+  working_dir: cache
+  graph_backend: kuzu
+  kv_backend: rocksdb
+
+nodes:
+  - id: start_trigger
+    op_name: read
+    type: source
+    dependencies: []
+    params:
+      input_path:
+        - dummy.txt
+
+  - id: partition
+    op_name: partition
+    type: aggregate
+    dependencies:
+      - start_trigger
+    save_output: true
+    params:
+      method: dfs  # REVERTED TO ATOMIC DEFAULT
+      method_params:
+        max_units_per_community: 1 # REVERTED TO ATOMIC DEFAULT
+
+  - id: generate
+    op_name: generate
+    type: map_batch
+    dependencies:
+      - partition
+    execution_params:
+      replicas: 1
+      batch_size: 1
+    save_output: true
+    params:
+      method: atomic
+      data_format: Sharegpt

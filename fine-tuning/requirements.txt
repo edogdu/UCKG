@@ -1,0 +1,6 @@
+# UCKG Fine-Tuning Data Generation Pipeline Dependencies
+neo4j>=5.0.0
+pandas>=2.0.0
+kuzu>=0.8.0
+python-dotenv>=1.0.0
+pyyaml>=6.0
