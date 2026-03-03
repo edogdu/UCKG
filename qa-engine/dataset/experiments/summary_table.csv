@@ -1,12 +1,22 @@
 Experiment,Recall,Precision,F1,Avg Entities,0-hop F1,1-hop F1,2-hop F1
+nomic_v2_hybrid_cross_encoder_prune_h25_35,63.58,20.04,29.18,5.74,23.52,31.94,32.03
+nomic_v2_hybrid_cross_encoder_prune_h8_15,63.58,20.04,29.18,5.74,23.52,31.94,32.03
+nomic_v2_cross_encoder_prune_h25_35,59.82,19.64,28.28,5.63,20.46,35.63,29.24
 gemma_baseline,55.08,9.65,15.77,11.62,8.71,18.55,19.85
+nomic_v2_vector_only,23.4,12.8,15.65,3.0,18.0,13.7,15.15
+nomic_v2_vector_only_topk5,26.93,9.14,13.02,5.0,12.67,11.59,14.55
+nomic_v2_hybrid_cross_encoder_ppr_topk5_3,68.1,6.83,11.93,21.03,7.99,10.97,16.32
 nomic_baseline,47.79,6.98,11.58,12.3,7.67,11.73,15.0
 securebert_hybrid_cross_encoder,57.4,6.03,10.29,19.92,7.9,8.59,13.9
 gemma_hybrid_cross_encoder,57.4,5.98,10.24,19.74,7.76,8.62,13.85
 nomic_hybrid_cross_encoder,57.4,5.96,10.19,20.01,7.71,8.53,13.83
 gemma_cross_encoder,45.25,5.93,9.9,16.7,5.52,8.75,14.85
 securebert_baseline,37.75,5.38,8.98,12.89,6.71,10.03,10.17
+nomic_v2_hybrid_cross_encoder_ppr,70.97,4.4,7.86,51.96,4.09,7.39,11.67
+nomic_v2_baseline,63.25,4.3,7.77,31.37,4.27,7.76,10.96
 nomic_cross_encoder,43.16,3.97,6.89,17.81,5.78,6.14,8.52
 securebert_cross_encoder,37.97,3.92,6.65,18.62,4.33,5.73,9.52
+nomic_v2_hybrid_cross_encoder,73.73,3.59,6.41,78.74,3.19,6.39,9.35
+nomic_v2_cross_encoder,68.32,3.26,5.86,75.8,3.67,7.69,6.32
 gemma_ollama_cross_encoder,5.08,0.82,1.39,7.03,1.98,0.62,1.49
 gemma_ollama_baseline,0.44,0.09,0.16,6.07,0.0,0.0,0.43

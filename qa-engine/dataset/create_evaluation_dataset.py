@@ -206,15 +206,32 @@ def run_question_through_pipeline(rag_engine: GraphRAGSimilarity, question: Dict
     try:
         # Run the full pipeline
         result = rag_engine.run(query_text)
+        pruning_metadata = result.get("pruning_metadata", {}) or {}
+        pruning_status = pruning_metadata.get("status", "")
+        pruning_enabled = pruning_status == "applied"
 
         # Extract the key components
         key_entities = extract_key_entities(result)  # Use pre-extracted URIs from pipeline
+
+        # Save ranked primary sources for Hit@k/MRR evaluation
+        ranked_sources = []
+        for rank, src in enumerate(result.get("sources", []), 1):
+            primary = src.get("primarySource", {})
+            ranked_sources.append({
+                "rank": rank,
+                "uri": primary.get("allProperties", {}).get("uri", ""),
+                "nodeLabel": primary.get("nodeLabel", ""),
+                "nodeType": primary.get("nodeType", ""),
+                "score": primary.get("score", 0.0),
+            })
+
         sample = {
             "question": query_text,
             "summary": question.get("context", ""),  # Background context from question file
             "context": result.get("context", ""),  # The exact formatted context passed to LLM
             "response": result.get("answer", ""),  # The final generated answer
             "key_entities": key_entities,  # Unique URIs of all visited nodes
+            "ranked_sources": ranked_sources,  # Ordered primary sources for Hit@k/MRR
             "metadata": {
                 "mode": result.get("mode", "unknown"),
                 "source_file": question.get("source_file", ""),
@@ -232,7 +249,12 @@ def run_question_through_pipeline(rag_engine: GraphRAGSimilarity, question: Dict
                     "num_sources": len(result.get("sources", [])),
                     "num_key_entities": len(key_entities),
                     "node_types": result.get("enhanced_metadata", {}).get("node_types", []),
-                    "relationship_types": result.get("enhanced_metadata", {}).get("relationship_types", [])
+                    "relationship_types": result.get("enhanced_metadata", {}).get("relationship_types", []),
+                    "pruning_enabled": pruning_enabled,
+                    "pruning_budget": pruning_metadata.get("budget"),
+                    "pre_nodes": pruning_metadata.get("pre_nodes"),
+                    "post_nodes": pruning_metadata.get("post_nodes"),
+                    "prune_ratio": pruning_metadata.get("prune_ratio"),
                 }
             }
         }

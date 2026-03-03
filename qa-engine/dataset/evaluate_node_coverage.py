@@ -24,14 +24,134 @@ Usage:
 import json
 import os
 import csv
+import re
+import sys
+import pickle
 import argparse
-from typing import Dict, List, Any
+from typing import Dict, List, Any, Optional, Tuple
 from collections import defaultdict
 
 from experiment_config import EXPERIMENTS, list_experiments
 
+# Add parent directory to path for graphrag imports
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from graphrag.utils import get_node_label
 
-def evaluate_sample_coverage(sample: Dict[str, Any]) -> Dict[str, Any]:
+
+def build_label_uri_lookup() -> Optional[Tuple[Dict, Dict]]:
+    """
+    Build (label, nodeType) → URI lookup from BM25 cache.
+
+    Returns:
+        Tuple of (primary_lookup, fragment_lookup) or None if cache unavailable.
+        - primary_lookup: {(label, nodeType): uri} for normal nodes
+        - fragment_lookup: {(nodeType, id_fragment): uri} for empty-label nodes
+    """
+    cache_path = os.path.join(
+        os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+        "graphrag", ".cache", "bm25_index", "bm25_index.pkl"
+    )
+    if not os.path.exists(cache_path):
+        print(f"WARNING: BM25 cache not found at {cache_path}")
+        print("  Hit@k/MRR metrics will be skipped for legacy datasets.")
+        return None
+
+    print(f"Loading BM25 cache for label→URI lookup...")
+    with open(cache_path, 'rb') as f:
+        cache = pickle.load(f)
+
+    node_documents = cache.get('node_documents', [])
+    primary_lookup = {}  # (label, nodeType) → uri
+    fragment_lookup = {}  # (nodeType, id_fragment) → uri
+
+    for doc in node_documents:
+        node_type = doc.get('nodeType', '')
+        props = doc.get('props', {})
+        uri = props.get('uri', '')
+        if not uri:
+            continue
+
+        label = get_node_label(node_type, props)
+
+        if label:
+            key = (label, node_type)
+            # First-seen wins (collisions are <0.2%)
+            if key not in primary_lookup:
+                primary_lookup[key] = uri
+
+        # Fragment fallback for empty-label nodes (e.g. UcoexSOFTWARE)
+        if not label and '#' in uri:
+            fragment = uri.rsplit('#', 1)[1]
+            fragment_lookup[(node_type, fragment)] = uri
+
+    print(f"  Lookup built: {len(primary_lookup)} primary entries, {len(fragment_lookup)} fragment entries")
+    return primary_lookup, fragment_lookup
+
+
+def extract_ranked_sources(
+    context: str,
+    primary_lookup: Dict,
+    fragment_lookup: Dict
+) -> List[Dict[str, Any]]:
+    """
+    Parse context string for ranked primary nodes and resolve labels to URIs.
+
+    Context format per block:
+        [N] PRIMARY NODE: <label>
+            Type: <nodeType>
+            ...
+
+    Returns:
+        List of {"rank": N, "uri": "..."} for each resolved primary node.
+    """
+    if not context:
+        return []
+
+    # Split on [N] PRIMARY NODE: pattern
+    parts = re.split(r'\[(\d+)\]\s+PRIMARY NODE:\s*', context)
+    # parts = [pre, rank1, block1, rank2, block2, ...]
+
+    ranked = []
+    for i in range(1, len(parts) - 1, 2):
+        rank = int(parts[i])
+        block = parts[i + 1]
+
+        # Extract label (first line before newline)
+        lines = block.split('\n')
+        label = lines[0].strip()
+
+        # Extract Type from next line
+        node_type = ''
+        for line in lines[1:5]:  # Type is always within first few lines
+            type_match = re.match(r'\s+Type:\s*(.+)', line)
+            if type_match:
+                node_type = type_match.group(1).strip()
+                break
+
+        # Resolve URI via primary lookup
+        uri = primary_lookup.get((label, node_type), '')
+
+        # Fragment fallback for empty-label UcoexSOFTWARE nodes
+        if not uri and not label and node_type:
+            # Try to extract ATT&CK ID from Content URL pattern
+            for line in lines[1:10]:
+                content_match = re.match(r'\s+Content:\s*(.*)', line)
+                if content_match:
+                    content = content_match.group(1)
+                    # Look for ATT&CK-style IDs like S1124
+                    id_match = re.search(r'\b(S\d{4})\b', content)
+                    if id_match:
+                        fragment = id_match.group(1)
+                        uri = fragment_lookup.get((node_type, fragment), '')
+                    break
+
+        if uri:
+            ranked.append({"rank": rank, "uri": uri})
+
+    return ranked
+
+
+def evaluate_sample_coverage(sample: Dict[str, Any], label_uri_lookup: Optional[Tuple[Dict, Dict]] = None) -> Dict[str, Any]:
     """
     Evaluate coverage for a single sample
     
@@ -86,6 +206,35 @@ def evaluate_sample_coverage(sample: Dict[str, Any]) -> Dict[str, Any]:
     retrieval_stats = metadata.get('retrieval_stats', {})
     num_sources = retrieval_stats.get('num_sources', 0)
 
+    # Hit@k / MRR: ranking quality of the primary (first_node) gold node
+    hit_at_1 = 0.0
+    hit_at_3 = 0.0
+    reciprocal_rank = 0.0
+    ranking_available = False
+
+    if first_node:
+        # Prefer pre-saved ranked_sources (future datasets)
+        if sample.get('ranked_sources'):
+            ranked_sources = sample['ranked_sources']
+        elif label_uri_lookup is not None:
+            # Resolve from context string using BM25 lookup
+            primary_lookup, fragment_lookup = label_uri_lookup
+            context = sample.get('context', '')
+            ranked_sources = extract_ranked_sources(context, primary_lookup, fragment_lookup)
+        else:
+            ranked_sources = []
+
+        if ranked_sources:
+            ranking_available = True
+            ranked_uris = [s['uri'] for s in sorted(ranked_sources, key=lambda x: x['rank'])]
+            if first_node in ranked_uris:
+                rank_pos = ranked_uris.index(first_node) + 1  # 1-indexed
+                reciprocal_rank = 1.0 / rank_pos
+                if rank_pos <= 1:
+                    hit_at_1 = 1.0
+                if rank_pos <= 3:
+                    hit_at_3 = 1.0
+
     return {
         'sample_id': sample.get('id', 0),
         'question': sample.get('question', '')[:60] + '...' if len(sample.get('question', '')) > 60 else sample.get('question', ''),
@@ -106,7 +255,11 @@ def evaluate_sample_coverage(sample: Dict[str, Any]) -> Dict[str, Any]:
         'precision': precision,
         'f1': f1,
         'key_entities_count': key_entities_count,
-        'num_sources': num_sources
+        'num_sources': num_sources,
+        'hit_at_1': hit_at_1,
+        'hit_at_3': hit_at_3,
+        'reciprocal_rank': reciprocal_rank,
+        'ranking_available': ranking_available,
     }
 
 
@@ -122,46 +275,42 @@ def evaluate_dataset(dataset_path: str) -> Dict[str, Any]:
     """
     with open(dataset_path, 'r', encoding='utf-8') as f:
         data = json.load(f)
-    
+
     samples = data.get('samples', [])
-    
+
     print(f"Evaluating {len(samples)} samples...")
     print("=" * 80)
-    
-    # Aggregate metrics by hop count
-    metrics_by_hop = defaultdict(lambda: {
-        'total': 0,
-        'coverage_counts': [],  # List of coverage counts (0, 1, 2, or 3)
-        'recalls': [],  # List of recall values (0.0 to 1.0)
-        'precisions': [],  # List of precision values (0.0 to 1.0)
-        'f1s': [],  # List of F1 scores (0.0 to 1.0)
-        'key_entities_counts': [],  # List of retrieved entity counts
-        'num_sources_list': [],  # List of source counts
-        'perfect_coverage': 0,  # Count of samples with 100% recall
-        'partial_coverage': 0,  # Count of samples with >0% but <100% recall
-        'no_coverage': 0,  # Count of samples with 0% recall
-    })
 
-    # Aggregate by question type
-    metrics_by_type = defaultdict(lambda: {
-        'total': 0,
-        'coverage_counts': [],
-        'recalls': [],
-        'precisions': [],
-        'f1s': [],
-        'key_entities_counts': [],
-        'num_sources_list': [],
-        'perfect_coverage': 0,
-        'partial_coverage': 0,
-        'no_coverage': 0,
-    })
-    
+    # Build label→URI lookup for Hit@k/MRR (once for all samples)
+    label_uri_lookup = build_label_uri_lookup()
+
+    # Aggregate metrics by hop count
+    def _make_agg_bucket():
+        return {
+            'total': 0,
+            'coverage_counts': [],
+            'recalls': [],
+            'precisions': [],
+            'f1s': [],
+            'key_entities_counts': [],
+            'num_sources_list': [],
+            'hit_at_1s': [],
+            'hit_at_3s': [],
+            'reciprocal_ranks': [],
+            'perfect_coverage': 0,
+            'partial_coverage': 0,
+            'no_coverage': 0,
+        }
+
+    metrics_by_hop = defaultdict(_make_agg_bucket)
+    metrics_by_type = defaultdict(_make_agg_bucket)
+
     all_results = []
-    
+
     for i, sample in enumerate(samples, 1):
         print(f"[{i}/{len(samples)}] Evaluating sample {sample.get('id', i)}...", end='\r')
-        
-        result = evaluate_sample_coverage(sample)
+
+        result = evaluate_sample_coverage(sample, label_uri_lookup)
         all_results.append(result)
         
         hop_count = result['hop_count']
@@ -188,6 +337,14 @@ def evaluate_dataset(dataset_path: str) -> Dict[str, Any]:
 
         metrics_by_hop[hop_count]['num_sources_list'].append(result['num_sources'])
         metrics_by_type[question_type]['num_sources_list'].append(result['num_sources'])
+
+        if result['ranking_available']:
+            metrics_by_hop[hop_count]['hit_at_1s'].append(result['hit_at_1'])
+            metrics_by_type[question_type]['hit_at_1s'].append(result['hit_at_1'])
+            metrics_by_hop[hop_count]['hit_at_3s'].append(result['hit_at_3'])
+            metrics_by_type[question_type]['hit_at_3s'].append(result['hit_at_3'])
+            metrics_by_hop[hop_count]['reciprocal_ranks'].append(result['reciprocal_rank'])
+            metrics_by_type[question_type]['reciprocal_ranks'].append(result['reciprocal_rank'])
 
         # Update coverage categories
         if result['recall'] == 1.0:
@@ -226,7 +383,7 @@ def evaluate_dataset(dataset_path: str) -> Dict[str, Any]:
         hop_label = {0: '0-hop', 1: '1-hop', 2: '2-hop'}.get(hop, f'{hop}-hop')
         total = stats['total']
 
-        results['by_hop_count'][hop_label] = {
+        hop_dict = {
             'total_questions': total,
             'avg_recall': sum(stats['recalls']) / len(stats['recalls']) if stats['recalls'] else 0.0,
             'avg_precision': sum(stats['precisions']) / len(stats['precisions']) if stats['precisions'] else 0.0,
@@ -241,12 +398,17 @@ def evaluate_dataset(dataset_path: str) -> Dict[str, Any]:
             'no_coverage': stats['no_coverage'],
             'no_coverage_pct': (stats['no_coverage'] / total * 100) if total > 0 else 0.0,
         }
-    
+        if stats['hit_at_1s']:
+            hop_dict['avg_hit_at_1'] = sum(stats['hit_at_1s']) / len(stats['hit_at_1s'])
+            hop_dict['avg_hit_at_3'] = sum(stats['hit_at_3s']) / len(stats['hit_at_3s'])
+            hop_dict['avg_mrr'] = sum(stats['reciprocal_ranks']) / len(stats['reciprocal_ranks'])
+        results['by_hop_count'][hop_label] = hop_dict
+
     # Aggregate by question type
     for qtype, stats in metrics_by_type.items():
         total = stats['total']
 
-        results['by_question_type'][qtype] = {
+        qtype_dict = {
             'total_questions': total,
             'avg_recall': sum(stats['recalls']) / len(stats['recalls']) if stats['recalls'] else 0.0,
             'avg_precision': sum(stats['precisions']) / len(stats['precisions']) if stats['precisions'] else 0.0,
@@ -261,6 +423,11 @@ def evaluate_dataset(dataset_path: str) -> Dict[str, Any]:
             'no_coverage': stats['no_coverage'],
             'no_coverage_pct': (stats['no_coverage'] / total * 100) if total > 0 else 0.0,
         }
+        if stats['hit_at_1s']:
+            qtype_dict['avg_hit_at_1'] = sum(stats['hit_at_1s']) / len(stats['hit_at_1s'])
+            qtype_dict['avg_hit_at_3'] = sum(stats['hit_at_3s']) / len(stats['hit_at_3s'])
+            qtype_dict['avg_mrr'] = sum(stats['reciprocal_ranks']) / len(stats['reciprocal_ranks'])
+        results['by_question_type'][qtype] = qtype_dict
     
     # Calculate overall statistics
     all_recalls = [r['recall'] for r in all_results]
@@ -284,7 +451,17 @@ def evaluate_dataset(dataset_path: str) -> Dict[str, Any]:
     results['overall']['perfect_coverage_pct'] = (perfect / len(samples) * 100) if samples else 0.0
     results['overall']['partial_coverage_pct'] = (partial / len(samples) * 100) if samples else 0.0
     results['overall']['no_coverage_pct'] = (none / len(samples) * 100) if samples else 0.0
-    
+
+    # Overall ranking metrics (only for samples where ranking was available)
+    all_hit1 = [r['hit_at_1'] for r in all_results if r['ranking_available']]
+    all_hit3 = [r['hit_at_3'] for r in all_results if r['ranking_available']]
+    all_rr = [r['reciprocal_rank'] for r in all_results if r['ranking_available']]
+    if all_hit1:
+        results['overall']['avg_hit_at_1'] = sum(all_hit1) / len(all_hit1)
+        results['overall']['avg_hit_at_3'] = sum(all_hit3) / len(all_hit3)
+        results['overall']['avg_mrr'] = sum(all_rr) / len(all_rr)
+        results['overall']['ranking_samples'] = len(all_hit1)
+
     return results
 
 
@@ -316,16 +493,19 @@ def export_to_csv(all_results: List[Dict[str, Any]], output_path: str):
         'recall',
         'precision',
         'f1',
+        'hit_at_1',
+        'hit_at_3',
+        'reciprocal_rank',
         'key_entities_count',
         'num_sources',
         'nodes_found',
         'gold_nodes'
     ]
-    
+
     with open(output_path, 'w', newline='', encoding='utf-8') as csvfile:
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
         writer.writeheader()
-        
+
         for result in all_results:
             row = {
                 'sample_id': result['sample_id'],
@@ -343,6 +523,9 @@ def export_to_csv(all_results: List[Dict[str, Any]], output_path: str):
                 'recall': f"{result['recall']:.4f}",
                 'precision': f"{result['precision']:.4f}",
                 'f1': f"{result['f1']:.4f}",
+                'hit_at_1': f"{result['hit_at_1']:.0f}" if result['ranking_available'] else '',
+                'hit_at_3': f"{result['hit_at_3']:.0f}" if result['ranking_available'] else '',
+                'reciprocal_rank': f"{result['reciprocal_rank']:.4f}" if result['ranking_available'] else '',
                 'key_entities_count': result['key_entities_count'],
                 'num_sources': result['num_sources'],
                 'nodes_found': '; '.join(result['nodes_found']) if result['nodes_found'] else '',
@@ -435,6 +618,10 @@ def print_results(results: Dict[str, Any], experiment_name: str = None):
     print(f"  Recall (Node Coverage):     {overall['avg_recall']:.2%}")
     print(f"  Precision (Answer Coverage): {overall['avg_precision']:.2%}")
     print(f"  F1 Score:                    {overall['avg_f1']:.2%}")
+    if 'avg_hit_at_1' in overall:
+        print(f"  Hit@1:                       {overall['avg_hit_at_1']:.2%}")
+        print(f"  Hit@3:                       {overall['avg_hit_at_3']:.2%}")
+        print(f"  MRR:                         {overall['avg_mrr']:.4f}")
     print()
     print("  Retrieval Statistics:")
     print(f"    Avg Gold Nodes Found:      {overall['avg_coverage_count']:.2f}")
@@ -453,6 +640,8 @@ def print_results(results: Dict[str, Any], experiment_name: str = None):
         print(f"\n{hop}:")
         print(f"  Questions: {metrics['total_questions']}")
         print(f"  Recall:    {metrics['avg_recall']:.2%}  |  Precision: {metrics['avg_precision']:.2%}  |  F1: {metrics['avg_f1']:.2%}")
+        if 'avg_hit_at_1' in metrics:
+            print(f"  Hit@1:     {metrics['avg_hit_at_1']:.2%}  |  Hit@3:     {metrics['avg_hit_at_3']:.2%}  |  MRR: {metrics['avg_mrr']:.4f}")
         print(f"  Avg Retrieved Entities: {metrics['avg_key_entities']:.1f}  |  Avg Sources: {metrics['avg_num_sources']:.1f}")
         print(f"  Coverage: Perfect {metrics['perfect_coverage']} ({metrics['perfect_coverage_pct']:.1f}%) | "
               f"Partial {metrics['partial_coverage']} ({metrics['partial_coverage_pct']:.1f}%) | "
@@ -465,6 +654,8 @@ def print_results(results: Dict[str, Any], experiment_name: str = None):
         print(f"\n{qtype}:")
         print(f"  Questions: {metrics['total_questions']}")
         print(f"  Recall:    {metrics['avg_recall']:.2%}  |  Precision: {metrics['avg_precision']:.2%}  |  F1: {metrics['avg_f1']:.2%}")
+        if 'avg_hit_at_1' in metrics:
+            print(f"  Hit@1:     {metrics['avg_hit_at_1']:.2%}  |  Hit@3:     {metrics['avg_hit_at_3']:.2%}  |  MRR: {metrics['avg_mrr']:.4f}")
         print(f"  Avg Retrieved Entities: {metrics['avg_key_entities']:.1f}  |  Avg Sources: {metrics['avg_num_sources']:.1f}")
         print(f"  Coverage: Perfect {metrics['perfect_coverage']} ({metrics['perfect_coverage_pct']:.1f}%) | "
               f"Partial {metrics['partial_coverage']} ({metrics['partial_coverage_pct']:.1f}%) | "

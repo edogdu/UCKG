@@ -35,6 +35,13 @@ EMBEDDING_CONFIGS = {
         "embedding_query_prompt": "",
         "embedding_doc_prompt": "",
     },
+    "nomic_v2": {
+        "embedding_backend": "ollama",
+        "embedding_model": "nomic-embed-text:latest",
+        "embedding_query_prefix": "search_query: ",
+        "embedding_query_prompt": "",
+        "embedding_doc_prompt": "",
+    },
     "gemma_ollama": {
         "embedding_backend": "ollama",
         "embedding_model": "embeddinggemma:latest",
@@ -71,8 +78,6 @@ RETRIEVAL_CONFIGS = {
             "enable_hybrid_retrieval": False,
             "enable_cross_encoder": False,
             "enable_second_hop": True,
-            "enable_dynamic_hop_selection": False,
-            "enable_relationship_prediction": False,
         }
     },
 
@@ -140,6 +145,58 @@ RETRIEVAL_CONFIGS = {
         }
     },
 
+    # Regular RAG (pure vector search, no graph traversal)
+    "vector_only": {
+        "description": "Pure vector search (regular RAG), top-k=3",
+        "config": {
+            "enable_graph_traversal": False,
+            "enable_hybrid_retrieval": False,
+            "enable_cross_encoder": False,
+            "enable_second_hop": False,
+            "enable_entity_name_boosting": False,
+            "zero_hop_top_k": 3,
+        }
+    },
+    "vector_only_topk5": {
+        "description": "Pure vector search (regular RAG), top-k=5",
+        "config": {
+            "enable_graph_traversal": False,
+            "enable_hybrid_retrieval": False,
+            "enable_cross_encoder": False,
+            "enable_second_hop": False,
+            "enable_entity_name_boosting": False,
+            "zero_hop_top_k": 5,
+        }
+    },
+
+    # PPR neighbor selection (replaces BFS traversal)
+    "hybrid_cross_encoder_ppr": {
+        "description": "Hybrid + Cross-encoder + PPR neighbor selection",
+        "config": {
+            "enable_hybrid_retrieval": True,
+            "bm25_weight": 0.4,
+            "vector_weight": 0.6,
+            "enable_cross_encoder": True,
+            "cross_encoder_model": "cross-encoder/ms-marco-MiniLM-L-6-v2",
+            "enable_second_hop": True,
+            "enable_ppr": True,
+        }
+    },
+    "hybrid_cross_encoder_ppr_topk5_3": {
+        "description": "Hybrid + Cross-encoder + PPR (top_k=5/3)",
+        "config": {
+            "enable_hybrid_retrieval": True,
+            "bm25_weight": 0.4,
+            "vector_weight": 0.6,
+            "enable_cross_encoder": True,
+            "cross_encoder_model": "cross-encoder/ms-marco-MiniLM-L-6-v2",
+            "enable_second_hop": True,
+            "enable_ppr": True,
+            "ppr_top_k_neighbors": 5,
+            "ppr_top_k_second_hop": 3,
+        }
+    },
+
     # Top-k variants
     "topk3": {
         "description": "Vector search with final_top_k=3",
@@ -180,6 +237,60 @@ def _generate_experiments():
                 "embedding_model": emb_config["embedding_model"],
                 "config": combined_config,
             }
+
+    # Explicit pruning experiments (decision-complete variants)
+    nomic_v2 = EMBEDDING_CONFIGS.get("nomic_v2")
+    if nomic_v2:
+        cross_base = RETRIEVAL_CONFIGS["cross_encoder"]["config"]
+        hybrid_cross_base = RETRIEVAL_CONFIGS["hybrid_cross_encoder"]["config"]
+
+        experiments["nomic_v2_cross_encoder_prune_h25_35"] = {
+            "description": "[nomic_v2] Vector + Cross-encoder + Subgraph Pruning (h1=25, h2=35)",
+            "embedding_model": nomic_v2["embedding_model"],
+            "config": {
+                **cross_base,
+                **nomic_v2,
+                "enable_subgraph_pruning": True,
+                "subgraph_prune_budget_hop1": 25,
+                "subgraph_prune_budget_hop2": 35,
+            },
+        }
+
+        experiments["nomic_v2_cross_encoder_prune_h8_15"] = {
+            "description": "[nomic_v2] Vector + Cross-encoder + Subgraph Pruning (h1=8, h2=15)",
+            "embedding_model": nomic_v2["embedding_model"],
+            "config": {
+                **cross_base,
+                **nomic_v2,
+                "enable_subgraph_pruning": True,
+                "subgraph_prune_budget_hop1": 8,
+                "subgraph_prune_budget_hop2": 15,
+            },
+        }
+
+        experiments["nomic_v2_hybrid_cross_encoder_prune_h25_35"] = {
+            "description": "[nomic_v2] Hybrid + Cross-encoder + Subgraph Pruning (h1=25, h2=35)",
+            "embedding_model": nomic_v2["embedding_model"],
+            "config": {
+                **hybrid_cross_base,
+                **nomic_v2,
+                "enable_subgraph_pruning": True,
+                "subgraph_prune_budget_hop1": 25,
+                "subgraph_prune_budget_hop2": 35,
+            },
+        }
+
+        experiments["nomic_v2_hybrid_cross_encoder_prune_h8_15"] = {
+            "description": "[nomic_v2] Hybrid + Cross-encoder + Subgraph Pruning (h1=8, h2=15)",
+            "embedding_model": nomic_v2["embedding_model"],
+            "config": {
+                **hybrid_cross_base,
+                **nomic_v2,
+                "enable_subgraph_pruning": True,
+                "subgraph_prune_budget_hop1": 8,
+                "subgraph_prune_budget_hop2": 15,
+            },
+        }
 
     return experiments
 
