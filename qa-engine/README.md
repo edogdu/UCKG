@@ -206,8 +206,8 @@ python main.py
 ```
 
 #### Step 4: Run UI Frontend & Backend
-# In a new terminal, from UI directory
 ```bash
+# In a new terminal, from UI directory
 cd UI
 npm run dev
 ```
@@ -324,8 +324,8 @@ python main.py
 ```
 
 #### Step 4: Run UI Frontend & Backend
-# In a new terminal, from UI directory
 ```bash
+# In a new terminal, from UI directory
 cd UI
 npm run dev
 ```
