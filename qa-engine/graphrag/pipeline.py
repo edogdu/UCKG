@@ -21,7 +21,7 @@ from .generation import ContextFormatter, AnswerGenerator
 from .retrieval import RelationshipRetriever
 
 
-class GraphRAGSimilarity:
+class GraphRAGPipeline:
     """
     Main GraphRAG pipeline orchestrator
 

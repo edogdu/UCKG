@@ -1,13 +1,13 @@
 """
-GraphRAG-Similarity System
+GraphRAG Pipeline
 
 Modular 3-stage pipeline for cybersecurity knowledge graph QA.
 
 USAGE:
-    from graphrag import GraphRAGSimilarity, GraphRAGConfig
+    from graphrag import GraphRAGPipeline, GraphRAGConfig
 
     # Use default configuration
-    rag = GraphRAGSimilarity()
+    rag = GraphRAGPipeline()
     result = rag.run("What is SQL injection?")
 
     # Or customize reranking weights
@@ -18,18 +18,18 @@ USAGE:
         rerank_gamma=0.10,
         final_top_k=3
     )
-    rag = GraphRAGSimilarity(config)
+    rag = GraphRAGPipeline(config)
     result = rag.run("What vulnerabilities are related to improper input validation?")
 """
 
-from .pipeline import GraphRAGSimilarity
+from .pipeline import GraphRAGPipeline
 from .utils import GraphRAGConfig, RAGMode
 from .reranking import CrossEncoderReranker
 from .reranking import SubgraphPruner
 from .retrieval import PPRRetriever
 
 __all__ = [
-    'GraphRAGSimilarity',
+    'GraphRAGPipeline',
     'GraphRAGConfig',
     'RAGMode',
     'CrossEncoderReranker',
