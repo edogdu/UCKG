@@ -95,7 +95,8 @@ class ContextFormatter:
         }
 
     def extract_enhanced_metadata(self, items: List[Dict], mode: RAGMode) -> Dict[str, Any]:
-        """Extract enhanced metadata with node and relationship statistics"""
+        """Extract enhanced metadata with node and relationship statistics.
+        Expects items in normalized flat format."""
         metadata = {
             "mode": mode.value,
             "item_count": len(items),
@@ -105,32 +106,19 @@ class ContextFormatter:
         }
 
         for item in items:
-            # Extract node types
-            if "metadata" in item:
-                node_type = item["metadata"].get("nodeType")
-                if node_type:
-                    metadata["node_types"].add(node_type)
+            primary = item.get("primarySource", {})
+            node_type = primary.get("nodeType")
+            if node_type:
+                metadata["node_types"].add(node_type)
 
-            if "primarySource" in item:
-                node_type = item["primarySource"].get("nodeType")
-                if node_type:
-                    metadata["node_types"].add(node_type)
+            score = item.get("score")
+            if score is not None:
+                metadata["semantic_scores"].append(score)
 
-            # Extract semantic scores
-            if "score" in item:
-                metadata["semantic_scores"].append(item["score"])
-
-            if "primarySource" in item:
-                score = item["primarySource"].get("score")
-                if score:
-                    metadata["semantic_scores"].append(score)
-
-            # Extract relationship types
-            if "firstHopNeighbors" in item:
-                for rel in item["firstHopNeighbors"]:
-                    rel_type = rel.get("relationshipType")
-                    if rel_type:
-                        metadata["relationship_types"].add(rel_type)
+            for rel in item.get("firstHopNeighbors", []):
+                rel_type = rel.get("relationshipType")
+                if rel_type:
+                    metadata["relationship_types"].add(rel_type)
 
         # Convert sets to lists for JSON serialization
         metadata["node_types"] = list(metadata["node_types"])
@@ -186,28 +174,6 @@ ANSWER:""",
             expected_inputs=["context", "query_text"]
         )
 
-        # Hybrid prompt (currently same as graphrag)
-        self.prompt_hybrid = RagTemplate(
-            template="""TASK: You are a cybersecurity expert assistant. Answer the user's question using both semantic search results and graph relationships provided below.
-
-QUESTION: {query_text}
-
-=== HYBRID KNOWLEDGE CONTEXT ===
-{context}
-
-INSTRUCTIONS:
-- Answer the question directly in natural, conversational language
-- Prioritize information from nodes with higher semantic relevance scores
-- For SEMANTIC MATCHES: Use the content directly to answer the question
-- For GRAPH NODES: Include relationship context when it adds value (e.g., connections to attacks, mitigations, related weaknesses)
-- Synthesize information from multiple sources when they complement each other
-- Be concise but comprehensive (3-5 sentences)
-- If sources provide conflicting or incomplete information, acknowledge this
-
-ANSWER:""",
-            expected_inputs=["context", "query_text"]
-        )
-
     def generate(self, query: str, context: str, mode: RAGMode) -> str:
         """
         Generate natural language answer from context
@@ -215,23 +181,13 @@ ANSWER:""",
         Args:
             query: Original user query
             context: Formatted context string
-            mode: RAG mode (graphrag or hybrid)
+            mode: RAG mode
 
         Returns:
             Generated answer string
         """
-        # Select prompt based on mode
-        if mode == RAGMode.graphrag:
-            prompt_template = self.prompt_graphrag
-        else:  # hybrid
-            prompt_template = self.prompt_graphrag  # Using same prompt
-
-        # Generate answer using LLM
-        response = self.llm.invoke(prompt_template.template.format(
+        response = self.llm.invoke(self.prompt_graphrag.template.format(
             context=context,
             query_text=query
         ))
-
-        # Extract answer text
-        answer_text = getattr(response, "content", str(response))
-        return answer_text
+        return getattr(response, "content", str(response))

@@ -1,7 +1,7 @@
 """
 GraphRAG-Similarity System
 
-Modular 4-stage pipeline for cybersecurity knowledge graph QA.
+Modular 3-stage pipeline for cybersecurity knowledge graph QA.
 
 USAGE:
     from graphrag import GraphRAGSimilarity, GraphRAGConfig
@@ -10,10 +10,12 @@ USAGE:
     rag = GraphRAGSimilarity()
     result = rag.run("What is SQL injection?")
 
-    # Or customize configuration
+    # Or customize reranking weights
     config = GraphRAGConfig(
         enable_second_hop=True,
-        enable_relationship_prediction=True,
+        rerank_alpha=0.65,
+        rerank_beta=0.25,
+        rerank_gamma=0.10,
         final_top_k=3
     )
     rag = GraphRAGSimilarity(config)
@@ -22,12 +24,18 @@ USAGE:
 
 from .pipeline import GraphRAGSimilarity
 from .utils import GraphRAGConfig, RAGMode
+from .reranking import CrossEncoderReranker
+from .reranking import SubgraphPruner
+from .retrieval import PPRRetriever
 
 __all__ = [
     'GraphRAGSimilarity',
     'GraphRAGConfig',
-    'RAGMode'
+    'RAGMode',
+    'CrossEncoderReranker',
+    'SubgraphPruner',
+    'PPRRetriever',
 ]
 
-__version__ = '2.0.0'
+__version__ = '3.0.0'
 __author__ = 'UCKG Team'
