@@ -91,7 +91,7 @@ nav {
    align-items: center;
    box-shadow: 0 2px 8px var(--color-shadow);
    position: relative;
-   z-index: 100;
+   z-index: 1100;
    min-height: 64px;
    padding: 0.5rem 0;
 }
@@ -141,6 +141,74 @@ nav a.active {
    background-color: var(--color-primary-2);
    font-weight: 600;
    box-shadow: 0 2px 8px rgba(255, 197, 42, 0.25);
+}
+
+/*===Nav bar for smaller screen*/
+/*This is hidden by default*/
+.dropdown {
+   display: none;
+   position: fixed;
+   top: 60px;
+   left: 0px;
+   background: linear-gradient(135deg, var(--color-primary-1) 0%, #013a73 100%);
+   width: 200px;
+   height: 180px;
+   flex-direction: column;
+   z-index: 1005;
+}
+
+
+.dropdown a {
+   position: relative;
+   display: none;
+   align-items: center;
+   justify-content: center;
+   text-align: center;
+   margin: 0.5rem 0.25rem;
+   padding: 0.75rem 1.75rem;
+   text-decoration: none;
+   font-size: 0.95rem;
+   font-weight: 500;
+   color: rgba(255, 255, 255, 0.85);
+   transition: var(--transition-base);
+   letter-spacing: 0.3px;
+   border-radius: var(--radius-m);
+   min-width: 120px;
+   background-color: transparent;
+}
+
+
+.hamburger {
+   display: none;
+   font-size: 50px;
+   padding: 14px 10px;
+   cursor: pointer;
+   color: white;
+}
+
+
+
+@media screen and (max-width: 600px) {
+
+   nav a {
+      display: none;
+   }
+   nav .logo {
+      display: none;
+   }
+
+   nav .hamburger {
+      display: block;
+   }
+
+   nav .dropdown {
+      display: block;
+   }
+
+   nav .dropdown a {
+      display: flex;
+   }
+
 }
 
 /* ========== HOME PAGE ========== */
@@ -721,6 +789,15 @@ nav a.active {
    flex-direction: column;
 }
 
+@media screen and (max-width: 600px) {
+   .graph .props{
+         top: auto;
+         right: 0;
+         left: 0;
+         bottom: 0;
+      }
+}
+
 .graph .props:hover {
    box-shadow: 0 12px 48px rgba(0, 0, 0, 0.12), 0 4px 12px rgba(0, 0, 0, 0.06);
    border-color: var(--color-primary-2);
@@ -1244,6 +1321,215 @@ nav a.active {
    font-size: 0.875rem;
 }
 
+/*=====Panel header for compressed design========*/
+
+/*side panel for the Q&A page*/
+.side-panel {
+   position: absolute;
+   background: linear-gradient(180deg, var(--color-primary-1) 0%, #01193a 100%);
+   color: white;
+   display: flex;
+   flex-direction: row-reverse;
+   transition: var(--transition-smooth);
+   border-right: 1px solid rgba(255, 255, 255, 0.1);
+   min-width: 0;
+   box-shadow: 4px 0 12px var(--color-shadow);
+   z-index: 1002;
+}
+
+.side-panel.open {
+   width: 240px;
+   flex-direction: row-reverse;
+}
+
+.side-panel.closed {
+   max-height: fit-content;
+   border-radius: 0 var(--radius-m) var(--radius-m) 0;
+}
+
+.side-panel-header {
+   display: none;
+   justify-content: space-between;
+   align-items: center;
+   padding: 1.25rem;
+   border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+   background-color: rgba(0, 0, 0, 0.15);
+   backdrop-filter: blur(10px);
+   width: 70px;
+   height: 60px;
+}
+
+.side-menu-toggle {
+   background: rgba(255, 255, 255, 0.1);
+   border: 1px solid rgba(255, 255, 255, 0.2);
+   color: white;
+   font-size: 1.1rem;
+   cursor: pointer;
+   padding: 0.5rem 0.75rem;
+   border-radius: var(--radius-s);
+   transition: var(--transition-base);
+   display: flex;
+   align-items: center;
+   justify-content: space-between;
+}
+
+.side-menu-toggle:hover {
+   background-color: rgba(255, 255, 255, 0.2);
+   transform: scale(1.05);
+}
+
+.side-menu-content {
+   flex: 1 1 auto;;
+   padding: 1rem;
+   overflow-y: auto;
+   display: flex;
+   flex-direction: column;
+   gap: 0.75rem;
+}
+
+.side-menu-content::before {
+   content: '';
+   position: absolute;
+   top: 0;
+   left: 0;
+   width: 4px;
+   height: 100%;
+   background: var(--color-primary-2);
+   transform: scaleY(0);
+   transition: var(--transition-base);
+}
+
+.Chat-button {
+   background: rgba(255, 255, 255, 0.08);
+   border: 1px solid rgba(255, 255, 255, 0.15);
+   border-radius: var(--radius-m);
+   padding: 1rem;
+   color: white;
+   cursor: pointer;
+   transition: var(--transition-base);
+   text-align: left;
+   display: flex;
+   flex-direction: column;
+   gap: 0.5rem;
+   position: relative;
+   overflow: hidden;
+   margin: 0;
+   font-family: var(--font-family-heading);
+   font-size: 1.1rem;
+   font-weight: 600;
+   letter-spacing: 0.5px;
+}
+
+.Interactive-button {
+   background: rgba(255, 255, 255, 0.08);
+   border: 1px solid rgba(255, 255, 255, 0.15);
+   border-radius: var(--radius-m);
+   padding: 1rem;
+   color: white;
+   cursor: pointer;
+   transition: var(--transition-base);
+   text-align: left;
+   display: flex;
+   flex-direction: column;
+   gap: 0.5rem;
+   position: relative;
+   overflow: hidden;
+   margin: 0;
+   font-family: var(--font-family-heading);
+   font-size: 1.1rem;
+   font-weight: 600;
+   letter-spacing: 0.5px;
+}
+
+
+@media screen and (max-width: 600px) {
+   .panel-header {
+      display: none;
+   }
+
+   .side-panel {
+      display: flex;
+   }
+
+   .side-panel-header {
+      display: flex;
+   }
+
+   .side-label-buttons {
+      display: flex;
+   }
+
+}
+
+/*=============Interactive Mode, compressed design==========*/
+
+/*Design for a pull up menu for the chat*/
+.pull-up-menu{
+   display: none;
+   position: fixed;
+   bottom: 0;
+   left: 0;
+   width: 100%;
+   height: 4%;
+   background: linear-gradient(180deg, var(--color-primary-1) 0%, #01193a 100%);
+   color: white;
+   transition: var(--transition-smooth);
+   border-right: 1px solid rgba(255, 255, 255, 0.1);
+   z-index: 1001;
+
+}
+
+.pull-up-menu.open {
+   transform: translateY(calc(-75vh + 1px));
+}
+
+.pull-up-button{
+   display: flex;
+   margin: auto;
+}
+
+.pull-up-chat{
+   flex: 1 1 auto;
+   overflow-y: auto;
+   display: flex;
+   flex-direction: column;
+   gap: 0.75rem;
+   position: fixed;
+   bottom: 0;
+   left: 0;
+   width: 100%;
+   height: 75vh;
+   z-index: 1000;
+
+   transform: translateY(100%); /* hidden off-screen */
+}
+
+.pull-up-chat.open {
+  transform: translateY(0);
+}
+
+
+/*Only graph will be visible at first*/
+@media screen and (max-width: 600px) {
+   .panel-divider {
+      display: none;
+   }
+
+   .right-panel {
+      display: none;
+   }
+
+   .left-panel.graph-panel {
+      flex: 1 1 auto;
+   }
+
+   .pull-up-menu{
+      display: flex;
+   }
+}
+
+
+
 /* ========== CHAT INTERFACE ========== */
 .chat-interface {
    display: flex;
@@ -1577,6 +1863,28 @@ nav a.active {
    text-align: right;
    opacity: 0.7;
    font-weight: 500;
+}
+
+/*Chat interface adjustments for a smaller screen*/
+@media screen and (max-width: 600px) {
+   .query-mode-selector {
+      justify-content: center;
+   }
+
+   .mode-btn, .reset-chat-btn {
+    padding: 0.4rem 0.95rem;  /* even smaller on phones */
+    font-size: 0.85rem;       /* smaller text on small screens */
+   }
+
+   .single-panel .chat-interface .query-mode-selector {
+      position: fixed;
+      z-index: 900;
+      bottom: 120px;
+      left: 0;
+      right: 0;
+      justify-content: center;
+   }
+
 }
 
 /* ========== TYPING INDICATOR ========== */

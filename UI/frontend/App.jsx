@@ -15,7 +15,19 @@ export default function App() {
         <NavLink to="/" className={({ isActive }) => isActive ? 'active' : ''}>Home</NavLink>
         <NavLink to="/qna" className={({ isActive }) => isActive ? 'active' : ''}>Q&A Chat</NavLink>
         <NavLink to="/graph" className={({ isActive }) => isActive ? 'active' : ''}>Graph Explorer</NavLink>
+
+
+        <div class="hamburger" onClick={dropdown}>
+          ☰
+        </div>
+        <div class='dropdown' id = 'drop'>
+        <NavLink to="/" className={({ isActive }) => isActive ? 'active' : ''}>Home</NavLink>
+        <NavLink to="/qna" className={({ isActive }) => isActive ? 'active' : ''}>Q&A Chat</NavLink>
+        <NavLink to="/graph" className={({ isActive }) => isActive ? 'active' : ''}>Graph Explorer</NavLink>
+        </div>
       </nav>
+
+
       {/* Set the link path of <a> */}
       <Routes>
         <Route path="/" element={<Home />} />
@@ -24,4 +36,13 @@ export default function App() {
       </Routes>
     </Router>
   );
+}
+
+function dropdown() {
+  let x = document.getElementById('drop');
+  if (x.style.display === 'block') {
+    x.style.display = 'none';
+  } else {
+    x.style.display = 'block';
+  }
 }

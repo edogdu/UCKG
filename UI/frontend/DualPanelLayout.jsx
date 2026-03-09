@@ -145,6 +145,18 @@ export default function DualPanelLayout() {
     }
   };
 
+  const [menuOpen, setMenuOpen] = useState(false);
+
+  const toggleMenu = () => {
+    setMenuOpen(prev => !prev);
+  };
+
+  const [isChatOpen, setisChatOpen] = useState(false);
+
+  const toggleChat = () => {
+    setisChatOpen(prev => !prev);
+  };
+
   return (
     <div className="dual-panel-layout">
       {/* Panel Header */}
@@ -203,6 +215,42 @@ export default function DualPanelLayout() {
           Mode: <span className="current-mode">{queryMode.toUpperCase()}</span>
         </div>
       </div>
+
+      {/*side panel for smaller screens*/}
+      <div className="side-panel">
+        <div className='side-panel-header'>
+          <button className='side-menu-toggle'
+          onClick={toggleMenu}
+          >
+            {menuOpen ? '◀' : '▶'}
+          </button>
+        </div>
+          {menuOpen && (
+          <div className="side-menu-content" id='side'>
+            <button
+            className={`Chat-button ${activeTab === 'chat' ? 'active' : ''}`}
+            onClick={() => handleTabChange('chat')}
+            title="Chat only view"
+            >
+            Q&A Chat
+            </button>
+
+            <button
+            className={`Interactive-button ${activeTab === 'dual' ? 'active' : ''}`}
+            onClick={() => handleTabChange('dual')}
+            title="Interactive chat + graph view"
+            >
+            Interactive Mode
+            {graphData.nodes.length > 0 && (
+              <span className="node-count-badge">
+                {graphData.nodes.length}
+              </span>
+            )}
+            </button>
+          </div>
+          )}
+       </div>
+    
 
       {/* Graph notification overlay */}
       {showGraphNotification && (
@@ -294,6 +342,28 @@ export default function DualPanelLayout() {
           </div>
         )}
       </div>
+
+        {/*pull up menu for smaller screens*/}
+        {activeTab === 'dual' && (
+          <>
+          <div className={`pull-up-menu ${isChatOpen ? 'open' : ''}`}>
+            <button className='pull-up-button' onClick={toggleChat}>
+              Click here to access the Chat Interface
+            </button>
+          </div>
+
+          {isChatOpen && (
+            <div className={`pull-up-chat ${isChatOpen ? 'open' : ''}`}>
+              <ChatInterface
+                onGraphUpdate={handleGraphUpdate}
+                onModeChange={setQueryMode}
+              />
+            </div>
+          )}
+          </>
+        )}
+
+
     </div>
   );
 }
