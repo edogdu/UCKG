@@ -64,6 +64,8 @@ class GraphRAGConfig:
     enable_hybrid_retrieval: bool = True  # Use hybrid retrieval (BM25 + Vector)
     bm25_weight: float = 0.4  # Weight for BM25 scores in hybrid retrieval
     vector_weight: float = 0.6  # Weight for Vector scores in hybrid retrieval
+    enable_late_graph_expansion: bool = False  # BM25+Vector flat → RRF top-k → expand seeds only (requires hybrid)
+    late_expand_flat_k: int = 0  # Flat pool size per retriever in late-expand (0 = auto: max(top_k*3, 20))
 
     # Entity name boosting
     enable_entity_name_boosting: bool = True  # Inject exact name matches into candidate pool

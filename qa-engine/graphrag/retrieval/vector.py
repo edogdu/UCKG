@@ -476,6 +476,150 @@ class GraphRetriever:
 
         return items
 
+    def expand_by_ids(
+        self,
+        items: List[Dict],
+        hop_depth: int,
+        query_embedding: List[float] = None,
+    ) -> List[Dict]:
+        """
+        Graph-expand a list of already-retrieved seed items by their node IDs.
+        Used by HybridRetriever for late graph expansion.
+
+        Mirrors the neighbour-fetching logic of _build_one/two_hop_query but
+        seeds by elementId instead of vector similarity, so it can be applied
+        to any node set after RRF merge.
+
+        DSA-BFS (enable_similarity_neighbor_ordering) is applied afterwards
+        via _sort_neighbors_by_similarity, same as the early-expand path.
+        """
+        if not items:
+            return items
+
+        node_ids = [
+            item.get('metadata', {}).get('primarySource', {}).get('nodeId')
+            for item in items
+        ]
+        node_ids = [nid for nid in node_ids if nid is not None]
+        if not node_ids:
+            return items
+
+        nb_type = "[label IN labels(neighbor) WHERE label <> 'Resource'][0]"
+        nb_label = cypher_label_case('neighbor', nb_type)
+        nb_content = cypher_content_case('neighbor', nb_type, primary=False)
+        nb_emb = (
+            "embedding: neighbor.embedding,\n                             "
+            if self._include_neighbor_embedding else ""
+        )
+        multiplier = (
+            self.config.similarity_neighbor_fetch_multiplier
+            if self.config.enable_similarity_neighbor_ordering else 1
+        )
+        max_nb = self.config.max_neighbors_per_node * multiplier
+
+        if hop_depth >= 2:
+            sh_type = "[label IN labels(secondHop) WHERE label <> 'Resource'][0]"
+            sh_label = cypher_label_case('secondHop', sh_type)
+            sh_content = cypher_content_case('secondHop', sh_type, primary=False)
+            max_sh = self.config.max_second_hop_per_first * multiplier
+
+            cypher = """
+                UNWIND $node_ids AS seed_id
+                MATCH (n) WHERE elementId(n) = seed_id
+                WITH n, elementId(n) AS nodeId
+
+                OPTIONAL MATCH (n)-[r]-(neighbor)
+                WHERE neighbor.embedding IS NOT NULL
+
+                OPTIONAL MATCH (neighbor)-[r2]-(secondHop)
+                WHERE secondHop.embedding IS NOT NULL
+                    AND elementId(secondHop) <> nodeId
+
+                WITH nodeId, neighbor, r,
+                     [item IN collect(DISTINCT {
+                         relationshipType: type(r2),
+                         relatedNode: {
+                             nodeId: elementId(secondHop),
+                             nodeLabel: %(sh_label)s,
+                             nodeType: %(sh_type)s,
+                             nodeContent: %(sh_content)s,
+                             allProperties: CASE WHEN secondHop IS NOT NULL THEN properties(secondHop) ELSE {} END
+                         }
+                     }) WHERE item.relatedNode.nodeId IS NOT NULL][..%(max_sh)s] as secondHopNeighbors
+
+                WITH nodeId,
+                     collect(DISTINCT {
+                         relationshipType: type(r),
+                         primaryNode: {
+                             nodeId: elementId(neighbor),
+                             nodeLabel: %(nb_label)s,
+                             nodeType: %(nb_type)s,
+                             nodeContent: %(nb_content)s,
+                             %(nb_emb)sallProperties: CASE WHEN neighbor IS NOT NULL THEN properties(neighbor) ELSE {} END
+                         },
+                         secondHopNeighbors: secondHopNeighbors
+                     })[..%(max_nb)s] AS neighbors
+
+                RETURN nodeId, [item IN neighbors WHERE item.primaryNode.nodeId IS NOT NULL] AS neighbors
+            """ % {
+                'sh_label': sh_label,
+                'sh_type': sh_type,
+                'sh_content': sh_content,
+                'max_sh': max_sh,
+                'nb_label': nb_label,
+                'nb_type': nb_type,
+                'nb_content': nb_content,
+                'nb_emb': nb_emb,
+                'max_nb': max_nb,
+            }
+        else:
+            cypher = """
+                UNWIND $node_ids AS seed_id
+                MATCH (n) WHERE elementId(n) = seed_id
+                WITH n, elementId(n) AS nodeId
+
+                OPTIONAL MATCH (n)-[r]-(neighbor)
+                WHERE neighbor.embedding IS NOT NULL
+
+                WITH nodeId,
+                     collect(DISTINCT {
+                         relationshipType: type(r),
+                         primaryNode: {
+                             nodeId: elementId(neighbor),
+                             nodeLabel: %(nb_label)s,
+                             nodeType: %(nb_type)s,
+                             nodeContent: %(nb_content)s,
+                             %(nb_emb)sallProperties: CASE WHEN neighbor IS NOT NULL THEN properties(neighbor) ELSE {} END
+                         }
+                     })[..%(max_nb)s] AS neighbors
+
+                RETURN nodeId, [item IN neighbors WHERE item.primaryNode.nodeId IS NOT NULL] AS neighbors
+            """ % {
+                'nb_label': nb_label,
+                'nb_type': nb_type,
+                'nb_content': nb_content,
+                'nb_emb': nb_emb,
+                'max_nb': max_nb,
+            }
+
+        try:
+            with self.driver.session() as session:
+                result = session.run(cypher, {"node_ids": node_ids})
+                neighbors_map = {record["nodeId"]: record["neighbors"] for record in result}
+        except Exception as e:
+            logger.warning("expand_by_ids Cypher failed: %s", e)
+            return items
+
+        for item in items:
+            nid = item.get('metadata', {}).get('primarySource', {}).get('nodeId')
+            if nid and nid in neighbors_map:
+                item['metadata']['firstHopNeighbors'] = neighbors_map[nid] or []
+
+        if self.config.enable_similarity_neighbor_ordering and query_embedding:
+            items = self._sort_neighbors_by_similarity(items, query_embedding)
+
+        return items
+
     def entity_name_lookup(self, query: str, limit: int = 5) -> List[Dict]:
         """
         Find nodes whose display name appears in the query via Neo4j property match.

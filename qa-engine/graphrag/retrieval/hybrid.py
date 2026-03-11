@@ -68,6 +68,9 @@ class HybridRetriever:
             logger.info("[HybridRetriever] BM25 not available, using vector-only retrieval")
             return self.vector_retriever.retrieve(query, top_k, hop_depth)
 
+        if self.config.enable_late_graph_expansion and hop_depth and hop_depth > 0:
+            return self._retrieve_late_expand(query, top_k, hop_depth)
+
         # Calculate how many candidates to fetch from each method
         # Fetch more candidates to allow for better merging
         candidate_multiplier = self.config.initial_top_k_multiplier if hop_depth and hop_depth > 0 else 1
@@ -193,3 +196,35 @@ class HybridRetriever:
             primary['rrf_score'] = rrf_scores[nid]
             merged.append(r)
         return merged
+
+    def _retrieve_late_expand(self, query: str, top_k: int, hop_depth: int) -> List[Dict]:
+        """
+        Late graph expansion:
+          1. BM25 flat + Vector flat in parallel (hop_depth=0, no neighbours)
+          2. RRF merge → top-k seeds
+          3. GraphRetriever.expand_by_ids() on the seeds only
+        """
+        flat_k = self.config.late_expand_flat_k if self.config.late_expand_flat_k > 0 else max(top_k * 3, 20)
+
+        with ThreadPoolExecutor(max_workers=2) as executor:
+            bm25_future = executor.submit(self._run_bm25_search, query, flat_k, 0)
+            vector_future = executor.submit(self._run_vector_search, query, flat_k, 0)
+            bm25_results = bm25_future.result()
+            vector_results = vector_future.result()
+
+        logger.info("[LateExpand] flat BM25=%d, Vector=%d", len(bm25_results), len(vector_results))
+
+        seeds = self._merge_results_rrf(bm25_results, vector_results)[:top_k]
+
+        # Compute query embedding once (needed for DSA-BFS inside expand_by_ids)
+        query_embedding = None
+        if self.config.enable_similarity_neighbor_ordering:
+            if self.config.embedding_backend == "ollama" and self.config.embedding_query_prefix:
+                embedded_query = f"{self.config.embedding_query_prefix}{query}"
+            else:
+                embedded_query = query
+            query_embedding = self.vector_retriever.embedder.embed_query(embedded_query)
+
+        seeds = self.vector_retriever.expand_by_ids(seeds, hop_depth, query_embedding)
+        logger.info("[LateExpand] expanded %d seeds at hop_depth=%d", len(seeds), hop_depth)
+        return seeds
