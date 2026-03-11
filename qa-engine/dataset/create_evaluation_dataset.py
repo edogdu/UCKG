@@ -50,13 +50,50 @@ import sys
 # Add parent directory to path for imports
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from graphrag import GraphRAGSimilarity
+from graphrag import GraphRAGPipeline
 from experiment_config import (
     EXPERIMENTS,
     get_experiment_config,
     get_experiment_metadata,
     list_experiments
 )
+
+
+def _load_pipeline(pipeline_name: str, graphrag_config):
+    """
+    Factory function to create the appropriate pipeline.
+
+    Args:
+        pipeline_name: "graphrag" or "subgraphrag"
+        graphrag_config: GraphRAGConfig instance (used for graphrag; ignored for subgraphrag)
+
+    Returns:
+        Pipeline instance with a .run(query) method and .close() method
+    """
+    if pipeline_name == "subgraphrag":
+        from graphrag.baselines.subgraphrag import SubgraphRAGPipeline, SubgraphRAGConfig
+        # Map experiment config fields to SubgraphRAGConfig where applicable
+        subgraph_config = SubgraphRAGConfig()
+        if graphrag_config is not None:
+            # Mirror embedding settings from experiment config
+            subgraph_config.embedding_backend = graphrag_config.embedding_backend
+            subgraph_config.embedding_model = graphrag_config.embedding_model
+            subgraph_config.embedding_query_prefix = graphrag_config.embedding_query_prefix
+            subgraph_config.embedding_query_prompt = graphrag_config.embedding_query_prompt
+            subgraph_config.embedding_doc_prompt = graphrag_config.embedding_doc_prompt
+            # Apply scoring_mode if set in experiment config
+            scoring_mode = getattr(graphrag_config, "_subgraphrag_scoring_mode", None)
+            if scoring_mode:
+                subgraph_config.scoring_mode = scoring_mode
+            model_path = getattr(graphrag_config, "_subgraphrag_model_path", None)
+            if model_path:
+                subgraph_config.model_path = model_path
+        return SubgraphRAGPipeline(subgraph_config)
+    else:
+        # Default: graphrag
+        if graphrag_config:
+            return GraphRAGPipeline(graphrag_config)
+        return GraphRAGPipeline()
 
 
 # Global flag for graceful shutdown
@@ -180,7 +217,7 @@ def load_all_questions(testing_dir: str) -> List[Dict[str, Any]]:
     return all_questions
 
 
-def run_question_through_pipeline(rag_engine: GraphRAGSimilarity, question: Dict[str, Any]) -> Dict[str, Any]:
+def run_question_through_pipeline(rag_engine, question: Dict[str, Any]) -> Dict[str, Any]:
     """
     Run a single question through the GraphRAG pipeline and capture all relevant data
 
@@ -334,7 +371,8 @@ def create_evaluation_dataset(
     experiment_name: str,
     graphrag_config=None,
     limit: int = None,
-    force_restart: bool = False
+    force_restart: bool = False,
+    pipeline_name: str = "graphrag",
 ) -> Dict[str, Any]:
     """
     Main function to create the evaluation dataset with checkpoint/resume support
@@ -407,15 +445,11 @@ def create_evaluation_dataset(
                 return json.load(f)
         return {"samples": samples}
 
-    # Initialize GraphRAG engine with config
-    print("\n[2/4] Initializing GraphRAG engine...")
-    if graphrag_config:
-        print(f"  Using experiment config: {experiment_name}")
-        _rag_engine = GraphRAGSimilarity(graphrag_config)
-    else:
-        print("  Using default config")
-        _rag_engine = GraphRAGSimilarity()
-    print("GraphRAG engine initialized")
+    # Initialize pipeline engine with config
+    print(f"\n[2/4] Initializing {pipeline_name} engine...")
+    print(f"  Using experiment config: {experiment_name}")
+    _rag_engine = _load_pipeline(pipeline_name, graphrag_config)
+    print(f"{pipeline_name} engine initialized")
 
     # Set up signal handlers for graceful shutdown (SIGINT=Ctrl+C, SIGTERM=kill/Docker)
     signal.signal(signal.SIGINT, signal_handler)
@@ -548,6 +582,13 @@ Examples:
         action="store_true",
         help="Force restart, ignoring any existing checkpoint"
     )
+    parser.add_argument(
+        "--pipeline", "-p",
+        type=str,
+        default="graphrag",
+        choices=["graphrag", "subgraphrag"],
+        help="Pipeline to use for evaluation (default: graphrag)"
+    )
 
     return parser.parse_args()
 
@@ -597,7 +638,8 @@ def main():
         experiment_name=args.experiment,
         graphrag_config=graphrag_config,
         limit=args.limit,
-        force_restart=args.restart
+        force_restart=args.restart,
+        pipeline_name=args.pipeline,
     )
 
     # Print summary statistics (only if completed)

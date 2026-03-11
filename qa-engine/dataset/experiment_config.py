@@ -12,7 +12,7 @@ Usage:
     from experiment_config import EXPERIMENTS, get_experiment_config
 
     config = get_experiment_config("nomic_baseline")
-    rag = GraphRAGSimilarity(config)
+    rag = GraphRAGPipeline(config)
 """
 
 from dataclasses import asdict
@@ -292,6 +292,158 @@ def _generate_experiments():
             },
         }
 
+    # DSA-BFS similarity-ordered neighbor selection experiments
+    # Mirrors core nomic_v2 configs with enable_similarity_neighbor_ordering=True
+    nomic_v2 = EMBEDDING_CONFIGS.get("nomic_v2")
+    if nomic_v2:
+        cross_base = RETRIEVAL_CONFIGS["cross_encoder"]["config"]
+        hybrid_cross_base = RETRIEVAL_CONFIGS["hybrid_cross_encoder"]["config"]
+
+        experiments["nomic_v2_limit_cross_encoder"] = {
+            "description": "[nomic_v2] Vector + Cross-encoder + DSA-BFS neighbor ordering (multiplier=3)",
+            "embedding_model": nomic_v2["embedding_model"],
+            "config": {
+                **cross_base,
+                **nomic_v2,
+                "enable_similarity_neighbor_ordering": True,
+                "similarity_neighbor_fetch_multiplier": 3,
+            },
+        }
+
+        experiments["nomic_v2_limit_cross_encoder_m5"] = {
+            "description": "[nomic_v2] Vector + Cross-encoder + DSA-BFS neighbor ordering (multiplier=5)",
+            "embedding_model": nomic_v2["embedding_model"],
+            "config": {
+                **cross_base,
+                **nomic_v2,
+                "enable_similarity_neighbor_ordering": True,
+                "similarity_neighbor_fetch_multiplier": 5,
+            },
+        }
+
+        experiments["nomic_v2_limit_hybrid_cross_encoder"] = {
+            "description": "[nomic_v2] Hybrid + Cross-encoder + DSA-BFS neighbor ordering (multiplier=3)",
+            "embedding_model": nomic_v2["embedding_model"],
+            "config": {
+                **hybrid_cross_base,
+                **nomic_v2,
+                "enable_similarity_neighbor_ordering": True,
+                "similarity_neighbor_fetch_multiplier": 3,
+            },
+        }
+
+        experiments["nomic_v2_limit_hybrid_cross_encoder_m5"] = {
+            "description": "[nomic_v2] Hybrid + Cross-encoder + DSA-BFS neighbor ordering (multiplier=5)",
+            "embedding_model": nomic_v2["embedding_model"],
+            "config": {
+                **hybrid_cross_base,
+                **nomic_v2,
+                "enable_similarity_neighbor_ordering": True,
+                "similarity_neighbor_fetch_multiplier": 5,
+            },
+        }
+
+        # HyDE variants: DSA-BFS + HyDE query expansion
+        experiments["nomic_v2_limit_cross_encoder_hyde"] = {
+            "description": "[nomic_v2] Vector + Cross-encoder + DSA-BFS + HyDE query expansion",
+            "embedding_model": nomic_v2["embedding_model"],
+            "config": {
+                **cross_base,
+                **nomic_v2,
+                "enable_similarity_neighbor_ordering": True,
+                "similarity_neighbor_fetch_multiplier": 3,
+                "enable_hyde": True,
+            },
+        }
+
+        experiments["nomic_v2_limit_hybrid_cross_encoder_hyde"] = {
+            "description": "[nomic_v2] Hybrid + Cross-encoder + DSA-BFS + HyDE query expansion",
+            "embedding_model": nomic_v2["embedding_model"],
+            "config": {
+                **hybrid_cross_base,
+                **nomic_v2,
+                "enable_similarity_neighbor_ordering": True,
+                "similarity_neighbor_fetch_multiplier": 3,
+                "enable_hyde": True,
+            },
+        }
+
+        # Late graph expansion experiments (SAGE / SPRIG style)
+        experiments["nomic_v2_late_hybrid_cross_encoder"] = {
+            "description": "[nomic_v2] Hybrid + Cross-encoder + Late graph expansion",
+            "embedding_model": nomic_v2["embedding_model"],
+            "config": {
+                **hybrid_cross_base,
+                **nomic_v2,
+                "enable_late_graph_expansion": True,
+            },
+        }
+        experiments["nomic_v2_late_limit_hybrid_cross_encoder"] = {
+            "description": "[nomic_v2] Hybrid + Cross-encoder + Late expansion + DSA-BFS (m=3)",
+            "embedding_model": nomic_v2["embedding_model"],
+            "config": {
+                **hybrid_cross_base,
+                **nomic_v2,
+                "enable_late_graph_expansion": True,
+                "enable_similarity_neighbor_ordering": True,
+                "similarity_neighbor_fetch_multiplier": 3,
+            },
+        }
+        experiments["nomic_v2_late_hybrid_cross_encoder_flat100"] = {
+            "description": "[nomic_v2] Hybrid + Cross-encoder + Late expansion (flat pool=100 per retriever)",
+            "embedding_model": nomic_v2["embedding_model"],
+            "config": {
+                **hybrid_cross_base,
+                **nomic_v2,
+                "enable_late_graph_expansion": True,
+                "late_expand_flat_k": 100,
+            },
+        }
+
+    # ----------------------------------------------------------------
+    # SubgraphRAG baseline experiments (triple-scoring pipeline)
+    # These use the SubgraphRAGPipeline, not GraphRAGPipeline.
+    # The GraphRAGConfig fields are used only to pass embedding settings;
+    # the _subgraphrag_* sentinel fields control MLP behaviour.
+    # ----------------------------------------------------------------
+
+    # Cosine fallback — no MLP training needed, testable immediately
+    experiments["subgraphrag_cosine"] = {
+        "description": "[SubgraphRAG] Cosine triple scoring (no MLP, nomic embeddings)",
+        "embedding_model": EMBEDDING_CONFIGS["nomic_v2"]["embedding_model"],
+        "config": {
+            **EMBEDDING_CONFIGS["nomic_v2"],
+            # sentinel fields read by _load_pipeline in create_evaluation_dataset
+            "_subgraphrag_scoring_mode": "cosine",
+        },
+    }
+
+    # Untrained MLP (random weights) — DDE ablation baseline
+    experiments["subgraphrag_untrained"] = {
+        "description": "[SubgraphRAG] Untrained MLP with DDE features (random weights)",
+        "embedding_model": EMBEDDING_CONFIGS["nomic_v2"]["embedding_model"],
+        "config": {
+            **EMBEDDING_CONFIGS["nomic_v2"],
+            "_subgraphrag_scoring_mode": "mlp",
+            "_subgraphrag_model_path": "",  # empty → random init
+        },
+    }
+
+    # Trained MLP — requires running training/train.py first
+    experiments["subgraphrag_trained"] = {
+        "description": "[SubgraphRAG] Trained MLP with DDE features (loaded from models/)",
+        "embedding_model": EMBEDDING_CONFIGS["nomic_v2"]["embedding_model"],
+        "config": {
+            **EMBEDDING_CONFIGS["nomic_v2"],
+            "_subgraphrag_scoring_mode": "mlp",
+            # Default model path; override at runtime if needed
+            "_subgraphrag_model_path": os.path.join(
+                os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+                "graphrag", "baselines", "subgraphrag", "models", "subgraphrag_mlp.pt"
+            ),
+        },
+    }
+
     return experiments
 
 
@@ -323,8 +475,17 @@ def get_experiment_config(experiment_name: str) -> GraphRAGConfig:
     experiment = EXPERIMENTS[experiment_name]
     config_overrides = experiment.get("config", {})
 
-    # Create config with overrides
-    return GraphRAGConfig(**config_overrides)
+    # Strip sentinel fields (prefixed with _) — used by _load_pipeline, not GraphRAGConfig
+    graphrag_overrides = {k: v for k, v in config_overrides.items() if not k.startswith("_")}
+
+    config = GraphRAGConfig(**graphrag_overrides)
+
+    # Attach sentinel fields as attributes for _load_pipeline to read
+    for k, v in config_overrides.items():
+        if k.startswith("_"):
+            setattr(config, k, v)
+
+    return config
 
 
 def get_experiment_metadata(experiment_name: str) -> dict:
