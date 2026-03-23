@@ -41,6 +41,7 @@ import os
 import json
 import argparse
 import signal
+import time
 from datetime import datetime
 from dataclasses import asdict
 from typing import List, Dict, Any, Optional
@@ -242,7 +243,9 @@ def run_question_through_pipeline(rag_engine, question: Dict[str, Any]) -> Dict[
 
     try:
         # Run the full pipeline
+        t0 = time.perf_counter()
         result = rag_engine.run(query_text)
+        latency_ms = (time.perf_counter() - t0) * 1000.0
         pruning_metadata = result.get("pruning_metadata", {}) or {}
         pruning_status = pruning_metadata.get("status", "")
         pruning_enabled = pruning_status == "applied"
@@ -292,7 +295,8 @@ def run_question_through_pipeline(rag_engine, question: Dict[str, Any]) -> Dict[
                     "pre_nodes": pruning_metadata.get("pre_nodes"),
                     "post_nodes": pruning_metadata.get("post_nodes"),
                     "prune_ratio": pruning_metadata.get("prune_ratio"),
-                }
+                },
+                "latency_ms": latency_ms,
             }
         }
 

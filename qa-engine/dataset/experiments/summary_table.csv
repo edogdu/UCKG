@@ -9,6 +9,7 @@ nomic_v2_hybrid_cross_encoder_ppr_topk5_3,68.1,6.83,11.93,21.03,7.99,10.97,16.32
 nomic_baseline,47.79,6.98,11.58,12.3,7.67,11.73,15.0
 nomic_v2_limit_hybrid_cross_encoder_m5,71.74,5.85,10.31,27.3,6.31,10.56,13.74
 securebert_hybrid_cross_encoder,57.4,6.03,10.29,19.92,7.9,8.59,13.9
+nomic_v2_hybrid_cross_encoder,70.97,5.83,10.26,27.31,6.41,9.76,14.17
 gemma_hybrid_cross_encoder,57.4,5.98,10.24,19.74,7.76,8.62,13.85
 nomic_hybrid_cross_encoder,57.4,5.96,10.19,20.01,7.71,8.53,13.83
 nomic_v2_late_limit_hybrid_cross_encoder,64.35,5.71,10.03,26.87,6.25,9.1,14.24
@@ -21,7 +22,6 @@ nomic_v2_hybrid_cross_encoder_ppr,70.97,4.4,7.86,51.96,4.09,7.39,11.67
 nomic_v2_baseline,63.25,4.3,7.77,31.37,4.27,7.76,10.96
 nomic_cross_encoder,43.16,3.97,6.89,17.81,5.78,6.14,8.52
 securebert_cross_encoder,37.97,3.92,6.65,18.62,4.33,5.73,9.52
-nomic_v2_hybrid_cross_encoder,73.73,3.59,6.41,78.74,3.19,6.39,9.35
 nomic_v2_cross_encoder,68.32,3.26,5.86,75.8,3.67,7.69,6.32
 subgraphrag_trained,17.33,2.69,4.56,12.33,2.0,5.79,5.85
 gemma_ollama_cross_encoder,5.08,0.82,1.39,7.03,1.98,0.62,1.49

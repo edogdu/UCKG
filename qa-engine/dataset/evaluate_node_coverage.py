@@ -260,6 +260,7 @@ def evaluate_sample_coverage(sample: Dict[str, Any], label_uri_lookup: Optional[
         'hit_at_3': hit_at_3,
         'reciprocal_rank': reciprocal_rank,
         'ranking_available': ranking_available,
+        'latency_ms': sample.get("metadata", {}).get("latency_ms"),
     }
 
 
@@ -461,6 +462,14 @@ def evaluate_dataset(dataset_path: str) -> Dict[str, Any]:
         results['overall']['avg_hit_at_3'] = sum(all_hit3) / len(all_hit3)
         results['overall']['avg_mrr'] = sum(all_rr) / len(all_rr)
         results['overall']['ranking_samples'] = len(all_hit1)
+
+    all_latencies = [
+        r["latency_ms"]
+        for r in results["detailed_results"]
+        if r.get("latency_ms") is not None
+    ]
+    if all_latencies:
+        results["overall"]["avg_latency_ms"] = sum(all_latencies) / len(all_latencies)
 
     return results
 
