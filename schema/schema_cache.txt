@@ -1,0 +1,102 @@
+# UCKG Physical Schema Cache
+# Generated from Neo4j — ground truth for semantic schema authoring
+# Only UCO-domain elements are listed (RDF/OWL ontology artifacts excluded)
+# ─────────────────────────────────────────────────────────────────────────────
+
+# NODE LABELS (14)
+UcoCVE
+UcoCWE
+UcoExploitTarget
+UcoVulnerability
+UcoexCAMPAIGNS
+UcoexCAPEC
+UcoexCPE
+UcoexGROUPS
+UcoexMITIGATIONS
+UcoexMITREATTACK
+UcoexMITRED3FEND
+UcoexObservedExample
+UcoexSOFTWARE
+UcoexTACTICS
+
+# RELATIONSHIP TRIPLES (16)
+# format: SourceLabel -[RELATIONSHIP_TYPE]-> TargetLabel
+UcoexCAMPAIGNS      -[UCOEXATTRIBUTEDTO]->           UcoexGROUPS
+UcoexCAMPAIGNS      -[UCOEXCAMPAIGNUSESSOFTWARE]->   UcoexSOFTWARE
+UcoexCAMPAIGNS      -[UCOEXCAMPAIGNUSESTECHNIQUE]->  UcoexMITREATTACK
+UcoexObservedExample -[UCOEXEXAMPLEOBSERVEDIN]->      UcoCVE
+UcoexGROUPS         -[UCOEXGROUPUSESSOFTWARE]->       UcoexSOFTWARE
+UcoexGROUPS         -[UCOEXGROUPUSESTECHNIQUE]->      UcoexMITREATTACK
+UcoCVE              -[UCOEXHASCPE]->                  UcoexCPE
+UcoexMITRED3FEND    -[UCOEXHASMITREATTACK]->          UcoexMITREATTACK
+UcoexCAPEC          -[UCOEXHASRELATEDWEAKNESS]->      UcoCWE
+UcoexCAPEC          -[UCOEXHASTAXONOMYMAPPING]->      UcoexMITREATTACK
+UcoexMITIGATIONS    -[UCOEXMITIGATES]->               UcoexMITREATTACK
+UcoexSOFTWARE       -[UCOEXSOFTWAREUSESTECHNIQUE]->   UcoexMITREATTACK
+UcoVulnerability    -[UCOHASCVE_ID]->                 UcoCVE
+UcoCWE              -[UCOHASOBSERVEDEXAMPLE]->        UcoexObservedExample
+UcoExploitTarget    -[UCOHASVULNERABILITY]->          UcoVulnerability
+UcoExploitTarget    -[UCOHASWEAKNESS]->               UcoCWE
+
+# PROPERTY KEYS (58)
+# format: property_key
+cpeName
+cpeNameId
+dictionary_found
+label
+lastModified
+titles
+uri
+ucoabstraction
+ucoapplicablePlatform
+ucobaseSeverity
+ucocommonConsequences
+ucocweExtendedSummary
+ucocweID
+ucocweName
+ucocweSummary
+ucodemonstrativeExamples
+ucodescription
+ucodetectionMethods
+ucoevaluatorSolution
+ucoexAbstraction
+ucoexCAPEC_id
+ucoexCAPEC_name
+ucoexConsequences
+ucoexDESCRIPTION
+ucoexDOMAIN
+ucoexDescription
+ucoexExample
+ucoexExecutionFlowTechnique
+ucoexExtendedDescription
+ucoexLikelihood
+ucoexMITRED3FEND_DEFINITION
+ucoexMITRED3FEND_LABEL
+ucoexMitigations
+ucoexNAME
+ucoexPrerequisites
+ucoexRelatedAttPattern
+ucoexRelatedWeaknesses
+ucoexResources_Required
+ucoexSeverity
+ucoexSkills_Required
+ucoexTaxonomyMappingATTACK
+ucoexURL
+ucoexploitabilityScore
+ucoimpactScore
+ucolastModifiedDateTime
+ucolikelihoodOfExploit
+ucomappingNotes
+ucomodesOfIntroduction
+ucoobtainAllPrivilege
+ucopotentialMitigations
+ucopublishedDateTime
+ucoreferences
+ucorelatedAttackPatterns
+ucostatus
+ucostructure
+ucosummary
+ucotimeOfIntroduction
+ucouserInteractionRequired
+ucovectorString
+ucovulnStatus
