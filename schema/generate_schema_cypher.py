@@ -28,8 +28,8 @@ from pathlib import Path
 from datetime import datetime
 
 # ─── defaults ────────────────────────────────────────────────────────────────
-REPO_ROOT      = Path(__file__).resolve().parents[3]          # UCKG/
-SCHEMA_DEFAULT = Path(__file__).resolve().parent.parent / "configt2c" / "semantic_schema_uckg_v3.json"
+REPO_ROOT      = Path(__file__).resolve().parent.parent       # UCKG/
+SCHEMA_DEFAULT = Path(__file__).resolve().parent / "semantic_schema_uckg_v3.json"
 OUT_DEFAULT    = REPO_ROOT / "neo4j" / "import" / "uckg_semantic_schema.cypher"
 
 

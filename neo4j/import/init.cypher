@@ -18,3 +18,8 @@ CALL n10s.graphconfig.init({
   keepCustomDataTypes: true,
   applyNeo4jNaming: true
 });
+
+// ─── UCKG Semantic Schema metadata ───────────────────────────────────────────
+// Load UCKGMeta_* nodes and edges on first container boot.
+// Skipped silently if the schema node already exists (idempotent).
+CALL apoc.cypher.runFile('uckg_semantic_schema.cypher') YIELD row, result RETURN row, result;

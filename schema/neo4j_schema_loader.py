@@ -56,8 +56,7 @@ except ImportError:
 # ─────────────────────────────────────────────────────────────────────────────
 
 DEFAULT_SCHEMA_PATH = (
-    Path(__file__).resolve().parent.parent
-    / "configt2c"
+    Path(__file__).resolve().parent
     / "semantic_schema_uckg_v3.json"
 )
 DEFAULT_URI      = "bolt://localhost:7687"

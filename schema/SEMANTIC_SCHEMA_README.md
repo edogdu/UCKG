@@ -143,10 +143,7 @@ semantic_schema_uckg_v3.json
 │   ├── description
 │   ├── cypher_pattern
 │   └── use_cases[]
-│
-└── embedding_corpus[]     70+ manually curated retrieval strings for vector search
-    (used by T2CSS — but also useful as a summary corpus for any RAG system)
-```
+
 
 ---
 
@@ -213,190 +210,26 @@ examples, making them directly usable by any tool that generates or explains que
 
 ---
 
-## 8. Storing it in Neo4j as metadata
+## 8. Storing and querying it in Neo4j
 
-The semantic schema can be persisted inside Neo4j itself as **`UCKGMeta_*` nodes**,
-making it queryable via Cypher like any other graph data.
+The semantic schema is persisted inside Neo4j as **`UCKGMeta_*` nodes**, making
+it queryable via Cypher like any other graph data.
 
-Five methods are available — use whichever fits your workflow:
+> **See [`SCHEMA_LOADING_GUIDE.md`](SCHEMA_LOADING_GUIDE.md) for the full
+> step-by-step loading and querying workflow.**
 
----
+**In short — two methods are used:**
 
-### Method 0 — Python driver script (manual / CI)
+| Method | When | Command |
+|---|---|---|
+| **Docker auto-load** | Fresh environment / first boot | `python3 schema/generate_schema_cypher.py` → `docker compose up` |
+| **Python driver** | Neo4j already running, push an update | `python3 schema/neo4j_schema_loader.py` |
 
-**File:** `core/neo4j_schema_loader.py`
-
-```bash
-# Dry-run: see what would be written, without touching Neo4j
-python core/neo4j_schema_loader.py --dry-run
-
-# Load into Neo4j
-python core/neo4j_schema_loader.py
-
-# Custom schema file or connection
-python core/neo4j_schema_loader.py \
-  --schema configt2c/semantic_schema_uckg_v3.json \
-  --uri bolt://localhost:7687 \
-  --user neo4j --password abcd90909090
-```
-
----
-
-### Method A — APOC `apoc.load.json()` (Neo4j Browser / cypher-shell)
-
-**File:** `core/apoc_schema_load.cypher`
-
-APOC and file import are already enabled in `docker-compose.yml`.
+**To extract the schema back from Neo4j:**
 
 ```bash
-# Copy the JSON into the Neo4j import mount
-cp configt2c/semantic_schema_uckg_v3.json \
-   ../../neo4j/import/semantic_schema_uckg_v3.json
-
-# Execute via cypher-shell
-docker compose exec neo4j \
-  cypher-shell -u neo4j -p abcd90909090 \
-  --file /var/lib/neo4j/import/apoc_schema_load.cypher
-```
-
----
-
-### Method B — Static `.cypher` generator (no APOC, no Python at load time)
-
-**File:** `core/generate_schema_cypher.py`
-
-Generates a self-contained `.cypher` file with MERGE statements — reproducible,
-committable, no runtime Python needed.
-
-```bash
-python core/generate_schema_cypher.py
-# → writes neo4j/import/uckg_semantic_schema.cypher
-
-docker compose exec neo4j \
-  cypher-shell -u neo4j -p abcd90909090 \
-  --file /var/lib/neo4j/import/uckg_semantic_schema.cypher
-```
-
----
-
-### Method C — FastAPI lifespan auto-bootstrap
-
-**File:** `main.py` (patched)
-
-On every API startup, the app checks if `UCKGMeta_Schema {version:'v3'}` exists:
-- **Not present** → runs the loader automatically (first boot)
-- **Already present** → skips (fast no-op)
-- **`FORCE_SCHEMA_RELOAD=true`** → always re-runs
-
-```bash
-FORCE_SCHEMA_RELOAD=true uvicorn main:app   # force refresh
-```
-
----
-
-### Method D — Docker `init.cypher` hook (first container boot)
-
-**File:** `neo4j/import/init.cypher` (patched)
-
-`docker-compose.yml` already calls `init.cypher` via APOC initializer on first Neo4j
-boot. The patched version now also calls:
-
-```cypher
-CALL apoc.cypher.runFile('file:///var/lib/neo4j/import/uckg_semantic_schema.cypher');
-```
-
-**Prerequisite:** generate the static Cypher file before starting the container:
-```bash
-python core/generate_schema_cypher.py
-docker compose up neo4j
-```
-
----
-
-### Comparison
-
-| | 0 — Python | A — APOC | B — Static Cypher | C — FastAPI | D — Docker init |
-|---|---|---|---|---|---|
-| **Trigger** | Manual | Manual | Manual | Auto on API start | Auto on first container boot |
-| **Runtime deps** | Python + neo4j pkg | APOC | None | Python + neo4j pkg | Docker + APOC |
-| **Best for** | Dev / CI | Interactive | CI/CD migrations | Production API | Fresh deployments |
-
----
-
-## 9. Extracting it from Neo4j
-
-**File:** `core/neo4j_semantic_extractor.py`
-
-Mirrors what `shared/schema_extract.py` does for the **physical** schema — queries
-the `UCKGMeta_*` sub-graph and returns a structured Python dict.
-
-This dict is the canonical representation any consumer should work with:
-
-```python
-{
-    "version":  "v3",
-    "source":   "neo4j",           # or "file"
-    "classes":           [...],    # 14 node entries
-    "object_properties": [...],    # 16 relationship entries
-    "data_properties":   {...},    # properties grouped by node
-    "embedding_corpus":  [...],    # reconstructed retrieval strings
-    "graph_traversal_paths": [...] # 7 multi-hop recipes
-}
-```
-
-### Usage — Python
-
-```python
-from core.neo4j_semantic_extractor import SemanticSchemaExtractor
-
-extractor = SemanticSchemaExtractor("bolt://localhost:7687", "neo4j", "pass")
-schema    = extractor.extract()
-extractor.close()
-
-# With caching (re-fetch only if cache is older than 24 hours)
-schema = extractor.extract(
-    cache_path    = "configt2c/semantic_schema_neo4j_cache.json",
-    max_age_hours = 24,
-)
-```
-
-### Convenience function
-
-```python
-from core.neo4j_semantic_extractor import load_semantic_schema_from_neo4j
-schema = load_semantic_schema_from_neo4j()
-```
-
-### CLI
-
-```bash
-# Print summary to stdout
-python core/neo4j_semantic_extractor.py
-
-# Save full schema to JSON
-python core/neo4j_semantic_extractor.py \
-  --out configt2c/semantic_schema_neo4j_cache.json
-```
-
-### Verify in Neo4j Browser
-
-```cypher
--- Count all metadata nodes
-MATCH (n) WHERE any(l IN labels(n) WHERE l STARTS WITH 'UCKGMeta')
-RETURN labels(n)[0] AS type, count(*) AS total
-
--- All node types with property counts
-MATCH (n:UCKGMeta_Node)
-OPTIONAL MATCH (n)-[:META_HAS_PROPERTY]->(p)
-RETURN n.semantic, n.physical_label, count(p) AS props
-
--- All relationship triples
-MATCH (src:UCKGMeta_Node)-[e:META_CONNECTS_TO]->(tgt:UCKGMeta_Node)
-RETURN src.semantic, e.via_semantic, e.via_physical, tgt.semantic
-
--- Multi-hop paths
-MATCH (tp:UCKGMeta_TraversalPath)
-RETURN tp.name, tp.cypher_pattern
+python3 schema/neo4j_semantic_extractor.py \
+  --out schema/semantic_schema_neo4j_cache.json
 ```
 
 ---
@@ -602,50 +435,23 @@ qa-engine/text2cypher/
 
 ## 16. Quick-start
 
-### One-time setup (first run, or after editing the schema JSON)
+> **Full step-by-step loading and querying instructions are in
+> [`SCHEMA_LOADING_GUIDE.md`](SCHEMA_LOADING_GUIDE.md).**
+
+Two commands cover the common case:
 
 ```bash
-cd /path/to/UCKG
+# 1. Generate static Cypher from the JSON (one-time, or after editing the schema)
+python3 schema/generate_schema_cypher.py
 
-# 1. Generate the static Cypher migration file
-python qa-engine/text2cypher/core/generate_schema_cypher.py
-# → writes neo4j/import/uckg_semantic_schema.cypher
-
-# 2. Load into Neo4j via Python driver
-python qa-engine/text2cypher/core/neo4j_schema_loader.py
+# 2. Start the stack — schema loads automatically on first Neo4j boot
+docker compose up
 ```
 
-### Verify it loaded
-
-```cypher
-MATCH (s:UCKGMeta_Schema) RETURN s.version, s.last_loaded
-```
-
-### Extract the schema from Neo4j
+If Neo4j is already running and you just need to push an update:
 
 ```bash
-python qa-engine/text2cypher/core/neo4j_semantic_extractor.py \
-  --out qa-engine/text2cypher/configt2c/semantic_schema_neo4j_cache.json
-```
-
-### Use in any Python consumer
-
-```python
-from core.neo4j_semantic_extractor import load_semantic_schema_from_neo4j
-
-schema = load_semantic_schema_from_neo4j()
-
-# Explore nodes
-for node in schema["classes"]:
-    print(node["semantic"], "→", node["physical_label"])
-
-# Explore relationships
-for rel in schema["object_properties"]:
-    print(rel["source_node_semantic"], "─[", rel["semantic"], "]→", rel["target_node_semantic"])
-
-# Use the embedding corpus (for RAG or T2CSS)
-corpus = schema["embedding_corpus"]
-print(f"{len(corpus)} corpus lines ready for embedding")
+python3 schema/neo4j_schema_loader.py
 ```
 
 ---
@@ -721,4 +527,4 @@ reconstruction in `_reconstruct_corpus()` is deterministic and fast (< 1 ms).
 
 ---
 
-*File: `qa-engine/text2cypher/SEMANTIC_SCHEMA_README.md`*
+*File: `schema/SEMANTIC_SCHEMA_README.md`*
