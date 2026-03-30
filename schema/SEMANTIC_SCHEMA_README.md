@@ -1,529 +1,652 @@
-# UCKG Semantic Schema — General Reference
+# UCKG Semantic Schema — Workflow & Design Reference
 
-The **UCKG Semantic Schema** is a human-authored, machine-readable documentation
-layer that describes the **meaning** of every node type, property, and relationship
-in the UCKG knowledge graph.
-
-It is **not** tied to any single application. It is a shared KG artifact — analogous
-to an ontology or a data dictionary — that any tool, pipeline, or service can read
-to understand what the graph contains and how to work with it.
+> **Version**: v3  
+> **Module**: `schema/semantic_schema.py`  
+> **Source of truth**: `schema/semantic_schema.cypher` → Neo4j `UCKGMeta_*` nodes
 
 ---
 
 ## Table of Contents
 
 1. [What is the semantic schema?](#1-what-is-the-semantic-schema)
-2. [Who can use it?](#2-who-can-use-it)
-3. [Where does it live?](#3-where-does-it-live)
-4. [Schema structure (v3)](#4-schema-structure-v3)
-5. [Covered nodes (14)](#5-covered-nodes-14)
-6. [Covered relationships (16)](#6-covered-relationships-16)
-7. [Covered traversal paths (7)](#7-covered-traversal-paths-7)
-8. [Storing it in Neo4j as metadata](#8-storing-it-in-neo4j-as-metadata)
-9. [Extracting it from Neo4j](#9-extracting-it-from-neo4j)
-10. [Consumer: Text-to-Cypher (T2CSS)](#10-consumer-text-to-cypher-t2css)
-11. [Consumer: Documentation & Exploration](#11-consumer-documentation--exploration)
-12. [Consumer: LLM Agents & RAG Systems](#12-consumer-llm-agents--rag-systems)
-13. [Consumer: API & Frontend](#13-consumer-api--frontend)
-14. [Consumer: Validation & Governance](#14-consumer-validation--governance)
-15. [File inventory](#15-file-inventory)
-16. [Quick-start](#16-quick-start)
-17. [Neo4j metadata graph layout](#17-neo4j-metadata-graph-layout)
-18. [Design decisions](#18-design-decisions)
+2. [Architecture overview](#2-architecture-overview)
+3. [What lives in Neo4j](#3-what-lives-in-neo4j)
+4. [What each metadata node contains](#4-what-each-metadata-node-contains)
+5. [The `nl_template` mechanism](#5-the-nl_template-mechanism)
+6. [Covered nodes (14)](#6-covered-nodes-14)
+7. [Covered relationships (16)](#7-covered-relationships-16)
+8. [Covered traversal paths (7)](#8-covered-traversal-paths-7)
+9. [Loading the schema into Neo4j](#9-loading-the-schema-into-neo4j)
+10. [Extracting the schema from Neo4j](#10-extracting-the-schema-from-neo4j)
+11. [Generating natural-language instance descriptions](#11-generating-natural-language-instance-descriptions)
+12. [Querying the metadata directly](#12-querying-the-metadata-directly)
+13. [Single module design (`semantic_schema.py`)](#13-single-module-design-semantic_schemapy)
+14. [File inventory](#14-file-inventory)
+15. [Design decisions](#15-design-decisions)
 
 ---
 
 ## 1. What is the semantic schema?
 
-The **physical schema** of a graph database answers: *what labels and relationship
-types exist?*
+The **physical schema** of a graph database answers: *what labels and relationship types exist?*
 
-The **semantic schema** answers the deeper questions:
+The **semantic schema** answers deeper questions:
 
 | Question | Physical schema | Semantic schema |
 |---|---|---|
-| What labels exist? | ✅ yes | ✅ yes |
-| What property keys exist? | ✅ yes | ✅ yes |
-| What does each label _mean_? | ❌ no | ✅ yes |
-| Which property is the primary identifier? | ❌ no | ✅ yes |
-| What are example property values? | ❌ no | ✅ yes |
-| How should I filter by a property in Cypher? | ❌ no | ✅ yes |
-| What does a relationship between two nodes _mean_? | ❌ no | ✅ yes |
-| Which nodes can I reach in 2–3 hops? | ❌ no | ✅ yes |
-| What natural-language phrases map to this node/rel? | ❌ no | ✅ yes |
+| What labels exist? | ✅ | ✅ |
+| What property keys exist? | ✅ | ✅ |
+| What does each label *mean*? | ❌ | ✅ |
+| Which property is the primary identifier? | ❌ | ✅ |
+| What are example property values? | ❌ | ✅ |
+| What does a relationship between two nodes *mean*? | ❌ | ✅ |
+| Which nodes can I reach in 2–3 hops? | ❌ | ✅ |
+| How do I describe a graph instance in English? | ❌ | ✅ (`nl_template`) |
 
-In the UCKG, the semantic schema lives in:
-
-- **JSON files** (portable, version-controlled, offline-readable)
-- **Neo4j itself** (queryable, always in sync with the graph, accessible to any tool)
+The semantic schema is embedded **inside Neo4j** as `UCKGMeta_*` metadata nodes — the same database that holds the data.  
+Any Cypher-capable tool can read it. No external files required at runtime.
 
 ---
 
-## 2. Who can use it?
+## 2. Architecture overview
 
 ```
-                    ┌─────────────────────────────────────┐
-                    │       UCKG Semantic Schema           │
-                    │  configt2c/semantic_schema_uckg_v3   │
-                    │         or UCKGMeta_* in Neo4j       │
-                    └───────────────┬─────────────────────┘
-                                    │
-          ┌─────────────────────────┼─────────────────────────┐
-          │                         │                          │
-          ▼                         ▼                          ▼
-  ┌───────────────┐       ┌──────────────────┐      ┌──────────────────┐
-  │  Text-to-     │       │  LLM Agents /    │      │  REST API /      │
-  │  Cypher       │       │  RAG Systems     │      │  Frontend        │
-  │  (T2CSS)      │       │                  │      │                  │
-  └───────────────┘       └──────────────────┘      └──────────────────┘
-          │                         │                          │
-          ▼                         ▼                          ▼
-  ┌───────────────┐       ┌──────────────────┐      ┌──────────────────┐
-  │  Validation & │       │  Documentation / │      │  Data Pipeline   │
-  │  Governance   │       │  KG Exploration  │      │  & ETL Checks    │
-  └───────────────┘       └──────────────────┘      └──────────────────┘
+  ┌─────────────────────────────────────────────────────────────┐
+  │  AUTHOR TIME  (developer writes once)                        │
+  │                                                              │
+  │   semantic_schema.cypher                                     │
+  │   ┌────────────────────────────────────────────────────┐    │
+  │   │ MERGE (n:UCKGMeta_Node {semantic:'CVE'})           │    │
+  │   │ SET n.nl_template = '{ID}, which is a              │    │
+  │   │                      vulnerability'                │    │
+  │   │                                                    │    │
+  │   │ MERGE (r:UCKGMeta_Relationship {semantic:'hasCPE'})│    │
+  │   │ SET r.nl_template = '{SRC_ID}, which is a          │    │
+  │   │     vulnerability, has a CPE, {TGT_ID}, which is   │    │
+  │   │     a software platform titled "{TGT_LABEL}".'     │    │
+  │   └────────────────────────────────────────────────────┘    │
+  │                          │                                   │
+  │                          ▼                                   │
+  │   semantic_schema.py update()                                │
+  │   Executes Cypher → creates UCKGMeta_* nodes in Neo4j       │
+  │                                                              │
+  └──────────────────────────┬──────────────────────────────────┘
+                             │
+                             ▼
+  ┌─────────────────────────────────────────────────────────────┐
+  │  EXTRACT TIME  (automated, on demand)                        │
+  │                                                              │
+  │   extract_schema(type="json", output="schema.json")         │
+  │   → Queries UCKGMeta_* nodes → exports structured file      │
+  │                                                              │
+  │   extract_text(node="all", relation="all", limit=20)        │
+  │   → Reads nl_templates from Neo4j                           │
+  │   → Queries real data nodes/edges                           │
+  │   → Fills templates → natural-language sentences             │
+  │                                                              │
+  └─────────────────────────────────────────────────────────────┘
 ```
 
-Every consumer reads the **same source** — the JSON file or the `UCKGMeta_*` nodes
-in Neo4j — so they all have a consistent, up-to-date view of the graph's meaning.
+**The developer only writes templates once in `semantic_schema.cypher`.**  
+Everything else — loading, exporting, sentence generation — is automated by `semantic_schema.py`.
 
 ---
 
-## 3. Where does it live?
+## 3. What lives in Neo4j
 
-| Location | Format | Use |
+```
+Neo4j Database
+│
+├── DATA LAYER  (the actual knowledge graph)
+│   ├── 200K+ UcoCVE nodes
+│   ├── 100K+ UcoexCPE nodes
+│   ├── 900+ UcoCWE nodes
+│   ├── ...  (14 node types, 16 relationship types)
+│   └── Total: ~500K+ nodes, ~1M+ edges
+│
+└── METADATA LAYER  (semantic descriptions — the semantic schema)
+    ├──  1   UCKGMeta_Schema          version / root node
+    ├── 14   UCKGMeta_Node            one per entity type
+    ├── 81   UCKGMeta_Property        one per property per entity type
+    ├── 16   UCKGMeta_Relationship    one per relationship type
+    ├──  7   UCKGMeta_TraversalPath   documented multi-hop patterns
+    ├── 16   META_CONNECTS_TO         schema-level topology edges
+    └── nl_template on every Node and Relationship metadata node
+```
+
+### Metadata graph layout
+
+```
+(:UCKGMeta_Schema {version, notes, last_loaded})
+    │
+    ├──[:META_HAS_NODE]──────────► (:UCKGMeta_Node)
+    │                               {semantic, physical_label, purpose,
+    │                                description, key_identifier,
+    │                                nl_template, triggers}
+    │                                    │
+    │                             [:META_HAS_PROPERTY]
+    │                                    ▼
+    │                               (:UCKGMeta_Property)
+    │                               {semantic, belongs_to, physical,
+    │                                type, description, example,
+    │                                query_pattern}
+    │
+    ├──[:META_HAS_RELATIONSHIP]──► (:UCKGMeta_Relationship)
+    │                               {semantic, physical_rel,
+    │                                source_node_semantic/physical,
+    │                                target_node_semantic/physical,
+    │                                description, nl_template,
+    │                                cypher_pattern, triggers,
+    │                                example_query}
+    │
+    └──[:META_HAS_PATH]──────────► (:UCKGMeta_TraversalPath)
+                                    {name, description,
+                                     cypher_pattern, use_cases}
+
+(:UCKGMeta_Node)──[:META_CONNECTS_TO {via_semantic, via_physical}]──►(:UCKGMeta_Node)
+```
+
+The `META_CONNECTS_TO` edges reproduce the **relationship topology** at the schema level,
+so the metadata itself is a traversable graph.
+
+---
+
+## 4. What each metadata node contains
+
+### UCKGMeta_Node (example: CVE)
+
+| Property | Value |
+|---|---|
+| `semantic` | `"CVE"` |
+| `physical_label` | `"UcoCVE"` |
+| `purpose` | `"Canonical CVE disclosure entry. Primary vulnerability identifier node."` |
+| `description` | `"A CVE node identifies a specific publicly known vulnerability..."` |
+| `key_identifier` | `"label"` |
+| `key_identifier_example` | `"CVE-2021-44228"` |
+| **`nl_template`** | **`"{ID}, which is a vulnerability"`** |
+| `triggers` | `["find CVE", "vulnerability identifier", "CVE score", ...]` |
+
+### UCKGMeta_Relationship (example: hasCPE)
+
+| Property | Value |
+|---|---|
+| `semantic` | `"hasCPE"` |
+| `physical_rel` | `"UCOEXHASCPE"` |
+| `source_node_semantic` | `"CVE"` |
+| `source_node_physical` | `"UcoCVE"` |
+| `target_node_semantic` | `"CPE"` |
+| `target_node_physical` | `"UcoexCPE"` |
+| `description` | `"Connects a CVE to the platform versions it affects..."` |
+| **`nl_template`** | **`"{SRC_ID}, which is a vulnerability, has a CPE, {TGT_ID}, which is a software platform titled \"{TGT_LABEL}\"."`** |
+| `cypher_pattern` | `"MATCH (c:UcoCVE)-[:UCOEXHASCPE]->(cpe:UcoexCPE)"` |
+| `triggers` | `["affected platform", "which CPE", ...]` |
+| `example_query` | `"MATCH (c:UcoCVE {label:'CVE-2021-44228'})-[:UCOEXHASCPE]->(cpe) RETURN cpe.cpeName"` |
+
+### UCKGMeta_Property (example: baseSeverity on CVE)
+
+| Property | Value |
+|---|---|
+| `semantic` | `"baseSeverity"` |
+| `belongs_to` | `"CVE"` |
+| `physical` | `"ucobaseSeverity"` |
+| `type` | `"string"` |
+| `description` | `"CVSS v3 base severity label (LOW / MEDIUM / HIGH / CRITICAL)"` |
+| `example` | `"CRITICAL"` |
+| `query_pattern` | `"WHERE n.ucobaseSeverity = 'CRITICAL'"` |
+
+---
+
+## 5. The `nl_template` mechanism
+
+Every `UCKGMeta_Node` and `UCKGMeta_Relationship` carries an **`nl_template`** — a sentence pattern with placeholder variables that can be filled with real data at runtime.
+
+### Node templates (describe a single entity)
+
+| Node type | nl_template |
+|---|---|
+| CVE | `"{ID}, which is a vulnerability"` |
+| Weakness | `"{ID}, which is a software weakness"` |
+| Group | `"{ID}, which is a threat actor group"` |
+| Technique | `"{ID}, which is an adversary technique"` |
+| Software | `"{ID}, which is a threat software tool"` |
+| Mitigation | `"{ID}, which is a security mitigation"` |
+| Campaign | `"{ID}, which is a threat campaign"` |
+| CPE | `"{ID}, which is a software platform"` |
+
+### Relationship templates (describe a connection between two entities)
+
+| Relationship | nl_template |
+|---|---|
+| hasCPE | `"{SRC_ID}, which is a vulnerability, has a CPE, {TGT_ID}, which is a software platform titled \"{TGT_LABEL}\"."` |
+| attributedTo | `"Campaign {SRC_ID} is attributed to threat group {TGT_ID}."` |
+| groupUsesTechnique | `"Threat group {SRC_ID} employs the adversary technique {TGT_ID}."` |
+| hasRelatedWeakness | `"Attack pattern {SRC_ID} exploits the weakness {TGT_ID}, which is a {TGT_LABEL}."` |
+| mitigates | `"Security mitigation {SRC_ID} reduces the effectiveness of technique {TGT_ID}."` |
+
+### Template variables
+
+| Variable | Replaced with at runtime | Source |
 |---|---|---|
-| `configt2c/semantic_schema_uckg_v3.json` | JSON | Authoring, version control, offline access, bootstrap source |
-| `UCKGMeta_*` nodes in Neo4j | Graph nodes/edges | Live queryable metadata, accessible to any Cypher-capable tool |
-| (optional) `configt2c/semantic_schema_neo4j_cache.json` | JSON cache | Fast offline reads after an initial Neo4j extraction |
+| `{ID}` | Node's key identifier value | e.g. `n.label` → `"CVE-2021-44228"` |
+| `{SRC_ID}` | Source node's key identifier | e.g. `src.label` → `"CVE-2021-44228"` |
+| `{SRC_LABEL}` | Source node's human-readable name | e.g. `src.ucoexNAME` |
+| `{TGT_ID}` | Target node's key identifier | e.g. `tgt.cpeName` → `"cpe:/a:apache:log4j:2.14.1"` |
+| `{TGT_LABEL}` | Target node's human-readable name | e.g. `tgt.label` → `"Apache Log4j 2.14.1"` |
+
+The `key_identifier` field on each `UCKGMeta_Node` tells the system **which Neo4j property** to read for `{ID}`, `{SRC_ID}`, or `{TGT_ID}`. This is how the system dynamically builds Cypher queries from metadata — no hardcoding.
 
 ---
 
-## 4. Schema structure (v3)
-
-`configt2c/semantic_schema_uckg_v3.json` has the following top-level keys:
-
-```
-semantic_schema_uckg_v3.json
-│
-├── version                "v3"
-├── notes                  free-text: purpose and authoring notes
-│
-├── nodes[]                14 entries — one per KG entity type
-│   ├── semantic                 human name          (e.g. "CVE")
-│   ├── physical_label           Neo4j label         (e.g. "UcoCVE")
-│   ├── purpose                  one-line purpose
-│   ├── description              full semantic description
-│   ├── key_identifier           primary lookup property
-│   ├── key_identifier_example   concrete example value
-│   ├── typical_natural_language_triggers   NL phrases that signal this node
-│   └── properties[]             one object per property
-│       ├── semantic             human property name
-│       ├── physical             actual Neo4j property key
-│       ├── type                 data type  (string / datetime / boolean / list)
-│       ├── description          what this property stores
-│       ├── example              concrete example value
-│       └── query_pattern        ready-to-use WHERE/RETURN clause snippet
-│
-├── relationships[]        16 entries — one per directed relationship triple
-│   ├── semantic                 human relationship name
-│   ├── physical_rel             Neo4j relationship type
-│   ├── source_node_semantic     source node — human name
-│   ├── source_node_physical     source node — Neo4j label
-│   ├── target_node_semantic     target node — human name
-│   ├── target_node_physical     target node — Neo4j label
-│   ├── description              what this connection means
-│   ├── traversal_direction      "NodeA → NodeB" short arrow description
-│   ├── cypher_pattern           MATCH clause template
-│   ├── natural_language_triggers   NL phrases that signal this relationship
-│   └── example_query            complete working Cypher example
-│
-├── graph_traversal_paths[] 7 entries — documented multi-hop query recipes
-│   ├── name
-│   ├── description
-│   ├── cypher_pattern
-│   └── use_cases[]
-
-
----
-
-## 5. Covered nodes (14)
+## 6. Covered nodes (14)
 
 | Semantic name | Physical label | Key identifier | Example value |
 |---|---|---|---|
 | CVE | UcoCVE | `label` | CVE-2021-44228 |
-| Vulnerability | UcoVulnerability | `uri` | urn:uckg:vuln:… |
+| Vulnerability | UcoVulnerability | `uri` | http://uckg.org/vulnerability/… |
 | Weakness | UcoCWE | `ucocweID` | CWE-79 |
-| ExploitTarget | UcoExploitTarget | `uri` | urn:uckg:et:… |
-| Campaign | UcoexCAMPAIGNS | `ucoexNAME` | APT29 |
-| Group | UcoexGROUPS | `ucoexNAME` | Lazarus Group |
-| Technique | UcoexMITREATTACK | `ucoexNAME` | T1059 |
-| Tactic | UcoexTACTICS | `ucoexNAME` | Execution |
-| Software | UcoexSOFTWARE | `ucoexNAME` | Cobalt Strike |
-| Mitigation | UcoexMITIGATIONS | `ucoexNAME` | M1038 |
+| ExploitTarget | UcoExploitTarget | `uri` | http://uckg.org/exploittarget/… |
+| Campaign | UcoexCAMPAIGNS | `ucoexNAME` | Operation Wocao |
+| Group | UcoexGROUPS | `ucoexNAME` | APT29 |
+| Technique | UcoexMITREATTACK | `ucoexNAME` | Phishing |
+| Tactic | UcoexTACTICS | `ucoexNAME` | Initial Access |
+| Software | UcoexSOFTWARE | `ucoexNAME` | Mimikatz |
+| Mitigation | UcoexMITIGATIONS | `ucoexNAME` | Multi-factor Authentication |
 | AttackPattern | UcoexCAPEC | `ucoexCAPEC_id` | CAPEC-66 |
-| D3FENDControl | UcoexMITRED3FEND | `ucoexMITRED3FEND_LABEL` | D3-OTF |
-| ObservedExample | UcoexObservedExample | `uri` | urn:uckg:obs:… |
-| CPE | UcoexCPE | `cpeName` | cpe:2.3:a:apache:… |
+| D3FENDControl | UcoexMITRED3FEND | `ucoexMITRED3FEND_LABEL` | Network Traffic Filtering |
+| ObservedExample | UcoexObservedExample | `uri` | http://uckg.org/observedexample/… |
+| CPE | UcoexCPE | `cpeName` | cpe:/a:apache:log4j:2.14.1 |
 
 ---
 
-## 6. Covered relationships (16)
+## 7. Covered relationships (16)
 
 ```
-CVE               -[UCOEXHASCPE]->                CPE
-Weakness          -[UCOHASOBSERVEDEXAMPLE]->       ObservedExample
-ExploitTarget     -[UCOHASVULNERABILITY]->         Vulnerability
-ExploitTarget     -[UCOHASWEAKNESS]->              Weakness
-Vulnerability     -[UCOHASCVE_ID]->               CVE
-Campaign          -[UCOEXATTRIBUTEDTO]->           Group
-Campaign          -[UCOEXCAMPAIGNUSESSOFTWARE]->   Software
-Campaign          -[UCOEXCAMPAIGNUSESTECHNIQUE]->  Technique
-AttackPattern     -[UCOEXHASRELATEDWEAKNESS]->     Weakness
-AttackPattern     -[UCOEXHASTAXONOMYMAPPING]->     Technique
-Group             -[UCOEXGROUPUSESSOFTWARE]->      Software
-Group             -[UCOEXGROUPUSESTECHNIQUE]->     Technique
-Mitigation        -[UCOEXMITIGATES]->              Technique
-D3FENDControl     -[UCOEXHASMITREATTACK]->         Technique
-ObservedExample   -[UCOEXEXAMPLEOBSERVEDIN]->      CVE
-Software          -[UCOEXSOFTWAREUSESTECHNIQUE]->  Technique
+Source             Relationship                      Target
+───────────────    ────────────────────────────────   ──────────────
+CVE                -[UCOEXHASCPE]->                  CPE
+Weakness           -[UCOHASOBSERVEDEXAMPLE]->         ObservedExample
+ExploitTarget      -[UCOHASVULNERABILITY]->           Vulnerability
+ExploitTarget      -[UCOHASWEAKNESS]->                Weakness
+Vulnerability      -[UCOHASCVE_ID]->                  CVE
+Campaign           -[UCOEXATTRIBUTEDTO]->             Group
+Campaign           -[UCOEXCAMPAIGNUSESSOFTWARE]->     Software
+Campaign           -[UCOEXCAMPAIGNUSESTECHNIQUE]->    Technique
+AttackPattern      -[UCOEXHASRELATEDWEAKNESS]->       Weakness
+AttackPattern      -[UCOEXHASTAXONOMYMAPPING]->       Technique
+Group              -[UCOEXGROUPUSESSOFTWARE]->        Software
+Group              -[UCOEXGROUPUSESTECHNIQUE]->       Technique
+Mitigation         -[UCOEXMITIGATES]->                Technique
+D3FENDControl      -[UCOEXHASMITREATTACK]->           Technique
+ObservedExample    -[UCOEXEXAMPLEOBSERVEDIN]->        CVE
+Software           -[UCOEXSOFTWAREUSESTECHNIQUE]->    Technique
 ```
 
----
-
-## 7. Covered traversal paths (7)
-
-Multi-hop query patterns documented in `graph_traversal_paths[]`:
-
-| Path name | Pattern summary |
-|---|---|
-| CVE to Weakness (via ExploitTarget) | CVE → Vulnerability → ExploitTarget → CWE |
-| CVE to Technique | CVE → Vulnerability → ExploitTarget → CWE → CAPEC → Technique |
-| Group to CVE | Group → Technique ← CAPEC ← CWE ← ExploitTarget ← Vulnerability ← CVE |
-| Software to CVE | Software → Technique ← CAPEC ← CWE ← ExploitTarget ← Vulnerability ← CVE |
-| Mitigation for CVE | CVE → Vulnerability → ExploitTarget → CWE → CAPEC → Technique ← Mitigation |
-| D3FEND for CVE | same chain … → Technique ← D3FENDControl |
-| Campaign full footprint | Campaign → Group, Software, Technique |
-
-Each entry includes a full Cypher MATCH template and natural-language use-case
-examples, making them directly usable by any tool that generates or explains queries.
+Each relationship has a full `nl_template`, `description`, `cypher_pattern`, `triggers`, and `example_query` stored in its `UCKGMeta_Relationship` node.
 
 ---
 
-## 8. Storing and querying it in Neo4j
+## 8. Covered traversal paths (7)
 
-The semantic schema is persisted inside Neo4j as **`UCKGMeta_*` nodes**, making
-it queryable via Cypher like any other graph data.
-
-> **See [`SCHEMA_LOADING_GUIDE.md`](SCHEMA_LOADING_GUIDE.md) for the full
-> step-by-step loading and querying workflow.**
-
-**In short — two methods are used:**
-
-| Method | When | Command |
+| Path name | Hops | Pattern summary |
 |---|---|---|
-| **Docker auto-load** | Fresh environment / first boot | `python3 schema/generate_schema_cypher.py` → `docker compose up` |
-| **Python driver** | Neo4j already running, push an update | `python3 schema/neo4j_schema_loader.py` |
+| CWE to CVE (full chain) | 4 | CWE ← ExploitTarget → Vulnerability → CVE |
+| CVE to affected platforms | 1 | CVE → CPE |
+| CVE to weakness (reverse) | 4 | CVE ← Vulnerability ← ExploitTarget → CWE |
+| CWE to ATT&CK techniques (via CAPEC) | 3 | CWE ← CAPEC → Technique |
+| Group full TTP profile | 1–3 | Group → Technique, Software; Campaign → Group |
+| Technique to mitigations and D3FEND | 1–2 | Technique ← Mitigation; Technique ← D3FEND |
+| CWE observed examples to CVE evidence | 2 | CWE → ObservedExample → CVE |
 
-**To extract the schema back from Neo4j:**
+Each path includes a `cypher_pattern` and `use_cases` list stored in its `UCKGMeta_TraversalPath` node.
+
+---
+
+## 9. Loading the schema into Neo4j
+
+There are two methods — both execute the same MERGE statements and are idempotent.
+
+### Method 1 — Docker auto-load (recommended for fresh environments)
+
+On container startup, Neo4j's APOC initializer runs `neo4j/import/init.cypher`, which includes:
+
+```cypher
+CALL apoc.cypher.runFile('uckg_semantic_schema.cypher')
+  YIELD row, result RETURN row, result;
+```
+
+All `UCKGMeta_*` nodes and edges are created before any service queries the database.
 
 ```bash
-python3 schema/neo4j_semantic_extractor.py \
-  --out schema/semantic_schema_neo4j_cache.json
+docker compose up
 ```
 
----
+> Subsequent boots: MERGE statements update existing nodes — no duplicates.
 
-## 10. Consumer: Text-to-Cypher (T2CSS)
+### Method 2 — Python driver (recommended for live updates)
 
-The **Enhanced T2CSS pipeline** (`core/t2css_enhanced.py`) uses the schema to:
+When Neo4j is already running and you need to push schema changes without restarting:
 
-1. Build an **embedding corpus** — one vector per schema "fact"
-2. At query time, embed the user question and retrieve the **top-K most similar facts**
-3. Inject those facts as a focused schema slice into the LLM prompt
+```bash
+python3 schema/semantic_schema.py update
+```
 
-`load_semantic_schema()` is the entry point. It now accepts a `source` parameter:
+This reads `schema/semantic_schema.cypher` and executes each statement via the Neo4j Python driver.
 
 ```python
-from core.t2css_enhanced import load_semantic_schema
-
-schema = load_semantic_schema()                    # auto: Neo4j → file fallback
-schema = load_semantic_schema(source="neo4j")      # Neo4j only
-schema = load_semantic_schema(source="file")       # JSON file only
-schema = load_semantic_schema(
-    source="neo4j",
-    cache_path="configt2c/semantic_schema_neo4j_cache.json",
-    cache_max_age_hours=24,
-)
+# Programmatic usage
+from schema.semantic_schema import update
+update()                                             # defaults
+update("schema/semantic_schema.cypher", uri="bolt://neo4j:7687")  # custom
 ```
 
-The pipeline auto-normalises v3 format to the v2-compatible keys that
-`build_embedding_corpus()` and `build_maps()` expect.
+### Verifying the load
+
+```cypher
+-- Health check
+MATCH (s:UCKGMeta_Schema) RETURN s.version, s.last_loaded;
+
+-- Count metadata nodes by type
+MATCH (n)
+WHERE any(l IN labels(n) WHERE l STARTS WITH 'UCKGMeta')
+RETURN labels(n)[1] AS type, count(n) AS total
+ORDER BY total DESC;
+
+-- Expected: Schema=1, Node=14, Property=81, Relationship=16, TraversalPath=7
+```
 
 ---
 
-## 11. Consumer: Documentation & Exploration
+## 10. Extracting the schema from Neo4j
 
-Because the schema is stored in Neo4j as nodes, it is **browsable and queryable**
+Pull the live semantic schema from Neo4j and export it as a structured file:
+
+```bash
+# Export as JSON
+python3 schema/semantic_schema.py extract-schema --type json --output schema/schema.json
+
+# Export as Turtle RDF
+python3 schema/semantic_schema.py extract-schema --type ttl --output schema/schema.ttl
+```
+
+```python
+# Programmatic usage — returns a dict without writing a file
+from schema.semantic_schema import extract_schema
+
+schema = extract_schema()                                 # in memory
+extract_schema(type="json", output="schema/schema.json")  # write to file
+extract_schema(type="ttl",  output="schema/schema.ttl")   # RDF format
+```
+
+The returned dict has this structure:
+
+```
+{
+    "version":               "v3",
+    "source":                "neo4j",
+    "classes":               [...],    # 14 node type entries
+    "object_properties":     [...],    # 16 relationship entries
+    "data_properties":       {...},    # properties keyed by node
+    "graph_traversal_paths": [...]     # 7 multi-hop patterns
+}
+```
+
+---
+
+## 11. Generating natural-language instance descriptions
+
+`extract_text()` is the core function that turns abstract `nl_template` patterns into
+**grounded English sentences** by filling them with real graph data.
+
+### How it works
+
+```
+Step 1 — Read metadata from Neo4j
+    MATCH (r:UCKGMeta_Relationship {semantic:'hasCPE'})
+    RETURN r.nl_template, r.source_node_physical, r.target_node_physical
+
+    Also fetch key_identifier for each side:
+      CVE  → key_identifier = "label"
+      CPE  → key_identifier = "cpeName"
+
+Step 2 — Dynamically build a data query from metadata
+    MATCH (src:UcoCVE)-[:UCOEXHASCPE]->(tgt:UcoexCPE)
+    RETURN src.label   AS src_id,
+           tgt.cpeName AS tgt_id,
+           tgt.label   AS tgt_label
+    LIMIT 20
+
+Step 3 — Fill the template for each row
+    _fill_nl_template(
+        template = "{SRC_ID}, which is a vulnerability, has a CPE,
+                    {TGT_ID}, which is a software platform titled
+                    \"{TGT_LABEL}\".",
+        src = {"id": "CVE-2021-44228"},
+        tgt = {"id": "cpe:/a:apache:log4j:2.14.1",
+               "label": "Apache Log4j 2.14.1"}
+    )
+
+    OUTPUT:
+    "CVE-2021-44228, which is a vulnerability, has a CPE,
+     cpe:/a:apache:log4j:2.14.1, which is a software platform
+     titled "Apache Log4j 2.14.1"."
+
+Step 4 — Repeat for all 16 relationship types + 14 node types
+    → ~740 grounded NL sentences (balanced: ~20 per type)
+```
+
+### Example output
+
+**Node descriptions:**
+```
+CVE-2021-44228, which is a vulnerability
+CWE-79, which is a software weakness
+APT29, which is a threat actor group
+Mimikatz, which is a threat software tool
+```
+
+**Edge descriptions:**
+```
+CVE-2021-44228, which is a vulnerability, has a CPE,
+cpe:/a:apache:log4j:2.14.1, which is a software platform
+titled "Apache Log4j 2.14.1".
+
+CWE-79, which is a software weakness, has an observed
+real-world exploitation example: "Cross-site scripting
+vulnerability in ..."
+
+Threat group APT29 employs the adversary technique Phishing.
+
+Campaign Operation Wocao is attributed to threat group APT20.
+
+Security mitigation Multi-factor Authentication reduces
+the effectiveness of technique Valid Accounts.
+```
+
+### Usage
+
+```bash
+# Generate NL sentences for everything (20 per type)
+python3 schema/semantic_schema.py extract-text --limit 20 --output corpus.txt
+
+# Generate only CVE-related sentences
+python3 schema/semantic_schema.py extract-text --node CVE --relation hasCPE --limit 50
+
+# Generate only relationship descriptions
+python3 schema/semantic_schema.py extract-text --node none --relation all --output edges.txt
+```
+
+```python
+# Programmatic usage
+from schema.semantic_schema import extract_text
+
+# All types, balanced, 20 instances each
+sentences = extract_text(node="all", relation="all", limit=20)
+
+# Specific types
+sentences = extract_text(relation="hasCPE", limit=100)
+
+# Write to file
+extract_text(node="all", relation="all", output="corpus.txt", limit=20)
+```
+
+### Balanced corpus design
+
+The `limit` parameter applies **per type**, not globally:
+
+| Category | Types | × limit | = sentences |
+|---|---|---|---|
+| Node descriptions | 14 | 20 | 280 |
+| Edge descriptions | 16 | 20 | 320 |
+| Traversal paths | 7 | 20 | 140 |
+| **Total** | | | **~740** |
+
+This ensures every node type and relationship type has equal representation.
+
+---
+
+## 12. Querying the metadata directly
+
+Because the semantic schema is stored as nodes in Neo4j, it is **browsable and queryable**
 by anyone with Neo4j Browser access — no code required.
-
-Useful queries for documentation:
 
 ```cypher
 -- What does each node type represent?
 MATCH (n:UCKGMeta_Node)
 RETURN n.semantic, n.physical_label, n.purpose
-ORDER BY n.semantic
+ORDER BY n.semantic;
 
 -- All properties of a specific node type
 MATCH (n:UCKGMeta_Node {semantic:'CVE'})-[:META_HAS_PROPERTY]->(p)
-RETURN p.semantic, p.physical, p.type, p.description, p.example
+RETURN p.semantic, p.physical, p.type, p.description, p.example;
 
 -- What relationships connect to a given node type?
 MATCH (src:UCKGMeta_Node {semantic:'Group'})-[e:META_CONNECTS_TO]->(tgt)
-RETURN e.via_semantic, e.cypher_pattern, tgt.semantic
+RETURN e.via_semantic, tgt.semantic, e.via_physical;
 
 -- Which nodes can I reach from CVE in 2 hops?
 MATCH (start:UCKGMeta_Node {semantic:'CVE'})
       -[:META_CONNECTS_TO*1..2]->(related:UCKGMeta_Node)
-RETURN DISTINCT related.semantic, related.physical_label
+RETURN DISTINCT related.semantic, related.physical_label;
+
+-- Get the NL template for a specific relationship
+MATCH (r:UCKGMeta_Relationship {semantic:'hasCPE'})
+RETURN r.nl_template, r.source_node_semantic, r.target_node_semantic;
+
+-- Full relationship catalogue with descriptions
+MATCH (r:UCKGMeta_Relationship)
+RETURN r.source_node_semantic AS source,
+       r.semantic             AS rel,
+       r.target_node_semantic AS target,
+       r.description
+ORDER BY r.source_node_semantic;
 ```
 
 ---
 
-## 12. Consumer: LLM Agents & RAG Systems
+## 13. Single module design (`semantic_schema.py`)
 
-Any LLM agent or retrieval-augmented generation system that needs to understand the
-UCKG graph can use the semantic schema as its context source:
-
-**Option A — Load from Neo4j at agent startup:**
-```python
-from core.neo4j_semantic_extractor import load_semantic_schema_from_neo4j
-
-schema = load_semantic_schema_from_neo4j()
-corpus = schema["embedding_corpus"]   # 70+ ready-to-embed fact strings
-```
-
-**Option B — Load from JSON file (no Neo4j connection):**
-```python
-import json
-with open("configt2c/semantic_schema_uckg_v3.json") as f:
-    schema = json.load(f)
-
-# Build context for an LLM prompt
-for node in schema["nodes"]:
-    print(f"{node['semantic']} ({node['physical_label']}): {node['description']}")
-```
-
-**Option C — Use the embedding corpus directly** (each line is already a
-dense, self-contained fact — ideal for chunking and indexing):
-
-```python
-corpus = schema["embedding_corpus"]
-# Lines with prefixes:
-# CLS| — node class descriptions
-# REL| — relationship descriptions
-# PROP| — property descriptions
-# PATTERN| — query pattern hints
-# DESC: — extended node summaries
-# PATH: — multi-hop path hints
-```
-
----
-
-## 13. Consumer: API & Frontend
-
-A REST endpoint or GraphQL resolver can expose the semantic schema to frontend
-applications without requiring them to understand Neo4j:
-
-```python
-# FastAPI example
-@app.get("/api/schema/nodes")
-async def get_nodes():
-    schema = load_semantic_schema_from_neo4j()
-    return [
-        {
-            "id":          n["physical_label"],
-            "label":       n["semantic"],
-            "description": n["description"],
-            "properties":  [
-                {"name": p["physical"], "type": p["type"], "description": p["description"]}
-                for p in n.get("properties", [])
-            ]
-        }
-        for n in schema["classes"]
-    ]
-
-@app.get("/api/schema/relationships")
-async def get_relationships():
-    schema = load_semantic_schema_from_neo4j()
-    return [
-        {
-            "type":   r["physical_rel"],
-            "label":  r["semantic"],
-            "from":   r["source_node_physical"],
-            "to":     r["target_node_physical"],
-            "meaning": r["description"],
-            "example": r["example_query"]
-        }
-        for r in schema["object_properties"]
-    ]
-```
-
-A frontend schema explorer, knowledge-graph visualiser, or chatbot UI can consume
-these endpoints to render a human-friendly view of the graph without embedding any
-schema knowledge in the frontend code.
-
----
-
-## 14. Consumer: Validation & Governance
-
-The semantic schema is an authoritative record of what *should* exist in the UCKG.
-It can drive validation and governance workflows:
-
-```python
-from core.neo4j_semantic_extractor import load_semantic_schema_from_neo4j
-
-schema   = load_semantic_schema_from_neo4j()
-expected = {n["physical_label"] for n in schema["classes"]}
-
-# Compare against physical schema
-from shared.schema_extract import SchemaExtractor
-
-extractor = SchemaExtractor(driver)
-physical  = extractor.extract()
-actual    = set(physical["labels"])
-
-missing  = expected - actual
-extra    = actual - expected
-
-if missing:
-    print(f"WARNING: labels documented but not in DB: {missing}")
-if extra:
-    print(f"INFO: labels in DB but not documented: {extra}")
-```
-
-Use it in CI to catch undocumented node types added to the graph, or to flag
-documented types that have been accidentally dropped.
-
----
-
-## 15. File inventory
+All semantic schema operations are consolidated into one module:
 
 ```
-qa-engine/text2cypher/
+schema/semantic_schema.py
 │
-├── configt2c/
-│   ├── semantic_schema_uckg_v2.json         previous version (kept for reference)
-│   └── semantic_schema_uckg_v3.json   ★ NEW  richly authored v3 semantic schema
+├── update(definition="semantic_schema.cypher")
+│   Execute Cypher definitions → create/update metadata in Neo4j.
+│   Idempotent: MERGE statements, safe to re-run.
 │
-├── core/
-│   ├── neo4j_schema_loader.py         ★ NEW  push schema → Neo4j (Method 0)
-│   ├── apoc_schema_load.cypher        ★ NEW  push schema via APOC (Method A)
-│   ├── generate_schema_cypher.py      ★ NEW  generate static .cypher (Method B)
-│   ├── neo4j_semantic_extractor.py    ★ NEW  pull schema ← Neo4j
-│   └── t2css_enhanced.py              ★ PATCHED  load_semantic_schema() updated
+├── extract_schema(type="json", output="schema.json")
+│   Query UCKGMeta_* nodes → export to JSON or Turtle RDF.
+│   Returns dict in memory if output is omitted.
 │
-├── main.py                            ★ PATCHED  lifespan auto-bootstrap (Method C)
-├── SEMANTIC_SCHEMA_README.md          ★ NEW  this file
-│
-└── (repo root)/
-    └── neo4j/import/init.cypher       ★ PATCHED  Docker init hook (Method D)
+└── extract_text(node="all", relation="all", limit=20, output="corpus.txt")
+    Read nl_templates + query real data → NL sentences.
+    Returns list of strings in memory if output is omitted.
 ```
 
----
-
-## 16. Quick-start
-
-> **Full step-by-step loading and querying instructions are in
-> [`SCHEMA_LOADING_GUIDE.md`](SCHEMA_LOADING_GUIDE.md).**
-
-Two commands cover the common case:
+### CLI
 
 ```bash
-# 1. Generate static Cypher from the JSON (one-time, or after editing the schema)
-python3 schema/generate_schema_cypher.py
+# Push definitions to Neo4j
+python3 schema/semantic_schema.py update
 
-# 2. Start the stack — schema loads automatically on first Neo4j boot
-docker compose up
+# Export schema as JSON
+python3 schema/semantic_schema.py extract-schema --type json --output schema/schema.json
+
+# Generate NL sentences
+python3 schema/semantic_schema.py extract-text --limit 20 --output corpus.txt
+
+# Generate specific subset
+python3 schema/semantic_schema.py extract-text --node CVE --relation hasCPE --limit 50
 ```
 
-If Neo4j is already running and you just need to push an update:
+### Internal helpers
 
-```bash
-python3 schema/neo4j_schema_loader.py
+| Helper | Purpose |
+|---|---|
+| `_get_driver()` | Create a Neo4j driver connection |
+| `_run_cypher_file()` | Split and execute a `.cypher` file |
+| `_fetch_node_metadata()` | Query all `UCKGMeta_Node` + properties |
+| `_fetch_relationship_metadata()` | Query all `UCKGMeta_Relationship` |
+| `_fetch_traversal_paths()` | Query all `UCKGMeta_TraversalPath` |
+| `_schema_to_json()` | Assemble structured dict from metadata |
+| `_schema_to_ttl()` | Serialise to Turtle RDF |
+| `_fill_nl_template()` | Substitute real data into an nl_template |
+| `_generate_node_sentences()` | Query real nodes → fill node templates |
+| `_generate_edge_sentences()` | Traverse real edges → fill relationship templates |
+| `_generate_path_sentences()` | Execute multi-hop patterns → chain templates |
+| `_write_lines()` | Write sentence list to file |
+
+---
+
+## 14. File inventory
+
+```
+schema/
+├── semantic_schema.cypher           ← SOURCE OF TRUTH: hand-authored Cypher definitions
+├── semantic_schema.py               ← single Python module (update / extract / generate)
+├── __init__.py                      ← package init
+├── schema_cache.txt                 ← physical schema cache (node labels, rels, properties)
+├── semantic_schema_uckg_v3.json     ← v3 JSON (reference / bootstrap, not used at runtime)
+├── uckg_semantic_schema_v3_for_review.json  ← advisor review copy (no embedding_corpus)
+├── uckg_schema_architecture.json    ← advisor-friendly architecture overview
+├── schema_embeddings.json           ← pre-computed embeddings (for T2CSS consumer)
+├── SEMANTIC_SCHEMA_README.md        ← this file
+├── SEMANTIC_SCHEMA_SLIDES.md        ← presentation slides for advisor
+└── SCHEMA_LOADING_GUIDE.md          ← step-by-step loading/querying workflows
+
+neo4j/import/
+├── init.cypher                      ← Docker init hook (calls uckg_semantic_schema.cypher)
+└── uckg_semantic_schema.cypher      ← generated static Cypher for Docker auto-load
 ```
 
 ---
 
-## 17. Neo4j metadata graph layout
+## 15. Design decisions
 
-```
-(:UCKGMeta_Schema {version, notes, last_loaded, embedding_corpus_size})
-        │
-        ├── [:META_HAS_NODE]──────────────► (:UCKGMeta_Node)
-        │                                    {semantic, physical_label,
-        │                                     purpose, description,
-        │                                     key_identifier, triggers}
-        │                                           │
-        │                                    [:META_HAS_PROPERTY]
-        │                                           ▼
-        │                                    (:UCKGMeta_Property)
-        │                                    {semantic, belongs_to, physical,
-        │                                     type, description, example,
-        │                                     query_pattern}
-        │
-        ├── [:META_HAS_RELATIONSHIP]──────► (:UCKGMeta_Relationship)
-        │                                    {semantic, physical_rel,
-        │                                     source_node_semantic, target_node_semantic,
-        │                                     description, cypher_pattern,
-        │                                     triggers, example_query}
-        │
-        └── [:META_HAS_PATH]──────────────► (:UCKGMeta_TraversalPath)
-                                             {name, description,
-                                              cypher_pattern, use_cases}
-
-(:UCKGMeta_Node) -[:META_CONNECTS_TO {via_semantic, via_physical,
-                                       description, cypher_pattern}]->
-(:UCKGMeta_Node)
-```
-
-The `META_CONNECTS_TO` edges reproduce the **relationship topology** of the UCKG
-at the schema level, so the metadata itself is a traversable graph — you can use
-Cypher path queries on the schema just as you would on the data.
-
----
-
-## 18. Design decisions
-
-### Why a general-purpose schema, not a T2CSS-specific config?
-
-A T2CSS-specific schema config would need to be duplicated and kept in sync for
-every other tool that needs to understand the graph (API, agents, validators,
-frontends). A shared artifact avoids drift and makes every consumer authoritative.
-
-### Why store in Neo4j at all?
+### Why store the schema in Neo4j?
 
 | Benefit | Detail |
 |---|---|
 | **Single source of truth** | Lives in the same DB as the data — no separate file to keep in sync |
-| **Queryable as a graph** | `MATCH (:UCKGMeta_Node)-[:META_CONNECTS_TO*2]->()` works |
+| **Queryable as a graph** | `MATCH (:UCKGMeta_Node)-[:META_CONNECTS_TO*2]->()` works natively |
 | **Tool-independent** | Any Cypher-capable client can read it — no Python, no API |
-| **Evolvable** | Add a new node type to the DB → update the metadata → all consumers see it |
+| **Evolvable** | Add a new node type → update the Cypher file → re-run `update()` |
 
-### Why keep the JSON file too?
+### Why hand-author `semantic_schema.cypher` instead of generating from JSON?
 
-- **Bootstrap**: something must exist before Neo4j is running
-- **Offline development**: no DB connection needed for local testing
-- **Version control**: human-readable diffs for schema changes
-- **Fallback**: `source="auto"` falls back to JSON if Neo4j is unavailable
+- **Neo4j is the primary source**, not JSON. The advisor's feedback was explicit: *"We want those descriptions to be in the Neo4j schema first. Then pull automatically by querying."*
+- The Cypher file is directly executable, human-readable, and version-controllable.
+- JSON exports are *derived* from Neo4j via `extract_schema()`, not the other way around.
 
-### Why reconstruct the embedding corpus in the extractor?
+### Why `nl_template` instead of pre-written sentences?
 
-The `UCKGMeta_Property`, `UCKGMeta_Node`, and `UCKGMeta_Relationship` nodes contain
-all the information the corpus needs. Reconstructing it from structured data keeps
-it perfectly in sync with the metadata — no second copy to maintain. The
-reconstruction in `_reconstruct_corpus()` is deterministic and fast (< 1 ms).
+- Templates are authored **once per type** (30 templates for 14 nodes + 16 relationships).
+- `extract_text()` generates **thousands of sentences** from those 30 templates by filling in real data.
+- When the graph data changes, re-running `extract_text()` produces updated sentences — no manual rewriting.
+
+### Why balanced sampling with `limit`?
+
+If the corpus had 500 CVE→CPE sentences but only 10 Campaign→Group sentences, downstream consumers (e.g. embedding-based search) would be biased toward CVE patterns. The `limit` parameter applies per type, ensuring equal representation.
 
 ---
 

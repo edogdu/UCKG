@@ -1,8 +1,17 @@
-# UCKG Schema package
-# Exposes semantic schema loading and Neo4j metadata utilities.
+"""
+schema
+======
+UCKG semantic schema package.
 
-from .neo4j_schema_loader    import UCKGSchemaLoader          # noqa: F401
-from .neo4j_semantic_extractor import (                        # noqa: F401
-    SemanticSchemaExtractor,
-    load_semantic_schema_from_neo4j,
-)
+Single entry point for all schema operations:
+
+    from schema.semantic_schema import update, extract_schema, extract_text
+
+    update()                                    # push Cypher into Neo4j
+    extract_schema(type="json", output="...")   # export schema to file
+    extract_text(relation="hasCPE", limit=100)  # generate NL sentences
+"""
+
+from schema.semantic_schema import update, extract_schema, extract_text
+
+__all__ = ["update", "extract_schema", "extract_text"]
