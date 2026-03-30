@@ -1,238 +1,138 @@
-# Dataset Generation for Graph RAG Evaluation
+# GraphRAG Evaluation Dataset
 
-Generate evaluation datasets from the MultiRAG pipeline for testing Graph RAG performance across different question complexities.
+Evaluate and compare GraphRAG retrieval configurations using sub-graph coverage metrics on a cybersecurity knowledge graph (CWE/CVE/CAPEC).
 
-## What It Does
-
-Processes questions through the complete 4-stage GraphRAG pipeline and captures:
-- **Question**: Original query text
-- **Context**: Exact formatted text passed to LLM
-- **Response**: Generated natural language answer
-- **Metadata**: Mode, hop count, question type, node types, relationships, used properties, retrieval statistics
-
-## File Structure
+## Directory Structure
 
 ```
-qa-engine/
-├── dataset/                              # Dataset Generation Module
-│   ├── README.md                        # This file
-│   ├── create_evaluation_dataset.py     # Main dataset generator script
-│   ├── evaluate_coverage.py             # Coverage analysis tool
-│   ├── evaluation_dataset.json          # Generated output (129 samples)
-│   └── evaluation_dataset.json.txt      # Text backup
-│
-└── shared/                               # Input Question Files
-    └── question_set/                    # Question datasets by hop type
-        ├── README.md                    # Question set documentation
-        ├── questions_0hop.json          # 9 single-node questions
-        ├── questions_1hop.json          # 25 one-hop questions
-        ├── questions_2hop.json          # 25 two-hop questions
-        ├── questions_0hop_bunny.json    # Alternative 0-hop set
-        ├── questions_1hop_bunny.json    # Alternative 1-hop set
-        ├── questions_2hop_bunny.json    # Alternative 2-hop set
-        ├── getNodes.py                  # Node extraction utility
-        ├── nodes.json                   # Extracted node data
-        ├── generate_questions.py        # Question generation script
-        ├── subgraph_description.py      # Subgraph analysis
-        ├── subgraph_description.txt     # Generated descriptions
-        └── semantic_descriptions.txt    # Semantic metadata
+qa-engine/dataset/
+├── README.md                      # This file
+├── experiment_config.py           # Experiment configurations (embedding x retrieval combos)
+├── create_evaluation_dataset.py   # Step 1: Generate datasets by running questions through pipeline
+├── evaluate_coverage.py           # Step 2: Calculate recall/precision/F1 metrics
+├── compare_experiments.py         # Step 3: Compare experiments, generate reports
+├── experiment_analysis.ipynb      # Step 4: Visualize results (plots, tables)
+├── evaluation_dataset.json        # Root-level generated dataset
+├── test_evaluation_dataset.py     # Tests for evaluation logic
+├── test_evaluation_output.json    # Test output data
+├── explore_node_coverage.ipynb    # Notebook for exploring node coverage
+└── experiments/                   # Output directory (one folder per experiment)
+    ├── <experiment_name>/
+    │   ├── config.json
+    │   ├── evaluation_dataset.json
+    │   ├── retrieval_metrics_results.json
+    │   └── retrieval_metrics_detailed.csv
+    ├── comparison_report.json
+    ├── summary_table.csv
+    ├── precision_recall.png
+    ├── precision_recall_by_model.png
+    ├── precision_recall_by_model_lines.png
+    ├── overall_comparison.png
+    └── hop_comparison.png
 ```
 
-### Key Files
-
-| File | Purpose | Input/Output |
-|------|---------|--------------|
-| `create_evaluation_dataset.py` | Main script - processes questions through GraphRAG pipeline | Input: `questions_*.json` → Output: `evaluation_dataset.json` |
-| `evaluate_coverage.py` | Analyzes dataset coverage and statistics | Input: `evaluation_dataset.json` → Output: Coverage report |
-| `evaluation_dataset.json` | Generated dataset with questions, contexts, and responses | 129 samples (9 + 25 + 25 from 0/1/2-hop questions) |
-| `shared/question_set/questions_0hop.json` | Single-node questions (no graph traversal) | 9 questions answerable from one node |
-| `shared/question_set/questions_1hop.json` | One-hop questions (one relationship) | 25 questions requiring 1 graph traversal |
-| `shared/question_set/questions_2hop.json` | Two-hop questions (two relationships) | 25 questions requiring 2 graph traversals |
-
-### Data Flow
+## Workflow
 
 ```
-┌─────────────────────────────────────────────────────────────────┐
-│                    Dataset Generation Pipeline                  │
-├─────────────────────────────────────────────────────────────────┤
-│                                                                 │
-│  shared/question_set/                                           │
-│  ├── questions_0hop.json  ──┐                                   │
-│  ├── questions_1hop.json  ──┼──► create_evaluation_dataset.py   │
-│  └── questions_2hop.json  ──┘            │                      │
-│                                          │                      │
-│                              ┌───────────▼──────────┐           │
-│                              │  GraphRAG Pipeline   │           │
-│                              │  (4-stage processing)│           │
-│                              └───────────┬──────────┘           │
-│                                          │                      │
-│                              ┌───────────▼──────────┐           │
-│                              │ evaluation_dataset.  │           │
-│                              │        json          │           │
-│                              │  (129 samples with   │           │
-│                              │  context + responses)│           │
-│                              └──────────────────────┘           │
-│                                                                 │
-└─────────────────────────────────────────────────────────────────┘
+1. Generate Dataset          python create_evaluation_dataset.py --experiment <name>
+        │                    Reads questions from shared/question_set/ (0/1/2-hop),
+        │                    runs each through GraphRAG, captures context + key entity URIs.
+        ▼
+2. Evaluate Metrics          python evaluate_coverage.py --experiment <name>
+        │                    Compares retrieved key_entities against gold-standard nodes.
+        │                    Outputs recall, precision, F1 per sample and aggregated.
+        ▼
+3. Compare Results           python compare_experiments.py
+        │                    Loads all experiment results, groups by embedding model,
+        │                    ranks by F1, exports comparison_report.json + summary_table.csv.
+        ▼
+4. Visualize                 jupyter notebook experiment_analysis.ipynb
+                             Generates precision-recall plots, hop-wise comparisons.
 ```
 
 ## Quick Start
 
 ```bash
-# Navigate to dataset directory
-cd /Users/shin/Programming/UCKG-2/qa-engine/dataset
+cd qa-engine
+source venv/bin/activate
 
-# Activate venv
-source ../text2cypher/venv/bin/activate
+# List available experiments
+python dataset/create_evaluation_dataset.py --list
 
-# Run full dataset generation (all 129 questions)
-python create_evaluation_dataset.py
+# Run an experiment (supports checkpoint/resume and Ctrl+C graceful shutdown)
+python dataset/create_evaluation_dataset.py --experiment nomic_baseline
+python dataset/evaluate_coverage.py --experiment nomic_baseline
 
-# Or test with limited questions
-# Edit script: LIMIT = 10
+# Compare all completed experiments
+python dataset/compare_experiments.py
 ```
 
-## What It Generates
+## Evaluation Metrics
 
-Creates `evaluation_dataset.json` with this structure:
+Based on Zhu et al. (2025) "Knowledge graph based question-answering model with subgraph retrieval optimization".
 
-```json
-{
-  "dataset_metadata": {
-    "total_questions": 129,
-    "generation_date": "2025-10-25T...",
-    "source_files": [
-      "questions_1node.json",
-      "questions_1hop.json",
-      "questions_2hop.json"
-    ],
-    "pipeline": "MultiRAG GraphRAG 4-Stage Pipeline"
-  },
-  "samples": [
-    {
-      "id": 1,
-      "question": "How can Content Spoofing deceive users into trusting falsified information?",
-      "context": "[1] PRIMARY NODE: CAPEC-148: Content Spoofing\n    Type: UcoexCAPEC\n    Content: Content spoofing is...",
-      "response": "Content Spoofing (CAPEC-148) is an attack pattern where adversaries...",
-      "metadata": {
-        "mode": "graphrag",
-        "source_file": "questions_1node.json",
-        "hop_count": 0,
-        "question_type": "<s,*,*>",
-        "node_info": {
-          "type": "<s,*,*>",
-          "first_node": "CAPEC",
-          "second_node": "",
-          "third_node": "",
-          "relationship_1": "",
-          "relationship_2": "",
-          "used_properties": {
-            "first_node": ["name", "ucoexDescription"],
-            "second_node": [],
-            "third_node": []
-          }
-        },
-        "retrieval_stats": {
-          "num_sources": 2,
-          "node_types": ["UcoexCAPEC"],
-          "relationship_types": ["UCOEXHASRELATEDWEAKNESS"]
+| Metric | Formula | Description |
+|--------|---------|-------------|
+| **Recall** | `\|G ∩ E\| / \|G\|` | % of gold nodes retrieved |
+| **Precision** | `\|G ∩ E\| / \|E\|` | % of retrieved nodes that are relevant |
+| **F1** | `2 x P x R / (P + R)` | Balanced retrieval quality |
+
+**Ground Truth (G)**: Nodes from question file
+- 0-hop: `first_node`
+- 1-hop: `first_node`, `second_node`
+- 2-hop: `first_node`, `second_node`, `third_node`
+
+**Retrieved (E)**: `key_entities` - URIs of all visited nodes during retrieval
+
+## Experiment Configurations
+
+Naming convention: `{embedding}_{retrieval_method}`
+
+Configurations are generated as a cross-product of embedding models and retrieval methods in `experiment_config.py`.
+
+### Embedding Models
+
+| Prefix | Backend | Model |
+|--------|---------|-------|
+| `nomic_` | Ollama | nomic-embed-text:latest |
+| `gemma_ollama_` | Ollama | embeddinggemma:latest |
+| `gemma_` | Sentence-Transformers | google/embeddinggemma-300M |
+| `securebert_` | Sentence-Transformers | cisco-ai/SecureBERT2.0-biencoder |
+
+Sentence-transformers models require: `pip install sentence-transformers`
+
+### Retrieval Methods
+
+| Suffix | Description |
+|--------|-------------|
+| `baseline` | Vector search only (2-hop traversal) |
+| `hybrid_04` | Hybrid: 40% BM25 + 60% vector |
+| `hybrid_05` | Hybrid: 50% BM25 + 50% vector |
+| `hybrid_06` | Hybrid: 60% BM25 + 40% vector |
+| `cross_encoder` | Vector + cross-encoder reranking (ms-marco-MiniLM-L-6-v2) |
+| `hybrid_cross_encoder` | Hybrid (40/60) + cross-encoder reranking |
+| `1hop` | 1-hop traversal only |
+| `topk3` / `topk5` | Different final_top_k values |
+
+## Adding New Experiments
+
+Edit `experiment_config.py`:
+
+```python
+EXPERIMENTS = {
+    "my_experiment": {
+        "description": "Description of the experiment",
+        "config": {
+            "enable_hybrid_retrieval": True,
+            "bm25_weight": 0.4,
+            "vector_weight": 0.6,
+            "enable_cross_encoder": False,
+            "enable_second_hop": True,
         }
-      }
     }
-  ]
 }
 ```
 
-## Input Question Files
+Or add a new embedding model to `EMBEDDING_CONFIGS` and/or a new retrieval method to `RETRIEVAL_CONFIGS` - all cross-product combinations are generated automatically.
 
-Reads questions from `../shared/question_set/` directory:
-
-### questions_1node.json (9 questions)
-0-hop questions that can be answered from a single node.
-
-```json
-[
-  {
-    "question": "How does encryption protect sensitive data during storage and transmission?",
-    "type": "<s,*,*>",
-    "first_node": "MITIGATIONS",
-    "used_properties": ["ucoexDESCRIPTION"]
-  }
-]
-```
-
-### questions_1hop.json (25 questions)
-1-hop questions requiring traversal of one relationship.
-
-```json
-[
-  {
-    "question": "How could a SOAP Array Overflow arise from weaknesses in buffer length handling?",
-    "type": "<s,p,o>",
-    "first_node": "UcoexCAPEC",
-    "used_properties_of_first_node": ["label", "ucoexDescription"],
-    "relationship": "UCOEXHASRELATEDWEAKNESS",
-    "second_node": "UcoCWE",
-    "used_properties_of_second_node": ["ucocweName", "ucocweSummary"]
-  }
-]
-```
-
-### questions_2hop.json (25 questions)
-2-hop questions requiring traversal of two relationships.
-
-```json
-[
-  {
-    "question": "How could symbolic link handling flaws lead to arbitrary file writes in Kubernetes?",
-    "type": "<s,*,o>",
-    "first_node": "UNIX Symbolic Link (Symlink) Following",
-    "used_properties_of_first_node": ["ucocweSummary", "ucocweExtendedSummary"],
-    "relationship_1": "UCOHASWEAKNESS",
-    "second_node": "UcoExploitTarget",
-    "used_properties_of_second_node": [],
-    "relationship_2": "UCOHASVULNERABILITY",
-    "third_node": "Kubernetes kubectl cp vulnerability",
-    "used_properties_of_third_node": ["ucosummary"]
-  }
-]
-```
-
-## Configuration
-
-Edit the script to customize:
-
-```python
-# Line 250: Limit questions for testing
-LIMIT = None  # Process all 129 questions
-LIMIT = 10    # Process only first 10
-
-# Line 242: Change output location
-OUTPUT_FILE = os.path.join(os.path.dirname(__file__), "my_dataset.json")
-```
-
-## Processing Time
-
-- **~5 seconds per question**
-
-Each question goes through:
-1. **Dynamic Hop Selection** (~0.2s) - Determines optimal graph depth
-2. **Vector Search** (~0.5s) - Semantic similarity retrieval
-3. **Graph Traversal** (~1s) - 1-hop or 2-hop neighbor expansion
-4. **Similarity Filtering** (~0.3s) - Top-2 per relationship type
-5. **Reranking** (~0.5s) - Neighbor-aware scoring
-6. **LLM Generation** (~3-8s) - Natural language answer
-
-## Requirements
-
-- **Neo4j**: Running with UCKG data and `global_embedding_idx` vector index
-- **Ollama**: Models `llama3:8b` (LLM) and `nomic-embed-text:latest` (embeddings)
-- **Python env**: Use `../text2cypher/venv`
-
-## Output
-
-- **File**: `evaluation_dataset.json`
-- **Format**: JSON with complete context and responses
-
----
-
+Run `python dataset/create_evaluation_dataset.py --list` to see all available configurations.

@@ -44,3 +44,8 @@ Thumbs.db
 *.orig
 *plugins/*.jar
 node_modules
+
+# Fine-Tuning Pipeline Cache & Data
+fine-tuning/cache/
+fine-tuning/pipelines/*.jsonl
+fine-tuning/pipelines/*.json

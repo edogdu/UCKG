@@ -89,24 +89,12 @@ def filter_node_properties(properties, labels):
 def get_single_node(node_id):
     
     with driver.session() as session:
-        # Check if ID is numeric (old format) or element ID (new format)
-        if isinstance(node_id, str) and node_id.isdigit():
-            # Use old id() function for numeric IDs
-            id_val = int(node_id)
-            query = """
-            MATCH (n)
-            WHERE id(n) = $node_id
-            RETURN n
-            """
-            result = session.run(query, node_id=id_val)
-        else:
-            # Use elementId() for new format
-            query = """
-            MATCH (n)
-            WHERE elementId(n) = $node_id
-            RETURN n
-            """
-            result = session.run(query, node_id=node_id)
+        query = """
+        MATCH (n)
+        WHERE elementId(n) = $node_id
+        RETURN n
+        """
+        result = session.run(query, node_id=str(node_id))
         
         record = result.single()
         

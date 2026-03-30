@@ -1,0 +1,146 @@
+BlueSmacking
+Lifting Sensitive Data Embedded in Cache
+Counterfeit Hardware Component Inserted During Product Assembly
+Content Spoofing
+Token Impersonation
+Establish Rogue Location
+Contradictory Destinations in Traffic Routing Schemes
+Utilizing REST's Trust in the System Resource to Obtain Sensitive Data
+Hardware Integrity Attack
+Replace Binaries
+Cache Poisoning
+SSL Flood
+Design for FPGA Maliciously Altered
+Windows Admin Shares with Stolen Credentials
+HTTP Flood
+Malicious Automated Software Update via Spoofing
+Modify Shared File
+Evercookie
+Upload a Web Shell to a Web Server
+File Manipulation
+Signature Spoof
+Sniff Application Code
+Retrieve Data from Decommissioned Devices
+Network Topology Mapping
+Collect Data from Common Resource Locations
+Malicious Logic Insertion into Product via Inclusion of Third-Party Component
+XML Flood
+Forced Deadlock
+Sustained Client Engagement
+Symlink Attack
+Probe System Files
+DNS Cache Poisoning
+Modification During Manufacture
+Embed Virus into DLL
+Port Scanning
+Infiltration of Software Development Environment
+Authentication Abuse
+DHCP Spoofing
+Audit Log Manipulation
+Modify Existing Service
+Open-Source Library Manipulation
+Developer Signing Maliciously Altered Software
+Replace Winlogon Helper DLL
+Spear Phishing
+Malicious Hardware Component Replacement
+Kerberoasting
+Excessive Allocation
+Replace Trusted Executable
+Leverage Executable Code in Non-Executable Files
+Targeted Malware
+Signature Spoofing by Key Theft
+Root/Jailbreak Detection Evasion via Hooking
+Collect Data from Registries
+Pretexting
+Inclusion of Code in Existing Process
+Block Logging to Central Repository
+Rainbow Table Password Cracking
+Install Rootkit 
+Disable Security Software
+Local Code Inclusion
+Embedding Scripts within Scripts
+Identify Shared Files/Directories on System
+Password Brute Forcing
+USB Memory Attacks
+Amplification
+Pull Data from System Resources
+Credential Stuffing
+Account Footprinting
+Escaping Virtualization
+Remote Services with Stolen Credentials
+Password Spraying
+Session Credential Falsification through Forging
+Signature Spoofing by Key Recreation
+Requirements for ASIC Functionality Maliciously Altered
+Malicious Software Update
+Footprinting
+Altered Installed BIOS
+Repo Jacking
+Credential Prompt Impersonation
+Brute Force
+Use of Captured Tickets (Pass The Ticket)
+Application Fingerprinting
+Exploitation of Trusted Identifiers
+Retrieve Embedded Sensitive Data
+Privilege Escalation
+ASIC With Malicious Functionality
+Subverting Environment Variable Values
+Software Development Tools Maliciously Altered
+Malicious Software Implanted
+Run Software at Logon
+Hiding Malicious Data or Code within Files
+Server Motherboard Compromise
+Hardware Component Substitution During Baselining
+Leverage Alternate Encoding
+Use of Captured Hashes (Pass The Hash)
+Malicious Logic Inserted Into Product by Authorized Developer
+Hardware Component Substitution
+Redirect Access to Libraries
+Exploiting Incorrectly Configured Access Control Security Levels
+Malicious Code Implanted During Chip Programming
+Alteration of a Software Update
+Malicious Automated Software Update via Redirection
+Adversary in the Browser (AiTB)
+Create files with the same name as files protected with a higher classification
+Privilege Abuse
+Use of Known Kerberos Credentials
+Alternative Execution Due to Deceptive Filenames
+Accessing/Intercepting/Modifying HTTP Cookies
+Key Negotiation of Bluetooth Attack (KNOB)
+Search Order Hijacking
+Leveraging/Manipulating Configuration File Search Paths
+Use of Known Domain Credentials
+Reusing Session IDs (aka Session Replay)
+Modification of Windows Service Configuration
+Resource Leak Exposure
+Counterfeit Websites
+Cellular Traffic Intercept
+Malicious Logic Insertion into Product Software via Configuration Management Manipulation
+Network Boundary Bridging
+Using Malicious Files
+Hijacking a Privileged Thread of Execution
+Accessing Functionality Not Properly Constrained by ACLs
+Exploitation of Thunderbolt Protection Flaws
+Transparent Proxy Abuse
+Malicious Root Certificate
+TCP Flood
+Infiltration of Hardware Development Environment
+Install Malicious Extension
+Manipulate Registry Information
+HTTP DoS
+Install New Service
+Altered Component Firmware
+Eavesdropping
+Collect Data from Screen Capture
+Flooding
+Spoof Open-Source Software Metadata
+Sniffing Network Traffic
+Try Common or Default Usernames and Passwords
+Authentication Bypass
+Read Sensitive Constants Within an Executable
+Manipulation During Distribution
+Infected Software
+Session Hijacking
+System Build Data Maliciously Altered
+Phishing
+Adversary in the Middle (AiTM)

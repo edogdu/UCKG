@@ -12,7 +12,7 @@ from neo4j.graph import Node, Relationship
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 # Import our Q&A engines
-from graphrag import GraphRAGSimilarity
+from graphrag import GraphRAGPipeline
 
 from text2cypher.core.text2cypher import Text2Cypher
 from text2cypher.llm.ollama_llm import OllamaLLM
@@ -26,7 +26,7 @@ NEO4J_URI = os.getenv("NEO4J_URI", "bolt://localhost:7687")
 NEO4J_USER = os.getenv("NEO4J_USER", "neo4j")
 NEO4J_PASSWORD = os.getenv("NEO4J_PASSWORD", "abcd90909090")
 OLLAMA_URL = os.getenv("OLLAMA_URL", "http://localhost:11434")
-OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "llama3")
+OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "llama3:8b")
 
 # Global instances (initialized on startup)
 graphrag_engine = None
@@ -41,10 +41,10 @@ async def lifespan(app: FastAPI):
     logger.info("Initializing Q&A engines...")
     
     try:
-        # Initialize GraphRAG-Similarity
-        logger.info("Initializing GraphRAG-Similarity engine...")
-        graphrag_engine = GraphRAGSimilarity()
-        logger.info("GraphRAG-Similarity engine initialized successfully")
+        # Initialize GraphRAG Pipeline
+        logger.info("Initializing GraphRAG pipeline...")
+        graphrag_engine = GraphRAGPipeline()
+        logger.info("GraphRAG pipeline initialized successfully")
         
         # Initialize Text2Cypher
         logger.info("Initializing Text2Cypher engine...")
