@@ -348,7 +348,7 @@ export default function DualPanelLayout() {
           <>
           <div className={`pull-up-menu ${isChatOpen ? 'open' : ''}`}>
             <button className='pull-up-button' onClick={toggleChat}>
-              Click here to access the Chat Interface
+              💬
             </button>
           </div>
 

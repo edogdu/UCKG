@@ -589,6 +589,12 @@ export default function Nvl({ initialNodes = [], initialRels = [], minimal = fal
     }
   };
 
+  const [isChatOpen, setisChatOpen] = useState(false);
+  
+    const toggleChat = () => {
+      setisChatOpen(prev => !prev);
+    };
+
   return (
     <div className='Q-n-A'>
       {/* Left Side Panel - Only show in non-minimal mode */}
@@ -722,6 +728,51 @@ export default function Nvl({ initialNodes = [], initialRels = [], minimal = fal
           </div>
         </div>
       )}
+      {/*Pull up menu for chat*/}
+          <div className={`chat-pull-up-menu ${isChatOpen ? 'open' : ''}`}>
+              <button className='chat-pull-up-button' onClick={toggleChat}>
+                  💬
+              </button>
+          </div>
+          
+
+          <div className={`chat-pull-up-chat ${isChatOpen ? 'open' : ''}`}>
+            <div className='Chat-bot'>
+              <div className='Chat-bot-content' ref={chatContainerRef}>
+                <ul className='Chat-list'>
+                  {chatHistory.map((msg, i) => (
+                    <li
+                    key={i}
+                    className={msg.type === 'user' ? 'Chat-list-user' : 'Chat-list-answer'}
+                    onClick={
+                      msg.type === 'user'
+                      ? () => handleHistorySearch(msg.text, msg.queryKey)
+                      : undefined
+                      }
+                    >
+                      {msg.text}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              <div className='Input-box'>
+                <input
+                className='Input-content'
+                type='text'
+                value={cypher}
+                onChange={e => setCypher(e.target.value)}
+                onKeyDown={e => e.key === 'Enter' && handleSearch()}
+                placeholder='Enter Cypher query'
+                />
+                <button
+                className='Input-button'
+                onClick={handleSearch}
+                >
+                Enter
+                </button>
+              </div>
+            </div>
+          </div>
     </div>
   );
 }

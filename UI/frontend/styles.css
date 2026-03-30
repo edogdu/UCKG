@@ -148,7 +148,7 @@ nav a.active {
 .dropdown {
    display: none;
    position: fixed;
-   top: 60px;
+   top: 64px;
    left: 0px;
    background: linear-gradient(135deg, var(--color-primary-1) 0%, #013a73 100%);
    width: 200px;
@@ -181,7 +181,7 @@ nav a.active {
 .hamburger {
    display: none;
    font-size: 50px;
-   padding: 14px 10px;
+   padding: 0px 10px;
    cursor: pointer;
    color: white;
 }
@@ -208,6 +208,7 @@ nav a.active {
    nav .dropdown a {
       display: flex;
    }
+
 
 }
 
@@ -754,6 +755,19 @@ nav a.active {
    color: rgba(255, 255, 255, 0.9);
 }
 
+@media screen and (max-width: 600px) {
+
+   .left-panel {
+      position: fixed;
+      z-index: 600;
+   }
+
+   .label-btn {
+      padding: 0.75rem;
+   }
+
+}
+
 /* ========== GRAPH PANEL ========== */
 .graph {
    flex: 1;
@@ -973,6 +987,85 @@ nav a.active {
    transform: translateY(0);
 }
 
+.chat-pull-up-menu {
+   display: none;
+   position: fixed;
+   bottom: 20px;                   
+   right: 20px;                     
+   width: 60px;                  
+   height: 60px;
+   border-radius: 50%; 
+   background: linear-gradient(180deg, var(--color-primary-1) 0%, #01193a 100%);
+   color: white;
+   transition: var(--transition-smooth);
+   border-right: 1px solid rgba(255, 255, 255, 0.1);
+   z-index: 1001;
+}
+
+.chat-pull-up-menu.open {
+   transform: translateY(calc(-46vh + 1px));
+}
+
+.chat-pull-up-button{
+   display: flex;
+   margin: auto;
+   border: none;      
+   outline: none;      
+   background: transparent; 
+   padding: 0;
+   font-size: 28px;          
+   cursor: pointer; 
+}
+
+.chat-pull-up-chat{
+   flex: block;
+   overflow-y: auto;
+   display: flex;
+   flex-direction: column;
+   gap: 0.75rem;
+   position: fixed;
+   bottom: 0;
+   left: 0;
+   width: 100%;
+   height: 45vh;
+   z-index: 1000;
+   transition: transform 0.3s ease;
+}
+
+.chat-pull-up-chat.open {
+  transform: translateY(0);
+}
+
+
+
+@media screen and (max-width: 740px) {
+   .chat-pull-up-menu{
+      display: flex;
+   }
+
+   .chat-pull-up-chat.open .Chat-bot{
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+   }
+
+   .chat-pull-up-chat.open .Chat-bot .Chat-bot-content {
+      flex: 1;         
+      overflow-y: auto;
+      padding: 0.5rem;
+   }
+
+   .chat-pull-up-chat.open .Chat-bot .Input-box {
+      flex-shrink: 0;  
+      display: flex;
+      gap: 0.5rem;
+      padding: 0.5rem;
+      border-top: 1px solid #ddd;
+      background: #f9f9f9;
+   }
+
+}
+
 /* Chatbot conversation styles */
 .Chat-list {
    display: flex;
@@ -1147,6 +1240,23 @@ nav a.active {
    background: linear-gradient(135deg, #9ca3af 0%, #6b7280 100%);
    transform: none;
    box-shadow: 0 4px 12px var(--color-shadow);
+}
+
+@media screen and (max-width: 600px) {
+
+   .Chat-bot {
+      display: none;
+   }
+
+   .graph {
+      flex: 1 1 auto;
+   }
+
+   .view-toggle-container {
+      left: auto;   /* unset left */
+      right: 1.25rem; /* move to the right */
+   }
+
 }
 
 /* ========== Q&A INTERFACE STYLES ========== */
@@ -1467,10 +1577,11 @@ nav a.active {
 .pull-up-menu{
    display: none;
    position: fixed;
-   bottom: 0;
-   left: 0;
-   width: 100%;
-   height: 4%;
+   bottom: 20px;                   
+   right: 20px;                     
+   width: 60px;                  
+   height: 60px;
+   border-radius: 50%; 
    background: linear-gradient(180deg, var(--color-primary-1) 0%, #01193a 100%);
    color: white;
    transition: var(--transition-smooth);
@@ -1486,6 +1597,12 @@ nav a.active {
 .pull-up-button{
    display: flex;
    margin: auto;
+   border: none;      
+   outline: none;      
+   background: transparent; 
+   padding: 0;
+   font-size: 28px;          
+   cursor: pointer; 
 }
 
 .pull-up-chat{
@@ -1510,7 +1627,7 @@ nav a.active {
 
 
 /*Only graph will be visible at first*/
-@media screen and (max-width: 600px) {
+@media screen and (max-width: 740px) {
    .panel-divider {
       display: none;
    }
@@ -1520,7 +1637,8 @@ nav a.active {
    }
 
    .left-panel.graph-panel {
-      flex: 1 1 auto;
+      flex: 1 1 auto !important;
+      width: 100% !important;
    }
 
    .pull-up-menu{
@@ -1879,7 +1997,7 @@ nav a.active {
    .single-panel .chat-interface .query-mode-selector {
       position: fixed;
       z-index: 900;
-      bottom: 120px;
+      bottom: 97px;
       left: 0;
       right: 0;
       justify-content: center;
@@ -1979,6 +2097,15 @@ nav a.active {
    opacity: 0.6;
    transform: none;
    box-shadow: none;
+}
+
+@media screen and (max-width: 740px) {
+   .input-container {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+   }
 }
 
 /* ========== QUICK EXAMPLES ========== */
