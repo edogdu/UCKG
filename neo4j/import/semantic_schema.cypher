@@ -10,12 +10,11 @@
 // definitions in place.
 //
 // Sections
-//   1. UCKGMeta_Schema       — schema singleton / version node
-//   2. UCKGMeta_Node         — one node per entity type  (14 nodes)
-//   3. UCKGMeta_Property     — one node per property per entity type (81 nodes)
-//   4. UCKGMeta_Relationship — one node per relationship type (16 nodes)
-//   5. META_CONNECTS_TO      — schema-level topology edges (16 edges)
-//   6. UCKGMeta_TraversalPath — documented multi-hop patterns (7 nodes)
+//   1. UCKGMeta_Schema        — schema singleton / version node
+//   2. UCKGMeta_Node          — one node per entity type  (14 nodes)
+//   3. UCKGMeta_Property      — one node per property per entity type (81 nodes)
+//   4. META_CONNECTS_TO       — relationship metadata encoded on edges (16 edges)
+//   5. UCKGMeta_TraversalPath — documented multi-hop patterns (7 nodes)
 // ═══════════════════════════════════════════════════════════════════════════
 
 
@@ -430,280 +429,185 @@ MERGE (p:UCKGMeta_Property {semantic:'uri', belongs_to:'CPE'}) SET p.physical='u
 MATCH (n:UCKGMeta_Node {semantic:'CPE'}),(p:UCKGMeta_Property {semantic:'uri',belongs_to:'CPE'}) MERGE (n)-[:META_HAS_PROPERTY]->(p);
 
 
-// ── 4. Relationship type metadata ─────────────────────────────────────────
-// Each entry specifies:
-//   semantic             — human name for the relationship
-//   physical_rel         — actual Neo4j relationship type
-//   source_node_semantic — semantic type of the source node
-//   source_node_physical — physical label of the source node
-//   target_node_semantic — semantic type of the target node
-//   target_node_physical — physical label of the target node
-//   nl_template          — sentence template for NL generation
-//                          variables: {SRC_ID}, {SRC_LABEL}, {TGT_ID}, {TGT_LABEL}
+// ── 4. Relationship metadata — encoded on META_CONNECTS_TO edges ─────────
+// No separate UCKGMeta_Relationship nodes needed.
+// All relationship metadata lives directly on the META_CONNECTS_TO edge
+// between the two UCKGMeta_Node endpoints.  This gives a cleaner graph:
+// one query returns the full triple (source node, relationship, target node)
+// with all metadata in a single traversal.
+//
+// Edge properties:
+//   semantic        — human-readable relationship name (e.g. "hasCPE")
+//   physical_rel    — Neo4j relationship type (e.g. "UCOEXHASCPE")
+//   description     — what this relationship means
+//   nl_template     — sentence template; variables: {SRC_ID}, {SRC_LABEL}, {TGT_ID}, {TGT_LABEL}
+//   cypher_pattern  — example MATCH pattern
+//   triggers        — NL phrases that indicate this relationship
+//   example_query   — full example Cypher query
+//   name            — display name for Neo4j Browser
 
-MERGE (r:UCKGMeta_Relationship {semantic:'hasCPE'})
-SET   r.physical_rel          = 'UCOEXHASCPE',
-      r.source_node_semantic  = 'CVE',
-      r.source_node_physical  = 'UcoCVE',
-      r.target_node_semantic  = 'CPE',
-      r.target_node_physical  = 'UcoexCPE',
-      r.description           = 'Connects a CVE to the specific platform or product versions it affects. Primary relationship for "which platforms/products are affected by this CVE" queries.',
-      r.nl_template           = '{SRC_ID}, which is a vulnerability, has a CPE, {TGT_ID}, which is a software platform titled "{TGT_LABEL}".',
-      r.cypher_pattern        = 'MATCH (c:UcoCVE)-[:UCOEXHASCPE]->(cpe:UcoexCPE)',
-      r.triggers              = ['affected platform', 'which CPE', 'platforms affected by CVE', 'products affected by vulnerability', 'vendor version affected'],
-      r.example_query         = 'MATCH (c:UcoCVE {label:\'CVE-2021-44228\'})-[:UCOEXHASCPE]->(cpe:UcoexCPE) RETURN cpe.cpeName';
-MATCH (s:UCKGMeta_Schema {version:'v3'}),(r:UCKGMeta_Relationship {semantic:'hasCPE'}) MERGE (s)-[:META_HAS_RELATIONSHIP]->(r);
+MATCH (src:UCKGMeta_Node {semantic:'CVE'}), (tgt:UCKGMeta_Node {semantic:'CPE'})
+MERGE (src)-[e:META_CONNECTS_TO {semantic:'hasCPE'}]->(tgt)
+SET   e.physical_rel    = 'UCOEXHASCPE',
+      e.description     = 'Connects a CVE to the specific platform or product versions it affects. Primary relationship for "which platforms/products are affected by this CVE" queries.',
+      e.nl_template     = '{SRC_ID}, which is a vulnerability, has a CPE, {TGT_ID}, which is a software platform titled "{TGT_LABEL}".',
+      e.cypher_pattern  = 'MATCH (c:UcoCVE)-[:UCOEXHASCPE]->(cpe:UcoexCPE)',
+      e.triggers        = ['affected platform', 'which CPE', 'platforms affected by CVE', 'products affected by vulnerability', 'vendor version affected'],
+      e.example_query   = 'MATCH (c:UcoCVE {label:\'CVE-2021-44228\'})-[:UCOEXHASCPE]->(cpe:UcoexCPE) RETURN cpe.cpeName',
+      e.name            = 'hasCPE';
 
-MERGE (r:UCKGMeta_Relationship {semantic:'hasObservedExample'})
-SET   r.physical_rel          = 'UCOHASOBSERVEDEXAMPLE',
-      r.source_node_semantic  = 'Weakness',
-      r.source_node_physical  = 'UcoCWE',
-      r.target_node_semantic  = 'ObservedExample',
-      r.target_node_physical  = 'UcoexObservedExample',
-      r.description           = 'Connects a CWE weakness to real-world observed examples of it being exploited.',
-      r.nl_template           = '{SRC_ID}, which is a software weakness, has an observed real-world exploitation example: {TGT_LABEL}.',
-      r.cypher_pattern        = 'MATCH (w:UcoCWE)-[:UCOHASOBSERVEDEXAMPLE]->(oe:UcoexObservedExample)',
-      r.triggers              = ['real world examples of weakness', 'where has CWE been exploited', 'observed examples', 'historical exploitation of weakness'],
-      r.example_query         = 'MATCH (w:UcoCWE {ucocweID:\'CWE-79\'})-[:UCOHASOBSERVEDEXAMPLE]->(oe:UcoexObservedExample) RETURN oe.ucoexDESCRIPTION LIMIT 5';
-MATCH (s:UCKGMeta_Schema {version:'v3'}),(r:UCKGMeta_Relationship {semantic:'hasObservedExample'}) MERGE (s)-[:META_HAS_RELATIONSHIP]->(r);
-
-MERGE (r:UCKGMeta_Relationship {semantic:'hasVulnerability'})
-SET   r.physical_rel          = 'UCOHASVULNERABILITY',
-      r.source_node_semantic  = 'ExploitTarget',
-      r.source_node_physical  = 'UcoExploitTarget',
-      r.target_node_semantic  = 'Vulnerability',
-      r.target_node_physical  = 'UcoVulnerability',
-      r.description           = 'Connects an ExploitTarget pivot node to its associated Vulnerability. Required to traverse from weaknesses to vulnerability records.',
-      r.nl_template           = 'Exploit target {SRC_ID} is associated with vulnerability {TGT_ID}.',
-      r.cypher_pattern        = 'MATCH (et:UcoExploitTarget)-[:UCOHASVULNERABILITY]->(v:UcoVulnerability)',
-      r.triggers              = ['vulnerability from weakness', 'exploit target linked vulnerability', 'CWE causes vulnerability'],
-      r.example_query         = 'MATCH (w:UcoCWE {ucocweID:\'CWE-89\'})<-[:UCOHASWEAKNESS]-(et:UcoExploitTarget)-[:UCOHASVULNERABILITY]->(v:UcoVulnerability)-[:UCOHASCVE_ID]->(c:UcoCVE) RETURN c.label LIMIT 10';
-MATCH (s:UCKGMeta_Schema {version:'v3'}),(r:UCKGMeta_Relationship {semantic:'hasVulnerability'}) MERGE (s)-[:META_HAS_RELATIONSHIP]->(r);
-
-MERGE (r:UCKGMeta_Relationship {semantic:'hasWeakness'})
-SET   r.physical_rel          = 'UCOHASWEAKNESS',
-      r.source_node_semantic  = 'ExploitTarget',
-      r.source_node_physical  = 'UcoExploitTarget',
-      r.target_node_semantic  = 'Weakness',
-      r.target_node_physical  = 'UcoCWE',
-      r.description           = 'Connects an ExploitTarget pivot node to the underlying CWE weakness. Used to find which weakness class underlies a given vulnerability.',
-      r.nl_template           = 'Exploit target {SRC_ID} is caused by weakness {TGT_ID}, which is a {TGT_LABEL}.',
-      r.cypher_pattern        = 'MATCH (et:UcoExploitTarget)-[:UCOHASWEAKNESS]->(w:UcoCWE)',
-      r.triggers              = ['weakness causing vulnerability', 'CWE for this CVE', 'underlying weakness', 'root cause weakness'],
-      r.example_query         = 'MATCH (v:UcoVulnerability)<-[:UCOHASVULNERABILITY]-(et:UcoExploitTarget)-[:UCOHASWEAKNESS]->(w:UcoCWE) MATCH (v)-[:UCOHASCVE_ID]->(c:UcoCVE {label:\'CVE-2021-44228\'}) RETURN w.ucocweID, w.ucocweName';
-MATCH (s:UCKGMeta_Schema {version:'v3'}),(r:UCKGMeta_Relationship {semantic:'hasWeakness'}) MERGE (s)-[:META_HAS_RELATIONSHIP]->(r);
-
-MERGE (r:UCKGMeta_Relationship {semantic:'hasCVE'})
-SET   r.physical_rel          = 'UCOHASCVE_ID',
-      r.source_node_semantic  = 'Vulnerability',
-      r.source_node_physical  = 'UcoVulnerability',
-      r.target_node_semantic  = 'CVE',
-      r.target_node_physical  = 'UcoCVE',
-      r.description           = 'Connects a Vulnerability concept node to its corresponding CVE identifier node. Required to access CVE scoring data from a Vulnerability node.',
-      r.nl_template           = 'Vulnerability {SRC_ID} is identified by {TGT_ID}, which is a CVE entry.',
-      r.cypher_pattern        = 'MATCH (v:UcoVulnerability)-[:UCOHASCVE_ID]->(c:UcoCVE)',
-      r.triggers              = ['CVE for vulnerability', 'vulnerability identifier', 'get CVE from vulnerability', 'link vulnerability to CVE'],
-      r.example_query         = 'MATCH (v:UcoVulnerability)-[:UCOHASCVE_ID]->(c:UcoCVE) WHERE v.ucopublishedDateTime >= datetime(\'2021-01-01\') RETURN c.label, c.ucobaseSeverity LIMIT 10';
-MATCH (s:UCKGMeta_Schema {version:'v3'}),(r:UCKGMeta_Relationship {semantic:'hasCVE'}) MERGE (s)-[:META_HAS_RELATIONSHIP]->(r);
-
-MERGE (r:UCKGMeta_Relationship {semantic:'attributedTo'})
-SET   r.physical_rel          = 'UCOEXATTRIBUTEDTO',
-      r.source_node_semantic  = 'Campaign',
-      r.source_node_physical  = 'UcoexCAMPAIGNS',
-      r.target_node_semantic  = 'Group',
-      r.target_node_physical  = 'UcoexGROUPS',
-      r.description           = 'Indicates that a threat campaign has been attributed to a specific threat actor group.',
-      r.nl_template           = 'Campaign {SRC_ID} is attributed to threat group {TGT_ID}.',
-      r.cypher_pattern        = 'MATCH (camp:UcoexCAMPAIGNS)-[:UCOEXATTRIBUTEDTO]->(g:UcoexGROUPS)',
-      r.triggers              = ['campaign attributed to', 'who conducted campaign', 'which group is behind', 'threat actor responsible'],
-      r.example_query         = 'MATCH (camp:UcoexCAMPAIGNS {ucoexNAME:\'Operation Wocao\'})-[:UCOEXATTRIBUTEDTO]->(g:UcoexGROUPS) RETURN g.ucoexNAME';
-MATCH (s:UCKGMeta_Schema {version:'v3'}),(r:UCKGMeta_Relationship {semantic:'attributedTo'}) MERGE (s)-[:META_HAS_RELATIONSHIP]->(r);
-
-MERGE (r:UCKGMeta_Relationship {semantic:'campaignUsesSoftware'})
-SET   r.physical_rel          = 'UCOEXCAMPAIGNUSESSOFTWARE',
-      r.source_node_semantic  = 'Campaign',
-      r.source_node_physical  = 'UcoexCAMPAIGNS',
-      r.target_node_semantic  = 'Software',
-      r.target_node_physical  = 'UcoexSOFTWARE',
-      r.description           = 'Indicates that a campaign used a specific software (malware/tool) as part of its operations.',
-      r.nl_template           = 'Campaign {SRC_ID} uses software {TGT_ID}, which is a threat tool.',
-      r.cypher_pattern        = 'MATCH (camp:UcoexCAMPAIGNS)-[:UCOEXCAMPAIGNUSESSOFTWARE]->(s:UcoexSOFTWARE)',
-      r.triggers              = ['software used in campaign', 'malware deployed by campaign', 'tools used in operation'],
-      r.example_query         = 'MATCH (camp:UcoexCAMPAIGNS {ucoexNAME:\'Operation Wocao\'})-[:UCOEXCAMPAIGNUSESSOFTWARE]->(s:UcoexSOFTWARE) RETURN s.ucoexNAME';
-MATCH (s:UCKGMeta_Schema {version:'v3'}),(r:UCKGMeta_Relationship {semantic:'campaignUsesSoftware'}) MERGE (s)-[:META_HAS_RELATIONSHIP]->(r);
-
-MERGE (r:UCKGMeta_Relationship {semantic:'campaignUsesTechnique'})
-SET   r.physical_rel          = 'UCOEXCAMPAIGNUSESTECHNIQUE',
-      r.source_node_semantic  = 'Campaign',
-      r.source_node_physical  = 'UcoexCAMPAIGNS',
-      r.target_node_semantic  = 'Technique',
-      r.target_node_physical  = 'UcoexMITREATTACK',
-      r.description           = 'Indicates that a campaign employed a specific ATT&CK technique.',
-      r.nl_template           = 'Campaign {SRC_ID} employs the adversary technique {TGT_ID}.',
-      r.cypher_pattern        = 'MATCH (camp:UcoexCAMPAIGNS)-[:UCOEXCAMPAIGNUSESTECHNIQUE]->(t:UcoexMITREATTACK)',
-      r.triggers              = ['technique used in campaign', 'campaign TTPs', 'attack techniques in operation'],
-      r.example_query         = 'MATCH (camp:UcoexCAMPAIGNS {ucoexNAME:\'Operation Wocao\'})-[:UCOEXCAMPAIGNUSESTECHNIQUE]->(t:UcoexMITREATTACK) RETURN t.ucoexNAME';
-MATCH (s:UCKGMeta_Schema {version:'v3'}),(r:UCKGMeta_Relationship {semantic:'campaignUsesTechnique'}) MERGE (s)-[:META_HAS_RELATIONSHIP]->(r);
-
-MERGE (r:UCKGMeta_Relationship {semantic:'hasRelatedWeakness'})
-SET   r.physical_rel          = 'UCOEXHASRELATEDWEAKNESS',
-      r.source_node_semantic  = 'AttackPattern',
-      r.source_node_physical  = 'UcoexCAPEC',
-      r.target_node_semantic  = 'Weakness',
-      r.target_node_physical  = 'UcoCWE',
-      r.description           = 'Maps a CAPEC attack pattern to the CWE weaknesses it exploits.',
-      r.nl_template           = 'Attack pattern {SRC_ID} exploits the weakness {TGT_ID}, which is a {TGT_LABEL}.',
-      r.cypher_pattern        = 'MATCH (ap:UcoexCAPEC)-[:UCOEXHASRELATEDWEAKNESS]->(w:UcoCWE)',
-      r.triggers              = ['attack pattern for weakness', 'CAPEC exploits CWE', 'which attack patterns exploit this weakness'],
-      r.example_query         = 'MATCH (ap:UcoexCAPEC)-[:UCOEXHASRELATEDWEAKNESS]->(w:UcoCWE {ucocweID:\'CWE-89\'}) RETURN ap.ucoexCAPEC_id, ap.ucoexCAPEC_name';
-MATCH (s:UCKGMeta_Schema {version:'v3'}),(r:UCKGMeta_Relationship {semantic:'hasRelatedWeakness'}) MERGE (s)-[:META_HAS_RELATIONSHIP]->(r);
-
-MERGE (r:UCKGMeta_Relationship {semantic:'mapsToTechnique'})
-SET   r.physical_rel          = 'UCOEXHASTAXONOMYMAPPING',
-      r.source_node_semantic  = 'AttackPattern',
-      r.source_node_physical  = 'UcoexCAPEC',
-      r.target_node_semantic  = 'Technique',
-      r.target_node_physical  = 'UcoexMITREATTACK',
-      r.description           = 'Maps a CAPEC attack pattern to corresponding ATT&CK techniques via ATT&CK taxonomy mapping.',
-      r.nl_template           = 'Attack pattern {SRC_ID} maps to ATT&CK technique {TGT_ID}.',
-      r.cypher_pattern        = 'MATCH (ap:UcoexCAPEC)-[:UCOEXHASTAXONOMYMAPPING]->(t:UcoexMITREATTACK)',
-      r.triggers              = ['CAPEC maps to technique', 'attack pattern ATT&CK mapping', 'ATT&CK equivalent of CAPEC'],
-      r.example_query         = 'MATCH (ap:UcoexCAPEC {ucoexCAPEC_id:\'CAPEC-66\'})-[:UCOEXHASTAXONOMYMAPPING]->(t:UcoexMITREATTACK) RETURN t.ucoexNAME';
-MATCH (s:UCKGMeta_Schema {version:'v3'}),(r:UCKGMeta_Relationship {semantic:'mapsToTechnique'}) MERGE (s)-[:META_HAS_RELATIONSHIP]->(r);
-
-MERGE (r:UCKGMeta_Relationship {semantic:'groupUsesSoftware'})
-SET   r.physical_rel          = 'UCOEXGROUPUSESSOFTWARE',
-      r.source_node_semantic  = 'Group',
-      r.source_node_physical  = 'UcoexGROUPS',
-      r.target_node_semantic  = 'Software',
-      r.target_node_physical  = 'UcoexSOFTWARE',
-      r.description           = 'Indicates that a threat group uses a specific software (malware or tool).',
-      r.nl_template           = 'Threat group {SRC_ID} uses software {TGT_ID}, which is a threat tool.',
-      r.cypher_pattern        = 'MATCH (g:UcoexGROUPS)-[:UCOEXGROUPUSESSOFTWARE]->(s:UcoexSOFTWARE)',
-      r.triggers              = ['software used by group', 'malware used by APT', 'tools of threat actor', 'group\'s toolset'],
-      r.example_query         = 'MATCH (g:UcoexGROUPS {ucoexNAME:\'APT29\'})-[:UCOEXGROUPUSESSOFTWARE]->(s:UcoexSOFTWARE) RETURN s.ucoexNAME';
-MATCH (s:UCKGMeta_Schema {version:'v3'}),(r:UCKGMeta_Relationship {semantic:'groupUsesSoftware'}) MERGE (s)-[:META_HAS_RELATIONSHIP]->(r);
-
-MERGE (r:UCKGMeta_Relationship {semantic:'groupUsesTechnique'})
-SET   r.physical_rel          = 'UCOEXGROUPUSESTECHNIQUE',
-      r.source_node_semantic  = 'Group',
-      r.source_node_physical  = 'UcoexGROUPS',
-      r.target_node_semantic  = 'Technique',
-      r.target_node_physical  = 'UcoexMITREATTACK',
-      r.description           = 'Indicates that a threat group employs a specific ATT&CK technique. Primary relationship for threat-actor TTP queries.',
-      r.nl_template           = 'Threat group {SRC_ID} employs the adversary technique {TGT_ID}.',
-      r.cypher_pattern        = 'MATCH (g:UcoexGROUPS)-[:UCOEXGROUPUSESTECHNIQUE]->(t:UcoexMITREATTACK)',
-      r.triggers              = ['techniques used by group', 'group TTPs', 'APT uses technique', 'threat actor attack methods'],
-      r.example_query         = 'MATCH (g:UcoexGROUPS {ucoexNAME:\'APT29\'})-[:UCOEXGROUPUSESTECHNIQUE]->(t:UcoexMITREATTACK) RETURN t.ucoexNAME LIMIT 10';
-MATCH (s:UCKGMeta_Schema {version:'v3'}),(r:UCKGMeta_Relationship {semantic:'groupUsesTechnique'}) MERGE (s)-[:META_HAS_RELATIONSHIP]->(r);
-
-MERGE (r:UCKGMeta_Relationship {semantic:'mitigates'})
-SET   r.physical_rel          = 'UCOEXMITIGATES',
-      r.source_node_semantic  = 'Mitigation',
-      r.source_node_physical  = 'UcoexMITIGATIONS',
-      r.target_node_semantic  = 'Technique',
-      r.target_node_physical  = 'UcoexMITREATTACK',
-      r.description           = 'Indicates that a mitigation reduces the effectiveness of a specific ATT&CK technique.',
-      r.nl_template           = 'Security mitigation {SRC_ID} reduces the effectiveness of technique {TGT_ID}.',
-      r.cypher_pattern        = 'MATCH (m:UcoexMITIGATIONS)-[:UCOEXMITIGATES]->(t:UcoexMITREATTACK)',
-      r.triggers              = ['how to mitigate technique', 'defense against technique', 'which mitigations cover', 'countermeasure for attack'],
-      r.example_query         = 'MATCH (m:UcoexMITIGATIONS)-[:UCOEXMITIGATES]->(t:UcoexMITREATTACK) WHERE toLower(t.ucoexNAME) CONTAINS \'phishing\' RETURN m.ucoexNAME';
-MATCH (s:UCKGMeta_Schema {version:'v3'}),(r:UCKGMeta_Relationship {semantic:'mitigates'}) MERGE (s)-[:META_HAS_RELATIONSHIP]->(r);
-
-MERGE (r:UCKGMeta_Relationship {semantic:'d3fendCoversTechnique'})
-SET   r.physical_rel          = 'UCOEXHASMITREATTACK',
-      r.source_node_semantic  = 'D3FENDControl',
-      r.source_node_physical  = 'UcoexMITRED3FEND',
-      r.target_node_semantic  = 'Technique',
-      r.target_node_physical  = 'UcoexMITREATTACK',
-      r.description           = 'Maps a D3FEND defensive control to the ATT&CK offensive technique it defends against.',
-      r.nl_template           = 'D3FEND control {SRC_ID} defends against ATT&CK technique {TGT_ID}.',
-      r.cypher_pattern        = 'MATCH (d:UcoexMITRED3FEND)-[:UCOEXHASMITREATTACK]->(t:UcoexMITREATTACK)',
-      r.triggers              = ['D3FEND control covers technique', 'defensive technique against ATT&CK', 'which D3FEND defends against'],
-      r.example_query         = 'MATCH (d:UcoexMITRED3FEND)-[:UCOEXHASMITREATTACK]->(t:UcoexMITREATTACK) WHERE toLower(t.ucoexNAME) CONTAINS \'phishing\' RETURN d.ucoexMITRED3FEND_LABEL';
-MATCH (s:UCKGMeta_Schema {version:'v3'}),(r:UCKGMeta_Relationship {semantic:'d3fendCoversTechnique'}) MERGE (s)-[:META_HAS_RELATIONSHIP]->(r);
-
-MERGE (r:UCKGMeta_Relationship {semantic:'exampleObservedIn'})
-SET   r.physical_rel          = 'UCOEXEXAMPLEOBSERVEDIN',
-      r.source_node_semantic  = 'ObservedExample',
-      r.source_node_physical  = 'UcoexObservedExample',
-      r.target_node_semantic  = 'CVE',
-      r.target_node_physical  = 'UcoCVE',
-      r.description           = 'Links a real-world observed example of a weakness to the CVE where that exploitation was recorded.',
-      r.nl_template           = 'This exploitation example was observed in {TGT_ID}, which is a vulnerability.',
-      r.cypher_pattern        = 'MATCH (oe:UcoexObservedExample)-[:UCOEXEXAMPLEOBSERVEDIN]->(c:UcoCVE)',
-      r.triggers              = ['example observed in CVE', 'weakness observed as CVE', 'real world CVE for weakness'],
-      r.example_query         = 'MATCH (w:UcoCWE {ucocweID:\'CWE-79\'})-[:UCOHASOBSERVEDEXAMPLE]->(oe:UcoexObservedExample)-[:UCOEXEXAMPLEOBSERVEDIN]->(c:UcoCVE) RETURN c.label, oe.ucoexDESCRIPTION LIMIT 5';
-MATCH (s:UCKGMeta_Schema {version:'v3'}),(r:UCKGMeta_Relationship {semantic:'exampleObservedIn'}) MERGE (s)-[:META_HAS_RELATIONSHIP]->(r);
-
-MERGE (r:UCKGMeta_Relationship {semantic:'softwareUsesTechnique'})
-SET   r.physical_rel          = 'UCOEXSOFTWAREUSESTECHNIQUE',
-      r.source_node_semantic  = 'Software',
-      r.source_node_physical  = 'UcoexSOFTWARE',
-      r.target_node_semantic  = 'Technique',
-      r.target_node_physical  = 'UcoexMITREATTACK',
-      r.description           = 'Indicates that a software (malware or tool) employs a specific ATT&CK technique.',
-      r.nl_template           = 'Software {SRC_ID} employs ATT&CK technique {TGT_ID}.',
-      r.cypher_pattern        = 'MATCH (s:UcoexSOFTWARE)-[:UCOEXSOFTWAREUSESTECHNIQUE]->(t:UcoexMITREATTACK)',
-      r.triggers              = ['technique used by software', 'malware uses technique', 'tool\'s ATT&CK techniques'],
-      r.example_query         = 'MATCH (s:UcoexSOFTWARE {ucoexNAME:\'Mimikatz\'})-[:UCOEXSOFTWAREUSESTECHNIQUE]->(t:UcoexMITREATTACK) RETURN t.ucoexNAME';
-MATCH (s:UCKGMeta_Schema {version:'v3'}),(r:UCKGMeta_Relationship {semantic:'softwareUsesTechnique'}) MERGE (s)-[:META_HAS_RELATIONSHIP]->(r);
-
-
-// ── 5. META_CONNECTS_TO — schema-level topology ───────────────────────────
-// One edge per relationship triple, reproducing the graph topology at the
-// schema level so the metadata itself is a traversable graph.
-
-MATCH (src:UCKGMeta_Node {semantic:'CVE'}),       (tgt:UCKGMeta_Node {semantic:'CPE'})
-MERGE (src)-[:META_CONNECTS_TO {via_semantic:'hasCPE', via_physical:'UCOEXHASCPE'}]->(tgt);
-
-MATCH (src:UCKGMeta_Node {semantic:'Weakness'}),  (tgt:UCKGMeta_Node {semantic:'ObservedExample'})
-MERGE (src)-[:META_CONNECTS_TO {via_semantic:'hasObservedExample', via_physical:'UCOHASOBSERVEDEXAMPLE'}]->(tgt);
+MATCH (src:UCKGMeta_Node {semantic:'Weakness'}), (tgt:UCKGMeta_Node {semantic:'ObservedExample'})
+MERGE (src)-[e:META_CONNECTS_TO {semantic:'hasObservedExample'}]->(tgt)
+SET   e.physical_rel    = 'UCOHASOBSERVEDEXAMPLE',
+      e.description     = 'Connects a CWE weakness to real-world observed examples of it being exploited.',
+      e.nl_template     = '{SRC_ID}, which is a software weakness, has an observed real-world exploitation example: {TGT_LABEL}.',
+      e.cypher_pattern  = 'MATCH (w:UcoCWE)-[:UCOHASOBSERVEDEXAMPLE]->(oe:UcoexObservedExample)',
+      e.triggers        = ['real world examples of weakness', 'where has CWE been exploited', 'observed examples', 'historical exploitation of weakness'],
+      e.example_query   = 'MATCH (w:UcoCWE {ucocweID:\'CWE-79\'})-[:UCOHASOBSERVEDEXAMPLE]->(oe:UcoexObservedExample) RETURN oe.ucoexDESCRIPTION LIMIT 5',
+      e.name            = 'hasObservedExample';
 
 MATCH (src:UCKGMeta_Node {semantic:'ExploitTarget'}), (tgt:UCKGMeta_Node {semantic:'Vulnerability'})
-MERGE (src)-[:META_CONNECTS_TO {via_semantic:'hasVulnerability', via_physical:'UCOHASVULNERABILITY'}]->(tgt);
+MERGE (src)-[e:META_CONNECTS_TO {semantic:'hasVulnerability'}]->(tgt)
+SET   e.physical_rel    = 'UCOHASVULNERABILITY',
+      e.description     = 'Connects an ExploitTarget pivot node to its associated Vulnerability. Required to traverse from weaknesses to vulnerability records.',
+      e.nl_template     = 'Exploit target {SRC_ID} is associated with vulnerability {TGT_ID}.',
+      e.cypher_pattern  = 'MATCH (et:UcoExploitTarget)-[:UCOHASVULNERABILITY]->(v:UcoVulnerability)',
+      e.triggers        = ['vulnerability from weakness', 'exploit target linked vulnerability', 'CWE causes vulnerability'],
+      e.example_query   = 'MATCH (w:UcoCWE {ucocweID:\'CWE-89\'})<-[:UCOHASWEAKNESS]-(et:UcoExploitTarget)-[:UCOHASVULNERABILITY]->(v:UcoVulnerability)-[:UCOHASCVE_ID]->(c:UcoCVE) RETURN c.label LIMIT 10',
+      e.name            = 'hasVulnerability';
 
 MATCH (src:UCKGMeta_Node {semantic:'ExploitTarget'}), (tgt:UCKGMeta_Node {semantic:'Weakness'})
-MERGE (src)-[:META_CONNECTS_TO {via_semantic:'hasWeakness', via_physical:'UCOHASWEAKNESS'}]->(tgt);
+MERGE (src)-[e:META_CONNECTS_TO {semantic:'hasWeakness'}]->(tgt)
+SET   e.physical_rel    = 'UCOHASWEAKNESS',
+      e.description     = 'Connects an ExploitTarget pivot node to the underlying CWE weakness. Used to find which weakness class underlies a given vulnerability.',
+      e.nl_template     = 'Exploit target {SRC_ID} is caused by weakness {TGT_ID}, which is a {TGT_LABEL}.',
+      e.cypher_pattern  = 'MATCH (et:UcoExploitTarget)-[:UCOHASWEAKNESS]->(w:UcoCWE)',
+      e.triggers        = ['weakness causing vulnerability', 'CWE for this CVE', 'underlying weakness', 'root cause weakness'],
+      e.example_query   = 'MATCH (v:UcoVulnerability)<-[:UCOHASVULNERABILITY]-(et:UcoExploitTarget)-[:UCOHASWEAKNESS]->(w:UcoCWE) MATCH (v)-[:UCOHASCVE_ID]->(c:UcoCVE {label:\'CVE-2021-44228\'}) RETURN w.ucocweID, w.ucocweName',
+      e.name            = 'hasWeakness';
 
 MATCH (src:UCKGMeta_Node {semantic:'Vulnerability'}), (tgt:UCKGMeta_Node {semantic:'CVE'})
-MERGE (src)-[:META_CONNECTS_TO {via_semantic:'hasCVE', via_physical:'UCOHASCVE_ID'}]->(tgt);
+MERGE (src)-[e:META_CONNECTS_TO {semantic:'hasCVE'}]->(tgt)
+SET   e.physical_rel    = 'UCOHASCVE_ID',
+      e.description     = 'Connects a Vulnerability concept node to its corresponding CVE identifier node. Required to access CVE scoring data from a Vulnerability node.',
+      e.nl_template     = 'Vulnerability {SRC_ID} is identified by {TGT_ID}, which is a CVE entry.',
+      e.cypher_pattern  = 'MATCH (v:UcoVulnerability)-[:UCOHASCVE_ID]->(c:UcoCVE)',
+      e.triggers        = ['CVE for vulnerability', 'vulnerability identifier', 'get CVE from vulnerability', 'link vulnerability to CVE'],
+      e.example_query   = 'MATCH (v:UcoVulnerability)-[:UCOHASCVE_ID]->(c:UcoCVE) WHERE v.ucopublishedDateTime >= datetime(\'2021-01-01\') RETURN c.label, c.ucobaseSeverity LIMIT 10',
+      e.name            = 'hasCVE';
 
-MATCH (src:UCKGMeta_Node {semantic:'Campaign'}),  (tgt:UCKGMeta_Node {semantic:'Group'})
-MERGE (src)-[:META_CONNECTS_TO {via_semantic:'attributedTo', via_physical:'UCOEXATTRIBUTEDTO'}]->(tgt);
+MATCH (src:UCKGMeta_Node {semantic:'Campaign'}), (tgt:UCKGMeta_Node {semantic:'Group'})
+MERGE (src)-[e:META_CONNECTS_TO {semantic:'attributedTo'}]->(tgt)
+SET   e.physical_rel    = 'UCOEXATTRIBUTEDTO',
+      e.description     = 'Indicates that a threat campaign has been attributed to a specific threat actor group.',
+      e.nl_template     = 'Campaign {SRC_ID} is attributed to threat group {TGT_ID}.',
+      e.cypher_pattern  = 'MATCH (camp:UcoexCAMPAIGNS)-[:UCOEXATTRIBUTEDTO]->(g:UcoexGROUPS)',
+      e.triggers        = ['campaign attributed to', 'who conducted campaign', 'which group is behind', 'threat actor responsible'],
+      e.example_query   = 'MATCH (camp:UcoexCAMPAIGNS {ucoexNAME:\'Operation Wocao\'})-[:UCOEXATTRIBUTEDTO]->(g:UcoexGROUPS) RETURN g.ucoexNAME',
+      e.name            = 'attributedTo';
 
-MATCH (src:UCKGMeta_Node {semantic:'Campaign'}),  (tgt:UCKGMeta_Node {semantic:'Software'})
-MERGE (src)-[:META_CONNECTS_TO {via_semantic:'campaignUsesSoftware', via_physical:'UCOEXCAMPAIGNUSESSOFTWARE'}]->(tgt);
+MATCH (src:UCKGMeta_Node {semantic:'Campaign'}), (tgt:UCKGMeta_Node {semantic:'Software'})
+MERGE (src)-[e:META_CONNECTS_TO {semantic:'campaignUsesSoftware'}]->(tgt)
+SET   e.physical_rel    = 'UCOEXCAMPAIGNUSESSOFTWARE',
+      e.description     = 'Indicates that a campaign used a specific software (malware/tool) as part of its operations.',
+      e.nl_template     = 'Campaign {SRC_ID} uses software {TGT_ID}, which is a threat tool.',
+      e.cypher_pattern  = 'MATCH (camp:UcoexCAMPAIGNS)-[:UCOEXCAMPAIGNUSESSOFTWARE]->(s:UcoexSOFTWARE)',
+      e.triggers        = ['software used in campaign', 'malware deployed by campaign', 'tools used in operation'],
+      e.example_query   = 'MATCH (camp:UcoexCAMPAIGNS {ucoexNAME:\'Operation Wocao\'})-[:UCOEXCAMPAIGNUSESSOFTWARE]->(s:UcoexSOFTWARE) RETURN s.ucoexNAME',
+      e.name            = 'campaignUsesSoftware';
 
-MATCH (src:UCKGMeta_Node {semantic:'Campaign'}),  (tgt:UCKGMeta_Node {semantic:'Technique'})
-MERGE (src)-[:META_CONNECTS_TO {via_semantic:'campaignUsesTechnique', via_physical:'UCOEXCAMPAIGNUSESTECHNIQUE'}]->(tgt);
+MATCH (src:UCKGMeta_Node {semantic:'Campaign'}), (tgt:UCKGMeta_Node {semantic:'Technique'})
+MERGE (src)-[e:META_CONNECTS_TO {semantic:'campaignUsesTechnique'}]->(tgt)
+SET   e.physical_rel    = 'UCOEXCAMPAIGNUSESTECHNIQUE',
+      e.description     = 'Indicates that a campaign employed a specific ATT&CK technique.',
+      e.nl_template     = 'Campaign {SRC_ID} employs the adversary technique {TGT_ID}.',
+      e.cypher_pattern  = 'MATCH (camp:UcoexCAMPAIGNS)-[:UCOEXCAMPAIGNUSESTECHNIQUE]->(t:UcoexMITREATTACK)',
+      e.triggers        = ['technique used in campaign', 'campaign TTPs', 'attack techniques in operation'],
+      e.example_query   = 'MATCH (camp:UcoexCAMPAIGNS {ucoexNAME:\'Operation Wocao\'})-[:UCOEXCAMPAIGNUSESTECHNIQUE]->(t:UcoexMITREATTACK) RETURN t.ucoexNAME',
+      e.name            = 'campaignUsesTechnique';
 
 MATCH (src:UCKGMeta_Node {semantic:'AttackPattern'}), (tgt:UCKGMeta_Node {semantic:'Weakness'})
-MERGE (src)-[:META_CONNECTS_TO {via_semantic:'hasRelatedWeakness', via_physical:'UCOEXHASRELATEDWEAKNESS'}]->(tgt);
+MERGE (src)-[e:META_CONNECTS_TO {semantic:'hasRelatedWeakness'}]->(tgt)
+SET   e.physical_rel    = 'UCOEXHASRELATEDWEAKNESS',
+      e.description     = 'Maps a CAPEC attack pattern to the CWE weaknesses it exploits.',
+      e.nl_template     = 'Attack pattern {SRC_ID} exploits the weakness {TGT_ID}, which is a {TGT_LABEL}.',
+      e.cypher_pattern  = 'MATCH (ap:UcoexCAPEC)-[:UCOEXHASRELATEDWEAKNESS]->(w:UcoCWE)',
+      e.triggers        = ['attack pattern for weakness', 'CAPEC exploits CWE', 'which attack patterns exploit this weakness'],
+      e.example_query   = 'MATCH (ap:UcoexCAPEC)-[:UCOEXHASRELATEDWEAKNESS]->(w:UcoCWE {ucocweID:\'CWE-89\'}) RETURN ap.ucoexCAPEC_id, ap.ucoexCAPEC_name',
+      e.name            = 'hasRelatedWeakness';
 
 MATCH (src:UCKGMeta_Node {semantic:'AttackPattern'}), (tgt:UCKGMeta_Node {semantic:'Technique'})
-MERGE (src)-[:META_CONNECTS_TO {via_semantic:'mapsToTechnique', via_physical:'UCOEXHASTAXONOMYMAPPING'}]->(tgt);
+MERGE (src)-[e:META_CONNECTS_TO {semantic:'mapsToTechnique'}]->(tgt)
+SET   e.physical_rel    = 'UCOEXHASTAXONOMYMAPPING',
+      e.description     = 'Maps a CAPEC attack pattern to corresponding ATT&CK techniques via ATT&CK taxonomy mapping.',
+      e.nl_template     = 'Attack pattern {SRC_ID} maps to ATT&CK technique {TGT_ID}.',
+      e.cypher_pattern  = 'MATCH (ap:UcoexCAPEC)-[:UCOEXHASTAXONOMYMAPPING]->(t:UcoexMITREATTACK)',
+      e.triggers        = ['CAPEC maps to technique', 'attack pattern ATT&CK mapping', 'ATT&CK equivalent of CAPEC'],
+      e.example_query   = 'MATCH (ap:UcoexCAPEC {ucoexCAPEC_id:\'CAPEC-66\'})-[:UCOEXHASTAXONOMYMAPPING]->(t:UcoexMITREATTACK) RETURN t.ucoexNAME',
+      e.name            = 'mapsToTechnique';
 
-MATCH (src:UCKGMeta_Node {semantic:'Group'}),     (tgt:UCKGMeta_Node {semantic:'Software'})
-MERGE (src)-[:META_CONNECTS_TO {via_semantic:'groupUsesSoftware', via_physical:'UCOEXGROUPUSESSOFTWARE'}]->(tgt);
+MATCH (src:UCKGMeta_Node {semantic:'Group'}), (tgt:UCKGMeta_Node {semantic:'Software'})
+MERGE (src)-[e:META_CONNECTS_TO {semantic:'groupUsesSoftware'}]->(tgt)
+SET   e.physical_rel    = 'UCOEXGROUPUSESSOFTWARE',
+      e.description     = 'Indicates that a threat group uses a specific software (malware or tool).',
+      e.nl_template     = 'Threat group {SRC_ID} uses software {TGT_ID}, which is a threat tool.',
+      e.cypher_pattern  = 'MATCH (g:UcoexGROUPS)-[:UCOEXGROUPUSESSOFTWARE]->(s:UcoexSOFTWARE)',
+      e.triggers        = ['software used by group', 'malware used by APT', 'tools of threat actor', 'group\'s toolset'],
+      e.example_query   = 'MATCH (g:UcoexGROUPS {ucoexNAME:\'APT29\'})-[:UCOEXGROUPUSESSOFTWARE]->(s:UcoexSOFTWARE) RETURN s.ucoexNAME',
+      e.name            = 'groupUsesSoftware';
 
-MATCH (src:UCKGMeta_Node {semantic:'Group'}),     (tgt:UCKGMeta_Node {semantic:'Technique'})
-MERGE (src)-[:META_CONNECTS_TO {via_semantic:'groupUsesTechnique', via_physical:'UCOEXGROUPUSESTECHNIQUE'}]->(tgt);
+MATCH (src:UCKGMeta_Node {semantic:'Group'}), (tgt:UCKGMeta_Node {semantic:'Technique'})
+MERGE (src)-[e:META_CONNECTS_TO {semantic:'groupUsesTechnique'}]->(tgt)
+SET   e.physical_rel    = 'UCOEXGROUPUSESTECHNIQUE',
+      e.description     = 'Indicates that a threat group employs a specific ATT&CK technique. Primary relationship for threat-actor TTP queries.',
+      e.nl_template     = 'Threat group {SRC_ID} employs the adversary technique {TGT_ID}.',
+      e.cypher_pattern  = 'MATCH (g:UcoexGROUPS)-[:UCOEXGROUPUSESTECHNIQUE]->(t:UcoexMITREATTACK)',
+      e.triggers        = ['techniques used by group', 'group TTPs', 'APT uses technique', 'threat actor attack methods'],
+      e.example_query   = 'MATCH (g:UcoexGROUPS {ucoexNAME:\'APT29\'})-[:UCOEXGROUPUSESTECHNIQUE]->(t:UcoexMITREATTACK) RETURN t.ucoexNAME LIMIT 10',
+      e.name            = 'groupUsesTechnique';
 
-MATCH (src:UCKGMeta_Node {semantic:'Mitigation'}),(tgt:UCKGMeta_Node {semantic:'Technique'})
-MERGE (src)-[:META_CONNECTS_TO {via_semantic:'mitigates', via_physical:'UCOEXMITIGATES'}]->(tgt);
+MATCH (src:UCKGMeta_Node {semantic:'Mitigation'}), (tgt:UCKGMeta_Node {semantic:'Technique'})
+MERGE (src)-[e:META_CONNECTS_TO {semantic:'mitigates'}]->(tgt)
+SET   e.physical_rel    = 'UCOEXMITIGATES',
+      e.description     = 'Indicates that a mitigation reduces the effectiveness of a specific ATT&CK technique.',
+      e.nl_template     = 'Security mitigation {SRC_ID} reduces the effectiveness of technique {TGT_ID}.',
+      e.cypher_pattern  = 'MATCH (m:UcoexMITIGATIONS)-[:UCOEXMITIGATES]->(t:UcoexMITREATTACK)',
+      e.triggers        = ['how to mitigate technique', 'defense against technique', 'which mitigations cover', 'countermeasure for attack'],
+      e.example_query   = 'MATCH (m:UcoexMITIGATIONS)-[:UCOEXMITIGATES]->(t:UcoexMITREATTACK) WHERE toLower(t.ucoexNAME) CONTAINS \'phishing\' RETURN m.ucoexNAME',
+      e.name            = 'mitigates';
 
-MATCH (src:UCKGMeta_Node {semantic:'D3FENDControl'}),(tgt:UCKGMeta_Node {semantic:'Technique'})
-MERGE (src)-[:META_CONNECTS_TO {via_semantic:'d3fendCoversTechnique', via_physical:'UCOEXHASMITREATTACK'}]->(tgt);
+MATCH (src:UCKGMeta_Node {semantic:'D3FENDControl'}), (tgt:UCKGMeta_Node {semantic:'Technique'})
+MERGE (src)-[e:META_CONNECTS_TO {semantic:'d3fendCoversTechnique'}]->(tgt)
+SET   e.physical_rel    = 'UCOEXHASMITREATTACK',
+      e.description     = 'Maps a D3FEND defensive control to the ATT&CK offensive technique it defends against.',
+      e.nl_template     = 'D3FEND control {SRC_ID} defends against ATT&CK technique {TGT_ID}.',
+      e.cypher_pattern  = 'MATCH (d:UcoexMITRED3FEND)-[:UCOEXHASMITREATTACK]->(t:UcoexMITREATTACK)',
+      e.triggers        = ['D3FEND control covers technique', 'defensive technique against ATT&CK', 'which D3FEND defends against'],
+      e.example_query   = 'MATCH (d:UcoexMITRED3FEND)-[:UCOEXHASMITREATTACK]->(t:UcoexMITREATTACK) WHERE toLower(t.ucoexNAME) CONTAINS \'phishing\' RETURN d.ucoexMITRED3FEND_LABEL',
+      e.name            = 'd3fendCoversTechnique';
 
-MATCH (src:UCKGMeta_Node {semantic:'ObservedExample'}),(tgt:UCKGMeta_Node {semantic:'CVE'})
-MERGE (src)-[:META_CONNECTS_TO {via_semantic:'exampleObservedIn', via_physical:'UCOEXEXAMPLEOBSERVEDIN'}]->(tgt);
+MATCH (src:UCKGMeta_Node {semantic:'ObservedExample'}), (tgt:UCKGMeta_Node {semantic:'CVE'})
+MERGE (src)-[e:META_CONNECTS_TO {semantic:'exampleObservedIn'}]->(tgt)
+SET   e.physical_rel    = 'UCOEXEXAMPLEOBSERVEDIN',
+      e.description     = 'Links a real-world observed example of a weakness to the CVE where that exploitation was recorded.',
+      e.nl_template     = 'This exploitation example was observed in {TGT_ID}, which is a vulnerability.',
+      e.cypher_pattern  = 'MATCH (oe:UcoexObservedExample)-[:UCOEXEXAMPLEOBSERVEDIN]->(c:UcoCVE)',
+      e.triggers        = ['example observed in CVE', 'weakness observed as CVE', 'real world CVE for weakness'],
+      e.example_query   = 'MATCH (w:UcoCWE {ucocweID:\'CWE-79\'})-[:UCOHASOBSERVEDEXAMPLE]->(oe:UcoexObservedExample)-[:UCOEXEXAMPLEOBSERVEDIN]->(c:UcoCVE) RETURN c.label, oe.ucoexDESCRIPTION LIMIT 5',
+      e.name            = 'exampleObservedIn';
 
-MATCH (src:UCKGMeta_Node {semantic:'Software'}),  (tgt:UCKGMeta_Node {semantic:'Technique'})
-MERGE (src)-[:META_CONNECTS_TO {via_semantic:'softwareUsesTechnique', via_physical:'UCOEXSOFTWAREUSESTECHNIQUE'}]->(tgt);
+MATCH (src:UCKGMeta_Node {semantic:'Software'}), (tgt:UCKGMeta_Node {semantic:'Technique'})
+MERGE (src)-[e:META_CONNECTS_TO {semantic:'softwareUsesTechnique'}]->(tgt)
+SET   e.physical_rel    = 'UCOEXSOFTWAREUSESTECHNIQUE',
+      e.description     = 'Indicates that a software (malware or tool) employs a specific ATT&CK technique.',
+      e.nl_template     = 'Software {SRC_ID} employs ATT&CK technique {TGT_ID}.',
+      e.cypher_pattern  = 'MATCH (s:UcoexSOFTWARE)-[:UCOEXSOFTWAREUSESTECHNIQUE]->(t:UcoexMITREATTACK)',
+      e.triggers        = ['technique used by software', 'malware uses technique', 'tool\'s ATT&CK techniques'],
+      e.example_query   = 'MATCH (s:UcoexSOFTWARE {ucoexNAME:\'Mimikatz\'})-[:UCOEXSOFTWAREUSESTECHNIQUE]->(t:UcoexMITREATTACK) RETURN t.ucoexNAME',
+      e.name            = 'softwareUsesTechnique';
 
 
-// ── 6. Traversal path metadata ────────────────────────────────────────────
+// ── 5. Traversal path metadata ───────────────────────────────────────────
 
 MERGE (tp:UCKGMeta_TraversalPath {name:'CWE to CVE (full chain)'})
 SET tp.description   = 'Traverse from a weakness (CWE) to all CVEs that resulted from that weakness type.',
@@ -746,6 +650,13 @@ SET tp.description   = 'Find real-world CVEs where a specific CWE weakness was d
     tp.cypher_pattern = 'MATCH (w:UcoCWE)-[:UCOHASOBSERVEDEXAMPLE]->(oe:UcoexObservedExample)-[:UCOEXEXAMPLEOBSERVEDIN]->(c:UcoCVE)',
     tp.use_cases      = ['real CVEs for XSS weakness', 'historical exploitation of CWE-89'];
 MATCH (s:UCKGMeta_Schema {version:'v3'}),(tp:UCKGMeta_TraversalPath {name:'CWE observed examples to CVE evidence'}) MERGE (s)-[:META_HAS_PATH]->(tp);
+
+
+// ── Display names (for Neo4j Browser visualisation) ──────────────────────
+// Neo4j Browser uses the `name` property as the default caption for nodes.
+MATCH (n:UCKGMeta_Node)     SET n.name = n.semantic;
+MATCH (p:UCKGMeta_Property) SET p.name = p.belongs_to + '.' + p.semantic;
+MATCH (s:UCKGMeta_Schema)   SET s.name = 'UCKG Schema ' + s.version;
 
 
 // ── Verification ──────────────────────────────────────────────────────────

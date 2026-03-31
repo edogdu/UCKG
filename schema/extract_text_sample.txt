@@ -1,0 +1,600 @@
+CVE-2002-1777, which is a HIGH severity vulnerability.
+CVE-2007-5655, which is a HIGH severity vulnerability.
+CVE-2002-1774, which is a HIGH severity vulnerability.
+CVE-2002-1772, which is a MEDIUM severity vulnerability.
+CVE-2002-1771, which is a MEDIUM severity vulnerability.
+CVE-2002-1770, which is a MEDIUM severity vulnerability.
+CVE-2008-5013, which is a HIGH severity vulnerability.
+CVE-2007-5657, which is a HIGH severity vulnerability.
+CVE-2003-1132, which is a MEDIUM severity vulnerability.
+CVE-2005-1604, which is a HIGH severity vulnerability.
+CVE-2005-2938, which is a HIGH severity vulnerability.
+CVE-2003-1136, which is a MEDIUM severity vulnerability.
+CVE-2002-0433, which is a MEDIUM severity vulnerability.
+CVE-2005-2933, which is a HIGH severity vulnerability.
+CVE-2008-5005, which is a HIGH severity vulnerability.
+CVE-2020-3566, which is a HIGH severity vulnerability.
+CVE-2002-1759, which is a MEDIUM severity vulnerability.
+CVE-2007-3012, which is a MEDIUM severity vulnerability.
+CVE-2002-1757, which is a HIGH severity vulnerability.
+CVE-2005-2946, which is a MEDIUM severity vulnerability.
+Vulnerability VULN-CVE-2000-0363 is described as: cdwtools 093 y anteriores de Linux permite a usuarios locales obtener privilegios de root a través del directorio /tmp.
+Vulnerability VULN-CVE-2000-0364 is described as: screen and rxvt in Red Hat Linux 6.0 do not properly set the modes of tty devices, which allows local users to write to other ttys.
+Vulnerability VULN-CVE-2000-0365 is described as: Red Hat Linux 6.0 installs the /dev/pts file system with insecure modes, which allows local users to write to other tty devices.
+Vulnerability VULN-CVE-2000-0366 is described as: volcado en Debian GNU/Linux 2.1 no restarura adecuadamente los vínculos simbólicos (symlinks), lo que permite a un usuario local modificar la propiedad de ficheros arbitrariamente.
+Vulnerability VULN-CVE-2000-0367 is described as: Vulnerability in eterm 0.8.8 in Debian GNU/Linux allows an attacker to gain root privileges.
+Vulnerability VULN-CVE-2000-0369 is described as: The IDENT server in Caldera Linux 2.3 creates multiple threads for each IDENT request, which allows remote attackers to cause a denial of service.
+Vulnerability VULN-CVE-2000-0361 is described as: The PPP wvdial.lxdialog script in wvdial 1.4 and earlier creates a .config file with world readable permissions, which allows a local attacker in the dialout group to access login and password informa…
+Vulnerability VULN-CVE-2000-0362 is described as: Desbordamiento de buffer en cdwtools de Linux, versión 093 y anteriores, que permite a usuarios locales conseguir privilegios de root.
+Vulnerability VULN-CVE-2000-0352 is described as: Pine before version 4.21 does not properly filter shell metacharacters from URLs, which allows remote attackers to execute arbitrary commands via a malformed URL.
+Vulnerability VULN-CVE-2000-0353 is described as: Pine 4.x allows a remote attacker to execute arbitrary commands via an index.html file which executes lynx and obtains a uudecoded file from a malicious web server, which is then executed by Pine.
+Vulnerability VULN-CVE-2000-0355 is described as: pg and pb in SuSE pbpg 1.x package allows an attacker to read arbitrary files.
+Vulnerability VULN-CVE-2000-0356 is described as: Pluggable Authentication Modules (PAM) in Red Hat Linux 6.1 does not properly lock access to disabled NIS accounts.
+Vulnerability VULN-CVE-2000-0357 is described as: ORBit and esound in Red Hat Linux 6.1 do not use sufficiently random numbers, which allows local users to guess the authentication keys.
+Vulnerability VULN-CVE-2000-0358 is described as: ORBit and gnome-session in Red Hat Linux 6.1 allows remote attackers to crash a program.
+Vulnerability VULN-CVE-2000-0350 is described as: A debugging feature in NetworkICE ICEcap 2.0.23 and earlier is enabled, which allows a remote attacker to bypass the weak authentication and post unencrypted events.
+Vulnerability VULN-CVE-2000-0385 is described as: FileMaker Pro 5 Web Companion allows remote attackers to bypass Field-Level database security restrictions via the XML publishing or email capabilities.
+Vulnerability VULN-CVE-2000-0386 is described as: FileMaker Pro 5 Web Companion allows remote attackers to send anonymous or forged email.
+Vulnerability VULN-CVE-2000-0387 is described as: The makelev program in the golddig game from the FreeBSD ports collection allows local users to overwrite arbitrary files.
+Vulnerability VULN-CVE-2000-0388 is described as: Buffer overflow in FreeBSD libmytinfo library allows local users to execute commands via a long TERMCAP environmental variable.
+Vulnerability VULN-CVE-2000-0389 is described as: Buffer overflow in krb_rd_req function in Kerberos 4 and 5 allows remote attackers to gain root privileges.
+CWE-24 (Path Traversal: '../filedir'), which is a software weakness.
+CWE-25 (Path Traversal: '/../filedir'), which is a software weakness.
+CWE-22 (Improper Limitation of a Pathname to a Restricted Directory ('Path Traversal')), which is a software weakness.
+CWE-23 (Relative Path Traversal), which is a software weakness.
+CWE-20 (Improper Input Validation), which is a software weakness.
+CWE-15 (External Control of System or Configuration Setting), which is a software weakness.
+CWE-35 (Path Traversal: '.../...//'), which is a software weakness.
+CWE-36 (Absolute Path Traversal), which is a software weakness.
+CWE-33 (Path Traversal: '....' (Multiple Dot)), which is a software weakness.
+CWE-34 (Path Traversal: '....//'), which is a software weakness.
+CWE-31 (Path Traversal: 'dir\..\..\filename'), which is a software weakness.
+CWE-32 (Path Traversal: '...' (Triple Dot)), which is a software weakness.
+CWE-30 (Path Traversal: '\dir\..\filename'), which is a software weakness.
+CWE-28 (Path Traversal: '..\filedir'), which is a software weakness.
+CWE-29 (Path Traversal: '\..\filename'), which is a software weakness.
+CWE-26 (Path Traversal: '/dir/../filename'), which is a software weakness.
+CWE-27 (Path Traversal: 'dir/../../filename'), which is a software weakness.
+CWE-13 (ASP.NET Misconfiguration: Password in Configuration File), which is a software weakness.
+CWE-14 (Compiler Removal of Code to Clear Buffers), which is a software weakness.
+CWE-11 (ASP.NET Misconfiguration: Creating Debug Binary), which is a software weakness.
+Exploit target ExploitTarget-CWE-1431, a pivot node linking weaknesses to vulnerabilities.
+Exploit target ExploitTarget-CWE-1421, a pivot node linking weaknesses to vulnerabilities.
+Exploit target ExploitTarget-CWE-1420, a pivot node linking weaknesses to vulnerabilities.
+Exploit target ExploitTarget-CWE-1429, a pivot node linking weaknesses to vulnerabilities.
+Exploit target ExploitTarget-CWE-1428, a pivot node linking weaknesses to vulnerabilities.
+Exploit target ExploitTarget-CWE-1427, a pivot node linking weaknesses to vulnerabilities.
+Exploit target ExploitTarget-CWE-1426, a pivot node linking weaknesses to vulnerabilities.
+Exploit target ExploitTarget-CWE-1423, a pivot node linking weaknesses to vulnerabilities.
+Exploit target ExploitTarget-CWE-1422, a pivot node linking weaknesses to vulnerabilities.
+Exploit target ExploitTarget-CWE-1419, a pivot node linking weaknesses to vulnerabilities.
+Exploit target ExploitTarget-CWE-908, a pivot node linking weaknesses to vulnerabilities.
+Exploit target ExploitTarget-CWE-909, a pivot node linking weaknesses to vulnerabilities.
+Exploit target ExploitTarget-CWE-80, a pivot node linking weaknesses to vulnerabilities.
+Exploit target ExploitTarget-CWE-82, a pivot node linking weaknesses to vulnerabilities.
+Exploit target ExploitTarget-CWE-81, a pivot node linking weaknesses to vulnerabilities.
+Exploit target ExploitTarget-CWE-88, a pivot node linking weaknesses to vulnerabilities.
+Exploit target ExploitTarget-CWE-915, a pivot node linking weaknesses to vulnerabilities.
+Exploit target ExploitTarget-CWE-87, a pivot node linking weaknesses to vulnerabilities.
+Exploit target ExploitTarget-CWE-916, a pivot node linking weaknesses to vulnerabilities.
+Exploit target ExploitTarget-CWE-917, a pivot node linking weaknesses to vulnerabilities.
+FrostyGoop Incident, which is a threat campaign: FrostyGoop Incident took place in January 2024 against a municipal district heating company in Ukraine.
+APT41 DUST, which is a threat campaign: APT41 DUST was conducted by APT41 from 2023 to July 2024 against entities in Europe, Asia, and the Middle East.
+Indian Critical Infrastructure Intrusions, which is a threat campaign: Indian Critical Infrastructure Intrusions is a sequence of intrusions from 2021 through early 2022 linked to People’s Republic of China (PRC) threat actors, particularly RedEcho and Threat Activity Gr…
+Outer Space, which is a threat campaign: Outer Space was a campaign conducted by OilRig throughout 2021 that used the SampleCheck5000 downloader and Solar backdoor to target Israeli organizations.
+ShadowRay, which is a threat campaign: ShadowRay was a campaign that began in late 2023 targeting the education, cryptocurrency, biopharma, and other sectors through a vulnerability (CVE-2023-48022) in the Ray AI framework named ShadowRay.…
+Juicy Mix, which is a threat campaign: Juicy Mix was a campaign conducted by OilRig throughout 2022 that targeted Israeli organizations with the Mango backdoor.
+RedDelta Modified PlugX Infection Chain Operations, which is a threat campaign: RedDelta Modified PlugX Infection Chain Operations was executed by Mustang Panda from mid-2023 through the end of 2024 against multiple entities in East and Southeast Asia.
+ArcaneDoor, which is a threat campaign: ArcaneDoor is a campaign targeting networking devices from Cisco and other vendors between July 2023 and April 2024, primarily focused on government and critical infrastructure networks.
+Leviathan Australian Intrusions, which is a threat campaign: Leviathan Australian Intrusions consisted of at least two long-term intrusions against victims in Australia by Leviathan, relying on similar tradecraft such as external service exploitation followed b…
+Operation MidnightEclipse, which is a threat campaign: Operation MidnightEclipse was a campaign conducted in March and April 2024 that involved initial exploit of zero-day vulnerability CVE-2024-3400, a critical command injection vulnerability in the Glob…
+Triton Safety Instrumented System Attack, which is a threat campaign: Triton Safety Instrumented System Attack was a campaign employed by TEMP.Veles which leveraged the Triton malware framework against a petrochemical organization.
+C0032, which is a threat campaign: C0032 was an extended campaign suspected to involve the Triton adversaries with related capabilities and techniques focused on gaining a foothold within IT environments.
+Unitronics Defacement Campaign, which is a threat campaign: The Unitronics Defacement Campaign was a collection of intrusions across multiple sectors by the CyberAv3ngers, where threat actors engaged in a seemingly opportunistic and global targeting and deface…
+2022 Ukraine Electric Power Attack, which is a threat campaign: The 2022 Ukraine Electric Power Attack was a Sandworm Team campaign that used a combination of GOGETTER, Neo-REGEORG, CaddyWiper, and living of the land (LotL) techniques to gain access to a Ukrainian…
+C0033, which is a threat campaign: C0033 was a PROMETHIUM campaign during which they used StrongPity to target Android users.
+Pikabot Distribution February 2024, which is a threat campaign: Pikabot was distributed in Pikabot Distribution February 2024 using malicious emails with embedded links leading to malicious ZIP archives requiring user interaction for follow-on infection.
+KV Botnet Activity, which is a threat campaign: KV Botnet Activity consisted of exploitation of primarily “end-of-life” small office-home office (SOHO) equipment from manufacturers such as Cisco, NETGEAR, and DrayTek.
+HomeLand Justice, which is a threat campaign: HomeLand Justice was a disruptive campaign involving the use of ransomware, wiper malware, and sensitive information leaks conducted by Iranian state cyber actors against Albanian government networks…
+Water Curupira Pikabot Distribution, which is a threat campaign: Pikabot was distributed in Water Curupira Pikabot Distribution throughout 2023 by an entity linked to BlackBasta ransomware deployment via email attachments.
+Versa Director Zero Day Exploitation, which is a threat campaign: Versa Director Zero Day Exploitation was conducted by Volt Typhoon from early June through August 2024 as zero-day exploitation of Versa Director servers controlling software-defined wide area network…
+Bouncing Golf, which is a threat actor group: Bouncing Golf is a cyberespionage campaign targeting Middle Eastern countries.
+BlackTech, which is a threat actor group: BlackTech is a suspected Chinese cyber espionage group that has primarily targeted organizations in East Asia--particularly Taiwan, Japan, and Hong Kong--and the US since at least 2013.
+Machete, which is a threat actor group: Machete is a suspected Spanish-speaking cyber espionage group that has been active since at least 2010.
+APT41, which is a threat actor group: APT41 is a threat group that researchers have assessed as Chinese state-sponsored espionage group that also conducts financially-motivated operations.
+APT-C-36, which is a threat actor group: APT-C-36 is a suspected South America espionage group that has been active since at least 2018.
+WIRTE, which is a threat actor group: WIRTE is a threat group that has been active since at least August 2018.
+GALLIUM, which is a threat actor group: GALLIUM is a cyberespionage group that has been active since at least 2012, primarily targeting telecommunications companies, financial institutions, and government entities in Afghanistan, Australia,…
+Kimsuky, which is a threat actor group: Kimsuky is a North Korea-based cyber espionage group that has been active since at least 2012.
+Silence, which is a threat actor group: Silence is a financially motivated threat actor targeting financial institutions in different countries. The group was first seen in June 2016.
+TA505, which is a threat actor group: TA505 is a cyber criminal group that has been active since at least 2014.
+Rancor, which is a threat actor group: Rancor is a threat group that has led targeted campaigns against the South East Asia region. Rancor uses politically-motivated lures to entice victims to open malicious documents.
+Thrip, which is a threat actor group: Thrip is an espionage group that has targeted satellite communications, telecoms, and defense contractor companies in the U.S. and Southeast Asia.
+APT19, which is a threat actor group: APT19 is a Chinese-based threat group that has targeted a variety of industries, including defense, finance, energy, pharmaceutical, telecommunications, high tech, education, manufacturing, and legal…
+DarkHydrus, which is a threat actor group: DarkHydrus is a threat group that has targeted government agencies and educational institutions in the Middle East since at least 2016.
+Leafminer, which is a threat actor group: Leafminer is an Iranian threat group that has targeted government organizations and business entities in the Middle East since at least early 2017.
+Gorgon Group, which is a threat actor group: Gorgon Group is a threat group consisting of members who are suspected to be Pakistan-based or have other connections to Pakistan.
+Orangeworm, which is a threat actor group: Orangeworm is a group that has targeted organizations in the healthcare sector in the United States, Europe, and Asia since at least 2015, likely for the purpose of corporate espionage.
+Dark Caracal, which is a threat actor group: Dark Caracal is threat group that has been attributed to the Lebanese General Directorate of General Security (GDGS) and has operated since at least 2012.
+APT39, which is a threat actor group: APT39 is one of several names for cyber espionage activity conducted by the Iranian Ministry of Intelligence and Security (MOIS) through the front company Rana Intelligence Computing since at least 20…
+Gallmaker, which is a threat actor group: Gallmaker is a cyberespionage group that has targeted victims in the Middle East and has been active since at least December 2017.
+Impair Defenses: Downgrade Attack, which is an adversary technique: Adversaries may downgrade or use a version of system features that may be outdated, vulnerable, and/or does not support updated security controls.
+Network Sniffing, which is an adversary technique: Adversaries may passively sniff network traffic to capture information about an environment, including authentication material passed over the network.
+Exfiltration Over C2 Channel, which is an adversary technique: Adversaries may steal data by exfiltrating it over an existing command and control channel.
+System Owner/User Discovery, which is an adversary technique: Adversaries may attempt to identify the primary user, currently logged in user, set of users that commonly uses a system, or whether a user is actively using the system.
+Event Triggered Execution: Component Object Model Hijacking, which is an adversary technique: Adversaries may establish persistence by executing malicious content triggered by hijacked references to Component Object Model (COM) objects.
+Scheduled Task/Job, which is an adversary technique: Adversaries may abuse task scheduling functionality to facilitate initial or recurring execution of malicious code.
+Windows Management Instrumentation, which is an adversary technique: Adversaries may abuse Windows Management Instrumentation (WMI) to execute malicious commands and payloads.
+Exfiltration Over Alternative Protocol, which is an adversary technique: Adversaries may steal data by exfiltrating it over a different protocol than that of the existing command and control channel.
+Command and Scripting Interpreter, which is an adversary technique: Adversaries may abuse command and script interpreters to execute commands, scripts, or binaries.
+Application Layer Protocol, which is an adversary technique: Adversaries may communicate using OSI application layer protocols to avoid detection/network filtering by blending in with existing traffic.
+Software Deployment Tools, which is an adversary technique: Adversaries may gain access to and use centralized software suites installed within an enterprise to execute commands and move laterally through the network.
+Event Triggered Execution: Accessibility Features, which is an adversary technique: Adversaries may establish persistence and/or elevate privileges by executing malicious content triggered by accessibility features.
+Exploit Public-Facing Application, which is an adversary technique: Adversaries may attempt to exploit a weakness in an Internet-facing host or system to initially access a network.
+BITS Jobs, which is an adversary technique: Adversaries may abuse BITS jobs to persistently execute code and perform various background tasks.
+Drive-by Compromise, which is an adversary technique: Adversaries may gain access to a system through a user visiting a website over the normal course of browsing.
+Exploitation for Privilege Escalation, which is an adversary technique: Adversaries may exploit software vulnerabilities in an attempt to elevate privileges.
+Event Triggered Execution: Unix Shell Configuration Modification, which is an adversary technique: Adversaries may establish persistence through executing malicious commands triggered by a user’s shell.
+Automated Collection, which is an adversary technique: Once established within a system or network, an adversary may use automated techniques for collecting internal data.
+Audio Capture, which is an adversary technique: An adversary can leverage a computer's peripheral devices (e.g., microphones and webcams) or applications (e.g., voice and video call services) to capture audio recordings for the purpose of listening…
+System Time Discovery, which is an adversary technique: An adversary may gather the system time and/or time zone settings from a local or remote system.
+Command and Control, which is an attack tactic: The adversary is trying to communicate with compromised devices to control them.
+Exfiltration, which is an attack tactic: The adversary is trying to steal data. Exfiltration refers to techniques and attributes that result or aid in the adversary removing files and information from the targeted mobile device.
+Collection, which is an attack tactic: The adversary is trying to gather data of interest to their goal.
+Impact, which is an attack tactic: The adversary is trying to manipulate, interrupt, or destroy your devices and data.
+Lateral Movement, which is an attack tactic: The adversary is trying to move through your environment.
+Reconnaissance, which is an attack tactic: The adversary is trying to gather information they can use to plan future operations.
+Resource Development, which is an attack tactic: The adversary is trying to establish resources they can use to support operations.
+Execution, which is an attack tactic: The adversary is trying to run malicious code. Execution consists of techniques that result in adversary-controlled code running on a mobile device.
+Impact, which is an attack tactic: The adversary is trying to manipulate, interrupt, or destroy your systems and data.
+Collection, which is an attack tactic: The adversary is trying to gather data of interest to their goal.
+Lateral Movement, which is an attack tactic: The adversary is trying to move through your environment. Lateral Movement consists of techniques that adversaries use to enter and control remote systems on a network.
+Discovery, which is an attack tactic: The adversary is trying to figure out your environment. Discovery consists of techniques an adversary may use to gain knowledge about the system and internal network.
+Credential Access, which is an attack tactic: The adversary is trying to steal account names and passwords. Credential Access consists of techniques for stealing credentials like account names and passwords.
+Defense Evasion, which is an attack tactic: The adversary is trying to avoid being detected. Defense Evasion consists of techniques that adversaries use to avoid detection throughout their compromise.
+Privilege Escalation, which is an attack tactic: The adversary is trying to gain higher-level permissions. Privilege Escalation consists of techniques that adversaries use to gain higher-level permissions on a system or network.
+Persistence, which is an attack tactic: The adversary is trying to maintain their foothold.
+Execution, which is an attack tactic: The adversary is trying to run malicious code. Execution consists of techniques that result in adversary-controlled code running on a local or remote system.
+Initial Access, which is an attack tactic: The adversary is trying to get into your network. Initial Access consists of techniques that use various entry vectors to gain their initial foothold within a network.
+Exfiltration, which is an attack tactic: The adversary is trying to steal data. Exfiltration consists of techniques that adversaries may use to steal data from your network.
+Command and Control, which is an attack tactic: The adversary is trying to communicate with compromised systems to control them.
+ZIPLINE, which is a threat software tool: ZIPLINE is a passive backdoor that was used during Cutting Edge on compromised Secure Connect VPNs for reverse shell and proxy functionality.
+FELIXROOT, which is a threat software tool: FELIXROOT is a backdoor that has been used to target Ukrainian victims.
+TrickBot, which is a threat software tool: TrickBot is a Trojan spyware program written in C++ that first emerged in September 2016 as a possible successor to Dyre.
+Kazuar, which is a threat software tool: Kazuar is a fully featured, multi-platform backdoor Trojan written using the Microsoft .NET framework.
+DarkGate, which is a threat software tool: DarkGate first emerged in 2018 and has evolved into an initial access and data gathering tool associated with various criminal cyber operations.
+BUSHWALK, which is a threat software tool: BUSHWALK is a web shell written in Perl that was inserted into the legitimate querymanifest.cgi file on compromised Ivanti Connect Secure VPNs during Cutting Edge.
+GLASSTOKEN, which is a threat software tool: GLASSTOKEN is a custom web shell used by threat actors during Cutting Edge to execute commands on compromised Ivanti Secure Connect VPNs.
+WARPWIRE, which is a threat software tool: WARPWIRE is a Javascript credential stealer that targets plaintext passwords and usernames for exfiltration that was used during Cutting Edge to target Ivanti Connect Secure VPNs.
+WIREFIRE, which is a threat software tool: WIREFIRE is a web shell written in Python that exists as trojanized logic to the visits.py component of Ivanti Connect Secure VPN appliances.
+Bisonal, which is a threat software tool: Bisonal is a remote access tool (RAT) that has been used by Tonto Team against public and private sector organizations in Russia, South Korea, and Japan since at least December 2010.
+LIGHTWIRE, which is a threat software tool: LIGHTWIRE is a web shell written in Perl that was used during Cutting Edge to maintain access and enable command execution by imbedding into the legitimate compcheckresult.cgi component of Ivanti Secu…
+RogueRobin, which is a threat software tool: RogueRobin is a payload used by DarkHydrus that has been developed in PowerShell and C#.
+LITTLELAMB.WOOLTEA, which is a threat software tool: LITTLELAMB.WOOLTEA is a backdoor that was used by UNC5325 during Cutting Edge to deploy malware on targeted Ivanti Connect Secure VPNs and to establish persistence across system upgrades and patches.
+Calisto, which is a threat software tool: Calisto is a macOS Trojan that opens a backdoor on the compromised machine. Calisto is believed to have first been developed in 2016.
+FRAMESTING, which is a threat software tool: FRAMESTING is a Python web shell that was used during Cutting Edge to embed into an Ivanti Connect Secure Python package for command execution.
+Socksbot, which is a threat software tool: Socksbot is a backdoor that abuses Socket Secure (SOCKS) proxies.
+NDiskMonitor, which is a threat software tool: NDiskMonitor is a custom backdoor written in .NET that appears to be unique to Patchwork.
+iKitten, which is a threat software tool: iKitten is a macOS exfiltration agent .
+SocGholish, which is a threat software tool: SocGholish is a JavaScript-based loader malware that has been used since at least 2017.
+FruitFly, which is a threat software tool: FruitFly is designed to spy on mac users .
+Do Not Mitigate, which is a security mitigation: This category is to associate techniques that mitigation might increase risk of compromise and therefore mitigation is not recommended.
+Antivirus/Antimalware, which is a security mitigation: Mobile security products, such as Mobile Threat Defense (MTD), offer various device-based mitigations against certain behaviors.
+Data Loss Prevention, which is a security mitigation: Data Loss Prevention (DLP) involves implementing strategies and technologies to identify, categorize, monitor, and control the movement of sensitive data within an organization.
+Pre-compromise, which is a security mitigation: Pre-compromise mitigations involve proactive measures and defenses implemented to prevent adversaries from successfully identifying and exploiting weaknesses during the Reconnaissance and Resource Dev…
+Do Not Mitigate, which is a security mitigation: The Do Not Mitigate category highlights scenarios where attempting to mitigate a specific technique may inadvertently increase the organization's security risk or operational instability.
+Software Configuration, which is a security mitigation: Software configuration refers to making security-focused adjustments to the settings of applications, middleware, databases, or other software to mitigate potential threats.
+Data Backup, which is a security mitigation: Data Backup involves taking and securely storing backups of data from end-user systems and critical servers.
+User Account Control, which is a security mitigation: User Account Control (UAC) is a security feature in Microsoft Windows that prevents unauthorized changes to the operating system.
+Update Software, which is a security mitigation: Software updates ensure systems are protected against known vulnerabilities by applying patches and upgrades provided by vendors.
+Exploit Protection, which is a security mitigation: Deploy capabilities that detect, block, and mitigate conditions indicative of software exploits.
+Antivirus/Antimalware, which is a security mitigation: Antivirus/Antimalware solutions utilize signatures, heuristics, and behavioral analysis to detect, block, and remediate malicious software, including viruses, trojans, ransomware, and spyware.
+Application Isolation and Sandboxing, which is a security mitigation: Application Isolation and Sandboxing refers to the technique of restricting the execution of code to a controlled and isolated environment (e.g., a virtual environment, container, or sandbox).
+Audit, which is a security mitigation: Auditing is the process of recording activity and systematically reviewing and analyzing the activity and system configurations.
+Boot Integrity, which is a security mitigation: Boot Integrity ensures that a system starts securely by verifying the integrity of its boot process, operating system, and associated components.
+Code Signing, which is a security mitigation: Code Signing is a security process that ensures the authenticity and integrity of software by digitally signing executables, scripts, and other code artifacts.
+Restrict Library Loading, which is a security mitigation: Restricting library loading involves implementing security controls to ensure that only trusted and verified libraries (DLLs, shared objects, etc.) are loaded into processes.
+Credential Access Protection, which is a security mitigation: Credential Access Protection focuses on implementing measures to prevent adversaries from obtaining credentials, such as passwords, hashes, tokens, or keys, that could be used for unauthorized access.…
+Disable or Remove Feature or Program, which is a security mitigation: Disable or remove unnecessary and potentially vulnerable software, features, or services to reduce the attack surface and prevent abuse by adversaries.
+Encrypt Sensitive Information, which is a security mitigation: Protect sensitive information at rest, in transit, and during processing by using strong encryption algorithms.
+Behavior Prevention on Endpoint, which is a security mitigation: Behavior Prevention on Endpoint refers to the use of technologies and strategies to detect and block potentially malicious activities by analyzing the behavior of processes, files, API calls, and othe…
+CAPEC-519 (Documentation Alteration to Cause Errors in System Design), which is an attack pattern.
+CAPEC-666 (BlueSmacking), which is an attack pattern.
+CAPEC-198 (XSS Targeting Error Pages), which is an attack pattern.
+CAPEC-649 (Adding a Space to a File Extension), which is an attack pattern.
+CAPEC-384 (Application API Message Manipulation via Man-in-the-Middle), which is an attack pattern.
+CAPEC-204 (Lifting Sensitive Data Embedded in Cache), which is an attack pattern.
+CAPEC-520 (Counterfeit Hardware Component Inserted During Product Assembly), which is an attack pattern.
+CAPEC-107 (Cross Site Tracing), which is an attack pattern.
+CAPEC-271 (Schema Poisoning), which is an attack pattern.
+CAPEC-148 (Content Spoofing), which is an attack pattern.
+CAPEC-310 (Scanning for Vulnerable Software), which is an attack pattern.
+CAPEC-406 (Dumpster Diving), which is an attack pattern.
+CAPEC-633 (Token Impersonation), which is an attack pattern.
+CAPEC-447 (Design Alteration), which is an attack pattern.
+CAPEC-616 (Establish Rogue Location), which is an attack pattern.
+CAPEC-50 (Password Recovery Exploitation), which is an attack pattern.
+CAPEC-569 (Collect Data as Provided by Users), which is an attack pattern.
+CAPEC-16 (Dictionary-based Password Attack), which is an attack pattern.
+CAPEC-295 (Timestamp Request), which is an attack pattern.
+CAPEC-481 (Contradictory Destinations in Traffic Routing Schemes), which is an attack pattern.
+Disk Encryption, which is a D3FEND defensive control: Encrypting a hard disk partition to prevent cleartext access to a file system.
+User Geolocation Logon Pattern Analysis, which is a D3FEND defensive control: Monitoring geolocation data of user logon attempts and comparing it to a baseline user behavior profile to identify anomalies in logon location.
+Web Session Activity Analysis, which is a D3FEND defensive control: Monitoring changes in user web session behavior by comparing current web session activity to a baseline behavior profile or a catalog of predetermined malicious behavior.
+RPC Traffic Analysis, which is a D3FEND defensive control: Monitoring the activity of remote procedure calls in communication traffic to establish standard protocol operations and potential attacker activities.
+Pointer Authentication, which is a D3FEND defensive control: Comparing the cryptographic hash or derivative of a pointer's value to an expected value.
+Firmware Verification, which is a D3FEND defensive control: Cryptographically verifying firmware integrity.
+Token Binding, which is a D3FEND defensive control: Token binding is a security mechanism used to enhance the protection of tokens, such as cookies or OAuth tokens, by binding them to a specific connection.
+Host Reboot, which is a D3FEND defensive control: Initiating a host's reboot sequence to terminate all running processes.
+Process Eviction, which is a D3FEND defensive control: Process eviction techniques terminate or remove running process.
+File Integrity Monitoring, which is a D3FEND defensive control: Detecting any suspicious changes to files in a computer system.
+File Metadata Consistency Validation, which is a D3FEND defensive control: The process of validating the consistency between a file's metadata and its actual content, ensuring that elements like declared lengths, pointers, and checksums accurately describe the file's content…
+Sender Reputation Analysis, which is a D3FEND defensive control: Ascertaining sender reputation based on information associated with a message (e.g. email/instant messaging).
+Decoy Object, which is a D3FEND defensive control: A Decoy Object is created and deployed for the purposes of deceiving attackers.
+DNS Denylisting, which is a D3FEND defensive control: Blocking DNS Network Traffic based on criteria such as IP address, domain name, or DNS query type.
+Password Authentication, which is a D3FEND defensive control: Password authentication is a security mechanism used to verify the identity of a user or entity attempting to access a system or resource by requiring the input of a secret string of characters, known…
+User Account Permissions, which is a D3FEND defensive control: Restricting a user account's access to resources.
+Sender MTA Reputation Analysis, which is a D3FEND defensive control: Characterizing the reputation of mail transfer agents (MTA) to determine the security risk in emails.
+Identifier Analysis, which is a D3FEND defensive control: Analyzing identifier artifacts such as IP address, domain names, or URL(I)s.
+Shadow Stack Comparisons, which is a D3FEND defensive control: Comparing a call stack in system memory with a shadow call stack maintained by the processor to determine unauthorized shellcode activity.
+Decoy File, which is a D3FEND defensive control: A file created for the purposes of deceiving an adversary.
+An observed exploitation example (CWE-805-CVE-2010-4156): Language interpreter API function doesn't validate length argument, leading to information exposure
+An observed exploitation example (CWE-81-CVE-2002-1053): XSS in error message.
+An observed exploitation example (CWE-84-CVE-2002-0118): Encoded "javascript" in IMG tag.
+An observed exploitation example (CWE-84-CVE-2002-0117): Encoded "javascript" in IMG tag.
+An observed exploitation example (CWE-681-CVE-2009-0231): Integer truncation of length value leads to heap-based buffer overflow.
+An observed exploitation example (CWE-330-CVE-2008-0166): SSL library uses a weak random number generator that only generates 65,536 unique keys.
+An observed exploitation example (CWE-413-CVE-2022-20141): Chain: an operating system kernel has insufficent resource locking (CWE-413) leading to a use after free (CWE-416).
+An observed exploitation example (CWE-436-CVE-2005-4260): Interpretation conflict allows XSS via invalid "<" when a ">" is expected, which is treated as ">" by many web browsers.
+An observed exploitation example (CWE-210-CVE-2005-1745): Infoleak of sensitive information in error message (physical access required).
+An observed exploitation example (CWE-394-CVE-2004-2371): Game server doesn't check return values for functions that handle text strings and associated size values.
+An observed exploitation example (CWE-798-CVE-2008-0961): Backup product uses hard-coded username and password, allowing attackers to bypass authentication via the RPC interface
+An observed exploitation example (CWE-206-CVE-2005-2025): Valid groupname enumeration via behavioral infoleak (sends response if valid, doesn't respond if not).
+An observed exploitation example (CWE-206-CVE-2001-1497): Behavioral infoleak in GUI allows attackers to distinguish between alphanumeric and non-alphanumeric characters in a password, thus reducing the search space.
+An observed exploitation example (CWE-757-CVE-2001-1444): Telnet protocol implementation allows downgrade to weaker authentication and encryption using an Adversary-in-the-Middle AITM attack.
+An observed exploitation example (CWE-392-CVE-2002-1446): Error checking routine in PKCS#11 library returns "OK" status even when invalid signature is detected, allowing spoofed messages.
+An observed exploitation example (CWE-327-CVE-2022-30320): Programmable Logic Controller (PLC) uses a protocol with a cryptographically insecure hashing algorithm for passwords.
+An observed exploitation example (CWE-627-CVE-2009-0422): Chain: Dynamic variable evaluation allows resultant remote file inclusion and path traversal.
+An observed exploitation example (CWE-704-CVE-2022-3979): Chain: data visualization program written in PHP uses the "!=" operator instead of the type-strict "!==" operator (CWE-480) when validating hash values, potentially leading to an incorrect type conver…
+An observed exploitation example (CWE-203-CVE-2004-2252): Behavioral infoleak by responding to SYN-FIN packets.
+An observed exploitation example (CWE-239-CVE-2002-1532): HTTP GET without \r\n\r\n CRLF sequences causes product to wait indefinitely and prevents other users from accessing it.
+cpe:2.3:a:beroftpd:beroftpd:1.3.2:*:*:*:*:*:*:*, which is a software platform.
+cpe:2.3:a:tamu:tiger:*:*:*:*:*:*:*:*, which is a software platform.
+cpe:2.3:a:at_computing:atsar_linux:1.4:*:*:*:*:*:*:*, which is a software platform.
+cpe:2.3:a:microsoft:ie:4.5:*:macintosh:*:*:*:*:*, which is a software platform.
+cpe:2.3:a:on_technology:meeting_maker:1.0:*:*:*:*:*:*:*, which is a software platform.
+cpe:2.3:a:microsoft:internet_explorer:4.01:*:*:*:*:*:*:*, which is a software platform.
+cpe:2.3:a:id_software:quakeworld:2.10:*:*:*:*:*:*:*, which is a software platform.
+cpe:2.3:a:broadcom:controlit:4.5:*:*:*:*:*:*:*, which is a software platform.
+cpe:2.3:a:rockliffe:mailsite:4.2.10:*:*:*:*:*:*:*, which is a software platform.
+cpe:2.3:a:1st_choice_software:ftppro:7.5:*:*:*:*:*:*:*, which is a software platform.
+cpe:2.3:a:flavio_veloso:nobo:*:*:*:*:*:*:*:*, which is a software platform.
+cpe:2.3:a:university_of_washington:imap:12.264:*:*:*:*:*:*:*, which is a software platform.
+cpe:2.3:a:smartdesk:websuite:2.1:*:*:*:*:*:*:*, which is a software platform.
+cpe:2.3:a:php:php:3.0:*:*:*:*:*:*:*, which is a software platform.
+cpe:2.3:a:qualcomm:qpopper:2.52:*:*:*:*:*:*:*, which is a software platform.
+cpe:2.3:a:lsoft:listserv:*:*:*:*:*:*:*:*, which is a software platform.
+cpe:2.3:a:adgrafix_corporation:check_it_out:*:*:*:*:*:*:*:*, which is a software platform.
+cpe:2.3:a:powerscripts:plusmail:*:*:*:*:*:*:*:*, which is a software platform.
+cpe:2.3:a:ssh:secure_shell:1.2.23:*:*:*:*:*:*:*, which is a software platform.
+cpe:2.3:a:symantec:norton_antivirus:2000:*:*:*:*:*:*:*, which is a software platform.
+Campaign C0032 is attributed to threat group TEMP.Veles.
+Campaign Operation Ghost is attributed to threat group APT29.
+Campaign RedDelta Modified PlugX Infection Chain Operations is attributed to threat group Mustang Panda.
+Campaign C0011 is attributed to threat group Transparent Tribe.
+Campaign Leviathan Australian Intrusions is attributed to threat group Leviathan.
+Campaign SolarWinds Compromise is attributed to threat group APT29.
+Campaign Operation Dream Job is attributed to threat group Lazarus Group.
+Campaign 2022 Ukraine Electric Power Attack is attributed to threat group Sandworm Team.
+Campaign 2015 Ukraine Electric Power Attack is attributed to threat group Sandworm Team.
+Campaign SPACEHOP Activity is attributed to threat group Ke3chang.
+Campaign Unitronics Defacement Campaign is attributed to threat group CyberAv3ngers.
+Campaign Outer Space is attributed to threat group OilRig.
+Campaign APT28 Nearest Neighbor Campaign is attributed to threat group APT28.
+Campaign Triton Safety Instrumented System Attack is attributed to threat group TEMP.Veles.
+Campaign KV Botnet Activity is attributed to threat group Volt Typhoon.
+Campaign C0017 is attributed to threat group APT41.
+Campaign HomeLand Justice is attributed to threat group HEXANE.
+Campaign SPACEHOP Activity is attributed to threat group APT5.
+Campaign Juicy Mix is attributed to threat group OilRig.
+Campaign 2016 Ukraine Electric Power Attack is attributed to threat group Sandworm Team.
+Campaign FrostyGoop Incident uses software FrostyGoop, which is a threat tool.
+Campaign APT41 DUST uses software Cobalt Strike, which is a threat tool.
+Campaign APT41 DUST uses software certutil, which is a threat tool.
+Campaign APT41 DUST uses software DUSTTRAP, which is a threat tool.
+Campaign APT41 DUST uses software DUSTPAN, which is a threat tool.
+Campaign Indian Critical Infrastructure Intrusions uses software ShadowPad, which is a threat tool.
+Campaign Indian Critical Infrastructure Intrusions uses software FRP, which is a threat tool.
+Campaign Outer Space uses software SampleCheck5000, which is a threat tool.
+Campaign Outer Space uses software Solar, which is a threat tool.
+Campaign Juicy Mix uses software Mango, which is a threat tool.
+Campaign RedDelta Modified PlugX Infection Chain Operations uses software ShadowPad, which is a threat tool.
+Campaign RedDelta Modified PlugX Infection Chain Operations uses software PlugX, which is a threat tool.
+Campaign ArcaneDoor uses software Line Dancer, which is a threat tool.
+Campaign ArcaneDoor uses software Line Runner, which is a threat tool.
+Campaign Operation MidnightEclipse uses software UPSTYLE, which is a threat tool.
+Campaign Triton Safety Instrumented System Attack uses software Mimikatz, which is a threat tool.
+Campaign Triton Safety Instrumented System Attack uses software Triton, which is a threat tool.
+Campaign C0032 uses software Mimikatz, which is a threat tool.
+Campaign 2022 Ukraine Electric Power Attack uses software CaddyWiper, which is a threat tool.
+Campaign C0033 uses software StrongPity, which is a threat tool.
+Campaign FrostyGoop Incident employs the adversary technique Application Layer Protocol.
+Campaign FrostyGoop Incident employs the adversary technique Exploit Public-Facing Application.
+Campaign FrostyGoop Incident employs the adversary technique System Firmware.
+Campaign FrostyGoop Incident employs the adversary technique Impair Defenses: Downgrade Attack.
+Campaign FrostyGoop Incident employs the adversary technique Loss of View.
+Campaign FrostyGoop Incident employs the adversary technique Loss of Availability.
+Campaign FrostyGoop Incident employs the adversary technique Modify Parameter.
+Campaign FrostyGoop Incident employs the adversary technique OS Credential Dumping: Security Account Manager.
+Campaign FrostyGoop Incident employs the adversary technique Server Software Component: Web Shell.
+Campaign APT41 DUST employs the adversary technique Search Open Websites/Domains: Search Engines.
+Campaign APT41 DUST employs the adversary technique Compromise Accounts: Cloud Accounts.
+Campaign APT41 DUST employs the adversary technique Indicator Removal: File Deletion.
+Campaign APT41 DUST employs the adversary technique Create or Modify System Process: Windows Service.
+Campaign APT41 DUST employs the adversary technique Hijack Execution Flow: DLL.
+Campaign APT41 DUST employs the adversary technique Subvert Trust Controls: Code Signing.
+Campaign APT41 DUST employs the adversary technique Obtain Capabilities: Code Signing Certificates.
+Campaign APT41 DUST employs the adversary technique Archive Collected Data: Archive via Utility.
+Campaign APT41 DUST employs the adversary technique Server Software Component: Web Shell.
+Campaign APT41 DUST employs the adversary technique Exfiltration Over Web Service: Exfiltration to Cloud Storage.
+Campaign APT41 DUST employs the adversary technique Ingress Tool Transfer.
+D3FEND control Disk Encryption defends against ATT&CK technique Cloud Storage Object Discovery.
+D3FEND control User Geolocation Logon Pattern Analysis defends against ATT&CK technique Automated Exfiltration.
+D3FEND control User Geolocation Logon Pattern Analysis defends against ATT&CK technique Remote System Discovery.
+D3FEND control User Geolocation Logon Pattern Analysis defends against ATT&CK technique Exploitation of Remote Services.
+D3FEND control RPC Traffic Analysis defends against ATT&CK technique Steal or Forge Kerberos Tickets: Kerberoasting.
+D3FEND control Firmware Verification defends against ATT&CK technique Rootkit.
+D3FEND control Token Binding defends against ATT&CK technique Steal Application Access Token.
+D3FEND control Token Binding defends against ATT&CK technique Steal or Forge Kerberos Tickets.
+D3FEND control Host Reboot defends against ATT&CK technique Exploitation for Credential Access.
+D3FEND control Host Reboot defends against ATT&CK technique Scheduled Task/Job: Scheduled Task.
+D3FEND control Process Eviction defends against ATT&CK technique System Owner/User Discovery.
+D3FEND control File Integrity Monitoring defends against ATT&CK technique System Network Configuration Discovery.
+D3FEND control File Integrity Monitoring defends against ATT&CK technique Rootkit.
+D3FEND control File Integrity Monitoring defends against ATT&CK technique System Owner/User Discovery.
+D3FEND control File Metadata Consistency Validation defends against ATT&CK technique Data from Local System.
+D3FEND control Sender Reputation Analysis defends against ATT&CK technique Internal Spearphishing.
+D3FEND control Decoy Object defends against ATT&CK technique Data from Local System.
+D3FEND control DNS Denylisting defends against ATT&CK technique Dynamic Resolution.
+D3FEND control Password Authentication defends against ATT&CK technique Create Account.
+D3FEND control Password Authentication defends against ATT&CK technique Valid Accounts.
+This exploitation example was observed in CVE-2010-4156, which is a vulnerability.
+This exploitation example was observed in CVE-2002-1053, which is a vulnerability.
+This exploitation example was observed in CVE-2002-0118, which is a vulnerability.
+This exploitation example was observed in CVE-2002-0117, which is a vulnerability.
+This exploitation example was observed in CVE-2009-0231, which is a vulnerability.
+This exploitation example was observed in CVE-2008-0166, which is a vulnerability.
+This exploitation example was observed in CVE-2022-20141, which is a vulnerability.
+This exploitation example was observed in CVE-2005-4260, which is a vulnerability.
+This exploitation example was observed in CVE-2005-1745, which is a vulnerability.
+This exploitation example was observed in CVE-2004-2371, which is a vulnerability.
+This exploitation example was observed in CVE-2008-0961, which is a vulnerability.
+This exploitation example was observed in CVE-2005-2025, which is a vulnerability.
+This exploitation example was observed in CVE-2001-1497, which is a vulnerability.
+This exploitation example was observed in CVE-2001-1444, which is a vulnerability.
+This exploitation example was observed in CVE-2002-1446, which is a vulnerability.
+This exploitation example was observed in CVE-2022-30320, which is a vulnerability.
+This exploitation example was observed in CVE-2009-0422, which is a vulnerability.
+This exploitation example was observed in CVE-2022-3979, which is a vulnerability.
+This exploitation example was observed in CVE-2004-2252, which is a vulnerability.
+This exploitation example was observed in CVE-2002-1532, which is a vulnerability.
+Threat group Bouncing Golf uses software GolfSpy, which is a threat tool.
+Threat group BlackTech uses software PLEAD, which is a threat tool.
+Threat group BlackTech uses software Waterbear, which is a threat tool.
+Threat group BlackTech uses software TSCookie, which is a threat tool.
+Threat group BlackTech uses software PsExec, which is a threat tool.
+Threat group BlackTech uses software Flagpro, which is a threat tool.
+Threat group BlackTech uses software Kivars, which is a threat tool.
+Threat group Machete uses software Machete, which is a threat tool.
+Threat group APT41 uses software DUSTTRAP, which is a threat tool.
+Threat group APT41 uses software ZxShell, which is a threat tool.
+Threat group APT41 uses software DUSTPAN, which is a threat tool.
+Threat group APT41 uses software Impacket, which is a threat tool.
+Threat group APT41 uses software LightSpy, which is a threat tool.
+Threat group APT41 uses software Winnti for Linux, which is a threat tool.
+Threat group APT41 uses software Mimikatz, which is a threat tool.
+Threat group APT41 uses software Ping, which is a threat tool.
+Threat group APT41 uses software ShadowPad, which is a threat tool.
+Threat group APT41 uses software ROCKBOOT, which is a threat tool.
+Threat group APT41 uses software sqlmap, which is a threat tool.
+Threat group APT41 uses software MESSAGETAP, which is a threat tool.
+Threat group Bouncing Golf employs the adversary technique Match Legitimate Name or Location.
+Threat group BlackTech employs the adversary technique Exploit Public-Facing Application.
+Threat group BlackTech employs the adversary technique Phishing: Spearphishing Attachment.
+Threat group BlackTech employs the adversary technique User Execution: Malicious File.
+Threat group BlackTech employs the adversary technique Network Service Discovery.
+Threat group BlackTech employs the adversary technique Obtain Capabilities: Digital Certificates.
+Threat group BlackTech employs the adversary technique Phishing: Spearphishing Link.
+Threat group BlackTech employs the adversary technique Remote Services: SSH.
+Threat group BlackTech employs the adversary technique Masquerading: Right-to-Left Override.
+Threat group BlackTech employs the adversary technique Hijack Execution Flow: DLL.
+Threat group BlackTech employs the adversary technique User Execution: Malicious Link.
+Threat group BlackTech employs the adversary technique Exploitation for Client Execution.
+Threat group BlackTech employs the adversary technique Obtain Capabilities: Code Signing Certificates.
+Threat group BlackTech employs the adversary technique Obtain Capabilities: Tool.
+Threat group BlackTech employs the adversary technique Native API.
+Threat group Machete employs the adversary technique Command and Scripting Interpreter: Visual Basic.
+Threat group Machete employs the adversary technique Phishing: Spearphishing Attachment.
+Threat group Machete employs the adversary technique Drive-by Compromise.
+Threat group Machete employs the adversary technique User Execution: Malicious Link.
+Threat group Machete employs the adversary technique Command and Scripting Interpreter: Python.
+CVE-1999-0878, which is a vulnerability, has a CPE, cpe:2.3:a:beroftpd:beroftpd:1.3.2:*:*:*:*:*:*:*, which is a software platform titled "cpe:2.3:a:beroftpd:beroftpd:1.3.2:*:*:*:*:*:*:*".
+CVE-1999-1560, which is a vulnerability, has a CPE, cpe:2.3:a:tamu:tiger:*:*:*:*:*:*:*:*, which is a software platform titled "cpe:2.3:a:tamu:tiger:*:*:*:*:*:*:*:*".
+CVE-2000-0171, which is a vulnerability, has a CPE, cpe:2.3:a:at_computing:atsar_linux:1.4:*:*:*:*:*:*:*, which is a software platform titled "cpe:2.3:a:at_computing:atsar_linux:1.4:*:*:*:*:*:*:*".
+CVE-2000-0036, which is a vulnerability, has a CPE, cpe:2.3:a:microsoft:ie:4.5:*:macintosh:*:*:*:*:*, which is a software platform titled "cpe:2.3:a:microsoft:ie:4.5:*:macintosh:*:*:*:*:*".
+CVE-2000-0326, which is a vulnerability, has a CPE, cpe:2.3:a:on_technology:meeting_maker:1.0:*:*:*:*:*:*:*, which is a software platform titled "cpe:2.3:a:on_technology:meeting_maker:1.0:*:*:*:*:*:*:*".
+CVE-1999-0877, which is a vulnerability, has a CPE, cpe:2.3:a:microsoft:internet_explorer:4.01:*:*:*:*:*:*:*, which is a software platform titled "cpe:2.3:a:microsoft:internet_explorer:4.01:*:*:*:*:*:*:*".
+CVE-1999-1505, which is a vulnerability, has a CPE, cpe:2.3:a:id_software:quakeworld:2.10:*:*:*:*:*:*:*, which is a software platform titled "cpe:2.3:a:id_software:quakeworld:2.10:*:*:*:*:*:*:*".
+CVE-1999-0355, which is a vulnerability, has a CPE, cpe:2.3:a:broadcom:controlit:4.5:*:*:*:*:*:*:*, which is a software platform titled "cpe:2.3:a:broadcom:controlit:4.5:*:*:*:*:*:*:*".
+CVE-2006-0790, which is a vulnerability, has a CPE, cpe:2.3:a:rockliffe:mailsite:4.2.10:*:*:*:*:*:*:*, which is a software platform titled "cpe:2.3:a:rockliffe:mailsite:4.2.10:*:*:*:*:*:*:*".
+CVE-2000-0398, which is a vulnerability, has a CPE, cpe:2.3:a:rockliffe:mailsite:4.2.10:*:*:*:*:*:*:*, which is a software platform titled "cpe:2.3:a:rockliffe:mailsite:4.2.10:*:*:*:*:*:*:*".
+CVE-2000-0008, which is a vulnerability, has a CPE, cpe:2.3:a:1st_choice_software:ftppro:7.5:*:*:*:*:*:*:*, which is a software platform titled "cpe:2.3:a:1st_choice_software:ftppro:7.5:*:*:*:*:*:*:*".
+CVE-1999-1169, which is a vulnerability, has a CPE, cpe:2.3:a:flavio_veloso:nobo:*:*:*:*:*:*:*:*, which is a software platform titled "cpe:2.3:a:flavio_veloso:nobo:*:*:*:*:*:*:*:*".
+CVE-2000-0284, which is a vulnerability, has a CPE, cpe:2.3:a:university_of_washington:imap:12.264:*:*:*:*:*:*:*, which is a software platform titled "cpe:2.3:a:university_of_washington:imap:12.264:*:*:*:*:*:*:*".
+CVE-1999-0928, which is a vulnerability, has a CPE, cpe:2.3:a:smartdesk:websuite:2.1:*:*:*:*:*:*:*, which is a software platform titled "cpe:2.3:a:smartdesk:websuite:2.1:*:*:*:*:*:*:*".
+CVE-2007-0905, which is a vulnerability, has a CPE, cpe:2.3:a:php:php:3.0:*:*:*:*:*:*:*, which is a software platform titled "cpe:2.3:a:php:php:3.0:*:*:*:*:*:*:*".
+CVE-2007-1777, which is a vulnerability, has a CPE, cpe:2.3:a:php:php:3.0:*:*:*:*:*:*:*, which is a software platform titled "cpe:2.3:a:php:php:3.0:*:*:*:*:*:*:*".
+CVE-2007-1378, which is a vulnerability, has a CPE, cpe:2.3:a:php:php:3.0:*:*:*:*:*:*:*, which is a software platform titled "cpe:2.3:a:php:php:3.0:*:*:*:*:*:*:*".
+CVE-2007-0906, which is a vulnerability, has a CPE, cpe:2.3:a:php:php:3.0:*:*:*:*:*:*:*, which is a software platform titled "cpe:2.3:a:php:php:3.0:*:*:*:*:*:*:*".
+CVE-2007-0909, which is a vulnerability, has a CPE, cpe:2.3:a:php:php:3.0:*:*:*:*:*:*:*, which is a software platform titled "cpe:2.3:a:php:php:3.0:*:*:*:*:*:*:*".
+CVE-2007-1379, which is a vulnerability, has a CPE, cpe:2.3:a:php:php:3.0:*:*:*:*:*:*:*, which is a software platform titled "cpe:2.3:a:php:php:3.0:*:*:*:*:*:*:*".
+Vulnerability VULN-CVE-2000-0363 is identified by CVE-2000-0363, which is a CVE entry.
+Vulnerability VULN-CVE-2000-0364 is identified by CVE-2000-0364, which is a CVE entry.
+Vulnerability VULN-CVE-2000-0365 is identified by CVE-2000-0365, which is a CVE entry.
+Vulnerability VULN-CVE-2000-0366 is identified by CVE-2000-0366, which is a CVE entry.
+Vulnerability VULN-CVE-2000-0367 is identified by CVE-2000-0367, which is a CVE entry.
+Vulnerability VULN-CVE-2000-0369 is identified by CVE-2000-0369, which is a CVE entry.
+Vulnerability VULN-CVE-2000-0361 is identified by CVE-2000-0361, which is a CVE entry.
+Vulnerability VULN-CVE-2000-0362 is identified by CVE-2000-0362, which is a CVE entry.
+Vulnerability VULN-CVE-2000-0352 is identified by CVE-2000-0352, which is a CVE entry.
+Vulnerability VULN-CVE-2000-0353 is identified by CVE-2000-0353, which is a CVE entry.
+Vulnerability VULN-CVE-2000-0355 is identified by CVE-2000-0355, which is a CVE entry.
+Vulnerability VULN-CVE-2000-0356 is identified by CVE-2000-0356, which is a CVE entry.
+Vulnerability VULN-CVE-2000-0357 is identified by CVE-2000-0357, which is a CVE entry.
+Vulnerability VULN-CVE-2000-0358 is identified by CVE-2000-0358, which is a CVE entry.
+Vulnerability VULN-CVE-2000-0350 is identified by CVE-2000-0350, which is a CVE entry.
+Vulnerability VULN-CVE-2000-0385 is identified by CVE-2000-0385, which is a CVE entry.
+Vulnerability VULN-CVE-2000-0386 is identified by CVE-2000-0386, which is a CVE entry.
+Vulnerability VULN-CVE-2000-0387 is identified by CVE-2000-0387, which is a CVE entry.
+Vulnerability VULN-CVE-2000-0388 is identified by CVE-2000-0388, which is a CVE entry.
+Vulnerability VULN-CVE-2000-0389 is identified by CVE-2000-0389, which is a CVE entry.
+CWE-24, which is a software weakness, has an observed real-world exploitation example: CWE-24-CVE-2022-45918.
+CWE-25, which is a software weakness, has an observed real-world exploitation example: CWE-25-CVE-2022-20775.
+CWE-22, which is a software weakness, has an observed real-world exploitation example: CWE-22-CVE-2024-0520.
+CWE-22, which is a software weakness, has an observed real-world exploitation example: CWE-22-CVE-2020-3452.
+CWE-22, which is a software weakness, has an observed real-world exploitation example: CWE-22-CVE-2022-24877.
+CWE-22, which is a software weakness, has an observed real-world exploitation example: CWE-22-CVE-2009-4053.
+CWE-22, which is a software weakness, has an observed real-world exploitation example: CWE-22-CVE-2006-7079.
+CWE-22, which is a software weakness, has an observed real-world exploitation example: CWE-22-CVE-2010-0467.
+CWE-22, which is a software weakness, has an observed real-world exploitation example: CWE-22-CVE-2008-5748.
+CWE-22, which is a software weakness, has an observed real-world exploitation example: CWE-22-CVE-2009-4194.
+CWE-22, which is a software weakness, has an observed real-world exploitation example: CWE-22-CVE-2009-1936.
+CWE-22, which is a software weakness, has an observed real-world exploitation example: CWE-22-CVE-2022-45918.
+CWE-22, which is a software weakness, has an observed real-world exploitation example: CWE-22-CVE-2010-0013.
+CWE-22, which is a software weakness, has an observed real-world exploitation example: CWE-22-CVE-2019-20916.
+CWE-22, which is a software weakness, has an observed real-world exploitation example: CWE-22-CVE-2019-10743.
+CWE-22, which is a software weakness, has an observed real-world exploitation example: CWE-22-CVE-2009-0244.
+CWE-22, which is a software weakness, has an observed real-world exploitation example: CWE-22-CVE-2010-0012.
+CWE-22, which is a software weakness, has an observed real-world exploitation example: CWE-22-CVE-2024-37032.
+CWE-22, which is a software weakness, has an observed real-world exploitation example: CWE-22-CVE-2021-21972.
+CWE-22, which is a software weakness, has an observed real-world exploitation example: CWE-22-CVE-2009-4449.
+Attack pattern 666 exploits the weakness CWE-404, which is a CWE-404.
+Attack pattern 198 exploits the weakness CWE-81, which is a CWE-81.
+Attack pattern 649 exploits the weakness CWE-46, which is a CWE-46.
+Attack pattern 384 exploits the weakness CWE-345, which is a CWE-345.
+Attack pattern 384 exploits the weakness CWE-602, which is a CWE-602.
+Attack pattern 384 exploits the weakness CWE-471, which is a CWE-471.
+Attack pattern 384 exploits the weakness CWE-311, which is a CWE-311.
+Attack pattern 384 exploits the weakness CWE-346, which is a CWE-346.
+Attack pattern 204 exploits the weakness CWE-1258, which is a CWE-1258.
+Attack pattern 204 exploits the weakness CWE-1239, which is a CWE-1239.
+Attack pattern 204 exploits the weakness CWE-524, which is a CWE-524.
+Attack pattern 204 exploits the weakness CWE-311, which is a CWE-311.
+Attack pattern 107 exploits the weakness CWE-648, which is a CWE-648.
+Attack pattern 107 exploits the weakness CWE-693, which is a CWE-693.
+Attack pattern 271 exploits the weakness CWE-15, which is a CWE-15.
+Attack pattern 148 exploits the weakness CWE-345, which is a CWE-345.
+Attack pattern 310 exploits the weakness CWE-200, which is a CWE-200.
+Attack pattern 633 exploits the weakness CWE-287, which is a CWE-287.
+Attack pattern 633 exploits the weakness CWE-1270, which is a CWE-1270.
+Attack pattern 616 exploits the weakness CWE-200, which is a CWE-200.
+Exploit target ExploitTarget-CWE-908 is associated with vulnerability VULN-CVE-2018-3975.
+Exploit target ExploitTarget-CWE-908 is associated with vulnerability VULN-CVE-2025-49718.
+Exploit target ExploitTarget-CWE-908 is associated with vulnerability VULN-CVE-2025-41239.
+Exploit target ExploitTarget-CWE-908 is associated with vulnerability VULN-CVE-2025-5777.
+Exploit target ExploitTarget-CWE-908 is associated with vulnerability VULN-CVE-2025-33052.
+Exploit target ExploitTarget-CWE-908 is associated with vulnerability VULN-CVE-2025-33070.
+Exploit target ExploitTarget-CWE-908 is associated with vulnerability VULN-CVE-2025-29830.
+Exploit target ExploitTarget-CWE-908 is associated with vulnerability VULN-CVE-2025-29959.
+Exploit target ExploitTarget-CWE-908 is associated with vulnerability VULN-CVE-2022-49845.
+Exploit target ExploitTarget-CWE-908 is associated with vulnerability VULN-CVE-2025-29958.
+Exploit target ExploitTarget-CWE-908 is associated with vulnerability VULN-CVE-2022-49862.
+Exploit target ExploitTarget-CWE-908 is associated with vulnerability VULN-CVE-2025-29829.
+Exploit target ExploitTarget-CWE-908 is associated with vulnerability VULN-CVE-2023-37930.
+Exploit target ExploitTarget-CWE-908 is associated with vulnerability VULN-CVE-2025-21996.
+Exploit target ExploitTarget-CWE-908 is associated with vulnerability VULN-CVE-2025-27474.
+Exploit target ExploitTarget-CWE-908 is associated with vulnerability VULN-CVE-2025-21922.
+Exploit target ExploitTarget-CWE-908 is associated with vulnerability VULN-CVE-2025-21959.
+Exploit target ExploitTarget-CWE-908 is associated with vulnerability VULN-CVE-2025-21891.
+Exploit target ExploitTarget-CWE-908 is associated with vulnerability VULN-CVE-2025-27810.
+Exploit target ExploitTarget-CWE-908 is associated with vulnerability VULN-CVE-2025-1650.
+Exploit target ExploitTarget-CWE-1431 is caused by weakness CWE-1431, which is a CWE-1431.
+Exploit target ExploitTarget-CWE-1421 is caused by weakness CWE-1421, which is a CWE-1421.
+Exploit target ExploitTarget-CWE-1420 is caused by weakness CWE-1420, which is a CWE-1420.
+Exploit target ExploitTarget-CWE-1429 is caused by weakness CWE-1429, which is a CWE-1429.
+Exploit target ExploitTarget-CWE-1428 is caused by weakness CWE-1428, which is a CWE-1428.
+Exploit target ExploitTarget-CWE-1427 is caused by weakness CWE-1427, which is a CWE-1427.
+Exploit target ExploitTarget-CWE-1426 is caused by weakness CWE-1426, which is a CWE-1426.
+Exploit target ExploitTarget-CWE-1423 is caused by weakness CWE-1423, which is a CWE-1423.
+Exploit target ExploitTarget-CWE-1422 is caused by weakness CWE-1422, which is a CWE-1422.
+Exploit target ExploitTarget-CWE-1419 is caused by weakness CWE-1419, which is a CWE-1419.
+Exploit target ExploitTarget-CWE-908 is caused by weakness CWE-908, which is a CWE-908.
+Exploit target ExploitTarget-CWE-909 is caused by weakness CWE-909, which is a CWE-909.
+Exploit target ExploitTarget-CWE-80 is caused by weakness CWE-80, which is a CWE-80.
+Exploit target ExploitTarget-CWE-82 is caused by weakness CWE-82, which is a CWE-82.
+Exploit target ExploitTarget-CWE-81 is caused by weakness CWE-81, which is a CWE-81.
+Exploit target ExploitTarget-CWE-88 is caused by weakness CWE-88, which is a CWE-88.
+Exploit target ExploitTarget-CWE-915 is caused by weakness CWE-915, which is a CWE-915.
+Exploit target ExploitTarget-CWE-87 is caused by weakness CWE-87, which is a CWE-87.
+Exploit target ExploitTarget-CWE-916 is caused by weakness CWE-916, which is a CWE-916.
+Exploit target ExploitTarget-CWE-917 is caused by weakness CWE-917, which is a CWE-917.
+Attack pattern 532 maps to ATT&CK technique Firmware Corruption.
+Attack pattern 639 maps to ATT&CK technique Unsecured Credentials: Credentials In Files.
+Attack pattern 561 maps to ATT&CK technique Remote Services: SMB/Windows Admin Shares.
+Attack pattern 642 maps to ATT&CK technique Compromise Host Software Binary.
+Attack pattern 551 maps to ATT&CK technique Create or Modify System Process.
+Attack pattern 636 maps to ATT&CK technique Data Obfuscation: Steganography.
+Attack pattern 469 maps to ATT&CK technique Endpoint Denial of Service: Service Exhaustion Flood.
+Attack pattern 639 maps to ATT&CK technique Unsecured Credentials: Bash History.
+Attack pattern 439 maps to ATT&CK technique Supply Chain Compromise.
+Attack pattern 159 maps to ATT&CK technique Hijack Execution Flow: Path Interception by Search Order Hijacking.
+Attack pattern 639 maps to ATT&CK technique Unsecured Credentials: Private Keys.
+Attack pattern 675 maps to ATT&CK technique Exfiltration Over Physical Medium.
+Attack pattern 562 maps to ATT&CK technique Taint Shared Content.
+Attack pattern 639 maps to ATT&CK technique Unsecured Credentials: Group Policy Preferences.
+Attack pattern 227 maps to ATT&CK technique Endpoint Denial of Service.
+Attack pattern 130 maps to ATT&CK technique Endpoint Denial of Service: Application Exhaustion Flood.
+Attack pattern 203 maps to ATT&CK technique Modify Registry.
+Attack pattern 669 maps to ATT&CK technique Supply Chain Compromise: Compromise Software Supply Chain.
+Attack pattern 568 maps to ATT&CK technique Input Capture: Keylogging.
+Attack pattern 593 maps to ATT&CK technique Remote Service Session Hijacking.
+Security mitigation Do Not Mitigate reduces the effectiveness of technique Conceal Multimedia Files.
+Security mitigation Antivirus/Antimalware reduces the effectiveness of technique Exploitation for Initial Access.
+Security mitigation Antivirus/Antimalware reduces the effectiveness of technique Phishing.
+Security mitigation Data Loss Prevention reduces the effectiveness of technique Exfiltration Over Web Service.
+Security mitigation Data Loss Prevention reduces the effectiveness of technique Exfiltration Over Alternative Protocol.
+Security mitigation Data Loss Prevention reduces the effectiveness of technique Exfiltration Over Alternative Protocol: Exfiltration Over Unencrypted Non-C2 Protocol.
+Security mitigation Data Loss Prevention reduces the effectiveness of technique Exfiltration Over Physical Medium: Exfiltration over USB.
+Security mitigation Data Loss Prevention reduces the effectiveness of technique Data from Removable Media.
+Security mitigation Data Loss Prevention reduces the effectiveness of technique Automated Exfiltration: Traffic Duplication.
+Security mitigation Data Loss Prevention reduces the effectiveness of technique Exfiltration Over Web Service: Exfiltration Over Webhook.
+Security mitigation Data Loss Prevention reduces the effectiveness of technique Exfiltration Over C2 Channel.
+Security mitigation Data Loss Prevention reduces the effectiveness of technique Exfiltration Over Alternative Protocol: Exfiltration Over Asymmetric Encrypted Non-C2 Protocol.
+Security mitigation Data Loss Prevention reduces the effectiveness of technique Transfer Data to Cloud Account.
+Security mitigation Data Loss Prevention reduces the effectiveness of technique Data from Local System.
+Security mitigation Data Loss Prevention reduces the effectiveness of technique Exfiltration Over Physical Medium.
+Security mitigation Pre-compromise reduces the effectiveness of technique Active Scanning: Vulnerability Scanning.
+Security mitigation Pre-compromise reduces the effectiveness of technique Develop Capabilities.
+Security mitigation Pre-compromise reduces the effectiveness of technique Gather Victim Identity Information.
+Security mitigation Pre-compromise reduces the effectiveness of technique Gather Victim Network Information: Network Security Appliances.
+Security mitigation Pre-compromise reduces the effectiveness of technique Establish Accounts: Email Accounts.
+Software ZIPLINE employs ATT&CK technique Command and Scripting Interpreter: Unix Shell.
+Software ZIPLINE employs ATT&CK technique Traffic Signaling.
+Software ZIPLINE employs ATT&CK technique File and Directory Discovery.
+Software ZIPLINE employs ATT&CK technique Ingress Tool Transfer.
+Software ZIPLINE employs ATT&CK technique Process Discovery.
+Software ZIPLINE employs ATT&CK technique Proxy.
+Software ZIPLINE employs ATT&CK technique Encrypted Channel: Symmetric Cryptography.
+Software ZIPLINE employs ATT&CK technique Impair Defenses: Disable or Modify Tools.
+Software ZIPLINE employs ATT&CK technique Non-Application Layer Protocol.
+Software FELIXROOT employs ATT&CK technique Obfuscated Files or Information: Encrypted/Encoded File.
+Software FELIXROOT employs ATT&CK technique System Information Discovery.
+Software FELIXROOT employs ATT&CK technique Boot or Logon Autostart Execution: Registry Run Keys / Startup Folder.
+Software FELIXROOT employs ATT&CK technique System Owner/User Discovery.
+Software FELIXROOT employs ATT&CK technique Windows Management Instrumentation.
+Software FELIXROOT employs ATT&CK technique System Time Discovery.
+Software FELIXROOT employs ATT&CK technique Command and Scripting Interpreter: Windows Command Shell.
+Software FELIXROOT employs ATT&CK technique Modify Registry.
+Software FELIXROOT employs ATT&CK technique Archive Collected Data.
+Software FELIXROOT employs ATT&CK technique Process Discovery.
+Software FELIXROOT employs ATT&CK technique Software Discovery: Security Software Discovery.
