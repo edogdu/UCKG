@@ -784,9 +784,6 @@ if __name__ == "__main__":
             print(f"Mode: {result['mode']}")
             print(f"Answer: {result['answer']}...")
             print("-" * 50)
-            #print(f"📚 Sources: {len(result['sources'])} items")
-            #print(f"🤖 Context: {result['context']}...")
-            #print(f"Context/wMetaData: {len(result['context_metadata'])} items")
-            #print(f"👾 Metadata: {result['enhanced_metadata']}...")
+
     finally:
         rag.close()

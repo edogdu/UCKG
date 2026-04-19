@@ -14,6 +14,7 @@ logger = logging.getLogger(__name__)
 from .utils import GraphRAGConfig, RAGMode, NEO4J_URI, NEO4J_USER, NEO4J_PASSWORD, normalize_retrieval_item
 from .retrieval import GraphRetriever
 from .retrieval import HybridRetriever
+from .retrieval import QueryType
 from .reranking import GraphReranker
 from .reranking import CrossEncoderReranker
 from .reranking import SubgraphPruner
@@ -193,6 +194,12 @@ class GraphRAGPipeline:
         items = self.retriever.retrieve(retrieval_query, retrieval_top_k, retrieval_hop_depth)
         items = [normalize_retrieval_item(i) for i in items]
 
+        # Capture query type from hybrid retriever (None when vector-only)
+        query_type_str = None
+        if isinstance(self.retriever, HybridRetriever):
+            qt = self.retriever._last_query_type
+            query_type_str = qt.value if qt else None
+
         # Inject relationship-level candidates into the pool (optional)
         if self.config.enable_relationship_retrieval and self.relationship_retriever:
             try:
@@ -259,6 +266,7 @@ class GraphRAGPipeline:
             "hop_depth": hop_depth,
             "mode": mode,
             "pruning_metadata": pruning_metadata,
+            "query_type": query_type_str,
         }
 
     def run(self, query: str) -> Dict[str, Any]:
@@ -281,6 +289,7 @@ class GraphRAGPipeline:
             items = pipeline_result["items"]
             mode = pipeline_result["mode"]
             pruning_metadata = pipeline_result.get("pruning_metadata", {})
+            query_type = pipeline_result.get("query_type")
 
             # STAGE 4: Generate
             context_info = self.formatter.format(items, mode)
@@ -299,6 +308,7 @@ class GraphRAGPipeline:
                 "enhanced_metadata": enhanced_metadata,
                 "key_entities": key_entities,
                 "pruning_metadata": pruning_metadata,
+                "query_type": query_type,
             }
 
         except Exception as e:
