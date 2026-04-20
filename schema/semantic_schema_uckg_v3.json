@@ -1,0 +1,1239 @@
+{
+  
+  "source_physical_schema": "qa-engine/shared/schema_cache.txt",
+  "notes": "Carefully authored semantic schema for UCKG (v3). Every node, property, and relationship triple carries a precise semantic description, physical-name mapping, example values, and representative Cypher query patterns. This corpus is used by EnhancedT2CSSPipeline for semantic retrieval and is also persisted as a queryable metadata sub-graph inside Neo4j (UCKGMeta_* nodes).",
+
+  "nodes": [
+    {
+      "semantic": "CVE",
+      "physical_label": "UcoCVE",
+      "purpose": "Represents a single Common Vulnerabilities and Exposures (CVE) disclosure entry. This is the canonical vulnerability identifier node. It stores CVSS scoring metadata and links to affected platforms (CPE) and observed real-world examples.",
+      "description": "A CVE node identifies a specific publicly known vulnerability. Each node is uniquely identified by its 'label' property (e.g. CVE-2021-44228). It carries CVSS v2/v3 scoring components such as base severity, exploitability subscore, impact subscore, and the raw vector string. The vulnerability status (ucovulnStatus) tracks whether NVD analysis is complete.",
+      "key_identifier": "label",
+      "key_identifier_example": "CVE-2021-44228",
+      "typical_natural_language_triggers": [
+        "find CVE", "vulnerability identifier", "CVE score", "severity rating",
+        "exploitability", "impact score", "CVSS vector", "vulnerability status"
+      ],
+      "properties": [
+        {
+          "semantic": "cveId",
+          "physical": "label",
+          "type": "string",
+          "description": "The canonical CVE identifier string in the format CVE-YYYY-NNNNN. This is the primary lookup key for a CVE node.",
+          "example": "CVE-2021-44228",
+          "query_pattern": "MATCH (c:UcoCVE) WHERE c.label = 'CVE-2021-44228' RETURN c"
+        },
+        {
+          "semantic": "baseSeverity",
+          "physical": "ucobaseSeverity",
+          "type": "string",
+          "description": "CVSS base severity rating: CRITICAL, HIGH, MEDIUM, or LOW. Use this for severity-based filtering.",
+          "example": "CRITICAL",
+          "query_pattern": "MATCH (c:UcoCVE) WHERE c.ucobaseSeverity = 'CRITICAL' RETURN c"
+        },
+        {
+          "semantic": "exploitabilityScore",
+          "physical": "ucoexploitabilityScore",
+          "type": "string (numeric)",
+          "description": "CVSS exploitability subscore as a string-encoded float (e.g. '3.9'). Reflects how easy it is to exploit the vulnerability.",
+          "example": "3.9",
+          "query_pattern": "MATCH (c:UcoCVE) WHERE toFloat(c.ucoexploitabilityScore) > 3.0 RETURN c"
+        },
+        {
+          "semantic": "impactScore",
+          "physical": "ucoimpactScore",
+          "type": "string (numeric)",
+          "description": "CVSS impact subscore as a string-encoded float (e.g. '5.9'). Reflects the potential damage from a successful exploit.",
+          "example": "5.9",
+          "query_pattern": "MATCH (c:UcoCVE) WHERE toFloat(c.ucoimpactScore) > 5.0 RETURN c"
+        },
+        {
+          "semantic": "vectorString",
+          "physical": "ucovectorString",
+          "type": "string",
+          "description": "CVSS vector string encoding all base metric values (e.g. AV:N/AC:L/PR:N/UI:N/S:C/C:H/I:H/A:H for Log4Shell).",
+          "example": "AV:N/AC:L/PR:N/UI:N/S:C/C:H/I:H/A:H",
+          "query_pattern": "MATCH (c:UcoCVE) WHERE c.ucovectorString CONTAINS 'AV:N' RETURN c"
+        },
+        {
+          "semantic": "vulnStatus",
+          "physical": "ucovulnStatus",
+          "type": "string",
+          "description": "NVD analysis status of the CVE (e.g. Analyzed, Modified, Awaiting Analysis, Rejected). Reflects the completeness of NVD processing.",
+          "example": "Analyzed",
+          "query_pattern": "MATCH (c:UcoCVE) WHERE c.ucovulnStatus = 'Analyzed' RETURN c"
+        },
+        {
+          "semantic": "evaluatorSolution",
+          "physical": "ucoevaluatorSolution",
+          "type": "string",
+          "description": "Free-text evaluator solution note added by NVD analysts. May describe workarounds or patch guidance.",
+          "example": "Update to version 2.15.0 or later.",
+          "query_pattern": "MATCH (c:UcoCVE) WHERE c.ucoevaluatorSolution IS NOT NULL RETURN c.label, c.ucoevaluatorSolution"
+        },
+        {
+          "semantic": "obtainAllPrivilege",
+          "physical": "ucoobtainAllPrivilege",
+          "type": "string (boolean)",
+          "description": "CVSS v2 flag indicating whether exploitation yields full privilege escalation.",
+          "example": "false",
+          "query_pattern": "MATCH (c:UcoCVE) WHERE c.ucoobtainAllPrivilege = 'true' RETURN c"
+        },
+        {
+          "semantic": "userInteractionRequired",
+          "physical": "ucouserInteractionRequired",
+          "type": "string (boolean)",
+          "description": "CVSS v2 flag indicating whether user interaction is required for exploitation.",
+          "example": "false",
+          "query_pattern": "MATCH (c:UcoCVE) WHERE c.ucouserInteractionRequired = 'false' RETURN c"
+        },
+        {
+          "semantic": "uri",
+          "physical": "uri",
+          "type": "string",
+          "description": "Canonical RDF/ontology URI for this CVE node (internal knowledge graph identifier).",
+          "example": "http://uckg.org/cve/CVE-2021-44228",
+          "query_pattern": "MATCH (c:UcoCVE) WHERE c.uri CONTAINS 'CVE-2021-44228' RETURN c"
+        }
+      ]
+    },
+
+    {
+      "semantic": "Vulnerability",
+      "physical_label": "UcoVulnerability",
+      "purpose": "Represents the vulnerability concept node. It carries temporal metadata (published/modified dates) and a free-text summary. It links to its CVE identifier via hasCVE, and is linked from an ExploitTarget via hasVulnerability.",
+      "description": "A Vulnerability node is the conceptual vulnerability record that wraps an NVD entry. It bridges ExploitTarget and CVE: ExploitTarget→Vulnerability→CVE→CPE. The key temporal properties are ucopublishedDateTime and ucolastModifiedDateTime. Note: date fields are stored here, NOT on UcoCVE.",
+      "key_identifier": "uri",
+      "key_identifier_example": "http://uckg.org/vulnerability/...",
+      "typical_natural_language_triggers": [
+        "vulnerability published", "disclosed in", "vulnerability description",
+        "when was vulnerability found", "vulnerability summary", "modified date"
+      ],
+      "properties": [
+        {
+          "semantic": "publishedDate",
+          "physical": "ucopublishedDateTime",
+          "type": "datetime",
+          "description": "The date and time when the vulnerability was first published in NVD. Use this for timeline/date-range queries.",
+          "example": "2021-12-10T10:15:00",
+          "query_pattern": "MATCH (v:UcoVulnerability) WHERE v.ucopublishedDateTime >= datetime('2021-01-01') RETURN v"
+        },
+        {
+          "semantic": "lastModifiedDate",
+          "physical": "ucolastModifiedDateTime",
+          "type": "datetime",
+          "description": "The date and time when the vulnerability record was last modified in NVD.",
+          "example": "2022-01-15T12:00:00",
+          "query_pattern": "MATCH (v:UcoVulnerability) WHERE v.ucolastModifiedDateTime >= datetime('2022-01-01') RETURN v"
+        },
+        {
+          "semantic": "summary",
+          "physical": "ucosummary",
+          "type": "string",
+          "description": "Free-text description/summary of the vulnerability. Use this for keyword/text search queries.",
+          "example": "Apache Log4j2 2.0-beta9 through 2.15.0 JNDI features used in ...",
+          "query_pattern": "MATCH (v:UcoVulnerability) WHERE toLower(v.ucosummary) CONTAINS 'remote code execution' RETURN v"
+        },
+        {
+          "semantic": "uri",
+          "physical": "uri",
+          "type": "string",
+          "description": "Canonical RDF/ontology URI for this Vulnerability node.",
+          "example": "http://uckg.org/vulnerability/...",
+          "query_pattern": "MATCH (v:UcoVulnerability) WHERE v.uri IS NOT NULL RETURN v.uri"
+        }
+      ]
+    },
+
+    {
+      "semantic": "Weakness",
+      "physical_label": "UcoCWE",
+      "purpose": "Represents a Common Weakness Enumeration (CWE) entry — a class of software/hardware weakness. CWE nodes describe the abstract weakness category (e.g. CWE-79 Cross-Site Scripting). They link to observed real-world examples and are connected to exploit targets and CAPEC attack patterns.",
+      "description": "A Weakness/CWE node is identified by its ucocweID property (e.g. CWE-79). It carries the weakness name (ucocweName), a summary, detailed description, exploitation likelihood, detection methods, potential mitigations text, and applicable platforms. The abstraction level (ucoabstraction) indicates whether this is a Variant, Base, Class, or Pillar in the CWE hierarchy.",
+      "key_identifier": "ucocweID",
+      "key_identifier_example": "CWE-79",
+      "typical_natural_language_triggers": [
+        "weakness", "CWE", "software weakness", "vulnerability class",
+        "cross-site scripting", "buffer overflow", "injection", "weakness category",
+        "likelihood of exploit", "weakness description"
+      ],
+      "properties": [
+        {
+          "semantic": "cweId",
+          "physical": "ucocweID",
+          "type": "string",
+          "description": "The CWE identifier string (e.g. CWE-79). Primary lookup key for a weakness node.",
+          "example": "CWE-79",
+          "query_pattern": "MATCH (w:UcoCWE) WHERE w.ucocweID = 'CWE-79' RETURN w"
+        },
+        {
+          "semantic": "cweName",
+          "physical": "ucocweName",
+          "type": "string",
+          "description": "Human-readable name of the weakness (e.g. 'Improper Neutralization of Input During Web Page Generation').",
+          "example": "Improper Neutralization of Input During Web Page Generation (Cross-site Scripting)",
+          "query_pattern": "MATCH (w:UcoCWE) WHERE toLower(w.ucocweName) CONTAINS 'injection' RETURN w"
+        },
+        {
+          "semantic": "summary",
+          "physical": "ucocweSummary",
+          "type": "string",
+          "description": "Short summary description of the weakness.",
+          "example": "The software does not neutralize or incorrectly neutralizes user-controllable input before it is placed in output...",
+          "query_pattern": "MATCH (w:UcoCWE) WHERE w.ucocweSummary IS NOT NULL RETURN w.ucocweID, w.ucocweSummary"
+        },
+        {
+          "semantic": "description",
+          "physical": "ucodescription",
+          "type": "string",
+          "description": "Detailed description of the weakness from the CWE specification.",
+          "example": "The product receives input from an upstream component...",
+          "query_pattern": "MATCH (w:UcoCWE) WHERE w.ucodescription IS NOT NULL RETURN w"
+        },
+        {
+          "semantic": "abstraction",
+          "physical": "ucoabstraction",
+          "type": "string",
+          "description": "CWE abstraction level: Pillar, Class, Base, or Variant. Lower levels are more specific.",
+          "example": "Base",
+          "query_pattern": "MATCH (w:UcoCWE) WHERE w.ucoabstraction = 'Base' RETURN w"
+        },
+        {
+          "semantic": "likelihoodOfExploit",
+          "physical": "ucolikelihoodOfExploit",
+          "type": "string",
+          "description": "Estimated likelihood that this weakness will be exploited: High, Medium, or Low.",
+          "example": "High",
+          "query_pattern": "MATCH (w:UcoCWE) WHERE w.ucolikelihoodOfExploit = 'High' RETURN w"
+        },
+        {
+          "semantic": "status",
+          "physical": "ucostatus",
+          "type": "string",
+          "description": "CWE entry status (e.g. Draft, Stable, Incomplete, Deprecated).",
+          "example": "Stable",
+          "query_pattern": "MATCH (w:UcoCWE) WHERE w.ucostatus = 'Stable' RETURN w"
+        },
+        {
+          "semantic": "applicablePlatform",
+          "physical": "ucoapplicablePlatform",
+          "type": "string",
+          "description": "Platforms/languages where this weakness applies (e.g. Language Independent, C, Java, PHP).",
+          "example": "Language Independent",
+          "query_pattern": "MATCH (w:UcoCWE) WHERE w.ucoapplicablePlatform CONTAINS 'PHP' RETURN w"
+        },
+        {
+          "semantic": "commonConsequences",
+          "physical": "ucocommonConsequences",
+          "type": "string",
+          "description": "Description of the common consequences if this weakness is exploited.",
+          "example": "Confidentiality, Integrity — Read/Modify application data",
+          "query_pattern": "MATCH (w:UcoCWE) WHERE w.ucocommonConsequences CONTAINS 'Confidentiality' RETURN w"
+        },
+        {
+          "semantic": "potentialMitigations",
+          "physical": "ucopotentialMitigations",
+          "type": "string",
+          "description": "Free-text description of mitigations recommended by the CWE specification.",
+          "example": "Use a vetted library or framework...",
+          "query_pattern": "MATCH (w:UcoCWE) WHERE w.ucopotentialMitigations IS NOT NULL RETURN w.ucocweID, w.ucopotentialMitigations"
+        },
+        {
+          "semantic": "detectionMethods",
+          "physical": "ucodetectionMethods",
+          "type": "string",
+          "description": "Recommended methods for detecting this weakness (e.g. Static Analysis, Fuzzing).",
+          "example": "Static Analysis, Automated Testing",
+          "query_pattern": "MATCH (w:UcoCWE) WHERE w.ucodetectionMethods CONTAINS 'Static Analysis' RETURN w"
+        },
+        {
+          "semantic": "extendedSummary",
+          "physical": "ucocweExtendedSummary",
+          "type": "string",
+          "description": "Extended summary providing additional context beyond the basic summary.",
+          "example": "...",
+          "query_pattern": "MATCH (w:UcoCWE) WHERE w.ucocweExtendedSummary IS NOT NULL RETURN w"
+        },
+        {
+          "semantic": "modesOfIntroduction",
+          "physical": "ucomodesOfIntroduction",
+          "type": "string",
+          "description": "When and how this weakness is typically introduced into software (e.g. Implementation, Design, Architecture).",
+          "example": "Implementation",
+          "query_pattern": "MATCH (w:UcoCWE) WHERE w.ucomodesOfIntroduction CONTAINS 'Implementation' RETURN w"
+        },
+        {
+          "semantic": "structure",
+          "physical": "ucostructure",
+          "type": "string",
+          "description": "CWE structural nature (Simple, Composite, Chain).",
+          "example": "Simple",
+          "query_pattern": "MATCH (w:UcoCWE) WHERE w.ucostructure = 'Composite' RETURN w"
+        },
+        {
+          "semantic": "uri",
+          "physical": "uri",
+          "type": "string",
+          "description": "Canonical RDF/ontology URI for this CWE node.",
+          "example": "http://uckg.org/cwe/CWE-79",
+          "query_pattern": "MATCH (w:UcoCWE) WHERE w.uri IS NOT NULL RETURN w.uri"
+        }
+      ]
+    },
+
+    {
+      "semantic": "ExploitTarget",
+      "physical_label": "UcoExploitTarget",
+      "purpose": "An abstract pivot node connecting a Weakness (CWE) and a Vulnerability. It represents the concept that a particular weakness is the underlying cause of a particular vulnerability.",
+      "description": "ExploitTarget nodes act as intermediaries in the chain: CWE→ExploitTarget→Vulnerability→CVE→CPE. They have no descriptive properties themselves (only uri). To traverse from a CWE to its associated CVEs, you must go through ExploitTarget and then Vulnerability. ExploitTarget→Vulnerability uses UCOHASVULNERABILITY; ExploitTarget→Weakness uses UCOHASWEAKNESS.",
+      "key_identifier": "uri",
+      "key_identifier_example": "http://uckg.org/exploittarget/...",
+      "typical_natural_language_triggers": [
+        "weakness causes vulnerability", "CWE linked to CVE",
+        "exploit target", "vulnerability root cause"
+      ],
+      "properties": [
+        {
+          "semantic": "uri",
+          "physical": "uri",
+          "type": "string",
+          "description": "Canonical RDF/ontology URI — the only property on ExploitTarget nodes.",
+          "example": "http://uckg.org/exploittarget/...",
+          "query_pattern": "MATCH (et:UcoExploitTarget) RETURN et.uri LIMIT 5"
+        }
+      ]
+    },
+
+    {
+      "semantic": "Campaign",
+      "physical_label": "UcoexCAMPAIGNS",
+      "purpose": "Represents a MITRE ATT&CK Campaign — a coordinated set of malicious activities and behaviors conducted by a threat actor over a period of time with specific goals.",
+      "description": "Campaign nodes describe named threat campaigns (e.g. Operation APT29). Each campaign can be attributed to one or more threat groups, and can use specific techniques and software. The name (ucoexNAME) is the primary identifier. The description (ucoexDESCRIPTION) contains detailed context.",
+      "key_identifier": "ucoexNAME",
+      "key_identifier_example": "Operation Wocao",
+      "typical_natural_language_triggers": [
+        "campaign", "operation", "attack campaign", "threat campaign",
+        "attributed to group", "campaign uses", "coordinated attack"
+      ],
+      "properties": [
+        {
+          "semantic": "name",
+          "physical": "ucoexNAME",
+          "type": "string",
+          "description": "The name of the campaign (e.g. 'Operation Wocao', 'FIN7'). Primary lookup key.",
+          "example": "Operation Wocao",
+          "query_pattern": "MATCH (c:UcoexCAMPAIGNS) WHERE c.ucoexNAME = 'Operation Wocao' RETURN c"
+        },
+        {
+          "semantic": "description",
+          "physical": "ucoexDESCRIPTION",
+          "type": "string",
+          "description": "Detailed description of the campaign including goals, attribution, and timeline.",
+          "example": "Operation Wocao was a cyber espionage campaign...",
+          "query_pattern": "MATCH (c:UcoexCAMPAIGNS) WHERE toLower(c.ucoexDESCRIPTION) CONTAINS 'espionage' RETURN c"
+        },
+        {
+          "semantic": "domain",
+          "physical": "ucoexDOMAIN",
+          "type": "string",
+          "description": "ATT&CK domain the campaign belongs to (e.g. enterprise-attack, ics-attack, mobile-attack).",
+          "example": "enterprise-attack",
+          "query_pattern": "MATCH (c:UcoexCAMPAIGNS) WHERE c.ucoexDOMAIN = 'enterprise-attack' RETURN c"
+        },
+        {
+          "semantic": "url",
+          "physical": "ucoexURL",
+          "type": "string",
+          "description": "Reference URL for this campaign on the MITRE ATT&CK website.",
+          "example": "https://attack.mitre.org/campaigns/C0014/",
+          "query_pattern": "MATCH (c:UcoexCAMPAIGNS) WHERE c.ucoexURL IS NOT NULL RETURN c.ucoexNAME, c.ucoexURL"
+        },
+        {
+          "semantic": "uri",
+          "physical": "uri",
+          "type": "string",
+          "description": "Canonical RDF/ontology URI for this campaign node.",
+          "example": "http://uckg.org/campaign/...",
+          "query_pattern": "MATCH (c:UcoexCAMPAIGNS) WHERE c.uri IS NOT NULL RETURN c"
+        }
+      ]
+    },
+
+    {
+      "semantic": "Group",
+      "physical_label": "UcoexGROUPS",
+      "purpose": "Represents a MITRE ATT&CK threat actor group (also called intrusion set or APT). Groups are named threat actors identified by security researchers, with known TTPs, tools, and campaign attributions.",
+      "description": "Group nodes describe named threat actor groups (e.g. APT29, Lazarus Group, FIN7). A group can use techniques directly and employ software/tools. Campaigns can be attributed to groups. The name (ucoexNAME) is the primary identifier.",
+      "key_identifier": "ucoexNAME",
+      "key_identifier_example": "APT29",
+      "typical_natural_language_triggers": [
+        "threat group", "APT group", "threat actor", "hacker group",
+        "intrusion set", "group uses", "attributed to group", "nation-state actor"
+      ],
+      "properties": [
+        {
+          "semantic": "name",
+          "physical": "ucoexNAME",
+          "type": "string",
+          "description": "Name of the threat group (e.g. 'APT29', 'Lazarus Group'). Primary lookup key.",
+          "example": "APT29",
+          "query_pattern": "MATCH (g:UcoexGROUPS) WHERE g.ucoexNAME = 'APT29' RETURN g"
+        },
+        {
+          "semantic": "description",
+          "physical": "ucoexDESCRIPTION",
+          "type": "string",
+          "description": "Detailed description of the group including origin, motivation, and known activities.",
+          "example": "APT29 is a threat group attributed to the Russian Foreign Intelligence Service...",
+          "query_pattern": "MATCH (g:UcoexGROUPS) WHERE toLower(g.ucoexDESCRIPTION) CONTAINS 'russia' RETURN g"
+        },
+        {
+          "semantic": "domain",
+          "physical": "ucoexDOMAIN",
+          "type": "string",
+          "description": "ATT&CK domain (e.g. enterprise-attack).",
+          "example": "enterprise-attack",
+          "query_pattern": "MATCH (g:UcoexGROUPS) WHERE g.ucoexDOMAIN = 'enterprise-attack' RETURN g"
+        },
+        {
+          "semantic": "url",
+          "physical": "ucoexURL",
+          "type": "string",
+          "description": "Reference URL on the MITRE ATT&CK website for this group.",
+          "example": "https://attack.mitre.org/groups/G0016/",
+          "query_pattern": "MATCH (g:UcoexGROUPS) WHERE g.ucoexURL IS NOT NULL RETURN g.ucoexNAME, g.ucoexURL"
+        },
+        {
+          "semantic": "uri",
+          "physical": "uri",
+          "type": "string",
+          "description": "Canonical RDF/ontology URI for this group node.",
+          "example": "http://uckg.org/group/...",
+          "query_pattern": "MATCH (g:UcoexGROUPS) WHERE g.uri IS NOT NULL RETURN g"
+        }
+      ]
+    },
+
+    {
+      "semantic": "Technique",
+      "physical_label": "UcoexMITREATTACK",
+      "purpose": "Represents a MITRE ATT&CK technique or sub-technique describing a specific adversary behavior or method used to achieve a tactic objective.",
+      "description": "Technique nodes cover both parent techniques (e.g. T1566 Phishing) and sub-techniques (e.g. T1566.001 Spearphishing Attachment). The name (ucoexNAME) typically contains the technique's descriptive name. The description (ucoexDESCRIPTION) explains the adversary behavior in detail. Techniques are the core pivot connecting groups, campaigns, software, mitigations, D3FEND controls, and CAPEC patterns.",
+      "key_identifier": "ucoexNAME",
+      "key_identifier_example": "Phishing",
+      "typical_natural_language_triggers": [
+        "technique", "ATT&CK technique", "adversary behavior", "attack technique",
+        "sub-technique", "TTP", "how do attackers", "tactic technique"
+      ],
+      "properties": [
+        {
+          "semantic": "name",
+          "physical": "ucoexNAME",
+          "type": "string",
+          "description": "Technique name as it appears in ATT&CK (e.g. 'Phishing', 'Valid Accounts'). Primary lookup key.",
+          "example": "Phishing",
+          "query_pattern": "MATCH (t:UcoexMITREATTACK) WHERE toLower(t.ucoexNAME) CONTAINS 'phishing' RETURN t"
+        },
+        {
+          "semantic": "description",
+          "physical": "ucoexDESCRIPTION",
+          "type": "string",
+          "description": "Detailed description of the adversary technique from MITRE ATT&CK.",
+          "example": "Adversaries may send phishing messages to gain access to victim systems...",
+          "query_pattern": "MATCH (t:UcoexMITREATTACK) WHERE toLower(t.ucoexDESCRIPTION) CONTAINS 'credential' RETURN t"
+        },
+        {
+          "semantic": "domain",
+          "physical": "ucoexDOMAIN",
+          "type": "string",
+          "description": "ATT&CK domain this technique belongs to (enterprise-attack, ics-attack, mobile-attack).",
+          "example": "enterprise-attack",
+          "query_pattern": "MATCH (t:UcoexMITREATTACK) WHERE t.ucoexDOMAIN = 'enterprise-attack' RETURN t"
+        },
+        {
+          "semantic": "url",
+          "physical": "ucoexURL",
+          "type": "string",
+          "description": "Reference URL on the MITRE ATT&CK website for this technique.",
+          "example": "https://attack.mitre.org/techniques/T1566/",
+          "query_pattern": "MATCH (t:UcoexMITREATTACK) WHERE t.ucoexURL IS NOT NULL RETURN t.ucoexNAME, t.ucoexURL"
+        },
+        {
+          "semantic": "uri",
+          "physical": "uri",
+          "type": "string",
+          "description": "Canonical RDF/ontology URI for this technique node.",
+          "example": "http://uckg.org/technique/...",
+          "query_pattern": "MATCH (t:UcoexMITREATTACK) WHERE t.uri IS NOT NULL RETURN t"
+        }
+      ]
+    },
+
+    {
+      "semantic": "Tactic",
+      "physical_label": "UcoexTACTICS",
+      "purpose": "Represents a MITRE ATT&CK tactic — the adversary's high-level goal or phase in an attack (e.g. Initial Access, Execution, Persistence, Exfiltration).",
+      "description": "Tactic nodes represent the 14 ATT&CK enterprise tactics (or ICS/mobile equivalents). Each tactic groups multiple techniques that share the same adversary objective. The name (ucoexNAME) is the tactic name. Note: in this KG, Tactic nodes are stored independently and are not directly linked to Technique nodes via explicit relationships — queries about 'techniques in a tactic' require domain knowledge.",
+      "key_identifier": "ucoexNAME",
+      "key_identifier_example": "Initial Access",
+      "typical_natural_language_triggers": [
+        "tactic", "attack phase", "adversary objective", "kill chain phase",
+        "initial access", "persistence", "lateral movement", "exfiltration", "execution"
+      ],
+      "properties": [
+        {
+          "semantic": "name",
+          "physical": "ucoexNAME",
+          "type": "string",
+          "description": "Tactic name (e.g. 'Initial Access', 'Persistence', 'Lateral Movement'). Primary lookup key.",
+          "example": "Initial Access",
+          "query_pattern": "MATCH (tac:UcoexTACTICS) WHERE tac.ucoexNAME = 'Initial Access' RETURN tac"
+        },
+        {
+          "semantic": "description",
+          "physical": "ucoexDESCRIPTION",
+          "type": "string",
+          "description": "Description of the tactic from MITRE ATT&CK.",
+          "example": "The adversary is trying to get into your network...",
+          "query_pattern": "MATCH (tac:UcoexTACTICS) WHERE tac.ucoexDESCRIPTION IS NOT NULL RETURN tac"
+        },
+        {
+          "semantic": "domain",
+          "physical": "ucoexDOMAIN",
+          "type": "string",
+          "description": "ATT&CK domain (enterprise-attack, ics-attack, mobile-attack).",
+          "example": "enterprise-attack",
+          "query_pattern": "MATCH (tac:UcoexTACTICS) WHERE tac.ucoexDOMAIN = 'enterprise-attack' RETURN tac"
+        },
+        {
+          "semantic": "url",
+          "physical": "ucoexURL",
+          "type": "string",
+          "description": "Reference URL on the MITRE ATT&CK website.",
+          "example": "https://attack.mitre.org/tactics/TA0001/",
+          "query_pattern": "MATCH (tac:UcoexTACTICS) WHERE tac.ucoexURL IS NOT NULL RETURN tac.ucoexNAME, tac.ucoexURL"
+        },
+        {
+          "semantic": "uri",
+          "physical": "uri",
+          "type": "string",
+          "description": "Canonical RDF/ontology URI for this tactic node.",
+          "example": "http://uckg.org/tactic/...",
+          "query_pattern": "MATCH (tac:UcoexTACTICS) WHERE tac.uri IS NOT NULL RETURN tac"
+        }
+      ]
+    },
+
+    {
+      "semantic": "Software",
+      "physical_label": "UcoexSOFTWARE",
+      "purpose": "Represents software used by threat actors — including malware, tools, and commercial-off-the-shelf software weaponized by attackers. Sourced from MITRE ATT&CK Software entries.",
+      "description": "Software nodes cover both malware (e.g. Emotet, Cobalt Strike) and tools (e.g. Mimikatz, PsExec). A software item can be used by multiple groups and campaigns, and can employ specific ATT&CK techniques. The name (ucoexNAME) is the primary identifier.",
+      "key_identifier": "ucoexNAME",
+      "key_identifier_example": "Mimikatz",
+      "typical_natural_language_triggers": [
+        "software", "malware", "tool", "ransomware", "trojan", "backdoor",
+        "exploit kit", "remote access tool", "RAT", "software used by group"
+      ],
+      "properties": [
+        {
+          "semantic": "name",
+          "physical": "ucoexNAME",
+          "type": "string",
+          "description": "Software name as listed in ATT&CK (e.g. 'Mimikatz', 'Emotet', 'Cobalt Strike'). Primary lookup key.",
+          "example": "Mimikatz",
+          "query_pattern": "MATCH (s:UcoexSOFTWARE) WHERE s.ucoexNAME = 'Mimikatz' RETURN s"
+        },
+        {
+          "semantic": "description",
+          "physical": "ucoexDESCRIPTION",
+          "type": "string",
+          "description": "Detailed description of the software including its capabilities and typical use.",
+          "example": "Mimikatz is a credential dumper capable of obtaining plaintext Windows account logins...",
+          "query_pattern": "MATCH (s:UcoexSOFTWARE) WHERE toLower(s.ucoexDESCRIPTION) CONTAINS 'credential' RETURN s"
+        },
+        {
+          "semantic": "domain",
+          "physical": "ucoexDOMAIN",
+          "type": "string",
+          "description": "ATT&CK domain this software belongs to.",
+          "example": "enterprise-attack",
+          "query_pattern": "MATCH (s:UcoexSOFTWARE) WHERE s.ucoexDOMAIN = 'enterprise-attack' RETURN s"
+        },
+        {
+          "semantic": "url",
+          "physical": "ucoexURL",
+          "type": "string",
+          "description": "Reference URL on the MITRE ATT&CK website.",
+          "example": "https://attack.mitre.org/software/S0002/",
+          "query_pattern": "MATCH (s:UcoexSOFTWARE) WHERE s.ucoexURL IS NOT NULL RETURN s.ucoexNAME, s.ucoexURL"
+        },
+        {
+          "semantic": "uri",
+          "physical": "uri",
+          "type": "string",
+          "description": "Canonical RDF/ontology URI for this software node.",
+          "example": "http://uckg.org/software/...",
+          "query_pattern": "MATCH (s:UcoexSOFTWARE) WHERE s.uri IS NOT NULL RETURN s"
+        }
+      ]
+    },
+
+    {
+      "semantic": "Mitigation",
+      "physical_label": "UcoexMITIGATIONS",
+      "purpose": "Represents a MITRE ATT&CK mitigation — a security control or configuration recommendation that reduces the likelihood or impact of an adversary technique being successfully executed.",
+      "description": "Mitigation nodes model the ATT&CK mitigation catalogue. Each mitigation is linked to one or more techniques it mitigates via the UCOEXMITIGATES relationship. The name (ucoexNAME) is the primary identifier (e.g. 'Multi-factor Authentication', 'Network Segmentation').",
+      "key_identifier": "ucoexNAME",
+      "key_identifier_example": "Multi-factor Authentication",
+      "typical_natural_language_triggers": [
+        "mitigation", "defense", "countermeasure", "control", "remediation",
+        "how to prevent", "how to mitigate", "security recommendation", "protect against"
+      ],
+      "properties": [
+        {
+          "semantic": "name",
+          "physical": "ucoexNAME",
+          "type": "string",
+          "description": "Mitigation name from ATT&CK (e.g. 'Multi-factor Authentication'). Primary lookup key.",
+          "example": "Multi-factor Authentication",
+          "query_pattern": "MATCH (m:UcoexMITIGATIONS) WHERE m.ucoexNAME = 'Multi-factor Authentication' RETURN m"
+        },
+        {
+          "semantic": "description",
+          "physical": "ucoexDESCRIPTION",
+          "type": "string",
+          "description": "Description of the mitigation and how it reduces risk.",
+          "example": "Use multi-factor authentication for user and privileged accounts...",
+          "query_pattern": "MATCH (m:UcoexMITIGATIONS) WHERE m.ucoexDESCRIPTION IS NOT NULL RETURN m.ucoexNAME, m.ucoexDESCRIPTION"
+        },
+        {
+          "semantic": "domain",
+          "physical": "ucoexDOMAIN",
+          "type": "string",
+          "description": "ATT&CK domain (enterprise-attack, ics-attack, mobile-attack).",
+          "example": "enterprise-attack",
+          "query_pattern": "MATCH (m:UcoexMITIGATIONS) WHERE m.ucoexDOMAIN = 'enterprise-attack' RETURN m"
+        },
+        {
+          "semantic": "url",
+          "physical": "ucoexURL",
+          "type": "string",
+          "description": "Reference URL on the MITRE ATT&CK website.",
+          "example": "https://attack.mitre.org/mitigations/M1032/",
+          "query_pattern": "MATCH (m:UcoexMITIGATIONS) WHERE m.ucoexURL IS NOT NULL RETURN m.ucoexNAME, m.ucoexURL"
+        },
+        {
+          "semantic": "uri",
+          "physical": "uri",
+          "type": "string",
+          "description": "Canonical RDF/ontology URI for this mitigation node.",
+          "example": "http://uckg.org/mitigation/...",
+          "query_pattern": "MATCH (m:UcoexMITIGATIONS) WHERE m.uri IS NOT NULL RETURN m"
+        }
+      ]
+    },
+
+    {
+      "semantic": "AttackPattern",
+      "physical_label": "UcoexCAPEC",
+      "purpose": "Represents a CAPEC (Common Attack Pattern Enumeration and Classification) entry — an abstract description of a common method used by adversaries to exploit software weaknesses.",
+      "description": "AttackPattern nodes describe CAPEC attack patterns at varying abstraction levels (Meta, Standard, Detailed). Each CAPEC entry is identified by its ucoexCAPEC_id (e.g. CAPEC-66). It maps to related CWE weaknesses (UCOEXHASRELATEDWEAKNESS) and to ATT&CK techniques (UCOEXHASTAXONOMYMAPPING). CAPEC nodes carry rich context including prerequisites, execution flow, mitigations, severity, and likelihood.",
+      "key_identifier": "ucoexCAPEC_id",
+      "key_identifier_example": "CAPEC-66",
+      "typical_natural_language_triggers": [
+        "attack pattern", "CAPEC", "common attack", "how to exploit",
+        "attack method", "exploitation technique", "attack abstraction"
+      ],
+      "properties": [
+        {
+          "semantic": "capecId",
+          "physical": "ucoexCAPEC_id",
+          "type": "string",
+          "description": "CAPEC identifier string (e.g. CAPEC-66). Primary lookup key.",
+          "example": "CAPEC-66",
+          "query_pattern": "MATCH (ap:UcoexCAPEC) WHERE ap.ucoexCAPEC_id = 'CAPEC-66' RETURN ap"
+        },
+        {
+          "semantic": "capecName",
+          "physical": "ucoexCAPEC_name",
+          "type": "string",
+          "description": "Human-readable name of the attack pattern (e.g. 'SQL Injection').",
+          "example": "SQL Injection",
+          "query_pattern": "MATCH (ap:UcoexCAPEC) WHERE toLower(ap.ucoexCAPEC_name) CONTAINS 'injection' RETURN ap"
+        },
+        {
+          "semantic": "description",
+          "physical": "ucoexDescription",
+          "type": "string",
+          "description": "Detailed description of the attack pattern.",
+          "example": "This attack exploits improper handling of input to a SQL database...",
+          "query_pattern": "MATCH (ap:UcoexCAPEC) WHERE ap.ucoexDescription IS NOT NULL RETURN ap.ucoexCAPEC_id, ap.ucoexDescription"
+        },
+        {
+          "semantic": "severity",
+          "physical": "ucoexSeverity",
+          "type": "string",
+          "description": "Severity rating of the attack pattern (High, Medium, Low).",
+          "example": "High",
+          "query_pattern": "MATCH (ap:UcoexCAPEC) WHERE ap.ucoexSeverity = 'High' RETURN ap"
+        },
+        {
+          "semantic": "likelihood",
+          "physical": "ucoexLikelihood",
+          "type": "string",
+          "description": "Likelihood rating of the attack pattern being used (High, Medium, Low).",
+          "example": "High",
+          "query_pattern": "MATCH (ap:UcoexCAPEC) WHERE ap.ucoexLikelihood = 'High' RETURN ap"
+        },
+        {
+          "semantic": "abstraction",
+          "physical": "ucoexAbstraction",
+          "type": "string",
+          "description": "CAPEC abstraction level: Meta, Standard, or Detailed.",
+          "example": "Standard",
+          "query_pattern": "MATCH (ap:UcoexCAPEC) WHERE ap.ucoexAbstraction = 'Standard' RETURN ap"
+        },
+        {
+          "semantic": "consequences",
+          "physical": "ucoexConsequences",
+          "type": "list<string>",
+          "description": "List of potential consequences if this attack pattern is executed.",
+          "example": ["Data exfiltration", "Authentication bypass"],
+          "query_pattern": "MATCH (ap:UcoexCAPEC) WHERE any(c IN ap.ucoexConsequences WHERE toLower(c) CONTAINS 'bypass') RETURN ap"
+        },
+        {
+          "semantic": "prerequisites",
+          "physical": "ucoexPrerequisites",
+          "type": "list<string>",
+          "description": "List of prerequisites needed by an attacker to execute this attack pattern.",
+          "example": ["Network access to target", "Vulnerable input field"],
+          "query_pattern": "MATCH (ap:UcoexCAPEC) WHERE ap.ucoexPrerequisites IS NOT NULL RETURN ap.ucoexCAPEC_id, ap.ucoexPrerequisites"
+        },
+        {
+          "semantic": "mitigations",
+          "physical": "ucoexMitigations",
+          "type": "list<string>",
+          "description": "List of recommended mitigations from the CAPEC specification.",
+          "example": ["Input validation", "Prepared statements"],
+          "query_pattern": "MATCH (ap:UcoexCAPEC) WHERE ap.ucoexMitigations IS NOT NULL RETURN ap.ucoexCAPEC_id, ap.ucoexMitigations"
+        },
+        {
+          "semantic": "uri",
+          "physical": "uri",
+          "type": "string",
+          "description": "Canonical RDF/ontology URI for this CAPEC node.",
+          "example": "http://uckg.org/capec/CAPEC-66",
+          "query_pattern": "MATCH (ap:UcoexCAPEC) WHERE ap.uri IS NOT NULL RETURN ap.uri"
+        }
+      ]
+    },
+
+    {
+      "semantic": "D3FENDControl",
+      "physical_label": "UcoexMITRED3FEND",
+      "purpose": "Represents a MITRE D3FEND defensive technique — a countermeasure that defends against one or more ATT&CK techniques. D3FEND complements ATT&CK by providing the defensive perspective.",
+      "description": "D3FENDControl nodes model defensive techniques from the MITRE D3FEND knowledge base. Each control has a label (ucoexMITRED3FEND_LABEL) and a formal definition (ucoexMITRED3FEND_DEFINITION). They link to ATT&CK techniques via UCOEXHASMITREATTACK, meaning 'this D3FEND control covers/defends against this ATT&CK technique'.",
+      "key_identifier": "ucoexMITRED3FEND_LABEL",
+      "key_identifier_example": "Network Traffic Filtering",
+      "typical_natural_language_triggers": [
+        "D3FEND", "defensive technique", "defense control", "countermeasure",
+        "how to defend", "defensive measure", "network defense"
+      ],
+      "properties": [
+        {
+          "semantic": "label",
+          "physical": "ucoexMITRED3FEND_LABEL",
+          "type": "string",
+          "description": "D3FEND defensive technique label/name. Primary lookup key.",
+          "example": "Network Traffic Filtering",
+          "query_pattern": "MATCH (d:UcoexMITRED3FEND) WHERE d.ucoexMITRED3FEND_LABEL = 'Network Traffic Filtering' RETURN d"
+        },
+        {
+          "semantic": "definition",
+          "physical": "ucoexMITRED3FEND_DEFINITION",
+          "type": "string",
+          "description": "Formal definition of the D3FEND defensive technique.",
+          "example": "Restricting network traffic by filtering based on criteria such as IP address, port, or protocol...",
+          "query_pattern": "MATCH (d:UcoexMITRED3FEND) WHERE d.ucoexMITRED3FEND_DEFINITION IS NOT NULL RETURN d.ucoexMITRED3FEND_LABEL, d.ucoexMITRED3FEND_DEFINITION"
+        },
+        {
+          "semantic": "uri",
+          "physical": "uri",
+          "type": "string",
+          "description": "Canonical RDF/ontology URI for this D3FEND control node.",
+          "example": "http://uckg.org/d3fend/...",
+          "query_pattern": "MATCH (d:UcoexMITRED3FEND) WHERE d.uri IS NOT NULL RETURN d"
+        }
+      ]
+    },
+
+    {
+      "semantic": "ObservedExample",
+      "physical_label": "UcoexObservedExample",
+      "purpose": "Represents a real-world observed example of a CWE weakness being exploited in practice. ObservedExample nodes link a textual description of the real exploitation event to the CVE where it was observed.",
+      "description": "ObservedExample nodes are attached to CWE weakness nodes (via UCOHASOBSERVEDEXAMPLE) and link to the CVE where the example was observed (via UCOEXEXAMPLEOBSERVEDIN). This creates the full evidence chain: CWE → ObservedExample → CVE.",
+      "key_identifier": "uri",
+      "key_identifier_example": "http://uckg.org/observedexample/...",
+      "typical_natural_language_triggers": [
+        "observed example", "real world example", "weakness in practice",
+        "CVE observed", "exploitation example", "CWE example"
+      ],
+      "properties": [
+        {
+          "semantic": "description",
+          "physical": "ucoexDESCRIPTION",
+          "type": "string",
+          "description": "Description of the real-world exploitation event demonstrating the weakness.",
+          "example": "XSS in the admin interface of Product X allows remote attackers to inject arbitrary web script...",
+          "query_pattern": "MATCH (oe:UcoexObservedExample) WHERE toLower(oe.ucoexDESCRIPTION) CONTAINS 'xss' RETURN oe"
+        },
+        {
+          "semantic": "uri",
+          "physical": "uri",
+          "type": "string",
+          "description": "Canonical RDF/ontology URI for this observed example node.",
+          "example": "http://uckg.org/observedexample/...",
+          "query_pattern": "MATCH (oe:UcoexObservedExample) WHERE oe.uri IS NOT NULL RETURN oe.uri"
+        }
+      ]
+    },
+
+    {
+      "semantic": "CPE",
+      "physical_label": "UcoexCPE",
+      "purpose": "Represents a CPE (Common Platform Enumeration) entry — a standardized naming scheme for IT systems, software, and packages. CPE nodes identify the specific platforms and products affected by a CVE.",
+      "description": "CPE nodes are linked to CVE nodes via UCOEXHASCPE, meaning 'this CVE affects this CPE platform'. The cpeName property holds the full CPE URI (e.g. cpe:/a:apache:log4j:2.14.1). The titles property provides human-readable platform names.",
+      "key_identifier": "cpeName",
+      "key_identifier_example": "cpe:/a:apache:log4j:2.14.1",
+      "typical_natural_language_triggers": [
+        "affected platform", "affected product", "CPE", "platform version",
+        "software version", "product affected", "vendor product"
+      ],
+      "properties": [
+        {
+          "semantic": "cpeName",
+          "physical": "cpeName",
+          "type": "string",
+          "description": "Full CPE URI string (e.g. cpe:/a:apache:log4j:2.14.1). The vendor, product, and version are encoded in the URI.",
+          "example": "cpe:/a:apache:log4j:2.14.1",
+          "query_pattern": "MATCH (cpe:UcoexCPE) WHERE cpe.cpeName CONTAINS 'apache:log4j' RETURN cpe"
+        },
+        {
+          "semantic": "cpeNameId",
+          "physical": "cpeNameId",
+          "type": "string",
+          "description": "Internal CPE dictionary identifier UUID.",
+          "example": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+          "query_pattern": "MATCH (cpe:UcoexCPE) WHERE cpe.cpeNameId IS NOT NULL RETURN cpe.cpeName, cpe.cpeNameId"
+        },
+        {
+          "semantic": "titles",
+          "physical": "titles",
+          "type": "string",
+          "description": "Human-readable title(s) for this CPE entry (e.g. 'Apache Log4j 2.14.1').",
+          "example": "Apache Log4j 2.14.1",
+          "query_pattern": "MATCH (cpe:UcoexCPE) WHERE toLower(cpe.titles) CONTAINS 'apache' RETURN cpe"
+        },
+        {
+          "semantic": "lastModified",
+          "physical": "lastModified",
+          "type": "datetime",
+          "description": "Last modification timestamp of the CPE entry in the NVD dictionary.",
+          "example": "2022-03-15T10:00:00",
+          "query_pattern": "MATCH (cpe:UcoexCPE) WHERE cpe.lastModified IS NOT NULL RETURN cpe.cpeName, cpe.lastModified"
+        },
+        {
+          "semantic": "dictionaryFound",
+          "physical": "dictionary_found",
+          "type": "boolean",
+          "description": "Flag indicating whether this CPE was found in the NVD CPE dictionary.",
+          "example": true,
+          "query_pattern": "MATCH (cpe:UcoexCPE) WHERE cpe.dictionary_found = true RETURN cpe"
+        },
+        {
+          "semantic": "uri",
+          "physical": "uri",
+          "type": "string",
+          "description": "Canonical RDF/ontology URI for this CPE node.",
+          "example": "http://uckg.org/cpe/...",
+          "query_pattern": "MATCH (cpe:UcoexCPE) WHERE cpe.uri IS NOT NULL RETURN cpe"
+        }
+      ]
+    }
+  ],
+
+  "relationships": [
+    {
+      "semantic": "hasCPE",
+      "physical_rel": "UCOEXHASCPE",
+      "source_node_semantic": "CVE",
+      "source_node_physical": "UcoCVE",
+      "target_node_semantic": "CPE",
+      "target_node_physical": "UcoexCPE",
+      "description": "Connects a CVE to the specific platform or product versions it affects. This is the primary relationship for 'which platforms/products are affected by this CVE' queries.",
+      "traversal_direction": "CVE → CPE",
+      "cypher_pattern": "MATCH (c:UcoCVE)-[:UCOEXHASCPE]->(cpe:UcoexCPE)",
+      "natural_language_triggers": [
+        "affected platform", "which CPE", "platforms affected by CVE",
+        "products affected by vulnerability", "vendor version affected"
+      ],
+      "example_query": "MATCH (c:UcoCVE {label: 'CVE-2021-44228'})-[:UCOEXHASCPE]->(cpe:UcoexCPE) RETURN cpe.cpeName"
+    },
+    {
+      "semantic": "hasObservedExample",
+      "physical_rel": "UCOHASOBSERVEDEXAMPLE",
+      "source_node_semantic": "Weakness",
+      "source_node_physical": "UcoCWE",
+      "target_node_semantic": "ObservedExample",
+      "target_node_physical": "UcoexObservedExample",
+      "description": "Connects a CWE weakness to real-world observed examples of it being exploited. Enables finding historical evidence of a weakness being used in practice.",
+      "traversal_direction": "Weakness (CWE) → ObservedExample",
+      "cypher_pattern": "MATCH (w:UcoCWE)-[:UCOHASOBSERVEDEXAMPLE]->(oe:UcoexObservedExample)",
+      "natural_language_triggers": [
+        "real world examples of weakness", "where has CWE been exploited",
+        "observed examples", "historical exploitation of weakness"
+      ],
+      "example_query": "MATCH (w:UcoCWE {ucocweID: 'CWE-79'})-[:UCOHASOBSERVEDEXAMPLE]->(oe:UcoexObservedExample) RETURN oe.ucoexDESCRIPTION LIMIT 5"
+    },
+    {
+      "semantic": "hasVulnerability",
+      "physical_rel": "UCOHASVULNERABILITY",
+      "source_node_semantic": "ExploitTarget",
+      "source_node_physical": "UcoExploitTarget",
+      "target_node_semantic": "Vulnerability",
+      "target_node_physical": "UcoVulnerability",
+      "description": "Connects an ExploitTarget pivot node to its associated Vulnerability. Part of the CWE→ExploitTarget→Vulnerability→CVE chain. Required to traverse from weaknesses to vulnerability records.",
+      "traversal_direction": "ExploitTarget → Vulnerability",
+      "cypher_pattern": "MATCH (et:UcoExploitTarget)-[:UCOHASVULNERABILITY]->(v:UcoVulnerability)",
+      "natural_language_triggers": [
+        "vulnerability from weakness", "exploit target linked vulnerability",
+        "CWE causes vulnerability"
+      ],
+      "example_query": "MATCH (w:UcoCWE {ucocweID: 'CWE-89'})<-[:UCOHASWEAKNESS]-(et:UcoExploitTarget)-[:UCOHASVULNERABILITY]->(v:UcoVulnerability)-[:UCOHASCVE_ID]->(c:UcoCVE) RETURN c.label LIMIT 10"
+    },
+    {
+      "semantic": "hasWeakness",
+      "physical_rel": "UCOHASWEAKNESS",
+      "source_node_semantic": "ExploitTarget",
+      "source_node_physical": "UcoExploitTarget",
+      "target_node_semantic": "Weakness",
+      "target_node_physical": "UcoCWE",
+      "description": "Connects an ExploitTarget pivot node to the underlying CWE weakness. Used to find which weakness class underlies a given vulnerability. Part of the full chain: CWE←ExploitTarget→Vulnerability→CVE.",
+      "traversal_direction": "ExploitTarget → Weakness (CWE)",
+      "cypher_pattern": "MATCH (et:UcoExploitTarget)-[:UCOHASWEAKNESS]->(w:UcoCWE)",
+      "natural_language_triggers": [
+        "weakness causing vulnerability", "CWE for this CVE",
+        "underlying weakness", "root cause weakness"
+      ],
+      "example_query": "MATCH (v:UcoVulnerability)<-[:UCOHASVULNERABILITY]-(et:UcoExploitTarget)-[:UCOHASWEAKNESS]->(w:UcoCWE) MATCH (v)-[:UCOHASCVE_ID]->(c:UcoCVE {label: 'CVE-2021-44228'}) RETURN w.ucocweID, w.ucocweName"
+    },
+    {
+      "semantic": "hasCVE",
+      "physical_rel": "UCOHASCVE_ID",
+      "source_node_semantic": "Vulnerability",
+      "source_node_physical": "UcoVulnerability",
+      "target_node_semantic": "CVE",
+      "target_node_physical": "UcoCVE",
+      "description": "Connects a Vulnerability concept node to its corresponding CVE identifier node. This is required to access CVE scoring data (baseSeverity, impactScore, etc.) from a Vulnerability node. Queries requiring both date and severity must traverse Vulnerability→CVE.",
+      "traversal_direction": "Vulnerability → CVE",
+      "cypher_pattern": "MATCH (v:UcoVulnerability)-[:UCOHASCVE_ID]->(c:UcoCVE)",
+      "natural_language_triggers": [
+        "CVE for vulnerability", "vulnerability identifier",
+        "get CVE from vulnerability", "link vulnerability to CVE"
+      ],
+      "example_query": "MATCH (v:UcoVulnerability)-[:UCOHASCVE_ID]->(c:UcoCVE) WHERE v.ucopublishedDateTime >= datetime('2021-01-01') RETURN c.label, c.ucobaseSeverity LIMIT 10"
+    },
+    {
+      "semantic": "attributedTo",
+      "physical_rel": "UCOEXATTRIBUTEDTO",
+      "source_node_semantic": "Campaign",
+      "source_node_physical": "UcoexCAMPAIGNS",
+      "target_node_semantic": "Group",
+      "target_node_physical": "UcoexGROUPS",
+      "description": "Indicates that a threat campaign has been attributed to (i.e. carried out by) a specific threat actor group. Use this to find which group is behind a campaign, or which campaigns a group has conducted.",
+      "traversal_direction": "Campaign → Group",
+      "cypher_pattern": "MATCH (camp:UcoexCAMPAIGNS)-[:UCOEXATTRIBUTEDTO]->(g:UcoexGROUPS)",
+      "natural_language_triggers": [
+        "campaign attributed to", "who conducted campaign", "which group is behind",
+        "threat actor responsible", "campaign linked to group"
+      ],
+      "example_query": "MATCH (camp:UcoexCAMPAIGNS)-[:UCOEXATTRIBUTEDTO]->(g:UcoexGROUPS) WHERE camp.ucoexNAME = 'Operation Wocao' RETURN g.ucoexNAME"
+    },
+    {
+      "semantic": "campaignUsesSoftware",
+      "physical_rel": "UCOEXCAMPAIGNUSESSOFTWARE",
+      "source_node_semantic": "Campaign",
+      "source_node_physical": "UcoexCAMPAIGNS",
+      "target_node_semantic": "Software",
+      "target_node_physical": "UcoexSOFTWARE",
+      "description": "Indicates that a campaign used a specific software (malware/tool) as part of its operations. Use this to find tools deployed in a campaign, or which campaigns used a given tool.",
+      "traversal_direction": "Campaign → Software",
+      "cypher_pattern": "MATCH (camp:UcoexCAMPAIGNS)-[:UCOEXCAMPAIGNUSESSOFTWARE]->(s:UcoexSOFTWARE)",
+      "natural_language_triggers": [
+        "software used in campaign", "malware deployed by campaign",
+        "tools used in operation", "campaign used tool"
+      ],
+      "example_query": "MATCH (camp:UcoexCAMPAIGNS {ucoexNAME: 'Operation Wocao'})-[:UCOEXCAMPAIGNUSESSOFTWARE]->(s:UcoexSOFTWARE) RETURN s.ucoexNAME"
+    },
+    {
+      "semantic": "campaignUsesTechnique",
+      "physical_rel": "UCOEXCAMPAIGNUSESTECHNIQUE",
+      "source_node_semantic": "Campaign",
+      "source_node_physical": "UcoexCAMPAIGNS",
+      "target_node_semantic": "Technique",
+      "target_node_physical": "UcoexMITREATTACK",
+      "description": "Indicates that a campaign employed a specific ATT&CK technique. Use this to find techniques observed in a campaign, or which campaigns used a specific technique.",
+      "traversal_direction": "Campaign → Technique",
+      "cypher_pattern": "MATCH (camp:UcoexCAMPAIGNS)-[:UCOEXCAMPAIGNUSESTECHNIQUE]->(t:UcoexMITREATTACK)",
+      "natural_language_triggers": [
+        "technique used in campaign", "campaign TTPs", "attack techniques in operation",
+        "which campaigns use this technique"
+      ],
+      "example_query": "MATCH (camp:UcoexCAMPAIGNS)-[:UCOEXCAMPAIGNUSESTECHNIQUE]->(t:UcoexMITREATTACK) WHERE camp.ucoexNAME = 'Operation Wocao' RETURN t.ucoexNAME"
+    },
+    {
+      "semantic": "hasRelatedWeakness",
+      "physical_rel": "UCOEXHASRELATEDWEAKNESS",
+      "source_node_semantic": "AttackPattern",
+      "source_node_physical": "UcoexCAPEC",
+      "target_node_semantic": "Weakness",
+      "target_node_physical": "UcoCWE",
+      "description": "Maps a CAPEC attack pattern to the CWE weaknesses it exploits. Enables traversal between the CAPEC and CWE knowledge bases — finding which weaknesses enable a given attack pattern, or which attack patterns exploit a given weakness.",
+      "traversal_direction": "AttackPattern (CAPEC) → Weakness (CWE)",
+      "cypher_pattern": "MATCH (ap:UcoexCAPEC)-[:UCOEXHASRELATEDWEAKNESS]->(w:UcoCWE)",
+      "natural_language_triggers": [
+        "attack pattern for weakness", "CAPEC exploits CWE",
+        "which attack patterns exploit this weakness", "weakness related to CAPEC"
+      ],
+      "example_query": "MATCH (ap:UcoexCAPEC)-[:UCOEXHASRELATEDWEAKNESS]->(w:UcoCWE {ucocweID: 'CWE-89'}) RETURN ap.ucoexCAPEC_id, ap.ucoexCAPEC_name"
+    },
+    {
+      "semantic": "mapsToTechnique",
+      "physical_rel": "UCOEXHASTAXONOMYMAPPING",
+      "source_node_semantic": "AttackPattern",
+      "source_node_physical": "UcoexCAPEC",
+      "target_node_semantic": "Technique",
+      "target_node_physical": "UcoexMITREATTACK",
+      "description": "Maps a CAPEC attack pattern to corresponding ATT&CK techniques via ATT&CK's taxonomy mapping. This bridges the CAPEC and MITRE ATT&CK knowledge bases — allowing traversal from abstract attack patterns to concrete adversary behaviors.",
+      "traversal_direction": "AttackPattern (CAPEC) → Technique (ATT&CK)",
+      "cypher_pattern": "MATCH (ap:UcoexCAPEC)-[:UCOEXHASTAXONOMYMAPPING]->(t:UcoexMITREATTACK)",
+      "natural_language_triggers": [
+        "CAPEC maps to technique", "attack pattern ATT&CK mapping",
+        "ATT&CK equivalent of CAPEC", "technique for attack pattern"
+      ],
+      "example_query": "MATCH (ap:UcoexCAPEC {ucoexCAPEC_id: 'CAPEC-66'})-[:UCOEXHASTAXONOMYMAPPING]->(t:UcoexMITREATTACK) RETURN t.ucoexNAME"
+    },
+    {
+      "semantic": "groupUsesSoftware",
+      "physical_rel": "UCOEXGROUPUSESSOFTWARE",
+      "source_node_semantic": "Group",
+      "source_node_physical": "UcoexGROUPS",
+      "target_node_semantic": "Software",
+      "target_node_physical": "UcoexSOFTWARE",
+      "description": "Indicates that a threat group uses a specific software (malware or tool). Use this to find tools associated with a group, or which groups use a given tool.",
+      "traversal_direction": "Group → Software",
+      "cypher_pattern": "MATCH (g:UcoexGROUPS)-[:UCOEXGROUPUSESSOFTWARE]->(s:UcoexSOFTWARE)",
+      "natural_language_triggers": [
+        "software used by group", "malware used by APT", "tools of threat actor",
+        "group's toolset", "which groups use this malware"
+      ],
+      "example_query": "MATCH (g:UcoexGROUPS {ucoexNAME: 'APT29'})-[:UCOEXGROUPUSESSOFTWARE]->(s:UcoexSOFTWARE) RETURN s.ucoexNAME"
+    },
+    {
+      "semantic": "groupUsesTechnique",
+      "physical_rel": "UCOEXGROUPUSESTECHNIQUE",
+      "source_node_semantic": "Group",
+      "source_node_physical": "UcoexGROUPS",
+      "target_node_semantic": "Technique",
+      "target_node_physical": "UcoexMITREATTACK",
+      "description": "Indicates that a threat group employs a specific ATT&CK technique. This is the primary relationship for threat-actor TTP queries ('what techniques does APT29 use?').",
+      "traversal_direction": "Group → Technique",
+      "cypher_pattern": "MATCH (g:UcoexGROUPS)-[:UCOEXGROUPUSESTECHNIQUE]->(t:UcoexMITREATTACK)",
+      "natural_language_triggers": [
+        "techniques used by group", "group TTPs", "APT uses technique",
+        "threat actor attack methods", "which groups use this technique"
+      ],
+      "example_query": "MATCH (g:UcoexGROUPS {ucoexNAME: 'APT29'})-[:UCOEXGROUPUSESTECHNIQUE]->(t:UcoexMITREATTACK) RETURN t.ucoexNAME LIMIT 10"
+    },
+    {
+      "semantic": "mitigates",
+      "physical_rel": "UCOEXMITIGATES",
+      "source_node_semantic": "Mitigation",
+      "source_node_physical": "UcoexMITIGATIONS",
+      "target_node_semantic": "Technique",
+      "target_node_physical": "UcoexMITREATTACK",
+      "description": "Indicates that a mitigation reduces the effectiveness of a specific ATT&CK technique. Use this to find how to defend against a technique, or which techniques a mitigation addresses.",
+      "traversal_direction": "Mitigation → Technique",
+      "cypher_pattern": "MATCH (m:UcoexMITIGATIONS)-[:UCOEXMITIGATES]->(t:UcoexMITREATTACK)",
+      "natural_language_triggers": [
+        "how to mitigate technique", "defense against technique",
+        "which mitigations cover", "countermeasure for attack"
+      ],
+      "example_query": "MATCH (m:UcoexMITIGATIONS)-[:UCOEXMITIGATES]->(t:UcoexMITREATTACK) WHERE toLower(t.ucoexNAME) CONTAINS 'phishing' RETURN m.ucoexNAME"
+    },
+    {
+      "semantic": "d3fendCoversTechnique",
+      "physical_rel": "UCOEXHASMITREATTACK",
+      "source_node_semantic": "D3FENDControl",
+      "source_node_physical": "UcoexMITRED3FEND",
+      "target_node_semantic": "Technique",
+      "target_node_physical": "UcoexMITREATTACK",
+      "description": "Maps a D3FEND defensive technique/control to the ATT&CK offensive technique it defends against. Enables querying 'what D3FEND controls cover this technique?' or 'which ATT&CK techniques does this D3FEND control address?'.",
+      "traversal_direction": "D3FENDControl → Technique",
+      "cypher_pattern": "MATCH (d:UcoexMITRED3FEND)-[:UCOEXHASMITREATTACK]->(t:UcoexMITREATTACK)",
+      "natural_language_triggers": [
+        "D3FEND control covers technique", "defensive technique against ATT&CK",
+        "D3FEND defense for technique", "which D3FEND defends against"
+      ],
+      "example_query": "MATCH (d:UcoexMITRED3FEND)-[:UCOEXHASMITREATTACK]->(t:UcoexMITREATTACK) WHERE toLower(t.ucoexNAME) CONTAINS 'phishing' RETURN d.ucoexMITRED3FEND_LABEL"
+    },
+    {
+      "semantic": "exampleObservedIn",
+      "physical_rel": "UCOEXEXAMPLEOBSERVEDIN",
+      "source_node_semantic": "ObservedExample",
+      "source_node_physical": "UcoexObservedExample",
+      "target_node_semantic": "CVE",
+      "target_node_physical": "UcoCVE",
+      "description": "Links a real-world observed example of a CWE weakness to the CVE identifier where that exploitation event was recorded. Completes the evidence chain: CWE → ObservedExample → CVE.",
+      "traversal_direction": "ObservedExample → CVE",
+      "cypher_pattern": "MATCH (oe:UcoexObservedExample)-[:UCOEXEXAMPLEOBSERVEDIN]->(c:UcoCVE)",
+      "natural_language_triggers": [
+        "example observed in CVE", "weakness observed as CVE",
+        "real world CVE for weakness", "exploitation evidence"
+      ],
+      "example_query": "MATCH (w:UcoCWE {ucocweID: 'CWE-79'})-[:UCOHASOBSERVEDEXAMPLE]->(oe:UcoexObservedExample)-[:UCOEXEXAMPLEOBSERVEDIN]->(c:UcoCVE) RETURN c.label, oe.ucoexDESCRIPTION LIMIT 5"
+    },
+    {
+      "semantic": "softwareUsesTechnique",
+      "physical_rel": "UCOEXSOFTWAREUSESTECHNIQUE",
+      "source_node_semantic": "Software",
+      "source_node_physical": "UcoexSOFTWARE",
+      "target_node_semantic": "Technique",
+      "target_node_physical": "UcoexMITREATTACK",
+      "description": "Indicates that a software (malware or tool) employs a specific ATT&CK technique to achieve its goals. Use this to find techniques associated with a given tool, or which tools use a given technique.",
+      "traversal_direction": "Software → Technique",
+      "cypher_pattern": "MATCH (s:UcoexSOFTWARE)-[:UCOEXSOFTWAREUSESTECHNIQUE]->(t:UcoexMITREATTACK)",
+      "natural_language_triggers": [
+        "technique used by software", "malware uses technique",
+        "tool's ATT&CK techniques", "which tools use this technique"
+      ],
+      "example_query": "MATCH (s:UcoexSOFTWARE {ucoexNAME: 'Mimikatz'})-[:UCOEXSOFTWAREUSESTECHNIQUE]->(t:UcoexMITREATTACK) RETURN t.ucoexNAME"
+    }
+  ],
+
+  "graph_traversal_paths": [
+    {
+      "name": "CWE to CVE (full chain)",
+      "description": "Traverse from a weakness (CWE) to all CVEs that resulted from that weakness type.",
+      "cypher_pattern": "MATCH (w:UcoCWE)<-[:UCOHASWEAKNESS]-(et:UcoExploitTarget)-[:UCOHASVULNERABILITY]->(v:UcoVulnerability)-[:UCOHASCVE_ID]->(c:UcoCVE)",
+      "use_cases": ["CVEs caused by SQL injection weakness", "all CVEs for a given CWE"]
+    },
+    {
+      "name": "CVE to affected platforms",
+      "description": "Find all CPE platforms/products affected by a specific CVE.",
+      "cypher_pattern": "MATCH (c:UcoCVE)-[:UCOEXHASCPE]->(cpe:UcoexCPE)",
+      "use_cases": ["which products are affected by Log4Shell", "affected versions for a CVE"]
+    },
+    {
+      "name": "CVE to weakness (reverse)",
+      "description": "From a CVE, find the underlying CWE weakness via the exploit target chain.",
+      "cypher_pattern": "MATCH (c:UcoCVE)<-[:UCOHASCVE_ID]-(v:UcoVulnerability)<-[:UCOHASVULNERABILITY]-(et:UcoExploitTarget)-[:UCOHASWEAKNESS]->(w:UcoCWE)",
+      "use_cases": ["what weakness type underlies CVE-XXXX", "CWE for a specific CVE"]
+    },
+    {
+      "name": "CWE to ATT&CK techniques (via CAPEC)",
+      "description": "From a CWE weakness, find related ATT&CK techniques through CAPEC attack patterns.",
+      "cypher_pattern": "MATCH (w:UcoCWE)<-[:UCOEXHASRELATEDWEAKNESS]-(ap:UcoexCAPEC)-[:UCOEXHASTAXONOMYMAPPING]->(t:UcoexMITREATTACK)",
+      "use_cases": ["ATT&CK techniques for SQL injection weakness", "technique coverage for a CWE"]
+    },
+    {
+      "name": "Group full TTP profile",
+      "description": "Retrieve the complete TTP profile of a threat group: techniques, software, and campaigns.",
+      "cypher_pattern": "MATCH (g:UcoexGROUPS) OPTIONAL MATCH (g)-[:UCOEXGROUPUSESTECHNIQUE]->(t:UcoexMITREATTACK) OPTIONAL MATCH (g)-[:UCOEXGROUPUSESSOFTWARE]->(s:UcoexSOFTWARE) OPTIONAL MATCH (camp:UcoexCAMPAIGNS)-[:UCOEXATTRIBUTEDTO]->(g)",
+      "use_cases": ["complete profile of APT29", "all TTPs for a threat actor"]
+    },
+    {
+      "name": "Technique to mitigations and D3FEND",
+      "description": "For a given ATT&CK technique, find all mitigations and D3FEND controls that address it.",
+      "cypher_pattern": "MATCH (t:UcoexMITREATTACK) OPTIONAL MATCH (m:UcoexMITIGATIONS)-[:UCOEXMITIGATES]->(t) OPTIONAL MATCH (d:UcoexMITRED3FEND)-[:UCOEXHASMITREATTACK]->(t)",
+      "use_cases": ["how to defend against phishing", "mitigations for credential dumping"]
+    },
+    {
+      "name": "CWE observed examples to CVE evidence",
+      "description": "Find real-world CVEs where a specific CWE was demonstrated.",
+      "cypher_pattern": "MATCH (w:UcoCWE)-[:UCOHASOBSERVEDEXAMPLE]->(oe:UcoexObservedExample)-[:UCOEXEXAMPLEOBSERVEDIN]->(c:UcoCVE)",
+      "use_cases": ["real CVEs for XSS weakness", "historical exploitation of CWE-89"]
+    }
+  ],
+
+  "embedding_corpus": [
+    "CVE hasCPE CPE — a CVE is linked to affected CPE platforms/products",
+    "Vulnerability hasCVE CVE — a Vulnerability record links to its CVE identifier node",
+    "ExploitTarget hasVulnerability Vulnerability — exploit target connects to vulnerability record",
+    "ExploitTarget hasWeakness Weakness — exploit target connects to the root cause CWE weakness",
+    "Weakness hasObservedExample ObservedExample — CWE weakness has real-world observed exploitation examples",
+    "ObservedExample exampleObservedIn CVE — observed example references the CVE where it occurred",
+    "Campaign attributedTo Group — a threat campaign is attributed to a threat actor group",
+    "Campaign campaignUsesTechnique Technique — campaign employs ATT&CK techniques",
+    "Campaign campaignUsesSoftware Software — campaign deploys malware or tools",
+    "Group groupUsesTechnique Technique — threat group employs ATT&CK techniques (TTP)",
+    "Group groupUsesSoftware Software — threat group uses malware or tools",
+    "Software softwareUsesTechnique Technique — malware or tool employs ATT&CK techniques",
+    "AttackPattern mapsToTechnique Technique — CAPEC attack pattern maps to ATT&CK technique",
+    "AttackPattern hasRelatedWeakness Weakness — CAPEC attack pattern exploits CWE weakness",
+    "Mitigation mitigates Technique — ATT&CK mitigation reduces risk of a technique",
+    "D3FENDControl d3fendCoversTechnique Technique — D3FEND control defends against ATT&CK technique",
+    "CVE node identified by label property (e.g. CVE-2021-44228)",
+    "CVE has baseSeverity (ucobaseSeverity): CRITICAL, HIGH, MEDIUM, LOW",
+    "CVE has exploitabilityScore (ucoexploitabilityScore): numeric string",
+    "CVE has impactScore (ucoimpactScore): numeric string",
+    "CVE has vectorString (ucovectorString): CVSS vector encoding",
+    "CVE has vulnStatus (ucovulnStatus): Analyzed, Modified, Awaiting Analysis",
+    "Vulnerability has publishedDate (ucopublishedDateTime): date vulnerability was disclosed",
+    "Vulnerability has lastModifiedDate (ucolastModifiedDateTime): date record last updated",
+    "Vulnerability has summary (ucosummary): free-text description of the vulnerability",
+    "Weakness identified by cweId (ucocweID) e.g. CWE-79",
+    "Weakness has cweName (ucocweName): human-readable weakness name",
+    "Weakness has likelihoodOfExploit (ucolikelihoodOfExploit): High, Medium, Low",
+    "Weakness has abstraction (ucoabstraction): Pillar, Class, Base, Variant",
+    "Weakness has description (ucodescription): detailed weakness description",
+    "Weakness has potentialMitigations (ucopotentialMitigations): mitigation recommendations from CWE",
+    "Campaign identified by name (ucoexNAME)",
+    "Campaign has description (ucoexDESCRIPTION)",
+    "Group identified by name (ucoexNAME) e.g. APT29, Lazarus Group",
+    "Group has description (ucoexDESCRIPTION)",
+    "Technique identified by name (ucoexNAME) e.g. Phishing",
+    "Technique has description (ucoexDESCRIPTION)",
+    "Software identified by name (ucoexNAME) e.g. Mimikatz, Emotet",
+    "Software has description (ucoexDESCRIPTION)",
+    "Mitigation identified by name (ucoexNAME) e.g. Multi-factor Authentication",
+    "AttackPattern identified by capecId (ucoexCAPEC_id) e.g. CAPEC-66",
+    "AttackPattern has capecName (ucoexCAPEC_name)",
+    "AttackPattern has severity (ucoexSeverity) and likelihood (ucoexLikelihood)",
+    "CPE identified by cpeName: CPE URI string e.g. cpe:/a:apache:log4j:2.14.1",
+    "CPE has titles: human-readable product name",
+    "D3FENDControl identified by label (ucoexMITRED3FEND_LABEL)",
+    "D3FENDControl has definition (ucoexMITRED3FEND_DEFINITION)",
+    "ObservedExample has description (ucoexDESCRIPTION): real-world exploitation description",
+    "DESC: CVE node (UcoCVE) — vulnerability identifier with CVSS severity scores (label=CVE-ID, ucobaseSeverity, ucoexploitabilityScore, ucoimpactScore, ucovulnStatus). Dates are on UcoVulnerability not UcoCVE.",
+    "DESC: Vulnerability node (UcoVulnerability) — carries dates (ucopublishedDateTime, ucolastModifiedDateTime) and summary. Connect via UCOHASCVE_ID to get CVE scoring.",
+    "DESC: Weakness node (UcoCWE) — CWE entry identified by ucocweID. Rich text fields: name, summary, description, detection, mitigations. Likelihood: ucolikelihoodOfExploit.",
+    "DESC: ExploitTarget (UcoExploitTarget) — pivot node with no properties except uri. Bridges CWE and Vulnerability: CWE←UCOHASWEAKNESS—ExploitTarget—UCOHASVULNERABILITY→Vulnerability.",
+    "DESC: Campaign (UcoexCAMPAIGNS) — named ATT&CK campaign. Name=ucoexNAME. Links to Group (UCOEXATTRIBUTEDTO), Technique (UCOEXCAMPAIGNUSESTECHNIQUE), Software (UCOEXCAMPAIGNUSESSOFTWARE).",
+    "DESC: Group (UcoexGROUPS) — threat actor group. Name=ucoexNAME. Links to Technique (UCOEXGROUPUSESTECHNIQUE) and Software (UCOEXGROUPUSESSOFTWARE).",
+    "DESC: Technique (UcoexMITREATTACK) — ATT&CK technique/sub-technique. Name=ucoexNAME. Central hub connected to Groups, Campaigns, Software, Mitigations, D3FEND controls, and CAPEC patterns.",
+    "DESC: Software (UcoexSOFTWARE) — malware or tool. Name=ucoexNAME. Links to Technique (UCOEXSOFTWAREUSESTECHNIQUE). Used by Groups and Campaigns.",
+    "DESC: Mitigation (UcoexMITIGATIONS) — ATT&CK mitigation. Name=ucoexNAME. Links to Technique via UCOEXMITIGATES.",
+    "DESC: AttackPattern (UcoexCAPEC) — CAPEC entry. ID=ucoexCAPEC_id. Links to Weakness (UCOEXHASRELATEDWEAKNESS) and Technique (UCOEXHASTAXONOMYMAPPING).",
+    "DESC: D3FENDControl (UcoexMITRED3FEND) — D3FEND defensive technique. Label=ucoexMITRED3FEND_LABEL. Links to Technique (UCOEXHASMITREATTACK).",
+    "DESC: ObservedExample (UcoexObservedExample) — real-world exploitation example. Linked from CWE via UCOHASOBSERVEDEXAMPLE. Links to CVE via UCOEXEXAMPLEOBSERVEDIN.",
+    "DESC: CPE (UcoexCPE) — affected platform/product. Name=cpeName (CPE URI). Linked from CVE via UCOEXHASCPE.",
+    "PATH: CWE to CVE requires chain UcoCWE←UCOHASWEAKNESS-UcoExploitTarget-UCOHASVULNERABILITY→UcoVulnerability-UCOHASCVE_ID→UcoCVE",
+    "PATH: CVE to CWE reverse: UcoCVE←UCOHASCVE_ID-UcoVulnerability←UCOHASVULNERABILITY-UcoExploitTarget-UCOHASWEAKNESS→UcoCWE",
+    "PATH: CWE to ATT&CK via CAPEC: UcoCWE←UCOEXHASRELATEDWEAKNESS-UcoexCAPEC-UCOEXHASTAXONOMYMAPPING→UcoexMITREATTACK",
+    "PATH: Group full profile: Group-UCOEXGROUPUSESTECHNIQUE→Technique, Group-UCOEXGROUPUSESSOFTWARE→Software, Campaign-UCOEXATTRIBUTEDTO→Group",
+    "PATH: Technique defense: Mitigation-UCOEXMITIGATES→Technique, D3FENDControl-UCOEXHASMITREATTACK→Technique"
+  ]
+}
