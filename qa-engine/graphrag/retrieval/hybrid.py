@@ -9,6 +9,7 @@ import logging
 
 from .bm25 import BM25Retriever
 from .vector import GraphRetriever
+from .classifier import QueryClassifier, QueryType
 
 logger = logging.getLogger(__name__)
 
@@ -36,6 +37,11 @@ class HybridRetriever:
         self.driver = driver
         self.config = config
         self.vector_retriever = vector_retriever
+        self.classifier = QueryClassifier(
+            enable_llm=config.enable_llm_classification,
+            llm_model=config.classifier_llm_model,
+        )
+        self._last_query_type: Optional[QueryType] = None
 
         # Initialize BM25 retriever
         try:
@@ -91,9 +97,21 @@ class HybridRetriever:
 
         logger.info("Parallel search completed: BM25=%d, Vector=%d results", len(bm25_results), len(vector_results))
 
-        # Step 2: Merge using Reciprocal Rank Fusion
+        # Step 2: Merge using Reciprocal Rank Fusion with adaptive weights
         logger.info("Step 2/2: Merging BM25 and Vector results with RRF...")
-        merged_results = self._merge_results_rrf(bm25_results, vector_results)
+        depth = hop_depth if hop_depth is not None else 0
+        qt, bm25_w, vector_w = self.classifier.get_weights(
+            query, depth,
+            self.config.bm25_weight, self.config.vector_weight,
+        )
+        self._last_query_type = qt
+        logger.info(
+            "[HybridRetriever] query_type=%s hop=%d bm25_w=%.2f vector_w=%.2f",
+            qt.value, depth, bm25_w, vector_w,
+        )
+        merged_results = self._merge_results_rrf(
+            bm25_results, vector_results, bm25_weight=bm25_w, vector_weight=vector_w,
+        )
 
         final_results = merged_results[:top_k]
         logger.info("Returning %d results after hybrid merge", len(final_results))
@@ -148,18 +166,25 @@ class HybridRetriever:
         self,
         bm25_results: List[Dict],
         vector_results: List[Dict],
-        k: int = 60
+        k: int = 60,
+        bm25_weight: float = 0.5,
+        vector_weight: float = 0.5,
     ) -> List[Dict]:
         """
         Merge using Reciprocal Rank Fusion — rank-based, no normalization needed.
 
-        RRF score = sum(1 / (k + rank + 1)) across lists where the node appears.
-        This avoids the pitfalls of min-max normalization on different score distributions.
+        Weighted RRF score = bm25_weight * 1/(k+rank+1)  [BM25 list]
+                           + vector_weight * 1/(k+rank+1) [Vector list]
+
+        When bm25_weight == vector_weight == 0.5, this is mathematically equivalent
+        to the original equal-weight RRF formula.
 
         Args:
             bm25_results: Results from BM25 search (ordered by BM25 score)
             vector_results: Results from Vector search (ordered by vector score)
             k: RRF constant (default 60, standard value from the original paper)
+            bm25_weight: Multiplicative weight applied to BM25 rank contributions
+            vector_weight: Multiplicative weight applied to Vector rank contributions
 
         Returns:
             Merged list of results sorted by RRF score
@@ -171,14 +196,14 @@ class HybridRetriever:
             node_id = result.get('metadata', {}).get('primarySource', {}).get('nodeId')
             if node_id is None:
                 continue
-            rrf_scores[node_id] = rrf_scores.get(node_id, 0) + 1.0 / (k + rank + 1)
+            rrf_scores[node_id] = rrf_scores.get(node_id, 0) + bm25_weight * (1.0 / (k + rank + 1))
             node_data[node_id] = result
 
         for rank, result in enumerate(vector_results):
             node_id = result.get('metadata', {}).get('primarySource', {}).get('nodeId')
             if node_id is None:
                 continue
-            rrf_scores[node_id] = rrf_scores.get(node_id, 0) + 1.0 / (k + rank + 1)
+            rrf_scores[node_id] = rrf_scores.get(node_id, 0) + vector_weight * (1.0 / (k + rank + 1))
             if node_id not in node_data:
                 node_data[node_id] = result
             else:
@@ -214,7 +239,14 @@ class HybridRetriever:
 
         logger.info("[LateExpand] flat BM25=%d, Vector=%d", len(bm25_results), len(vector_results))
 
-        seeds = self._merge_results_rrf(bm25_results, vector_results)[:top_k]
+        # Late expand always uses flat hop=0 seeds; classify for adaptive weights
+        qt, bm25_w, vector_w = self.classifier.get_weights(
+            query, 0, self.config.bm25_weight, self.config.vector_weight,
+        )
+        self._last_query_type = qt
+        seeds = self._merge_results_rrf(
+            bm25_results, vector_results, bm25_weight=bm25_w, vector_weight=vector_w,
+        )[:top_k]
 
         # Compute query embedding once (needed for DSA-BFS inside expand_by_ids)
         query_embedding = None

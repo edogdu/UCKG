@@ -18,3 +18,8 @@ ollama>=0.1.2
 
 # Semantic similarity for relevance validation
 sentence_transformers
+
+# Multi-Agent pipeline (LangGraph orchestration + fuzzy matching)
+langgraph>=0.2.0
+langchain-core>=0.3.0
+rapidfuzz>=3.0.0

@@ -74,6 +74,10 @@ class GraphRAGConfig:
     enable_hyde: bool = False  # Opt-in, adds ~200-500ms latency per query
     hyde_llm_model: str = "llama3:8b"  # Model for generating hypothetical documents
 
+    # LLM-backed query classification (called only when heuristic returns MIXED)
+    enable_llm_classification: bool = False
+    classifier_llm_model: str = "llama3:8b"
+
     # Personalized PageRank (PPR) neighbor selection
     enable_ppr: bool = False                   # Replace BFS with PPR (opt-in)
     ppr_damping: float = 0.85                  # Teleport probability = 1 - damping
