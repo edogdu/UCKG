@@ -147,8 +147,10 @@ nav a.active {
 /*This is hidden by default*/
 .dropdown {
    display: none;
-   position: fixed;
-   top: 64px;
+   position: absolute;
+   border-radius: 0 var(--radius-m) var(--radius-m) 0;
+   transform: translateY(-1px);
+   top: 100%;
    left: 0px;
    background: linear-gradient(135deg, var(--color-primary-1) 0%, #013a73 100%);
    width: 200px;
@@ -759,11 +761,15 @@ nav a.active {
 
    .left-panel {
       position: fixed;
-      z-index: 600;
+      overflow-y: auto;
+      z-index: 700;
    }
+
+
 
    .label-btn {
       padding: 0.75rem;
+      z-index: 600;
    }
 
 }
@@ -809,7 +815,19 @@ nav a.active {
          right: 0;
          left: 0;
          bottom: 0;
+         touch-action: manipulation;
       }
+   
+      .graph {
+         position: relative;
+         width: 100%;
+         height: 100%;
+
+         overflow: hidden;              
+         touch-action: pan-x pan-y;
+         overscroll-behavior: contain;            
+      }
+   
 }
 
 .graph .props:hover {
@@ -991,9 +1009,9 @@ nav a.active {
    display: none;
    position: fixed;
    bottom: 20px;                   
-   right: 20px;                     
-   width: 60px;                  
-   height: 60px;
+   right: 10px;                     
+   width: 50px;                  
+   height: 50px;
    border-radius: 50%; 
    background: linear-gradient(180deg, var(--color-primary-1) 0%, #01193a 100%);
    color: white;
@@ -1003,7 +1021,7 @@ nav a.active {
 }
 
 .chat-pull-up-menu.open {
-   transform: translateY(calc(-46vh + 1px));
+   transform: translateY(calc(-46vh + 13px));
 }
 
 .chat-pull-up-button{
@@ -1015,12 +1033,13 @@ nav a.active {
    padding: 0;
    font-size: 28px;          
    cursor: pointer; 
+   color: White;
 }
 
 .chat-pull-up-chat{
-   flex: block;
+   flex: 1 1 auto; 
    overflow-y: auto;
-   display: flex;
+   display: none;
    flex-direction: column;
    gap: 0.75rem;
    position: fixed;
@@ -1030,10 +1049,14 @@ nav a.active {
    height: 45vh;
    z-index: 1000;
    transition: transform 0.3s ease;
+
+   background: linear-gradient(135deg, var(--color-primary-1) 0%, #013a73 100%);
+   border-top: 10px solid #01193a;
 }
 
 .chat-pull-up-chat.open {
   transform: translateY(0);
+  display: flex;
 }
 
 
@@ -1047,6 +1070,7 @@ nav a.active {
       display: flex;
       flex-direction: column;
       height: 100%;
+      width: 100%;
    }
 
    .chat-pull-up-chat.open .Chat-bot .Chat-bot-content {
@@ -1434,79 +1458,37 @@ nav a.active {
 /*=====Panel header for compressed design========*/
 
 /*side panel for the Q&A page*/
-.side-panel {
+
+.mode-container {
    position: absolute;
-   background: linear-gradient(180deg, var(--color-primary-1) 0%, #01193a 100%);
-   color: white;
-   display: flex;
-   flex-direction: row-reverse;
-   transition: var(--transition-smooth);
-   border-right: 1px solid rgba(255, 255, 255, 0.1);
-   min-width: 0;
-   box-shadow: 4px 0 12px var(--color-shadow);
-   z-index: 1002;
-}
-
-.side-panel.open {
-   width: 240px;
-   flex-direction: row-reverse;
-}
-
-.side-panel.closed {
-   max-height: fit-content;
-   border-radius: 0 var(--radius-m) var(--radius-m) 0;
-}
-
-.side-panel-header {
+   top: 5.65rem;
+   left: auto;
+   z-index: 1000;
+   right: .75rem; 
    display: none;
-   justify-content: space-between;
-   align-items: center;
-   padding: 1.25rem;
-   border-bottom: 1px solid rgba(255, 255, 255, 0.12);
-   background-color: rgba(0, 0, 0, 0.15);
-   backdrop-filter: blur(10px);
-   width: 70px;
-   height: 60px;
+
 }
 
-.side-menu-toggle {
-   background: rgba(255, 255, 255, 0.1);
-   border: 1px solid rgba(255, 255, 255, 0.2);
+.mode-toggle-btn {
+   display: none;
+   left: auto;
+   right: 1.25rem;
+   background: linear-gradient(135deg, var(--color-primary-1) 0%, #013a73 100%);
    color: white;
-   font-size: 1.1rem;
-   cursor: pointer;
+   border: none;
+   border-radius: var(--radius-m);
    padding: 0.5rem 0.75rem;
-   border-radius: var(--radius-s);
+   font-size: 0.9rem;
+   font-weight: 600;
+   cursor: pointer;
    transition: var(--transition-base);
+   box-shadow: 0 4px 12px var(--color-shadow);
    display: flex;
    align-items: center;
-   justify-content: space-between;
-}
+   gap: 0.5rem;
+   font-family: var(--font-family-heading);
+   letter-spacing: 0.3px;
 
-.side-menu-toggle:hover {
-   background-color: rgba(255, 255, 255, 0.2);
-   transform: scale(1.05);
-}
-
-.side-menu-content {
-   flex: 1 1 auto;;
-   padding: 1rem;
-   overflow-y: auto;
-   display: flex;
-   flex-direction: column;
-   gap: 0.75rem;
-}
-
-.side-menu-content::before {
-   content: '';
-   position: absolute;
-   top: 0;
-   left: 0;
-   width: 4px;
-   height: 100%;
-   background: var(--color-primary-2);
-   transform: scaleY(0);
-   transition: var(--transition-base);
 }
 
 .Chat-button {
@@ -1553,20 +1535,17 @@ nav a.active {
 
 
 @media screen and (max-width: 600px) {
+
+   .mode-container {
+      display: flex;
+   }
+   
+   .mode-toggle-btn {
+      display: flex;
+   }
+
    .panel-header {
       display: none;
-   }
-
-   .side-panel {
-      display: flex;
-   }
-
-   .side-panel-header {
-      display: flex;
-   }
-
-   .side-label-buttons {
-      display: flex;
    }
 
 }
@@ -1578,9 +1557,9 @@ nav a.active {
    display: none;
    position: fixed;
    bottom: 20px;                   
-   right: 20px;                     
-   width: 60px;                  
-   height: 60px;
+   right: 10px;                     
+   width: 50px;                  
+   height: 50px;
    border-radius: 50%; 
    background: linear-gradient(180deg, var(--color-primary-1) 0%, #01193a 100%);
    color: white;
@@ -1591,7 +1570,7 @@ nav a.active {
 }
 
 .pull-up-menu.open {
-   transform: translateY(calc(-75vh + 1px));
+   transform: translateY(calc(-75vh + 13px));
 }
 
 .pull-up-button{
@@ -1602,7 +1581,8 @@ nav a.active {
    background: transparent; 
    padding: 0;
    font-size: 28px;          
-   cursor: pointer; 
+   cursor: pointer;
+   color: White;
 }
 
 .pull-up-chat{
@@ -1619,6 +1599,9 @@ nav a.active {
    z-index: 1000;
 
    transform: translateY(100%); /* hidden off-screen */
+
+   background: linear-gradient(135deg, var(--color-primary-1) 0%, #013a73 100%);
+   border-top: 10px solid #01193a;
 }
 
 .pull-up-chat.open {

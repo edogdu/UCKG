@@ -731,7 +731,7 @@ export default function Nvl({ initialNodes = [], initialRels = [], minimal = fal
       {/*Pull up menu for chat*/}
           <div className={`chat-pull-up-menu ${isChatOpen ? 'open' : ''}`}>
               <button className='chat-pull-up-button' onClick={toggleChat}>
-                  💬
+                  {isChatOpen ? '✕' : '💬'}
               </button>
           </div>
           

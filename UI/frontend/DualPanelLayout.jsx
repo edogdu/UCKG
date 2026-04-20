@@ -157,6 +157,10 @@ export default function DualPanelLayout() {
     setisChatOpen(prev => !prev);
   };
 
+  const toggleTab = () => {
+  handleTabChange(activeTab === 'chat' ? 'dual' : 'chat');
+  };
+
   return (
     <div className="dual-panel-layout">
       {/* Panel Header */}
@@ -217,39 +221,25 @@ export default function DualPanelLayout() {
       </div>
 
       {/*side panel for smaller screens*/}
-      <div className="side-panel">
-        <div className='side-panel-header'>
-          <button className='side-menu-toggle'
-          onClick={toggleMenu}
-          >
-            {menuOpen ? '◀' : '▶'}
-          </button>
-        </div>
-          {menuOpen && (
-          <div className="side-menu-content" id='side'>
-            <button
-            className={`Chat-button ${activeTab === 'chat' ? 'active' : ''}`}
-            onClick={() => handleTabChange('chat')}
-            title="Chat only view"
-            >
-            Q&A Chat
-            </button>
+      <div className='mode-container'>
+      <button
+      className={`mode-toggle-btn ${activeTab}`}
+      onClick={toggleTab}
+      title={
+      activeTab === 'chat'
+      ? 'Switch to Interactive Mode'
+      : 'Switch to Chat Mode'
+      }
+      >
+      {activeTab === 'chat' ? 'Interactive Mode' : 'Q&A Chat'}
 
-            <button
-            className={`Interactive-button ${activeTab === 'dual' ? 'active' : ''}`}
-            onClick={() => handleTabChange('dual')}
-            title="Interactive chat + graph view"
-            >
-            Interactive Mode
-            {graphData.nodes.length > 0 && (
-              <span className="node-count-badge">
-                {graphData.nodes.length}
-              </span>
+        {activeTab === 'dual' && graphData.nodes.length > 0 && (
+          <span className="node-count-badge">
+            {graphData.nodes.length}
+            </span>
             )}
-            </button>
-          </div>
-          )}
-       </div>
+      </button>
+      </div>
     
 
       {/* Graph notification overlay */}
@@ -348,7 +338,7 @@ export default function DualPanelLayout() {
           <>
           <div className={`pull-up-menu ${isChatOpen ? 'open' : ''}`}>
             <button className='pull-up-button' onClick={toggleChat}>
-              💬
+              {isChatOpen ? '✕' : '💬'}
             </button>
           </div>
 

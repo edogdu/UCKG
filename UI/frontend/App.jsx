@@ -32,6 +32,8 @@ export default function App() {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/qna" element={<DualPanelLayout />} />
+        <Route path="/chat/qna" element={<DualPanelLayout />} />
+        <Route path="/chat/interactive" element={<DualPanelLayout />} />
         <Route path="/graph" element={<Nvl />} />
       </Routes>
     </Router>
