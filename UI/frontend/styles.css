@@ -203,12 +203,12 @@ nav a.active {
       display: block;
    }
 
-   nav .dropdown {
-      display: block;
-   }
-
    nav .dropdown a {
       display: flex;
+   }
+
+   .dropdown.active {
+   display: block;
    }
 
 
@@ -810,25 +810,22 @@ nav a.active {
 }
 
 @media screen and (max-width: 600px) {
-   .graph .props{
-         top: auto;
-         right: 0;
-         left: 0;
-         bottom: 0;
-         touch-action: manipulation;
-      }
-   
-      .graph {
-         position: relative;
-         width: 100%;
-         height: 100%;
+   .graph .props {
+      position: fixed;
+      bottom: 0;
+      right: 0;
+      left: 0;
+      top: auto;
+   }
 
-         overflow: hidden;              
-         touch-action: pan-x pan-y;
-         overscroll-behavior: contain;            
-      }
-   
+   .graph {
+     flex: 1;
+      position: relative;
+      overflow: hidden;
+      background-color: #fafbfc;
+   }
 }
+
 
 .graph .props:hover {
    box-shadow: 0 12px 48px rgba(0, 0, 0, 0.12), 0 4px 12px rgba(0, 0, 0, 0.06);
