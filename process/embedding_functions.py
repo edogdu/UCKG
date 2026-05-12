@@ -109,19 +109,20 @@ class UCKGEmbedder:
     def _extract_node_text(self, node_type: str, node_props: dict) -> str:
         """Extract text for embedding based on node type and selected properties"""
         
-        # Property selection map based on analysis
+        # Property selection map based on analysis.
+        # Labels follow the dual-label STIX-aligned schema (ucoex node labels).
         property_map = {
             'UcoCWE': ['ucocweSummary', 'ucocweExtendedSummary', 'ucocweName'],
             'UcoCVE': ['label', 'ucobaseSeverity'],
             'UcoVulnerability': ['ucosummary'],
             'UcoexCAPEC': ['label', 'ucoexDescription'],
-            'UcoexSOFTWARE': ['ucoexDESCRIPTION', 'ucoexDOMAIN'],
-            'UcoexGROUPS': ['ucoexDESCRIPTION', 'ucoexDOMAIN'],
-            'UcoexCAMPAIGNS': ['ucoexDESCRIPTION', 'ucoexDOMAIN'],
-            'UcoexMITIGATIONS': ['ucoexDESCRIPTION', 'ucoexDOMAIN', 'ucoexNAME'],
-            'UcoexMITREATTACK': ['ucoexDESCRIPTION', 'ucoexDOMAIN', 'ucoexNAME'],
+            'UcoexSoftware': ['ucoexDESCRIPTION', 'ucoexDOMAIN', 'ucoexNAME'],
+            'UcoexGroup': ['ucoexDESCRIPTION', 'ucoexDOMAIN', 'ucoexNAME'],
+            'UcoexCampaign': ['ucoexDESCRIPTION', 'ucoexDOMAIN', 'ucoexNAME'],
+            'UcoexMitigation': ['ucoexDESCRIPTION', 'ucoexDOMAIN', 'ucoexNAME'],
+            'UcoexTechnique': ['ucoexDESCRIPTION', 'ucoexDOMAIN', 'ucoexNAME'],
+            'UcoexTactic': ['ucoexDESCRIPTION', 'ucoexDOMAIN', 'ucoexNAME'],
             'UcoexObservedExample': ['ucoexDESCRIPTION'],
-            'UcoexTACTICS': ['ucoexDESCRIPTION', 'ucoexDOMAIN'],
             'UcoexMITRED3FEND': ['ucoexMITRED3FEND_DEFINITION', 'ucoexMITRED3FEND_LABEL'],
             'UcoexCPE': ['cpeName', 'titles'],
         }
@@ -205,10 +206,10 @@ class UCKGEmbedder:
         
         # Node types ordered by count (largest first)
         node_types = [
-            'UcoCVE', 'UcoVulnerability', 'UcoexCPE', 'UcoexObservedExample', 
-            'UcoCWE', 'UcoexMITREATTACK', 'UcoexSOFTWARE', 'UcoexCAPEC',
-            'UcoexMITRED3FEND', 'UcoexGROUPS', 'UcoexMITIGATIONS', 
-            'UcoexCAMPAIGNS', 'UcoexTACTICS'
+            'UcoCVE', 'UcoVulnerability', 'UcoexCPE', 'UcoexObservedExample',
+            'UcoCWE', 'UcoexTechnique', 'UcoexSoftware', 'UcoexCAPEC',
+            'UcoexMITRED3FEND', 'UcoexGroup', 'UcoexMitigation',
+            'UcoexCampaign', 'UcoexTactic'
         ]
         
         total_processed = 0

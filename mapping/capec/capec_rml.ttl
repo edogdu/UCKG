@@ -16,181 +16,185 @@
 @prefix ucoex: <http://example.com/ucoex#> .
 @base <http://purl.org/cyber/uco#> .
 
-# CAPEC Class mapping
+
+# =============================================================================
+# CAPEC ENTITY MAP
+# Source: cti/capec/2.1/stix-capec.json (STIX 2.1 bundle)
+# Iterates over attack-pattern objects which represent CAPEC entries.
+# =============================================================================
+
 <#CAPECMap> a rr:TriplesMap;
     rml:logicalSource [
-        rml:source "./data/capec/capec.json";
+        rml:source "./data/cti/stix-capec.json";
         rml:referenceFormulation ql:JSONPath;
-        rml:iterator "$[*]"
+        rml:iterator "$.objects[?(@.type=='attack-pattern')]"
     ];
+    rr:subjectMap [
+        rr:template "http://example.com/ucoex#{external_references[0].external_id}";
+        rr:class <http://purl.org/cyber/ucoAttackPattern>;
+        rr:class <http://example.com/ucoexCAPEC>
+    ];
+
+    # Label: "CAPEC-1: Name"
     rr:predicateObjectMap [
         rr:predicate rdfs:label ;
         rr:objectMap [
-            rr:template "CAPEC-{ID}: {Name}" ; # Label Node
+            rr:template "{external_references[0].external_id}: {name}" ;
             rr:datatype xsd:string
         ]
     ];
-    # Define Mapping Relationship to CWE
+
+    # CAPEC ID (e.g. "CAPEC-1")
     rr:predicateObjectMap [
-        rr:predicate <http://example.com/ucoexhasRelatedWeakness>;
+        rr:predicate <http://example.com/ucoexCAPEC_id>;
+        rr:objectMap [ rml:reference "external_references[0].external_id"; rr:datatype xsd:string ]
+    ];
+
+    # Name
+    rr:predicateObjectMap [
+        rr:predicate <http://example.com/ucoexCAPEC_name>;
+        rr:objectMap [ rml:reference "name"; rr:datatype xsd:string ]
+    ];
+
+    # Abstraction level (Standard, Detailed, Meta)
+    rr:predicateObjectMap [
+        rr:predicate <http://example.com/ucoexAbstraction>;
+        rr:objectMap [ rml:reference "x_capec_abstraction"; rr:datatype xsd:string ]
+    ];
+
+    # Likelihood of attack
+    rr:predicateObjectMap [
+        rr:predicate <http://example.com/ucoexLikelihood>;
+        rr:objectMap [ rml:reference "x_capec_likelihood_of_attack"; rr:datatype xsd:string ]
+    ];
+
+    # Typical severity
+    rr:predicateObjectMap [
+        rr:predicate <http://example.com/ucoexSeverity>;
+        rr:objectMap [ rml:reference "x_capec_typical_severity"; rr:datatype xsd:string ]
+    ];
+
+    # Description
+    rr:predicateObjectMap [
+        rr:predicate <http://example.com/ucoexDescription>;
+        rr:objectMap [ rml:reference "description"; rr:datatype xsd:string ]
+    ];
+
+    # Execution flow (HTML from STIX)
+    rr:predicateObjectMap [
+        rr:predicate <http://example.com/ucoexExecutionFlowTechnique>;
+        rr:objectMap [ rml:reference "x_capec_execution_flow"; rr:datatype xsd:string ]
+    ];
+
+    # Prerequisites (array)
+    rr:predicateObjectMap [
+        rr:predicate <http://example.com/ucoexPrerequisites>;
+        rr:objectMap [ rml:reference "x_capec_prerequisites[*]"; rr:datatype xsd:string ]
+    ];
+
+    # Resources required (array)
+    rr:predicateObjectMap [
+        rr:predicate <http://example.com/ucoexResources_Required>;
+        rr:objectMap [ rml:reference "x_capec_resources_required[*]"; rr:datatype xsd:string ]
+    ];
+
+    # Example instances (array)
+    rr:predicateObjectMap [
+        rr:predicate <http://example.com/ucoexExample>;
+        rr:objectMap [ rml:reference "x_capec_example_instances[*]"; rr:datatype xsd:string ]
+    ];
+
+    # Status
+    rr:predicateObjectMap [
+        rr:predicate <http://example.com/ucoexStatus>;
+        rr:objectMap [ rml:reference "x_capec_status"; rr:datatype xsd:string ]
+    ];
+
+    # STIX ID (for reference)
+    rr:predicateObjectMap [
+        rr:predicate <http://example.com/ucoexSTIX_ID>;
+        rr:objectMap [ rml:reference "id"; rr:datatype xsd:string ]
+    ];
+
+    # Created / Modified timestamps
+    rr:predicateObjectMap [
+        rr:predicate <http://example.com/ucoexCREATED>;
+        rr:objectMap [ rml:reference "created"; rr:datatype xsd:string ]
+    ];
+    rr:predicateObjectMap [
+        rr:predicate <http://example.com/ucoexMODIFIED>;
+        rr:objectMap [ rml:reference "modified"; rr:datatype xsd:string ]
+    ];
+
+    # --- Cross-references extracted from external_references ---
+
+    # Related Weaknesses (CWE links)
+    # external_references where source_name=="cwe" → external_id gives "CWE-276" etc.
+    rr:predicateObjectMap [
+        rr:predicate <http://example.com/ucoexRelatedWeaknesses>;
         rr:objectMap [
-            rr:template "http://purl.org/cyber/uco#{.Related_Weaknesses[*]}";
+            rml:reference "external_references[?(@.source_name=='cwe')].external_id";
+            rr:datatype xsd:string
+        ]
+    ];
+
+    # Relationship link: CAPEC → CWE node
+    rr:predicateObjectMap [
+        rr:predicate <http://example.com/ucoex#hasRelatedWeakness>;
+        rr:objectMap [
+            rr:template "http://purl.org/cyber/uco#{external_references[?(@.source_name=='cwe')].external_id}";
             rr:class <http://purl.org/cyber/ucoCWE>
         ]
     ];
+
+    # Taxonomy Mappings to ATT&CK (MITRE IDs like "T1574.010")
     rr:predicateObjectMap [
-        rr:predicate <http://example.com/ucoexCAPEC_id>;  # Custom property name
+        rr:predicate <http://example.com/ucoexTaxonomyMappingATTACK>;
         rr:objectMap [
-                    rml:reference "ID";
-                    rr:datatype xsd:string  # Specifying that the datatype
-        ]
-    ];
-    rr:predicateObjectMap [
-        rr:predicate <http://example.com/ucoexCAPEC_name>; # Custom property name
-        rr:objectMap [
-                    rml:reference "Name";
-                    rr:datatype xsd:string  # Specifying that the datatype
-        ]
-    ];
-    rr:predicateObjectMap [
-        rr:predicate <http://example.com/ucoexAbstraction>;  # Custom property name
-        rr:objectMap [
-                    rml:reference "Abstraction";
-                    rr:datatype xsd:string  # Specifying that the datatype
-        ]
-    ];
-    rr:predicateObjectMap [
-        rr:predicate <http://example.com/ucoexLikelihood>;  # Custom property name
-        rr:objectMap [
-                    rml:reference "Likelihood_Of_Attack";
-                    rr:datatype xsd:string  # Specifying that the datatype
-        ]
-    ];
-    rr:predicateObjectMap [
-        rr:predicate <http://example.com/ucoexSeverity>;  # Custom property name
-        rr:objectMap [
-                    rml:reference "Typical_Severity";
-                    rr:datatype xsd:string  # Specifying that the datatype
-        ]
-    ];
-    rr:predicateObjectMap [
-        rr:predicate <http://example.com/ucoexDescription>;  # Custom property name
-        rr:objectMap [
-            rml:reference "Description";
-            rr:datatype xsd:string  # Specifying that the datatype
-        ]
-    ];
-    rr:predicateObjectMap [
-        rr:predicate <http://example.com/ucoexExtendedDescription>;  # Custom property name
-        rr:objectMap [
-            rml:reference "Extended_Description[*]";
-            rr:datatype xsd:string  # Specifying that the datatype
-        ]
-    ];
-    rr:predicateObjectMap [
-        rr:predicate <http://example.com/ucoexRelatedAttPattern>;  # Custom property name
-        rr:objectMap [
-            rml:reference "Related_Attack_Patterns[*]";
-            rr:datatype xsd:string  # Specifying that the datatype
-        ]
-    ];
-    rr:predicateObjectMap [
-        rr:predicate <http://example.com/ucoexExecutionFlowTechnique> ; # Custom property name
-        rr:objectMap [
-            rml:reference "Execution_Flow[*]" ;
+            rml:reference "external_references[?(@.source_name=='ATTACK')].external_id";
             rr:datatype xsd:string
         ]
-    ]; 
+    ];
+
+    # Relationship link: CAPEC → ATT&CK technique node
     rr:predicateObjectMap [
-        rr:predicate <http://example.com/ucoexPrerequisites>; # Custom property name
+        rr:predicate <http://example.com/ucoex#hasTaxonomyMapping>;
         rr:objectMap [
-            rml:reference "Prerequisites";
-            rr:datatype xsd:string  # Specifying that the datatype
+            rr:template "http://example.com/ucoex#{external_references[?(@.source_name=='ATTACK')].external_id}";
+            rr:class <http://example.com/ucoexTechnique>
         ]
-    ];
-    rr:predicateObjectMap [
-        rr:predicate <http://example.com/ucoexSkills_Required>; # Custom property name
-        rr:objectMap [
-            rml:reference "Skills_Required[*]";
-            rr:datatype xsd:string  # Specifying that the datatype
-        ]
-    ];
-    rr:predicateObjectMap [
-        rr:predicate <http://example.com/ucoexResources_Required>;  # Custom property name
-        rr:objectMap [
-            rml:reference "Resources_Required";
-            rr:datatype xsd:string  # Specifying that the datatype
-        ]
-    ];
-    rr:predicateObjectMap [
-        rr:predicate <http://example.com/ucoexMitigations>;  # Custom property name
-        rr:objectMap [
-            rml:reference "Mitigations";
-            rr:datatype xsd:string  # Specifying that the datatype
-        ]
-    ];
-    rr:predicateObjectMap [
-        rr:predicate <http://example.com/ucoexExample>;  # Custom property name
-        rr:objectMap [
-            rml:reference "Example_Instances";
-            rr:datatype xsd:string  # Specifying that the datatype
-        ]
-    ];
-    rr:predicateObjectMap [
-        rr:predicate <http://example.com/ucoexRelatedWeaknesses>;  # Custom property name
-        rr:objectMap [
-            rml:reference "Related_Weaknesses[*]";
-            rr:datatype xsd:string  # Specifying that the datatype
-        ]
-    ];
-    rr:predicateObjectMap [
-        rr:predicate <http://example.com/ucoexTaxonomyMappingATTACK>;  # Custom property name
-        rr:objectMap [
-            rml:reference "Taxonomy_Mappings[*]";  # This pulls each taxonomy mapping string
-            rr:datatype xsd:string
-            ]
-    ];
-    rr:predicateObjectMap [
-        rr:predicate <http://example.com/ucoexConsequences>;  # Custom property name
-        rr:objectMap [
-            rml:reference "Consequences[*]";  # This pulls each Consequences string
-            rr:datatype xsd:string
-            ]
-    ];
-    # Define Mapping Relationship to MITRE ATT&CK
-    rr:predicateObjectMap [
-        rr:predicate <http://example.com/ucoexhasTaxonomyMapping> ;
-        rr:objectMap [
-            rr:template "http://example.com/ucoex#{.Taxonomy_Mappings[*]}";
-            rr:class <http://example.com/ucoexMITREATTACK>
-        ]
-    ];
-    # Customize uri link of CAPEC note
-    rr:subjectMap [
-        rr:template "https://capec.mitre.org/data/definitions/{ID}.html";
-        rr:class <http://example.com/ucoexCAPEC>
     ].
 
-# Mapping between CAPEC to MITRE ATTACKMap
+
+# =============================================================================
+# ATT&CK stub map — ensures ATT&CK nodes referenced by CAPEC exist
+# Creates minimal ATT&CK nodes from CAPEC's external_references
+# =============================================================================
+
 <#ATTACKMap> a rr:TriplesMap;
     rml:logicalSource [
-        rml:source "./data/capec/capec.json";
+        rml:source "./data/cti/stix-capec.json";
         rml:referenceFormulation ql:JSONPath;
-        rml:iterator "$[*]"
+        rml:iterator "$.objects[?(@.type=='attack-pattern')]"
     ];
     rr:subjectMap [
-        rr:template "http://example.com/ucoex#{.Taxonomy_Mappings[*]}";
-        rr:class <http://example.com/ucoexMITREATTACK>
+        rr:template "http://example.com/ucoex#{external_references[?(@.source_name=='ATTACK')].external_id}";
+        rr:class <http://purl.org/cyber/ucoAttackPattern>;
+        rr:class <http://example.com/ucoexTechnique>
     ].
 
-# Mapping between CAPEC to CWEMap
+
+# =============================================================================
+# CWE stub map — ensures CWE nodes referenced by CAPEC exist
+# =============================================================================
+
 <#CWEMap> a rr:TriplesMap;
     rml:logicalSource [
-        rml:source "./data/capec/capec.json";
+        rml:source "./data/cti/stix-capec.json";
         rml:referenceFormulation ql:JSONPath;
-        rml:iterator "$[*]"
+        rml:iterator "$.objects[?(@.type=='attack-pattern')]"
     ];
     rr:subjectMap [
-        rr:template "http://purl.org/cyber/uco#{.Related_Weaknesses[*]}";
+        rr:template "http://purl.org/cyber/uco#{external_references[?(@.source_name=='cwe')].external_id}";
         rr:class <http://purl.org/cyber/ucoCWE>
     ].

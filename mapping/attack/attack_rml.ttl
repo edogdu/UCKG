@@ -17,238 +17,445 @@
 @base <http://purl.org/cyber/uco#> .
 
 
+# =============================================================================
+# ENTITY MAPS — ENTERPRISE DOMAIN
+# Source: cti/enterprise-attack/enterprise-attack.json
+# =============================================================================
 
 <#ATTACKMap> a rr:TriplesMap;
     rml:logicalSource [
-        rml:source "./data/attack/attack.json";
+        rml:source "./data/cti/enterprise-attack.json";
         rml:referenceFormulation ql:JSONPath;
-        rml:iterator "$[*]"
+        rml:iterator "$.objects[?(@.type=='attack-pattern' && @.x_mitre_deprecated!=true)]"
     ];
     rr:subjectMap [
-     rr:template "http://example.com/ucoex#{ID}";
-     rr:class <http://example.com/ucoexMITREATTACK>
-      ];
-    rr:predicateObjectMap [
-         rr:predicate <http://example.com/ucoexNAME>;
-         rr:objectMap [
-             rml:reference "name";
-             rr:datatype xsd:string
-         ]
+        rr:template "http://example.com/ucoex#{external_references[0].external_id}";
+        rr:class <http://purl.org/cyber/ucoAttackPattern>;
+        rr:class <http://example.com/ucoexTechnique>
     ];
-    rr:predicateObjectMap [
-         rr:predicate <http://example.com/ucoexDESCRIPTION>;
-         rr:objectMap [
-             rml:reference "description";
-             rr:datatype xsd:string
-         ]
-    ];
-    rr:predicateObjectMap [
-         rr:predicate <http://example.com/ucoexURL>;
-         rr:objectMap [
-             rml:reference "url";
-             rr:datatype xsd:string
-         ]
-    ];
-    rr:predicateObjectMap [
-         rr:predicate <http://example.com/ucoexDOMAIN>;
-         rr:objectMap [
-             rml:reference "domain";
-             rr:datatype xsd:string
-         ]
-    ].
+    rr:predicateObjectMap [ rr:predicate <http://example.com/ucoexNAME>; rr:objectMap [ rml:reference "name"; rr:datatype xsd:string ] ];
+    rr:predicateObjectMap [ rr:predicate <http://example.com/ucoexDESCRIPTION>; rr:objectMap [ rml:reference "description"; rr:datatype xsd:string ] ];
+    rr:predicateObjectMap [ rr:predicate <http://example.com/ucoexURL>; rr:objectMap [ rml:reference "external_references[0].url"; rr:datatype xsd:string ] ];
+    rr:predicateObjectMap [ rr:predicate <http://example.com/ucoexDOMAIN>; rr:objectMap [ rml:reference "x_mitre_domains[*]"; rr:datatype xsd:string ] ];
+    rr:predicateObjectMap [ rr:predicate <http://example.com/ucoexSTIX_ID>; rr:objectMap [ rml:reference "id"; rr:datatype xsd:string ] ];
+    rr:predicateObjectMap [ rr:predicate <http://example.com/ucoexCREATED>; rr:objectMap [ rml:reference "created"; rr:datatype xsd:string ] ];
+    rr:predicateObjectMap [ rr:predicate <http://example.com/ucoexMODIFIED>; rr:objectMap [ rml:reference "modified"; rr:datatype xsd:string ] ];
+    rr:predicateObjectMap [ rr:predicate <http://example.com/ucoexSTIX_TYPE>; rr:objectMap [ rml:reference "type"; rr:datatype xsd:string ] ].
 
 
 <#MITIGATIONSMap> a rr:TriplesMap;
-  rml:logicalSource [
-    rml:source             "./data/attack/mitigations.json";
-    rml:referenceFormulation ql:JSONPath;
-    rml:iterator           "$[*]"
-  ];
-  rr:subjectMap [
-    rr:template            "http://example.com/ucoex#{ID}";
-    rr:class               <http://example.com/ucoexMITIGATIONS>
-  ];
-  rr:predicateObjectMap [
-    rr:predicate           <http://example.com/ucoexNAME>;
-    rr:objectMap [ rml:reference "name"; rr:datatype xsd:string ]
-  ];
-  rr:predicateObjectMap [
-    rr:predicate           <http://example.com/ucoexDESCRIPTION>;
-    rr:objectMap [ rml:reference "description"; rr:datatype xsd:string ]
-  ];
-  rr:predicateObjectMap [
-    rr:predicate           <http://example.com/ucoexURL>;
-    rr:objectMap [ rml:reference "url"; rr:datatype xsd:string ]
-  ];
-  rr:predicateObjectMap [
-    rr:predicate           <http://example.com/ucoexDOMAIN>;
-    rr:objectMap [ rml:reference "domain"; rr:datatype xsd:string ]
-  ].
-
+    rml:logicalSource [
+        rml:source "./data/cti/enterprise-attack.json";
+        rml:referenceFormulation ql:JSONPath;
+        rml:iterator "$.objects[?(@.type=='course-of-action' && @.x_mitre_deprecated!=true)]"
+    ];
+    rr:subjectMap [
+        rr:template "http://example.com/ucoex#{external_references[0].external_id}";
+        rr:class <http://purl.org/cyber/ucoCourseofAction>;
+        rr:class <http://example.com/ucoexMitigation>
+    ];
+    rr:predicateObjectMap [ rr:predicate <http://example.com/ucoexNAME>; rr:objectMap [ rml:reference "name"; rr:datatype xsd:string ] ];
+    rr:predicateObjectMap [ rr:predicate <http://example.com/ucoexDESCRIPTION>; rr:objectMap [ rml:reference "description"; rr:datatype xsd:string ] ];
+    rr:predicateObjectMap [ rr:predicate <http://example.com/ucoexURL>; rr:objectMap [ rml:reference "external_references[0].url"; rr:datatype xsd:string ] ];
+    rr:predicateObjectMap [ rr:predicate <http://example.com/ucoexDOMAIN>; rr:objectMap [ rml:reference "x_mitre_domains[*]"; rr:datatype xsd:string ] ];
+    rr:predicateObjectMap [ rr:predicate <http://example.com/ucoexSTIX_ID>; rr:objectMap [ rml:reference "id"; rr:datatype xsd:string ] ];
+    rr:predicateObjectMap [ rr:predicate <http://example.com/ucoexCREATED>; rr:objectMap [ rml:reference "created"; rr:datatype xsd:string ] ];
+    rr:predicateObjectMap [ rr:predicate <http://example.com/ucoexMODIFIED>; rr:objectMap [ rml:reference "modified"; rr:datatype xsd:string ] ];
+    rr:predicateObjectMap [ rr:predicate <http://example.com/ucoexSTIX_TYPE>; rr:objectMap [ rml:reference "type"; rr:datatype xsd:string ] ].
 
 
 <#CAMPAIGNSMap> a rr:TriplesMap;
     rml:logicalSource [
-        rml:source "./data/attack/campaigns.json";
+        rml:source "./data/cti/enterprise-attack.json";
         rml:referenceFormulation ql:JSONPath;
-        rml:iterator "$[*]"
+        rml:iterator "$.objects[?(@.type=='campaign' && @.x_mitre_deprecated!=true)]"
     ];
     rr:subjectMap [
-     rr:template "http://example.com/ucoex#{ID}";
-     rr:class <http://example.com/ucoexCAMPAIGNS>
-      ];
-    rr:predicateObjectMap [
-         rr:predicate <http://example.com/ucoexNAME>;
-         rr:objectMap [
-             rml:reference "name";
-             rr:datatype xsd:string
-         ]
+        rr:template "http://example.com/ucoex#{external_references[0].external_id}";
+        rr:class <http://purl.org/cyber/ucoCampaign>;
+        rr:class <http://example.com/ucoexCampaign>
     ];
-    rr:predicateObjectMap [
-         rr:predicate <http://example.com/ucoexDESCRIPTION>;
-         rr:objectMap [
-             rml:reference "description";
-             rr:datatype xsd:string
-         ]
-    ];
-    rr:predicateObjectMap [
-         rr:predicate <http://example.com/ucoexURL>;
-         rr:objectMap [
-             rml:reference "url";
-             rr:datatype xsd:string
-         ]
-    ];
-    rr:predicateObjectMap [
-         rr:predicate <http://example.com/ucoexDOMAIN>;
-         rr:objectMap [
-             rml:reference "domain";
-             rr:datatype xsd:string
-         ]
-    ].
-
+    rr:predicateObjectMap [ rr:predicate <http://example.com/ucoexNAME>; rr:objectMap [ rml:reference "name"; rr:datatype xsd:string ] ];
+    rr:predicateObjectMap [ rr:predicate <http://example.com/ucoexDESCRIPTION>; rr:objectMap [ rml:reference "description"; rr:datatype xsd:string ] ];
+    rr:predicateObjectMap [ rr:predicate <http://example.com/ucoexURL>; rr:objectMap [ rml:reference "external_references[0].url"; rr:datatype xsd:string ] ];
+    rr:predicateObjectMap [ rr:predicate <http://example.com/ucoexDOMAIN>; rr:objectMap [ rml:reference "x_mitre_domains[*]"; rr:datatype xsd:string ] ];
+    rr:predicateObjectMap [ rr:predicate <http://example.com/ucoexSTIX_ID>; rr:objectMap [ rml:reference "id"; rr:datatype xsd:string ] ];
+    rr:predicateObjectMap [ rr:predicate <http://example.com/ucoexCREATED>; rr:objectMap [ rml:reference "created"; rr:datatype xsd:string ] ];
+    rr:predicateObjectMap [ rr:predicate <http://example.com/ucoexMODIFIED>; rr:objectMap [ rml:reference "modified"; rr:datatype xsd:string ] ];
+    rr:predicateObjectMap [ rr:predicate <http://example.com/ucoexSTIX_TYPE>; rr:objectMap [ rml:reference "type"; rr:datatype xsd:string ] ].
 
 
 <#GROUPSMap> a rr:TriplesMap;
     rml:logicalSource [
-        rml:source "./data/attack/groups.json";
+        rml:source "./data/cti/enterprise-attack.json";
         rml:referenceFormulation ql:JSONPath;
-        rml:iterator "$[*]"
+        rml:iterator "$.objects[?(@.type=='intrusion-set' && @.x_mitre_deprecated!=true)]"
     ];
     rr:subjectMap [
-     rr:template "http://example.com/ucoex#{ID}";
-     rr:class <http://example.com/ucoexGROUPS>
-      ];
-    rr:predicateObjectMap [
-         rr:predicate <http://example.com/ucoexNAME>;
-         rr:objectMap [
-             rml:reference "name";
-             rr:datatype xsd:string
-         ]
+        rr:template "http://example.com/ucoex#{external_references[0].external_id}";
+        rr:class <http://purl.org/cyber/ucoAttacker>;
+        rr:class <http://example.com/ucoexGroup>
     ];
-    rr:predicateObjectMap [
-         rr:predicate <http://example.com/ucoexDESCRIPTION>;
-         rr:objectMap [
-             rml:reference "description";
-             rr:datatype xsd:string
-         ]
-    ];
-    rr:predicateObjectMap [
-         rr:predicate <http://example.com/ucoexURL>;
-         rr:objectMap [
-             rml:reference "url";
-             rr:datatype xsd:string
-         ]
-    ];
-    rr:predicateObjectMap [
-         rr:predicate <http://example.com/ucoexDOMAIN>;
-         rr:objectMap [
-             rml:reference "domain";
-             rr:datatype xsd:string
-         ]
-    ].
+    rr:predicateObjectMap [ rr:predicate <http://example.com/ucoexNAME>; rr:objectMap [ rml:reference "name"; rr:datatype xsd:string ] ];
+    rr:predicateObjectMap [ rr:predicate <http://example.com/ucoexDESCRIPTION>; rr:objectMap [ rml:reference "description"; rr:datatype xsd:string ] ];
+    rr:predicateObjectMap [ rr:predicate <http://example.com/ucoexURL>; rr:objectMap [ rml:reference "external_references[0].url"; rr:datatype xsd:string ] ];
+    rr:predicateObjectMap [ rr:predicate <http://example.com/ucoexDOMAIN>; rr:objectMap [ rml:reference "x_mitre_domains[*]"; rr:datatype xsd:string ] ];
+    rr:predicateObjectMap [ rr:predicate <http://example.com/ucoexSTIX_ID>; rr:objectMap [ rml:reference "id"; rr:datatype xsd:string ] ];
+    rr:predicateObjectMap [ rr:predicate <http://example.com/ucoexCREATED>; rr:objectMap [ rml:reference "created"; rr:datatype xsd:string ] ];
+    rr:predicateObjectMap [ rr:predicate <http://example.com/ucoexMODIFIED>; rr:objectMap [ rml:reference "modified"; rr:datatype xsd:string ] ];
+    rr:predicateObjectMap [ rr:predicate <http://example.com/ucoexSTIX_TYPE>; rr:objectMap [ rml:reference "type"; rr:datatype xsd:string ] ].
 
 
-
-<#SOFTWAREMap> a rr:TriplesMap;
+<#MalwareMap> a rr:TriplesMap;
     rml:logicalSource [
-        rml:source "./data/attack/software.json";
+        rml:source "./data/cti/enterprise-attack.json";
         rml:referenceFormulation ql:JSONPath;
-        rml:iterator "$[*]"
+        rml:iterator "$.objects[?(@.type=='malware' && @.x_mitre_deprecated!=true)]"
     ];
     rr:subjectMap [
-     rr:template "http://example.com/ucoex#{ID}";
-     rr:class <http://example.com/ucoexSOFTWARE>
-      ];
-    rr:predicateObjectMap [
-         rr:predicate <http://example.com/ucoexNAME>;
-         rr:objectMap [
-             rml:reference "name";
-             rr:datatype xsd:string
-         ]
+        rr:template "http://example.com/ucoex#{external_references[0].external_id}";
+        rr:class <http://purl.org/cyber/ucoMalware>;
+        rr:class <http://example.com/ucoexSoftware>
     ];
-    rr:predicateObjectMap [
-         rr:predicate <http://example.com/ucoexDESCRIPTION>;
-         rr:objectMap [
-             rml:reference "description";
-             rr:datatype xsd:string
-         ]
+    rr:predicateObjectMap [ rr:predicate <http://example.com/ucoexNAME>; rr:objectMap [ rml:reference "name"; rr:datatype xsd:string ] ];
+    rr:predicateObjectMap [ rr:predicate <http://example.com/ucoexDESCRIPTION>; rr:objectMap [ rml:reference "description"; rr:datatype xsd:string ] ];
+    rr:predicateObjectMap [ rr:predicate <http://example.com/ucoexURL>; rr:objectMap [ rml:reference "external_references[0].url"; rr:datatype xsd:string ] ];
+    rr:predicateObjectMap [ rr:predicate <http://example.com/ucoexDOMAIN>; rr:objectMap [ rml:reference "x_mitre_domains[*]"; rr:datatype xsd:string ] ];
+    rr:predicateObjectMap [ rr:predicate <http://example.com/ucoexSTIX_ID>; rr:objectMap [ rml:reference "id"; rr:datatype xsd:string ] ];
+    rr:predicateObjectMap [ rr:predicate <http://example.com/ucoexCREATED>; rr:objectMap [ rml:reference "created"; rr:datatype xsd:string ] ];
+    rr:predicateObjectMap [ rr:predicate <http://example.com/ucoexMODIFIED>; rr:objectMap [ rml:reference "modified"; rr:datatype xsd:string ] ];
+    rr:predicateObjectMap [ rr:predicate <http://example.com/ucoexSTIX_TYPE>; rr:objectMap [ rml:reference "type"; rr:datatype xsd:string ] ].
+
+
+<#ToolMap> a rr:TriplesMap;
+    rml:logicalSource [
+        rml:source "./data/cti/enterprise-attack.json";
+        rml:referenceFormulation ql:JSONPath;
+        rml:iterator "$.objects[?(@.type=='tool' && @.x_mitre_deprecated!=true)]"
     ];
-    rr:predicateObjectMap [
-         rr:predicate <http://example.com/ucoexURL>;
-         rr:objectMap [
-             rml:reference "url";
-             rr:datatype xsd:string
-         ]
+    rr:subjectMap [
+        rr:template "http://example.com/ucoex#{external_references[0].external_id}";
+        rr:class <http://purl.org/cyber/ucoSoftware>;
+        rr:class <http://example.com/ucoexSoftware>
     ];
-    rr:predicateObjectMap [
-         rr:predicate <http://example.com/ucoexDOMAIN>;
-         rr:objectMap [
-             rml:reference "domain";
-             rr:datatype xsd:string
-         ]
-    ].
+    rr:predicateObjectMap [ rr:predicate <http://example.com/ucoexNAME>; rr:objectMap [ rml:reference "name"; rr:datatype xsd:string ] ];
+    rr:predicateObjectMap [ rr:predicate <http://example.com/ucoexDESCRIPTION>; rr:objectMap [ rml:reference "description"; rr:datatype xsd:string ] ];
+    rr:predicateObjectMap [ rr:predicate <http://example.com/ucoexURL>; rr:objectMap [ rml:reference "external_references[0].url"; rr:datatype xsd:string ] ];
+    rr:predicateObjectMap [ rr:predicate <http://example.com/ucoexDOMAIN>; rr:objectMap [ rml:reference "x_mitre_domains[*]"; rr:datatype xsd:string ] ];
+    rr:predicateObjectMap [ rr:predicate <http://example.com/ucoexSTIX_ID>; rr:objectMap [ rml:reference "id"; rr:datatype xsd:string ] ];
+    rr:predicateObjectMap [ rr:predicate <http://example.com/ucoexCREATED>; rr:objectMap [ rml:reference "created"; rr:datatype xsd:string ] ];
+    rr:predicateObjectMap [ rr:predicate <http://example.com/ucoexMODIFIED>; rr:objectMap [ rml:reference "modified"; rr:datatype xsd:string ] ];
+    rr:predicateObjectMap [ rr:predicate <http://example.com/ucoexSTIX_TYPE>; rr:objectMap [ rml:reference "type"; rr:datatype xsd:string ] ].
 
 
 <#TACTICSMap> a rr:TriplesMap;
     rml:logicalSource [
-        rml:source "./data/attack/tactics.json";
+        rml:source "./data/cti/enterprise-attack.json";
         rml:referenceFormulation ql:JSONPath;
-        rml:iterator "$[*]"
+        rml:iterator "$.objects[?(@.type=='x-mitre-tactic' && @.x_mitre_deprecated!=true)]"
     ];
     rr:subjectMap [
-     rr:template "http://example.com/ucoex#{ID}";
-     rr:class <http://example.com/ucoexTACTICS>
-      ];
-    rr:predicateObjectMap [
-         rr:predicate <http://example.com/ucoexNAME>;
-         rr:objectMap [
-             rml:reference "name";
-             rr:datatype xsd:string
-         ]
+        rr:template "http://example.com/ucoex#{external_references[0].external_id}";
+        rr:class <http://purl.org/cyber/ucoKillChainPhase>;
+        rr:class <http://example.com/ucoexTactic>
     ];
-    rr:predicateObjectMap [
-         rr:predicate <http://example.com/ucoexDESCRIPTION>;
-         rr:objectMap [
-             rml:reference "description";
-             rr:datatype xsd:string
-         ]
-    ];
-    rr:predicateObjectMap [
-         rr:predicate <http://example.com/ucoexURL>;
-         rr:objectMap [
-             rml:reference "url";
-             rr:datatype xsd:string
-         ]
-    ];
-    rr:predicateObjectMap [
-         rr:predicate <http://example.com/ucoexDOMAIN>;
-         rr:objectMap [
-             rml:reference "domain";
-             rr:datatype xsd:string
-         ]
-    ].
+    rr:predicateObjectMap [ rr:predicate <http://example.com/ucoexNAME>; rr:objectMap [ rml:reference "name"; rr:datatype xsd:string ] ];
+    rr:predicateObjectMap [ rr:predicate <http://example.com/ucoexDESCRIPTION>; rr:objectMap [ rml:reference "description"; rr:datatype xsd:string ] ];
+    rr:predicateObjectMap [ rr:predicate <http://example.com/ucoexURL>; rr:objectMap [ rml:reference "external_references[0].url"; rr:datatype xsd:string ] ];
+    rr:predicateObjectMap [ rr:predicate <http://example.com/ucoexDOMAIN>; rr:objectMap [ rml:reference "x_mitre_domains[*]"; rr:datatype xsd:string ] ];
+    rr:predicateObjectMap [ rr:predicate <http://example.com/ucoexSTIX_ID>; rr:objectMap [ rml:reference "id"; rr:datatype xsd:string ] ];
+    rr:predicateObjectMap [ rr:predicate <http://example.com/ucoexCREATED>; rr:objectMap [ rml:reference "created"; rr:datatype xsd:string ] ];
+    rr:predicateObjectMap [ rr:predicate <http://example.com/ucoexMODIFIED>; rr:objectMap [ rml:reference "modified"; rr:datatype xsd:string ] ];
+    rr:predicateObjectMap [ rr:predicate <http://example.com/ucoexSTIX_TYPE>; rr:objectMap [ rml:reference "type"; rr:datatype xsd:string ] ].
 
 
+# =============================================================================
+# ENTITY MAPS — MOBILE DOMAIN
+# Source: cti/mobile-attack/mobile-attack.json
+# =============================================================================
+
+<#ATTACKMap_Mobile> a rr:TriplesMap;
+    rml:logicalSource [
+        rml:source "./data/cti/mobile-attack.json";
+        rml:referenceFormulation ql:JSONPath;
+        rml:iterator "$.objects[?(@.type=='attack-pattern' && @.x_mitre_deprecated!=true)]"
+    ];
+    rr:subjectMap [
+        rr:template "http://example.com/ucoex#{external_references[0].external_id}";
+        rr:class <http://purl.org/cyber/ucoAttackPattern>;
+        rr:class <http://example.com/ucoexTechnique>
+    ];
+    rr:predicateObjectMap [ rr:predicate <http://example.com/ucoexNAME>; rr:objectMap [ rml:reference "name"; rr:datatype xsd:string ] ];
+    rr:predicateObjectMap [ rr:predicate <http://example.com/ucoexDESCRIPTION>; rr:objectMap [ rml:reference "description"; rr:datatype xsd:string ] ];
+    rr:predicateObjectMap [ rr:predicate <http://example.com/ucoexURL>; rr:objectMap [ rml:reference "external_references[0].url"; rr:datatype xsd:string ] ];
+    rr:predicateObjectMap [ rr:predicate <http://example.com/ucoexDOMAIN>; rr:objectMap [ rml:reference "x_mitre_domains[*]"; rr:datatype xsd:string ] ];
+    rr:predicateObjectMap [ rr:predicate <http://example.com/ucoexSTIX_ID>; rr:objectMap [ rml:reference "id"; rr:datatype xsd:string ] ];
+    rr:predicateObjectMap [ rr:predicate <http://example.com/ucoexCREATED>; rr:objectMap [ rml:reference "created"; rr:datatype xsd:string ] ];
+    rr:predicateObjectMap [ rr:predicate <http://example.com/ucoexMODIFIED>; rr:objectMap [ rml:reference "modified"; rr:datatype xsd:string ] ];
+    rr:predicateObjectMap [ rr:predicate <http://example.com/ucoexSTIX_TYPE>; rr:objectMap [ rml:reference "type"; rr:datatype xsd:string ] ].
+
+
+<#MITIGATIONSMap_Mobile> a rr:TriplesMap;
+    rml:logicalSource [
+        rml:source "./data/cti/mobile-attack.json";
+        rml:referenceFormulation ql:JSONPath;
+        rml:iterator "$.objects[?(@.type=='course-of-action' && @.x_mitre_deprecated!=true)]"
+    ];
+    rr:subjectMap [
+        rr:template "http://example.com/ucoex#{external_references[0].external_id}";
+        rr:class <http://purl.org/cyber/ucoCourseofAction>;
+        rr:class <http://example.com/ucoexMitigation>
+    ];
+    rr:predicateObjectMap [ rr:predicate <http://example.com/ucoexNAME>; rr:objectMap [ rml:reference "name"; rr:datatype xsd:string ] ];
+    rr:predicateObjectMap [ rr:predicate <http://example.com/ucoexDESCRIPTION>; rr:objectMap [ rml:reference "description"; rr:datatype xsd:string ] ];
+    rr:predicateObjectMap [ rr:predicate <http://example.com/ucoexURL>; rr:objectMap [ rml:reference "external_references[0].url"; rr:datatype xsd:string ] ];
+    rr:predicateObjectMap [ rr:predicate <http://example.com/ucoexDOMAIN>; rr:objectMap [ rml:reference "x_mitre_domains[*]"; rr:datatype xsd:string ] ];
+    rr:predicateObjectMap [ rr:predicate <http://example.com/ucoexSTIX_ID>; rr:objectMap [ rml:reference "id"; rr:datatype xsd:string ] ];
+    rr:predicateObjectMap [ rr:predicate <http://example.com/ucoexCREATED>; rr:objectMap [ rml:reference "created"; rr:datatype xsd:string ] ];
+    rr:predicateObjectMap [ rr:predicate <http://example.com/ucoexMODIFIED>; rr:objectMap [ rml:reference "modified"; rr:datatype xsd:string ] ];
+    rr:predicateObjectMap [ rr:predicate <http://example.com/ucoexSTIX_TYPE>; rr:objectMap [ rml:reference "type"; rr:datatype xsd:string ] ].
+
+
+<#CAMPAIGNSMap_Mobile> a rr:TriplesMap;
+    rml:logicalSource [
+        rml:source "./data/cti/mobile-attack.json";
+        rml:referenceFormulation ql:JSONPath;
+        rml:iterator "$.objects[?(@.type=='campaign' && @.x_mitre_deprecated!=true)]"
+    ];
+    rr:subjectMap [
+        rr:template "http://example.com/ucoex#{external_references[0].external_id}";
+        rr:class <http://purl.org/cyber/ucoCampaign>;
+        rr:class <http://example.com/ucoexCampaign>
+    ];
+    rr:predicateObjectMap [ rr:predicate <http://example.com/ucoexNAME>; rr:objectMap [ rml:reference "name"; rr:datatype xsd:string ] ];
+    rr:predicateObjectMap [ rr:predicate <http://example.com/ucoexDESCRIPTION>; rr:objectMap [ rml:reference "description"; rr:datatype xsd:string ] ];
+    rr:predicateObjectMap [ rr:predicate <http://example.com/ucoexURL>; rr:objectMap [ rml:reference "external_references[0].url"; rr:datatype xsd:string ] ];
+    rr:predicateObjectMap [ rr:predicate <http://example.com/ucoexDOMAIN>; rr:objectMap [ rml:reference "x_mitre_domains[*]"; rr:datatype xsd:string ] ];
+    rr:predicateObjectMap [ rr:predicate <http://example.com/ucoexSTIX_ID>; rr:objectMap [ rml:reference "id"; rr:datatype xsd:string ] ];
+    rr:predicateObjectMap [ rr:predicate <http://example.com/ucoexCREATED>; rr:objectMap [ rml:reference "created"; rr:datatype xsd:string ] ];
+    rr:predicateObjectMap [ rr:predicate <http://example.com/ucoexMODIFIED>; rr:objectMap [ rml:reference "modified"; rr:datatype xsd:string ] ];
+    rr:predicateObjectMap [ rr:predicate <http://example.com/ucoexSTIX_TYPE>; rr:objectMap [ rml:reference "type"; rr:datatype xsd:string ] ].
+
+
+<#GROUPSMap_Mobile> a rr:TriplesMap;
+    rml:logicalSource [
+        rml:source "./data/cti/mobile-attack.json";
+        rml:referenceFormulation ql:JSONPath;
+        rml:iterator "$.objects[?(@.type=='intrusion-set' && @.x_mitre_deprecated!=true)]"
+    ];
+    rr:subjectMap [
+        rr:template "http://example.com/ucoex#{external_references[0].external_id}";
+        rr:class <http://purl.org/cyber/ucoAttacker>;
+        rr:class <http://example.com/ucoexGroup>
+    ];
+    rr:predicateObjectMap [ rr:predicate <http://example.com/ucoexNAME>; rr:objectMap [ rml:reference "name"; rr:datatype xsd:string ] ];
+    rr:predicateObjectMap [ rr:predicate <http://example.com/ucoexDESCRIPTION>; rr:objectMap [ rml:reference "description"; rr:datatype xsd:string ] ];
+    rr:predicateObjectMap [ rr:predicate <http://example.com/ucoexURL>; rr:objectMap [ rml:reference "external_references[0].url"; rr:datatype xsd:string ] ];
+    rr:predicateObjectMap [ rr:predicate <http://example.com/ucoexDOMAIN>; rr:objectMap [ rml:reference "x_mitre_domains[*]"; rr:datatype xsd:string ] ];
+    rr:predicateObjectMap [ rr:predicate <http://example.com/ucoexSTIX_ID>; rr:objectMap [ rml:reference "id"; rr:datatype xsd:string ] ];
+    rr:predicateObjectMap [ rr:predicate <http://example.com/ucoexCREATED>; rr:objectMap [ rml:reference "created"; rr:datatype xsd:string ] ];
+    rr:predicateObjectMap [ rr:predicate <http://example.com/ucoexMODIFIED>; rr:objectMap [ rml:reference "modified"; rr:datatype xsd:string ] ];
+    rr:predicateObjectMap [ rr:predicate <http://example.com/ucoexSTIX_TYPE>; rr:objectMap [ rml:reference "type"; rr:datatype xsd:string ] ].
+
+
+<#MalwareMap_Mobile> a rr:TriplesMap;
+    rml:logicalSource [
+        rml:source "./data/cti/mobile-attack.json";
+        rml:referenceFormulation ql:JSONPath;
+        rml:iterator "$.objects[?(@.type=='malware' && @.x_mitre_deprecated!=true)]"
+    ];
+    rr:subjectMap [
+        rr:template "http://example.com/ucoex#{external_references[0].external_id}";
+        rr:class <http://purl.org/cyber/ucoMalware>;
+        rr:class <http://example.com/ucoexSoftware>
+    ];
+    rr:predicateObjectMap [ rr:predicate <http://example.com/ucoexNAME>; rr:objectMap [ rml:reference "name"; rr:datatype xsd:string ] ];
+    rr:predicateObjectMap [ rr:predicate <http://example.com/ucoexDESCRIPTION>; rr:objectMap [ rml:reference "description"; rr:datatype xsd:string ] ];
+    rr:predicateObjectMap [ rr:predicate <http://example.com/ucoexURL>; rr:objectMap [ rml:reference "external_references[0].url"; rr:datatype xsd:string ] ];
+    rr:predicateObjectMap [ rr:predicate <http://example.com/ucoexDOMAIN>; rr:objectMap [ rml:reference "x_mitre_domains[*]"; rr:datatype xsd:string ] ];
+    rr:predicateObjectMap [ rr:predicate <http://example.com/ucoexSTIX_ID>; rr:objectMap [ rml:reference "id"; rr:datatype xsd:string ] ];
+    rr:predicateObjectMap [ rr:predicate <http://example.com/ucoexCREATED>; rr:objectMap [ rml:reference "created"; rr:datatype xsd:string ] ];
+    rr:predicateObjectMap [ rr:predicate <http://example.com/ucoexMODIFIED>; rr:objectMap [ rml:reference "modified"; rr:datatype xsd:string ] ];
+    rr:predicateObjectMap [ rr:predicate <http://example.com/ucoexSTIX_TYPE>; rr:objectMap [ rml:reference "type"; rr:datatype xsd:string ] ].
+
+
+<#ToolMap_Mobile> a rr:TriplesMap;
+    rml:logicalSource [
+        rml:source "./data/cti/mobile-attack.json";
+        rml:referenceFormulation ql:JSONPath;
+        rml:iterator "$.objects[?(@.type=='tool' && @.x_mitre_deprecated!=true)]"
+    ];
+    rr:subjectMap [
+        rr:template "http://example.com/ucoex#{external_references[0].external_id}";
+        rr:class <http://purl.org/cyber/ucoSoftware>;
+        rr:class <http://example.com/ucoexSoftware>
+    ];
+    rr:predicateObjectMap [ rr:predicate <http://example.com/ucoexNAME>; rr:objectMap [ rml:reference "name"; rr:datatype xsd:string ] ];
+    rr:predicateObjectMap [ rr:predicate <http://example.com/ucoexDESCRIPTION>; rr:objectMap [ rml:reference "description"; rr:datatype xsd:string ] ];
+    rr:predicateObjectMap [ rr:predicate <http://example.com/ucoexURL>; rr:objectMap [ rml:reference "external_references[0].url"; rr:datatype xsd:string ] ];
+    rr:predicateObjectMap [ rr:predicate <http://example.com/ucoexDOMAIN>; rr:objectMap [ rml:reference "x_mitre_domains[*]"; rr:datatype xsd:string ] ];
+    rr:predicateObjectMap [ rr:predicate <http://example.com/ucoexSTIX_ID>; rr:objectMap [ rml:reference "id"; rr:datatype xsd:string ] ];
+    rr:predicateObjectMap [ rr:predicate <http://example.com/ucoexCREATED>; rr:objectMap [ rml:reference "created"; rr:datatype xsd:string ] ];
+    rr:predicateObjectMap [ rr:predicate <http://example.com/ucoexMODIFIED>; rr:objectMap [ rml:reference "modified"; rr:datatype xsd:string ] ];
+    rr:predicateObjectMap [ rr:predicate <http://example.com/ucoexSTIX_TYPE>; rr:objectMap [ rml:reference "type"; rr:datatype xsd:string ] ].
+
+
+<#TACTICSMap_Mobile> a rr:TriplesMap;
+    rml:logicalSource [
+        rml:source "./data/cti/mobile-attack.json";
+        rml:referenceFormulation ql:JSONPath;
+        rml:iterator "$.objects[?(@.type=='x-mitre-tactic' && @.x_mitre_deprecated!=true)]"
+    ];
+    rr:subjectMap [
+        rr:template "http://example.com/ucoex#{external_references[0].external_id}";
+        rr:class <http://purl.org/cyber/ucoKillChainPhase>;
+        rr:class <http://example.com/ucoexTactic>
+    ];
+    rr:predicateObjectMap [ rr:predicate <http://example.com/ucoexNAME>; rr:objectMap [ rml:reference "name"; rr:datatype xsd:string ] ];
+    rr:predicateObjectMap [ rr:predicate <http://example.com/ucoexDESCRIPTION>; rr:objectMap [ rml:reference "description"; rr:datatype xsd:string ] ];
+    rr:predicateObjectMap [ rr:predicate <http://example.com/ucoexURL>; rr:objectMap [ rml:reference "external_references[0].url"; rr:datatype xsd:string ] ];
+    rr:predicateObjectMap [ rr:predicate <http://example.com/ucoexDOMAIN>; rr:objectMap [ rml:reference "x_mitre_domains[*]"; rr:datatype xsd:string ] ];
+    rr:predicateObjectMap [ rr:predicate <http://example.com/ucoexSTIX_ID>; rr:objectMap [ rml:reference "id"; rr:datatype xsd:string ] ];
+    rr:predicateObjectMap [ rr:predicate <http://example.com/ucoexCREATED>; rr:objectMap [ rml:reference "created"; rr:datatype xsd:string ] ];
+    rr:predicateObjectMap [ rr:predicate <http://example.com/ucoexMODIFIED>; rr:objectMap [ rml:reference "modified"; rr:datatype xsd:string ] ];
+    rr:predicateObjectMap [ rr:predicate <http://example.com/ucoexSTIX_TYPE>; rr:objectMap [ rml:reference "type"; rr:datatype xsd:string ] ].
+
+
+# =============================================================================
+# ENTITY MAPS — ICS DOMAIN
+# Source: cti/ics-attack/ics-attack.json
+# =============================================================================
+
+<#ATTACKMap_ICS> a rr:TriplesMap;
+    rml:logicalSource [
+        rml:source "./data/cti/ics-attack.json";
+        rml:referenceFormulation ql:JSONPath;
+        rml:iterator "$.objects[?(@.type=='attack-pattern' && @.x_mitre_deprecated!=true)]"
+    ];
+    rr:subjectMap [
+        rr:template "http://example.com/ucoex#{external_references[0].external_id}";
+        rr:class <http://purl.org/cyber/ucoAttackPattern>;
+        rr:class <http://example.com/ucoexTechnique>
+    ];
+    rr:predicateObjectMap [ rr:predicate <http://example.com/ucoexNAME>; rr:objectMap [ rml:reference "name"; rr:datatype xsd:string ] ];
+    rr:predicateObjectMap [ rr:predicate <http://example.com/ucoexDESCRIPTION>; rr:objectMap [ rml:reference "description"; rr:datatype xsd:string ] ];
+    rr:predicateObjectMap [ rr:predicate <http://example.com/ucoexURL>; rr:objectMap [ rml:reference "external_references[0].url"; rr:datatype xsd:string ] ];
+    rr:predicateObjectMap [ rr:predicate <http://example.com/ucoexDOMAIN>; rr:objectMap [ rml:reference "x_mitre_domains[*]"; rr:datatype xsd:string ] ];
+    rr:predicateObjectMap [ rr:predicate <http://example.com/ucoexSTIX_ID>; rr:objectMap [ rml:reference "id"; rr:datatype xsd:string ] ];
+    rr:predicateObjectMap [ rr:predicate <http://example.com/ucoexCREATED>; rr:objectMap [ rml:reference "created"; rr:datatype xsd:string ] ];
+    rr:predicateObjectMap [ rr:predicate <http://example.com/ucoexMODIFIED>; rr:objectMap [ rml:reference "modified"; rr:datatype xsd:string ] ];
+    rr:predicateObjectMap [ rr:predicate <http://example.com/ucoexSTIX_TYPE>; rr:objectMap [ rml:reference "type"; rr:datatype xsd:string ] ].
+
+
+<#MITIGATIONSMap_ICS> a rr:TriplesMap;
+    rml:logicalSource [
+        rml:source "./data/cti/ics-attack.json";
+        rml:referenceFormulation ql:JSONPath;
+        rml:iterator "$.objects[?(@.type=='course-of-action' && @.x_mitre_deprecated!=true)]"
+    ];
+    rr:subjectMap [
+        rr:template "http://example.com/ucoex#{external_references[0].external_id}";
+        rr:class <http://purl.org/cyber/ucoCourseofAction>;
+        rr:class <http://example.com/ucoexMitigation>
+    ];
+    rr:predicateObjectMap [ rr:predicate <http://example.com/ucoexNAME>; rr:objectMap [ rml:reference "name"; rr:datatype xsd:string ] ];
+    rr:predicateObjectMap [ rr:predicate <http://example.com/ucoexDESCRIPTION>; rr:objectMap [ rml:reference "description"; rr:datatype xsd:string ] ];
+    rr:predicateObjectMap [ rr:predicate <http://example.com/ucoexURL>; rr:objectMap [ rml:reference "external_references[0].url"; rr:datatype xsd:string ] ];
+    rr:predicateObjectMap [ rr:predicate <http://example.com/ucoexDOMAIN>; rr:objectMap [ rml:reference "x_mitre_domains[*]"; rr:datatype xsd:string ] ];
+    rr:predicateObjectMap [ rr:predicate <http://example.com/ucoexSTIX_ID>; rr:objectMap [ rml:reference "id"; rr:datatype xsd:string ] ];
+    rr:predicateObjectMap [ rr:predicate <http://example.com/ucoexCREATED>; rr:objectMap [ rml:reference "created"; rr:datatype xsd:string ] ];
+    rr:predicateObjectMap [ rr:predicate <http://example.com/ucoexMODIFIED>; rr:objectMap [ rml:reference "modified"; rr:datatype xsd:string ] ];
+    rr:predicateObjectMap [ rr:predicate <http://example.com/ucoexSTIX_TYPE>; rr:objectMap [ rml:reference "type"; rr:datatype xsd:string ] ].
+
+
+<#CAMPAIGNSMap_ICS> a rr:TriplesMap;
+    rml:logicalSource [
+        rml:source "./data/cti/ics-attack.json";
+        rml:referenceFormulation ql:JSONPath;
+        rml:iterator "$.objects[?(@.type=='campaign' && @.x_mitre_deprecated!=true)]"
+    ];
+    rr:subjectMap [
+        rr:template "http://example.com/ucoex#{external_references[0].external_id}";
+        rr:class <http://purl.org/cyber/ucoCampaign>;
+        rr:class <http://example.com/ucoexCampaign>
+    ];
+    rr:predicateObjectMap [ rr:predicate <http://example.com/ucoexNAME>; rr:objectMap [ rml:reference "name"; rr:datatype xsd:string ] ];
+    rr:predicateObjectMap [ rr:predicate <http://example.com/ucoexDESCRIPTION>; rr:objectMap [ rml:reference "description"; rr:datatype xsd:string ] ];
+    rr:predicateObjectMap [ rr:predicate <http://example.com/ucoexURL>; rr:objectMap [ rml:reference "external_references[0].url"; rr:datatype xsd:string ] ];
+    rr:predicateObjectMap [ rr:predicate <http://example.com/ucoexDOMAIN>; rr:objectMap [ rml:reference "x_mitre_domains[*]"; rr:datatype xsd:string ] ];
+    rr:predicateObjectMap [ rr:predicate <http://example.com/ucoexSTIX_ID>; rr:objectMap [ rml:reference "id"; rr:datatype xsd:string ] ];
+    rr:predicateObjectMap [ rr:predicate <http://example.com/ucoexCREATED>; rr:objectMap [ rml:reference "created"; rr:datatype xsd:string ] ];
+    rr:predicateObjectMap [ rr:predicate <http://example.com/ucoexMODIFIED>; rr:objectMap [ rml:reference "modified"; rr:datatype xsd:string ] ];
+    rr:predicateObjectMap [ rr:predicate <http://example.com/ucoexSTIX_TYPE>; rr:objectMap [ rml:reference "type"; rr:datatype xsd:string ] ].
+
+
+<#GROUPSMap_ICS> a rr:TriplesMap;
+    rml:logicalSource [
+        rml:source "./data/cti/ics-attack.json";
+        rml:referenceFormulation ql:JSONPath;
+        rml:iterator "$.objects[?(@.type=='intrusion-set' && @.x_mitre_deprecated!=true)]"
+    ];
+    rr:subjectMap [
+        rr:template "http://example.com/ucoex#{external_references[0].external_id}";
+        rr:class <http://purl.org/cyber/ucoAttacker>;
+        rr:class <http://example.com/ucoexGroup>
+    ];
+    rr:predicateObjectMap [ rr:predicate <http://example.com/ucoexNAME>; rr:objectMap [ rml:reference "name"; rr:datatype xsd:string ] ];
+    rr:predicateObjectMap [ rr:predicate <http://example.com/ucoexDESCRIPTION>; rr:objectMap [ rml:reference "description"; rr:datatype xsd:string ] ];
+    rr:predicateObjectMap [ rr:predicate <http://example.com/ucoexURL>; rr:objectMap [ rml:reference "external_references[0].url"; rr:datatype xsd:string ] ];
+    rr:predicateObjectMap [ rr:predicate <http://example.com/ucoexDOMAIN>; rr:objectMap [ rml:reference "x_mitre_domains[*]"; rr:datatype xsd:string ] ];
+    rr:predicateObjectMap [ rr:predicate <http://example.com/ucoexSTIX_ID>; rr:objectMap [ rml:reference "id"; rr:datatype xsd:string ] ];
+    rr:predicateObjectMap [ rr:predicate <http://example.com/ucoexCREATED>; rr:objectMap [ rml:reference "created"; rr:datatype xsd:string ] ];
+    rr:predicateObjectMap [ rr:predicate <http://example.com/ucoexMODIFIED>; rr:objectMap [ rml:reference "modified"; rr:datatype xsd:string ] ];
+    rr:predicateObjectMap [ rr:predicate <http://example.com/ucoexSTIX_TYPE>; rr:objectMap [ rml:reference "type"; rr:datatype xsd:string ] ].
+
+
+<#MalwareMap_ICS> a rr:TriplesMap;
+    rml:logicalSource [
+        rml:source "./data/cti/ics-attack.json";
+        rml:referenceFormulation ql:JSONPath;
+        rml:iterator "$.objects[?(@.type=='malware' && @.x_mitre_deprecated!=true)]"
+    ];
+    rr:subjectMap [
+        rr:template "http://example.com/ucoex#{external_references[0].external_id}";
+        rr:class <http://purl.org/cyber/ucoMalware>;
+        rr:class <http://example.com/ucoexSoftware>
+    ];
+    rr:predicateObjectMap [ rr:predicate <http://example.com/ucoexNAME>; rr:objectMap [ rml:reference "name"; rr:datatype xsd:string ] ];
+    rr:predicateObjectMap [ rr:predicate <http://example.com/ucoexDESCRIPTION>; rr:objectMap [ rml:reference "description"; rr:datatype xsd:string ] ];
+    rr:predicateObjectMap [ rr:predicate <http://example.com/ucoexURL>; rr:objectMap [ rml:reference "external_references[0].url"; rr:datatype xsd:string ] ];
+    rr:predicateObjectMap [ rr:predicate <http://example.com/ucoexDOMAIN>; rr:objectMap [ rml:reference "x_mitre_domains[*]"; rr:datatype xsd:string ] ];
+    rr:predicateObjectMap [ rr:predicate <http://example.com/ucoexSTIX_ID>; rr:objectMap [ rml:reference "id"; rr:datatype xsd:string ] ];
+    rr:predicateObjectMap [ rr:predicate <http://example.com/ucoexCREATED>; rr:objectMap [ rml:reference "created"; rr:datatype xsd:string ] ];
+    rr:predicateObjectMap [ rr:predicate <http://example.com/ucoexMODIFIED>; rr:objectMap [ rml:reference "modified"; rr:datatype xsd:string ] ];
+    rr:predicateObjectMap [ rr:predicate <http://example.com/ucoexSTIX_TYPE>; rr:objectMap [ rml:reference "type"; rr:datatype xsd:string ] ].
+
+
+<#TACTICSMap_ICS> a rr:TriplesMap;
+    rml:logicalSource [
+        rml:source "./data/cti/ics-attack.json";
+        rml:referenceFormulation ql:JSONPath;
+        rml:iterator "$.objects[?(@.type=='x-mitre-tactic' && @.x_mitre_deprecated!=true)]"
+    ];
+    rr:subjectMap [
+        rr:template "http://example.com/ucoex#{external_references[0].external_id}";
+        rr:class <http://purl.org/cyber/ucoKillChainPhase>;
+        rr:class <http://example.com/ucoexTactic>
+    ];
+    rr:predicateObjectMap [ rr:predicate <http://example.com/ucoexNAME>; rr:objectMap [ rml:reference "name"; rr:datatype xsd:string ] ];
+    rr:predicateObjectMap [ rr:predicate <http://example.com/ucoexDESCRIPTION>; rr:objectMap [ rml:reference "description"; rr:datatype xsd:string ] ];
+    rr:predicateObjectMap [ rr:predicate <http://example.com/ucoexURL>; rr:objectMap [ rml:reference "external_references[0].url"; rr:datatype xsd:string ] ];
+    rr:predicateObjectMap [ rr:predicate <http://example.com/ucoexDOMAIN>; rr:objectMap [ rml:reference "x_mitre_domains[*]"; rr:datatype xsd:string ] ];
+    rr:predicateObjectMap [ rr:predicate <http://example.com/ucoexSTIX_ID>; rr:objectMap [ rml:reference "id"; rr:datatype xsd:string ] ];
+    rr:predicateObjectMap [ rr:predicate <http://example.com/ucoexCREATED>; rr:objectMap [ rml:reference "created"; rr:datatype xsd:string ] ];
+    rr:predicateObjectMap [ rr:predicate <http://example.com/ucoexMODIFIED>; rr:objectMap [ rml:reference "modified"; rr:datatype xsd:string ] ];
+    rr:predicateObjectMap [ rr:predicate <http://example.com/ucoexSTIX_TYPE>; rr:objectMap [ rml:reference "type"; rr:datatype xsd:string ] ].
+
+
+# =============================================================================
+# RELATIONSHIP MAPS
+# Source: ./data/attack/relationships.json (preprocessed from STIX bundles)
+# =============================================================================
 
 <#MitigationToTechnique> a rr:TriplesMap;
   rml:logicalSource [
@@ -257,18 +464,19 @@
     rml:iterator            "$[?(@['source type']=='mitigation' && @['target type']=='technique')]"
   ];
   rr:subjectMap [
-    rr:template          "http://example.com/ucoex#{source ID}";
-    rr:class             <http://example.com/ucoexMITIGATIONS>
+    rr:template "http://example.com/ucoex#{source ID}"
   ];
   rr:predicateObjectMap [
-    rr:predicate            <http://example.com/ucoexMITIGATES>;
-    rr:objectMap [
-      rr:parentTriplesMap    <#ATTACKMap>;
-      rr:joinCondition [
-        rr:child             "target ID";
-        rr:parent            "ID"
-      ]
-    ]
+    rr:predicate            <http://example.com/ucoex#mitigates>;
+    rr:objectMap [ rr:parentTriplesMap <#ATTACKMap>;        rr:joinCondition [ rr:child "target_ref"; rr:parent "id" ] ]
+  ];
+  rr:predicateObjectMap [
+    rr:predicate            <http://example.com/ucoex#mitigates>;
+    rr:objectMap [ rr:parentTriplesMap <#ATTACKMap_Mobile>; rr:joinCondition [ rr:child "target_ref"; rr:parent "id" ] ]
+  ];
+  rr:predicateObjectMap [
+    rr:predicate            <http://example.com/ucoex#mitigates>;
+    rr:objectMap [ rr:parentTriplesMap <#ATTACKMap_ICS>;    rr:joinCondition [ rr:child "target_ref"; rr:parent "id" ] ]
   ].
 
 
@@ -279,18 +487,19 @@
     rml:iterator            "$[?(@['source type']=='campaign' && @['target type']=='group')]"
   ];
   rr:subjectMap [
-    rr:template          "http://example.com/ucoex#{source ID}";
-    rr:class             <http://example.com/ucoexCAMPAIGNS>
+    rr:template "http://example.com/ucoex#{source ID}"
   ];
   rr:predicateObjectMap [
-    rr:predicate            <http://example.com/ucoexATTRIBUTEDTO>;
-    rr:objectMap [
-      rr:parentTriplesMap    <#GROUPSMap>;
-      rr:joinCondition [
-        rr:child             "target ID";
-        rr:parent            "ID"
-      ]
-    ]
+    rr:predicate            <http://example.com/ucoex#isLaunchedBy>;
+    rr:objectMap [ rr:parentTriplesMap <#GROUPSMap>;        rr:joinCondition [ rr:child "target_ref"; rr:parent "id" ] ]
+  ];
+  rr:predicateObjectMap [
+    rr:predicate            <http://example.com/ucoex#isLaunchedBy>;
+    rr:objectMap [ rr:parentTriplesMap <#GROUPSMap_Mobile>; rr:joinCondition [ rr:child "target_ref"; rr:parent "id" ] ]
+  ];
+  rr:predicateObjectMap [
+    rr:predicate            <http://example.com/ucoex#isLaunchedBy>;
+    rr:objectMap [ rr:parentTriplesMap <#GROUPSMap_ICS>;    rr:joinCondition [ rr:child "target_ref"; rr:parent "id" ] ]
   ].
 
 
@@ -301,18 +510,27 @@
     rml:iterator            "$[?(@['source type']=='campaign' && @['target type']=='software')]"
   ];
   rr:subjectMap [
-    rr:template          "http://example.com/ucoex#{source ID}";
-    rr:class             <http://example.com/ucoexCAMPAIGNS>
+    rr:template "http://example.com/ucoex#{source ID}"
   ];
   rr:predicateObjectMap [
-    rr:predicate            <http://example.com/ucoexCampaignUsesSoftware>;
-    rr:objectMap [
-      rr:parentTriplesMap    <#SOFTWAREMap>;
-      rr:joinCondition [
-        rr:child             "target ID";
-        rr:parent            "ID"
-      ]
-    ]
+    rr:predicate            <http://example.com/ucoex#uses>;
+    rr:objectMap [ rr:parentTriplesMap <#MalwareMap>;        rr:joinCondition [ rr:child "target_ref"; rr:parent "id" ] ]
+  ];
+  rr:predicateObjectMap [
+    rr:predicate            <http://example.com/ucoex#uses>;
+    rr:objectMap [ rr:parentTriplesMap <#ToolMap>;           rr:joinCondition [ rr:child "target_ref"; rr:parent "id" ] ]
+  ];
+  rr:predicateObjectMap [
+    rr:predicate            <http://example.com/ucoex#uses>;
+    rr:objectMap [ rr:parentTriplesMap <#MalwareMap_Mobile>; rr:joinCondition [ rr:child "target_ref"; rr:parent "id" ] ]
+  ];
+  rr:predicateObjectMap [
+    rr:predicate            <http://example.com/ucoex#uses>;
+    rr:objectMap [ rr:parentTriplesMap <#ToolMap_Mobile>;    rr:joinCondition [ rr:child "target_ref"; rr:parent "id" ] ]
+  ];
+  rr:predicateObjectMap [
+    rr:predicate            <http://example.com/ucoex#uses>;
+    rr:objectMap [ rr:parentTriplesMap <#MalwareMap_ICS>;    rr:joinCondition [ rr:child "target_ref"; rr:parent "id" ] ]
   ].
 
 
@@ -323,18 +541,19 @@
     rml:iterator            "$[?(@['source type']=='campaign' && @['target type']=='technique')]"
   ];
   rr:subjectMap [
-    rr:template          "http://example.com/ucoex#{source ID}";
-    rr:class             <http://example.com/ucoexCAMPAIGNS>
+    rr:template "http://example.com/ucoex#{source ID}"
   ];
   rr:predicateObjectMap [
-    rr:predicate            <http://example.com/ucoexCampaignUsesTechnique>;
-    rr:objectMap [
-      rr:parentTriplesMap    <#ATTACKMap>;
-      rr:joinCondition [
-        rr:child             "target ID";
-        rr:parent            "ID"
-      ]
-    ]
+    rr:predicate            <http://example.com/ucoex#uses>;
+    rr:objectMap [ rr:parentTriplesMap <#ATTACKMap>;        rr:joinCondition [ rr:child "target_ref"; rr:parent "id" ] ]
+  ];
+  rr:predicateObjectMap [
+    rr:predicate            <http://example.com/ucoex#uses>;
+    rr:objectMap [ rr:parentTriplesMap <#ATTACKMap_Mobile>; rr:joinCondition [ rr:child "target_ref"; rr:parent "id" ] ]
+  ];
+  rr:predicateObjectMap [
+    rr:predicate            <http://example.com/ucoex#uses>;
+    rr:objectMap [ rr:parentTriplesMap <#ATTACKMap_ICS>;    rr:joinCondition [ rr:child "target_ref"; rr:parent "id" ] ]
   ].
 
 
@@ -345,18 +564,27 @@
     rml:iterator            "$[?(@['source type']=='group' && @['target type']=='software')]"
   ];
   rr:subjectMap [
-    rr:template          "http://example.com/ucoex#{source ID}";
-    rr:class             <http://example.com/ucoexGROUPS>
+    rr:template "http://example.com/ucoex#{source ID}"
   ];
   rr:predicateObjectMap [
-    rr:predicate            <http://example.com/ucoexGroupUsesSoftware>;
-    rr:objectMap [
-      rr:parentTriplesMap    <#SOFTWAREMap>;
-      rr:joinCondition [
-        rr:child             "target ID";
-        rr:parent            "ID"
-      ]
-    ]
+    rr:predicate            <http://example.com/ucoex#uses>;
+    rr:objectMap [ rr:parentTriplesMap <#MalwareMap>;        rr:joinCondition [ rr:child "target_ref"; rr:parent "id" ] ]
+  ];
+  rr:predicateObjectMap [
+    rr:predicate            <http://example.com/ucoex#uses>;
+    rr:objectMap [ rr:parentTriplesMap <#ToolMap>;           rr:joinCondition [ rr:child "target_ref"; rr:parent "id" ] ]
+  ];
+  rr:predicateObjectMap [
+    rr:predicate            <http://example.com/ucoex#uses>;
+    rr:objectMap [ rr:parentTriplesMap <#MalwareMap_Mobile>; rr:joinCondition [ rr:child "target_ref"; rr:parent "id" ] ]
+  ];
+  rr:predicateObjectMap [
+    rr:predicate            <http://example.com/ucoex#uses>;
+    rr:objectMap [ rr:parentTriplesMap <#ToolMap_Mobile>;    rr:joinCondition [ rr:child "target_ref"; rr:parent "id" ] ]
+  ];
+  rr:predicateObjectMap [
+    rr:predicate            <http://example.com/ucoex#uses>;
+    rr:objectMap [ rr:parentTriplesMap <#MalwareMap_ICS>;    rr:joinCondition [ rr:child "target_ref"; rr:parent "id" ] ]
   ].
 
 
@@ -367,19 +595,21 @@
     rml:iterator            "$[?(@['source type']=='group' && @['target type']=='technique')]"
   ];
   rr:subjectMap [
-    rr:template          "http://example.com/ucoex#{source ID}";
-    rr:class             <http://example.com/ucoexGROUPS>
+    rr:template "http://example.com/ucoex#{source ID}"
   ];
   rr:predicateObjectMap [
-    rr:predicate            <http://example.com/ucoexGroupUsesTechnique>;
-    rr:objectMap [
-      rr:parentTriplesMap    <#ATTACKMap>;
-      rr:joinCondition [
-        rr:child             "target ID";
-        rr:parent            "ID"
-      ]
-    ]
+    rr:predicate            <http://example.com/ucoex#uses>;
+    rr:objectMap [ rr:parentTriplesMap <#ATTACKMap>;        rr:joinCondition [ rr:child "target_ref"; rr:parent "id" ] ]
+  ];
+  rr:predicateObjectMap [
+    rr:predicate            <http://example.com/ucoex#uses>;
+    rr:objectMap [ rr:parentTriplesMap <#ATTACKMap_Mobile>; rr:joinCondition [ rr:child "target_ref"; rr:parent "id" ] ]
+  ];
+  rr:predicateObjectMap [
+    rr:predicate            <http://example.com/ucoex#uses>;
+    rr:objectMap [ rr:parentTriplesMap <#ATTACKMap_ICS>;    rr:joinCondition [ rr:child "target_ref"; rr:parent "id" ] ]
   ].
+
 
 <#SoftwareToTechnique> a rr:TriplesMap;
   rml:logicalSource [
@@ -388,16 +618,40 @@
     rml:iterator            "$[?(@['source type']=='software' && @['target type']=='technique')]"
   ];
   rr:subjectMap [
-    rr:template          "http://example.com/ucoex#{source ID}";
-    rr:class             <http://example.com/ucoexSOFTWARE>
+    rr:template "http://example.com/ucoex#{source ID}"
   ];
   rr:predicateObjectMap [
-    rr:predicate            <http://example.com/ucoexSoftwareUsesTechnique>;
-    rr:objectMap [
-      rr:parentTriplesMap    <#ATTACKMap>;
-      rr:joinCondition [
-        rr:child             "target ID";
-        rr:parent            "ID"
-      ]
-    ]
+    rr:predicate            <http://example.com/ucoex#uses>;
+    rr:objectMap [ rr:parentTriplesMap <#ATTACKMap>;        rr:joinCondition [ rr:child "target_ref"; rr:parent "id" ] ]
+  ];
+  rr:predicateObjectMap [
+    rr:predicate            <http://example.com/ucoex#uses>;
+    rr:objectMap [ rr:parentTriplesMap <#ATTACKMap_Mobile>; rr:joinCondition [ rr:child "target_ref"; rr:parent "id" ] ]
+  ];
+  rr:predicateObjectMap [
+    rr:predicate            <http://example.com/ucoex#uses>;
+    rr:objectMap [ rr:parentTriplesMap <#ATTACKMap_ICS>;    rr:joinCondition [ rr:child "target_ref"; rr:parent "id" ] ]
+  ].
+
+
+<#TechniqueToTactic> a rr:TriplesMap;
+  rml:logicalSource [
+    rml:source              "./data/attack/relationships.json";
+    rml:referenceFormulation ql:JSONPath;
+    rml:iterator            "$[?(@['source type']=='technique' && @['target type']=='tactic')]"
+  ];
+  rr:subjectMap [
+    rr:template "http://example.com/ucoex#{source ID}"
+  ];
+  rr:predicateObjectMap [
+    rr:predicate            <http://example.com/ucoex#achieves>;
+    rr:objectMap [ rr:parentTriplesMap <#TACTICSMap>;        rr:joinCondition [ rr:child "target_ref"; rr:parent "id" ] ]
+  ];
+  rr:predicateObjectMap [
+    rr:predicate            <http://example.com/ucoex#achieves>;
+    rr:objectMap [ rr:parentTriplesMap <#TACTICSMap_Mobile>; rr:joinCondition [ rr:child "target_ref"; rr:parent "id" ] ]
+  ];
+  rr:predicateObjectMap [
+    rr:predicate            <http://example.com/ucoex#achieves>;
+    rr:objectMap [ rr:parentTriplesMap <#TACTICSMap_ICS>;    rr:joinCondition [ rr:child "target_ref"; rr:parent "id" ] ]
   ].

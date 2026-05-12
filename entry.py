@@ -6,7 +6,8 @@ import network
 from process import shared_functions as sf
 
 sys.path.append("./data_collection")
-from data_collection import cve_collection as cve, cwe_collection as cwe, d3fend_collection as d3fend, attack_collection as attack, capec_collection as capec
+from data_collection import cve_collection as cve, cwe_collection as cwe, d3fend_collection as d3fend
+from data_collection import cti_preprocess
 
 # Add embedding processor import from new location
 from process.embedding_functions import run_embedding_processing
@@ -57,21 +58,48 @@ elif d3fend_data_status == 0:
 
 
 attack_data_status = sf.check_status("attack")
+capec_data_status = sf.check_status("capec")
+
+if attack_data_status in (3, 0) or capec_data_status in (3, 0):
+    logger.info("Downloading STIX bundles from MITRE CTI GitHub repository...")
+    cti_preprocess.download_stix_bundles()
+    logger.info("Preprocessing ATT&CK relationships (UUID resolution)...")
+    cti_preprocess.preprocess_relationships()
+
 if attack_data_status == 3:
     logger.info("The ATT&CK database has not been created yet, starting initialization now...\n")
-    attack.attack_init()
+    success = sf.call_mapper_update("attack")
+    if success:
+        sf.call_ontology_updater(reason=True)
+        logger.info("ATT&CK initialization complete")
+    else:
+        logger.error("ATT&CK mapping failed")
 elif attack_data_status == 0:
     logger.info("The ATT&CK initialization has not finished yet, continuing now...\n")
-    attack.attack_init()
+    success = sf.call_mapper_update("attack")
+    if success:
+        sf.call_ontology_updater(reason=True)
+        logger.info("ATT&CK initialization complete")
+    else:
+        logger.error("ATT&CK mapping failed")
 
 
-capec_data_status = sf.check_status("capec")
 if capec_data_status == 3:
     logger.info("The CAPEC database has not been created yet, starting initialization now...\n")
-    capec.capec_init()
+    success = sf.call_mapper_update("capec")
+    if success:
+        sf.call_ontology_updater(reason=True)
+        logger.info("CAPEC initialization complete")
+    else:
+        logger.error("CAPEC mapping failed")
 elif capec_data_status == 0:
     logger.info("The CAPEC initialization has not finished yet, continuing now...\n")
-    capec.capec_init()
+    success = sf.call_mapper_update("capec")
+    if success:
+        sf.call_ontology_updater(reason=True)
+        logger.info("CAPEC initialization complete")
+    else:
+        logger.error("CAPEC mapping failed")
 
 
 logger.info("###############################################")

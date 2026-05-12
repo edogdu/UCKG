@@ -8,33 +8,67 @@
 <http://example.com/ucoex> rdf:type owl:Ontology ;
                                 owl:imports <http://purl.org/cyber/uco> .
 
- <http://example.com/ucoexCPE> rdf:type owl:Class ;
-       rdfs:subClassOf  <http://purl.org/cyber/ucoUCOThing>.
+# ATT&CK-specific classes (CTI node types)
 
+<http://example.com/ucoexTechnique> rdf:type owl:Class ;
+        rdfs:subClassOf <http://purl.org/cyber/ucoAttackPattern> .
+
+<http://example.com/ucoexMitigation> rdf:type owl:Class ;
+        rdfs:subClassOf <http://purl.org/cyber/ucoCourseofAction> .
+
+<http://example.com/ucoexCampaign> rdf:type owl:Class ;
+        rdfs:subClassOf <http://purl.org/cyber/ucoCampaign> .
+
+<http://example.com/ucoexGroup> rdf:type owl:Class ;
+        rdfs:subClassOf <http://purl.org/cyber/ucoAttacker> .
+
+<http://example.com/ucoexSoftware> rdf:type owl:Class ;
+        rdfs:subClassOf <http://purl.org/cyber/ucoSoftware> .
+
+<http://example.com/ucoexTactic> rdf:type owl:Class ;
+        rdfs:subClassOf <http://purl.org/cyber/ucoKillChainPhase> .
+
+# CAPEC-specific class
+
+<http://example.com/ucoexCAPEC> rdf:type owl:Class ;
+                     rdfs:subClassOf <http://purl.org/cyber/ucoAttackPattern> .
+
+# D3FEND and CPE classes (unchanged)
+
+<http://example.com/ucoexCPE> rdf:type owl:Class ;
+       rdfs:subClassOf  <http://purl.org/cyber/ucoUCOThing>.
 
 <http://example.com/ucoexhasCPE> rdf:type owl:ObjectProperty ;
                                      rdfs:domain <http://purl.org/cyber/ucoCVE>;
                                      rdfs:range <http://example.com/ucoexCPE> .
 
-
 <http://example.com/ucoexMITRED3FEND> rdf:type owl:Class ;
                 rdfs:subClassOf <http://purl.org/cyber/ucoUCOThing>.
 
-<http://example.com/ucoexMITREATTACK> rdf:type owl:Class ;
-                rdfs:subClassOf <http://purl.org/cyber/ucoUCOThing>.
-
-
 <http://example.com/ucoexhasMITREATTACK> rdf:type owl:ObjectProperty ;
                 rdfs:domain <http://example.com/ucoexMITRED3FEND>;
-                rdfs:range <http://example.com/ucoexMITREATTACK> .
+                rdfs:range <http://example.com/ucoexTechnique> .
 
-<http://example.com/ucoexCAPEC> rdf:type owl:Class ;
-                     rdfs:subClassOf <http://purl.org/cyber/ucoUCOThing> .
+# STIX-derived relationship predicates (clean local names; ucoex namespace)
 
-<http://example.com/ucoexhasRelatedWeakness> rdf:type owl:ObjectProperty ;
-                        rdfs:domain <http://example.com/ucoexCAPEC>;
-                        rdfs:range <http://purl.org/cyber/ucoCWE> .
+<http://example.com/ucoex#uses> rdf:type owl:ObjectProperty .
 
-<http://example.com/ucoexhasTaxonomyMapping> rdf:type owl:ObjectProperty ;
-                            rdfs:domain <http://example.com/ucoexCAPEC>;
-                            rdfs:range <http://example.com/ucoexMITREATTACK> .
+<http://example.com/ucoex#mitigates> rdf:type owl:ObjectProperty ;
+        rdfs:domain <http://example.com/ucoexMitigation>;
+        rdfs:range <http://example.com/ucoexTechnique> .
+
+<http://example.com/ucoex#isLaunchedBy> rdf:type owl:ObjectProperty ;
+        rdfs:domain <http://example.com/ucoexCampaign>;
+        rdfs:range <http://example.com/ucoexGroup> .
+
+<http://example.com/ucoex#achieves> rdf:type owl:ObjectProperty ;
+        rdfs:domain <http://example.com/ucoexTechnique>;
+        rdfs:range <http://example.com/ucoexTactic> .
+
+<http://example.com/ucoex#hasRelatedWeakness> rdf:type owl:ObjectProperty ;
+        rdfs:domain <http://example.com/ucoexCAPEC>;
+        rdfs:range <http://purl.org/cyber/ucoCWE> .
+
+<http://example.com/ucoex#hasTaxonomyMapping> rdf:type owl:ObjectProperty ;
+        rdfs:domain <http://example.com/ucoexCAPEC>;
+        rdfs:range <http://example.com/ucoexTechnique> .
