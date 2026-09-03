@@ -2,6 +2,7 @@ import requests
 import os
 import json
 import time
+import random
 import datetime
 import sqlite3
 import logging
@@ -25,11 +26,36 @@ vol_path = os.environ['VOL_PATH']
 # Function to handle API retries
 def try_call(api_url, parameters_arg, header):
     for i in range(5):  # Retry up to 5 times
-        response = requests.get(api_url, params=parameters_arg, headers=header)
+        try:
+            response = requests.get(
+                api_url,
+                params=parameters_arg,
+                headers=header,
+                timeout=(10, 30),  # (connect_timeout_s, read_timeout_s)
+            )
+        except requests.exceptions.Timeout:
+            logger.warning(f"Request timed out (attempt {i + 1}/5).")
+            if i < 4:
+                delay = min(2 ** i, 60) + random.uniform(0, 1)
+                logger.warning(f"Retrying in {delay:.1f} seconds...")
+                time.sleep(delay)
+            continue
+        except requests.exceptions.RequestException as e:
+            logger.warning(f"Request failed (attempt {i + 1}/5): {e}")
+            if i < 4:
+                delay = min(2 ** i, 60) + random.uniform(0, 1)
+                time.sleep(delay)
+            continue
+
         if response.status_code == 200:
             return response
-        logger.warning(f"API call failed with status {response.status_code}. Retrying in 10 seconds...")
-        time.sleep(10)  # Wait before retrying
+
+        logger.warning(f"API call failed with status {response.status_code} (attempt {i + 1}/5).")
+        if i < 4:
+            delay = min(2 ** i, 60) + random.uniform(0, 1)
+            logger.warning(f"Retrying in {delay:.1f} seconds...")
+            time.sleep(delay)
+
     return response  # Return the last response, even if it failed
 
 def count_cpes_in_sqlite(db_path):
@@ -64,7 +90,11 @@ def count_cpes_in_nvd():
     header = {
         'apiKey': 'ccba97f5-3cb8-4bec-bd96-f5084eb8034e'
     }
-    response = requests.get('https://services.nvd.nist.gov/rest/json/cpes/2.0?resultsPerPage=1', headers=header)
+    response = requests.get(
+        'https://services.nvd.nist.gov/rest/json/cpes/2.0?resultsPerPage=1',
+        headers=header,
+        timeout=(10, 30),
+    )
     if response.status_code != 200:
         logger.warning(f"NVD API returned error code {response.status_code}")
         return None
@@ -126,7 +156,7 @@ def download_cpe_data_to_db(db_path):
 
     # Initial API call to get total results
     logger.info("Starting API call to fetch CPEs...")
-    cpe_response = requests.get(cpe_url, params=parameters, headers=header)
+    cpe_response = requests.get(cpe_url, params=parameters, headers=header, timeout=(10, 30))
     if cpe_response.status_code != 200:
         cpe_response = try_call(cpe_url, parameters, header)
         if cpe_response.status_code != 200:
@@ -143,8 +173,10 @@ def download_cpe_data_to_db(db_path):
     increments = [str(num * 10000 + start_index) for num in range((remaining_results // 10000) + 1)]
 
     # Multithreading setup
+    # NVD rate limit: 50 req/30s with API key => minimum 0.6s between requests.
+    _NVD_RATE_LIMIT_DELAY = 0.6
     logger.info("Starting multithreaded CPE data collection...")
-    with concurrent.futures.ThreadPoolExecutor(max_workers=2) as executor:
+    with concurrent.futures.ThreadPoolExecutor(max_workers=20) as executor:
         # Submit all API call tasks
         # Store futures mapped to their parameters for contextual logging on error/completion
         future_to_params = {}
@@ -152,9 +184,10 @@ def download_cpe_data_to_db(db_path):
             # Create a distinct copy of parameters for each submitted task
             current_parameters = parameters.copy()
             current_parameters['startIndex'] = increment_val
-            
+
             future = executor.submit(try_call, cpe_url, current_parameters, header)
             future_to_params[future] = current_parameters
+            time.sleep(_NVD_RATE_LIMIT_DELAY)  # pace dispatch rate to stay within NVD rate limit
 
         processed_count = 0
         total_calls = len(future_to_params)
