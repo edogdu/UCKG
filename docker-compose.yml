@@ -37,7 +37,6 @@ services:
       - "7687:7687"
       - "2004:2004"  # Expose Neo4j metrics endpoint
     volumes:
-      - $PWD/plugins:/plugins # Mount plugins directory for all custom plugins
       - my_volume:/vol/data # Persist data
       - neo4j_vol:/data
       - $PWD/neo4j/import:/var/lib/neo4j/import # Import directory
