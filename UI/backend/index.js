@@ -25,7 +25,7 @@ app.use('/api/graph', graphRouter);
 app.use('/api/qna', Q_ARouter);
 
 // SPA fallback — must be after API routes
-app.get('*', (req, res) => {
+app.get('/{*splat}', (req, res) => {
   res.sendFile(path.join(__dirname, '../dist', 'index.html'));
 });
 
