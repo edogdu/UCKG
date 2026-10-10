@@ -1,6 +1,7 @@
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
+const path = require('path');
 const dbConnection = require('./utils/database');
 
 // Import routers
@@ -16,9 +17,17 @@ app.use(cors({
 }));
 app.use(express.json());
 
+// Serve React bundle
+app.use(express.static(path.join(__dirname, '../dist')));
+
 // Routes
 app.use('/api/graph', graphRouter);
 app.use('/api/qna', Q_ARouter);
+
+// SPA fallback — must be after API routes
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, '../dist', 'index.html'));
+});
 
 
 // Initialize database connection and start server

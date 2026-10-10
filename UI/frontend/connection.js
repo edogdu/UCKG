@@ -1,5 +1,5 @@
 // API base URL for backend
-const API_BASE_URL = 'http://localhost:3001/api';
+const API_BASE_URL = '/api';
 
 // ========== NEW Q&A INTEGRATION FUNCTIONS ==========
 
