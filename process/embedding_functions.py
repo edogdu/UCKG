@@ -86,8 +86,9 @@ class UCKGEmbedder:
             return []
         
         try:
-            
-            
+            texts = [t[:30000] for t in texts]
+            texts = [f"search_document: {t}" for t in texts]
+
             response = self._session.post(
                 f"{self.config['ollama_url']}/api/embed",
                 json={"model": self.config['embedding_model'], "input": texts},
@@ -311,14 +312,26 @@ class UCKGEmbedder:
                         break
                 
                 if chunk_failed:
-                    logger.warning(f"{node_type} batch {batch_num} failed due to chunk failure, skipping")
+                    logger.warning(f"{node_type} batch {batch_num} failed due to chunk failure, marking nodes to skip")
+                    all_node_ids = [nid for nid, _ in valid_nodes] + empty_text_nodes
+                    session.run("""
+                        UNWIND $node_ids as node_id
+                        MATCH (n) WHERE elementId(n) = node_id
+                        SET n.embedding_processed = true, n.embedding_failed = true
+                    """, {'node_ids': all_node_ids})
                     continue
             else:
                 # Generate embeddings normally
                 embeddings = self._create_batch_embeddings(texts)
             
             if len(embeddings) != len(texts):
-                logger.warning(f"{node_type} batch {batch_num} failed, skipping {len(texts)} nodes")
+                logger.warning(f"{node_type} batch {batch_num} failed, marking {len(texts)} nodes to skip")
+                all_node_ids = [nid for nid, _ in valid_nodes] + empty_text_nodes
+                session.run("""
+                    UNWIND $node_ids as node_id
+                    MATCH (n) WHERE elementId(n) = node_id
+                    SET n.embedding_processed = true, n.embedding_failed = true
+                """, {'node_ids': all_node_ids})
                 continue
             
             # Process ALL nodes in this batch (mark as processed with or without embeddings)
