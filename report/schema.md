@@ -31,7 +31,7 @@
 </pre>
 
 ### Relationships:
-
+<pre>
 (:UcoVulnerability)-[:UCOHASCVE_ID]->(:UcoCVE) // links a vulnerability record to its standard CVE record
 (:UcoCVE)-[:UCOEXHASCPE]->(:UcoexCPE) // links a CVE to vulnerable Common Platform Enumeration (CPE) software/hardware platforms
 (:UcoExploitTarget)-[:UCOHASVULNERABILITY]->(:UcoVulnerability) // links an exploit target to affected vulnerability instances
@@ -83,3 +83,4 @@
 (:Ontology)-[:VERSIONIRI]->(:Ontology) // ontology version IRI definition
 (:Resource)-[:FIRST]->(:Resource) // head element of an RDF collection list (rdf:first)
 (:Resource)-[:REST]->(:Resource) // rest of an RDF collection list (rdf:rest)
+</pre>

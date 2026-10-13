@@ -233,7 +233,9 @@ def format_rel(src, rname, tgt):
     return f"(:{src})-[:{rname}]->(:{tgt}){comment_suffix}"
 
 def generate_schema_markdown(schema_meta):
-    lines = ["# Unified Cybersecurity Knowledge Graph (UCKG) Schema\n\nNodes:"]
+    lines = [
+        "# Unified Cybersecurity Knowledge Graph (UCKG) Schema\n\n### Nodes:\n<pre>"
+    ]
     nodes = {k: v for k, v in schema_meta.items() if v.get("type") == "node"}
     
     # Order nodes by domain first, then metamodel, then any others
@@ -251,7 +253,7 @@ def generate_schema_markdown(schema_meta):
     for label in ordered_labels:
         lines.append(format_node(label, nodes[label]))
         
-    lines.append("\nRelationships:")
+    lines.append("</pre>\n\n### Relationships:\n<pre>")
     raw_rels = extract_relationships(schema_meta)
     
     # Sort relationships domain-first according to REL_DESCRIPTIONS
@@ -267,7 +269,7 @@ def generate_schema_markdown(schema_meta):
     for src, rname, tgt in ordered_rels:
         lines.append(format_rel(src, rname, tgt))
         
-    lines.append("") # trailing newline
+    lines.append("</pre>\n")
     return "\n".join(lines)
 
 def main():
