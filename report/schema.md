@@ -1,6 +1,7 @@
 # Unified Cybersecurity Knowledge Graph (UCKG) Schema
 
-Nodes:
+### Nodes:
+
 (:UcoCVE {{embedding: list (vector embedding), embedding_processed: bool, label: str (CVE identifier, e.g. CVE-2002-1777), ucobaseSeverity: str (CVSS severity: HIGH, MEDIUM, LOW, CRITICAL), ucoevaluatorSolution: str, ucoexploitabilityScore: str, ucoimpactScore: str, ucoobtainAllPrivilege: str, ucouserInteractionRequired: str, ucovectorString: str (CVSS vector string), ucovulnStatus: str (vulnerability status, e.g. Modified, Analyzed), uri: str (URI)}}) // Common Vulnerabilities and Exposures (CVE) definitions
 (:UcoCWE {{embedding: list, embedding_processed: bool, ucoabstraction: str (e.g. Class, Base, Variant), ucoapplicablePlatform: str, ucocommonConsequences: str, ucocweExtendedSummary: str, ucocweID: str (CWE identifier, e.g. CWE-24), ucocweName: str (weakness name), ucocweSummary: str, ucodemonstrativeExamples: str, ucodescription: str, ucodetectionMethods: str, ucolikelihoodOfExploit: str, ucomappingNotes: str, ucomodesOfIntroduction: str, ucopotentialMitigations: str, ucoreferences: str, ucorelatedAttackPatterns: str, ucostatus: str (e.g. Stable, Incomplete), ucostructure: str (e.g. Simple, Composite), ucotimeOfIntroduction: datetime, uri: str}}) // Common Weakness Enumeration (CWE) weakness types
 (:UcoVulnerability {{embedding: list, embedding_processed: bool, ucolastModifiedDateTime: datetime, ucopublishedDateTime: datetime, ucosummary: str (vulnerability description), uri: str}}) // Vulnerability instances with publication timelines and summaries
@@ -28,7 +29,8 @@ Nodes:
 (:Resource {{uri: str}}) // Base RDF resource node label assigned to all imported entities
 (:_GraphConfig {{_applyNeo4jNaming: bool, _classLabel: str, _classNamePropName: str, _dataTypePropertyLabel: str, _domainRel: str, _handleMultival: int, _handleRDFTypes: int, _handleVocabUris: int, _keepCustomDataTypes: bool, _keepLangTag: bool, _multivalPropList: list, _objectPropertyLabel: str, _rangeRel: str, _relNamePropName: str, _subClassOfRel: str, _subPropertyOfRel: str}}) // Neosemantics (n10s) RDF ingestion configuration node
 
-Relationships:
+### Relationships:
+
 (:UcoVulnerability)-[:UCOHASCVE_ID]->(:UcoCVE) // links a vulnerability record to its standard CVE record
 (:UcoCVE)-[:UCOEXHASCPE]->(:UcoexCPE) // links a CVE to vulnerable Common Platform Enumeration (CPE) software/hardware platforms
 (:UcoExploitTarget)-[:UCOHASVULNERABILITY]->(:UcoVulnerability) // links an exploit target to affected vulnerability instances
